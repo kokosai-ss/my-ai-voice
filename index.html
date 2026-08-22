@@ -708,14 +708,13 @@ async function generateVoice(){
     try{
         const prompt = `${style}
 
-Perform this script as a conversation with two distinct speakers:
-- Speaker 1 is using voice: ${spk1}
-- Speaker 2 is using voice: ${spk2}
+Read the following conversation between two speakers:
+- Speaker 1 (female line marked with [1]:) voice using ${spk1}
+- Speaker 2 (male line marked with [2]:) voice using ${spk2}
 
 Rules:
-1. Speak in natural Burmese pronunciation.
-2. Maintain the emotional tone of each speaker.
-3. Replace [1]: with Speaker 1 line and [2]: with Speaker 2 line seamlessly.
+1. Speak clearly in natural Burmese pronunciation.
+2. Read [1]: lines with Speaker 1 voice and [2]: lines with Speaker 2 voice seamlessly. Do not speak the tag "[1]:" or "[2]:" out loud.
 
 Script:
 ${text}`;
@@ -725,8 +724,10 @@ ${text}`;
             generationConfig: {
                 responseModalities: ["AUDIO"],
                 speechConfig: {
-                    multiSpeakerConfig: {
-                        speakerCount: 2
+                    voiceConfig: {
+                        prebuiltVoiceConfig: {
+                            voiceName: spk1
+                        }
                     }
                 }
             }
