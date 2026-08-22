@@ -3,16 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Voice Generator</title>
+    <title>AI Voice Studio</title>
     <style>
         body { font-family: sans-serif; background-color: #0f172a; color: #ffffff; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; padding: 20px; }
         .card { background-color: #1e293b; padding: 25px; border-radius: 12px; width: 100%; max-width: 400px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
         h2 { text-align: center; color: #38bdf8; margin-bottom: 20px; }
         label { font-size: 13px; color: #94a3b8; display: block; margin-bottom: 5px; margin-top: 10px; }
-        textarea, select { width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #334155; background-color: #0f172a; color: #ffffff; box-sizing: border-box; }
+        textarea, select, input { width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #334155; background-color: #0f172a; color: #ffffff; box-sizing: border-box; }
         button { width: 100%; padding: 12px; background-color: #0284c7; color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; margin-top: 15px; }
         button:hover { background-color: #0369a1; }
-        audio { width: 100%; margin-top: 15px; display: none; }
+        .stop-btn { background-color: #ef4444; margin-top: 8px; }
+        .stop-btn:hover { background-color: #dc2626; }
     </style>
 </head>
 <body>
@@ -20,43 +21,38 @@
 <div class="card">
     <h2>🎙️ AI Voice Generator</h2>
 
-    <label>ဘာသာစကား / အသံ ရွေးပါ</label>
-    <select id="langSelect">
-        <option value="en">English (အင်္ဂလိပ်)</option>
-        <option value="my">Myanmar (မြန်မာ)</option>
-        <option value="th">Thai (ထိုင်း)</option>
-        <option value="ja">Japanese (ဂျပန်)</option>
-        <option value="ko">Korean (ကိုရီးယား)</option>
-    </select>
+    <label>အသံ အမြန်နှုန်း (Speed: <span id="speedVal">1x</span>)</label>
+    <input type="range" id="speedSlider" min="0.5" max="2" step="0.1" value="1" oninput="document.getElementById('speedVal').innerText = this.value + 'x'">
 
-    <label>စာသား ရိုက်ထည့်ပါ</label>
-    <textarea id="textInput" rows="4" placeholder="အသံပြောင်းချင်သော စာသားကို ရိုက်ပါ..."></textarea>
+    <label>စာသား ရိုက်ထည့်ပါ (အင်္ဂလိပ် / မြန်မာ)</label>
+    <textarea id="textInput" rows="5" placeholder="အသံထုတ်ချင်သော စာသားကို ရိုက်ထည့်ပါ..."></textarea>
 
-    <button id="submitBtn" onclick="generateVoice()">အသံထုတ်မည်</button>
-
-    <audio id="audioPlayer" controls></audio>
+    <button onclick="playVoice()">🔊 အသံထုတ်မည်</button>
+    <button class="stop-btn" onclick="stopVoice()">⏹️ ရပ်မည်</button>
 </div>
 
 <script>
-function generateVoice() {
-    const text = document.getElementById('textInput').value.trim();
-    const lang = document.getElementById('langSelect').value;
-    const audioPlayer = document.getElementById('audioPlayer');
+function playVoice() {
+    window.speechSynthesis.cancel(); // အဟောင်းရပ်မည်
 
+    const text = document.getElementById('textInput').value.trim();
     if (!text) {
         alert("စာသား ရိုက်ထည့်ပါ သားကြီး!");
         return;
     }
 
-    // Google Translate TTS Engine ကို တိုက်ရိုက် ခေါ်သုံးခြင်း
-    const encodedText = encodeURIComponent(text);
-    const audioUrl = `https://translate.google.com/translate_tts?ie=UTF-8&q=${encodedText}&tl=${lang}&client=tw-ob`;
+    const utterance = new SpeechSynthesisUtterance(text);
+    const speed = parseFloat(document.getElementById('speedSlider').value);
+    
+    utterance.rate = speed;
+    utterance.pitch = 1;
 
-    audioPlayer.src = audioUrl;
-    audioPlayer.style.display = "block";
-    audioPlayer.play().catch(() => {
-        // Autoplay Block ဖြစ်ရင် Player ကနေ နှိပ်ဖွင့်နိုင်အောင်
-    });
+    // ဖုန်းနဲ့ ကွန်ပျူတာမှာ အသံတိုက်ရိုက်ပွင့်စေရန်
+    window.speechSynthesis.speak(utterance);
+}
+
+function stopVoice() {
+    window.speechSynthesis.cancel();
 }
 </script>
 
