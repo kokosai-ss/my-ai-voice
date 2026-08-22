@@ -464,7 +464,7 @@ audio{
         </div>
 
         <div class="subtitle" style="margin-bottom:15px;">
-            Gemini Voice ရွေးပါ (နှိပ်ရင် အသံနမူနာထွက်မည်)
+            Gemini Voice ရွေးပါ
         </div>
 
         <div class="voice-grid" id="voiceGrid"></div>
@@ -641,7 +641,7 @@ const voices = [
 
 
 /* =========================================
-   VOICE SPEED & PREVIEW
+   VOICE SPEED
 ========================================= */
 
 function updateSpeed(val) {
@@ -649,51 +649,6 @@ function updateSpeed(val) {
     const player = document.getElementById("audioPlayer");
     if (player) {
         player.playbackRate = parseFloat(val);
-    }
-}
-
-async function playVoicePreview(voiceName) {
-    const key = getStoredKey() || document.getElementById("apiKey").value.trim();
-    if (!key) return;
-
-    try {
-        const body = {
-            contents: [{ parts: [{ text: "Hello! This is a preview." }] }],
-            generationConfig: {
-                responseModalities: ["AUDIO"],
-                speechConfig: {
-                    voiceConfig: {
-                        prebuiltVoiceConfig: { voiceName: voiceName }
-                    }
-                }
-            }
-        };
-
-        const res = await fetch(API_URL, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "x-goog-api-key": key
-            },
-            body: JSON.stringify(body)
-        });
-
-        const data = await res.json();
-        const base64 = data?.candidates?.[0]?.content?.parts?.find(p => p.inlineData)?.inlineData?.data;
-
-        if (base64) {
-            const pcm = base64ToUint8Array(base64);
-            const wav = pcmToWav(pcm, 24000, 1, 16);
-            const previewBlob = new Blob([wav], { type: "audio/wav" });
-            const previewAudio = new Audio(URL.createObjectURL(previewBlob));
-            
-            const currentSpeed = document.getElementById("speedSlider")?.value || 1.0;
-            previewAudio.playbackRate = parseFloat(currentSpeed);
-            
-            previewAudio.play();
-        }
-    } catch (err) {
-        console.log("Preview error:", err);
     }
 }
 
@@ -705,7 +660,7 @@ function loadVoices(){
 
     grid.innerHTML = "";
 
-    voices.forEach((voice,index)=>{
+    voices.forEach((voice)=>{
 
         const button =
             document.createElement("button");
@@ -728,9 +683,6 @@ function loadVoices(){
                 .forEach(v=>v.classList.remove("active"));
 
             button.classList.add("active");
-
-            // Character နှိပ်ရင် အသံနမူနာ ထွက်ပါမယ်
-            playVoicePreview(selectedVoice);
 
         };
 
@@ -1145,7 +1097,6 @@ ${text}`;
         player.src =
             audioURL;
 
-        // Speed ကို audio player ထဲ ချိန်ပေးသည်
         const currentSpeed = document.getElementById("speedSlider")?.value || 1.0;
         player.playbackRate = parseFloat(currentSpeed);
 
