@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AI Voice Studio - Dialogue</title>
+<title>AI Voice Studio - Multi-Speaker Dialogue</title>
 
 <style>
 *{
@@ -438,22 +438,32 @@ audio{
     </div>
 
 
-    <!-- VOICE SELECT -->
+    <!-- MULTI-SPEAKER SELECT -->
     <div class="section">
 
         <div class="section-title">
-            <h2>🎭 Choose Voice Model</h2>
-            <span class="badge">Base Voice</span>
+            <h2>🎭 Speaker Voices (အသံ ၂ မျိုး)</h2>
+            <span class="badge">Multi-Speaker</span>
         </div>
 
-        <div class="speaker-box">
-            <label>🎙️ အဓိကပြောမည့် အသံပုံစံ ရွေးပါ:</label>
-            <select id="voiceSelect">
-                <option value="Kore">Kore (Female - နူးညံ့အေးဆေး မိန်းကလေးသံ)</option>
-                <option value="Puck">Puck (Male - တက်ကြွဆွဲဆောင်မှုရှိ ယောကျာ်းလေးသံ)</option>
-                <option value="Fenrir">Fenrir (Male - လေးနက်ခန့်ညား ယောကျာ်းလေးသံ)</option>
-                <option value="Aoede">Aoede (Female - လန်းဆန်းတက်ကြွ မိန်းကလေးသံ)</option>
-            </select>
+        <div class="speaker-select-grid">
+            <div class="speaker-box">
+                <label>👩 Speaker 1 ([1]: မိန်းကလေး):</label>
+                <select id="speaker1Select">
+                    <option value="Kore">Kore (Female)</option>
+                    <option value="Aoede">Aoede (Female)</option>
+                    <option value="Despina">Despina (Female)</option>
+                </select>
+            </div>
+
+            <div class="speaker-box">
+                <label>👨 Speaker 2 ([2]: ယောကျာ်းလေး):</label>
+                <select id="speaker2Select">
+                    <option value="Puck">Puck (Male)</option>
+                    <option value="Fenrir">Fenrir (Male)</option>
+                    <option value="Orus">Orus (Male)</option>
+                </select>
+            </div>
         </div>
 
     </div>
@@ -496,15 +506,15 @@ audio{
         </div>
 
         <select id="styleSelect">
-            <option value="Speak naturally and clearly as a conversation dialogue between a female and a male.">
+            <option value="Speak naturally as a dialogue.">
                 Natural Dialogue - သဘာဝကျကျ စကားပြော
             </option>
 
-            <option value="Speak warmly and gently as a romantic dialogue.">
-                Warm & Romantic - နူးညံ့စွာ
+            <option value="Speak warmly and gently as a conversation.">
+                Warm - နူးညံ့စွာ
             </option>
 
-            <option value="Speak like a dramatic movie voice acting.">
+            <option value="Speak like a dramatic movie dialogue.">
                 Movie Dialogue - ဇာတ်လမ်းပြော
             </option>
         </select>
@@ -666,9 +676,10 @@ function updateCounter(){
 
 async function generateVoice(){
     const key = document.getElementById("apiKey").value.trim();
-    const text = document.getElementById("textInput").value.trim();
+    const rawText = document.getElementById("textInput").value.trim();
     const style = document.getElementById("styleSelect").value;
-    const selectedVoice = document.getElementById("voiceSelect").value;
+    const spk1 = document.getElementById("speaker1Select").value;
+    const spk2 = document.getElementById("speaker2Select").value;
     const btn = document.getElementById("generateBtn");
 
     if(!key){
@@ -676,38 +687,44 @@ async function generateVoice(){
         return;
     }
 
-    if(!text){
+    if(!rawText){
         showGenerateMessage("📝 စကားပြော စာသားထည့်ပါ။", "error");
         return;
     }
 
     btn.disabled = true;
-    btn.innerHTML = '<span class="loading"></span>Generating Audio...';
+    btn.innerHTML = '<span class="loading"></span>Generating Dialogue...';
     document.getElementById("generateMessage").className = "message";
     document.getElementById("result").style.display = "none";
 
     try{
-        const prompt = `${style}
+        // Replace [1]: and [2]: to Speaker 1: and Speaker 2:
+        const formattedScript = rawText
+            .replace(/\[1\]\s*:/g, "Speaker 1:")
+            .replace(/\[2\]\s*:/g, "Speaker 2:");
 
-Instruction:
-- You are doing voice acting for a dialogue between two characters.
-- [1]: denotes lines spoken by a Female character. Use a gentle female tone.
-- [2]: denotes lines spoken by a Male character. Use a deeper male tone.
-- Do NOT read out "[1]:" or "[2]:" in the final audio.
-- Read natively in clear Burmese language.
-
-Script:
-${text}`;
+        const prompt = `${style}\n\nPerform this conversation script naturally in Burmese language:\n\n${formattedScript}`;
 
         const body = {
             contents: [{ parts: [{ text: prompt }] }],
             generationConfig: {
                 responseModalities: ["AUDIO"],
                 speechConfig: {
-                    voiceConfig: {
-                        prebuiltVoiceConfig: {
-                            voiceName: selectedVoice
-                        }
+                    multiSpeakerVoiceConfig: {
+                        speakerVoiceConfigs: [
+                            {
+                                speaker: "Speaker 1",
+                                voiceConfig: {
+                                    prebuiltVoiceConfig: { voiceName: spk1 }
+                                }
+                            },
+                            {
+                                speaker: "Speaker 2",
+                                voiceConfig: {
+                                    prebuiltVoiceConfig: { voiceName: spk2 }
+                                }
+                            }
+                        ]
                     }
                 }
             }
@@ -755,7 +772,7 @@ ${text}`;
         download.download = "gemini-dialogue.wav";
 
         document.getElementById("result").style.display = "block";
-        showGenerateMessage("✅ Voice ဖန်တီးပြီးပါပြီ။", "success");
+        showGenerateMessage("✅ Multi-Voice ဖန်တီးပြီးပါပြီ။", "success");
 
     }catch(error){
         console.error(error);
