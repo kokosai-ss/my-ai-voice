@@ -464,7 +464,7 @@ audio{
         </div>
 
         <div class="subtitle" style="margin-bottom:15px;">
-            Gemini Voice ရွေးပါ
+            Gemini Voice ရွေးပါ (နှိပ်ရင် အသံနမူနာထွက်မည်)
         </div>
 
         <div class="voice-grid" id="voiceGrid"></div>
@@ -498,11 +498,11 @@ audio{
     </div>
 
 
-    <!-- STYLE -->
+    <!-- STYLE & SPEED -->
     <div class="section">
 
         <div class="section-title">
-            <h2>🎚️ Voice Style</h2>
+            <h2>🎚️ Voice Style & Speed</h2>
         </div>
 
         <select id="styleSelect">
@@ -530,6 +530,22 @@ audio{
                 Dramatic - ခံစားချက်ပြင်းပြင်း
             </option>
         </select>
+
+        <div style="margin-top: 15px;">
+            <label style="display:flex; justify-content:space-between; margin-bottom:8px; color:#b7d5ee; font-size:14px;">
+                <span>⚡ Voice Speed (အသံမြန်နှုန်း):</span>
+                <span id="speedVal" style="color:#00baff; font-weight:bold;">1.0x</span>
+            </label>
+            <input 
+                type="range" 
+                id="speedSlider" 
+                min="0.5" 
+                max="2.0" 
+                step="0.1" 
+                value="1.0" 
+                oninput="updateSpeed(this.value)"
+            >
+        </div>
 
         <button
             class="generate"
@@ -624,6 +640,64 @@ const voices = [
 ];
 
 
+/* =========================================
+   VOICE SPEED & PREVIEW
+========================================= */
+
+function updateSpeed(val) {
+    document.getElementById("speedVal").textContent = val + "x";
+    const player = document.getElementById("audioPlayer");
+    if (player) {
+        player.playbackRate = parseFloat(val);
+    }
+}
+
+async function playVoicePreview(voiceName) {
+    const key = getStoredKey() || document.getElementById("apiKey").value.trim();
+    if (!key) return;
+
+    try {
+        const body = {
+            contents: [{ parts: [{ text: "Hello! This is a preview." }] }],
+            generationConfig: {
+                responseModalities: ["AUDIO"],
+                speechConfig: {
+                    voiceConfig: {
+                        prebuiltVoiceConfig: { voiceName: voiceName }
+                    }
+                }
+            }
+        };
+
+        const res = await fetch(API_URL, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "x-goog-api-key": key
+            },
+            body: JSON.stringify(body)
+        });
+
+        const data = await res.json();
+        const base64 = data?.candidates?.[0]?.content?.parts?.find(p => p.inlineData)?.inlineData?.data;
+
+        if (base64) {
+            const pcm = base64ToUint8Array(base64);
+            const wav = pcmToWav(pcm, 24000, 1, 16);
+            const previewBlob = new Blob([wav], { type: "audio/wav" });
+            const previewAudio = new Audio(URL.createObjectURL(previewBlob));
+            
+            const currentSpeed = document.getElementById("speedSlider")?.value || 1.0;
+            previewAudio.playbackRate = parseFloat(currentSpeed);
+            
+            previewAudio.play();
+        }
+    } catch (err) {
+        console.log("Preview error:", err);
+    }
+}
+
+
 function loadVoices(){
 
     const grid =
@@ -654,6 +728,9 @@ function loadVoices(){
                 .forEach(v=>v.classList.remove("active"));
 
             button.classList.add("active");
+
+            // Character နှိပ်ရင် အသံနမူနာ ထွက်ပါမယ်
+            playVoicePreview(selectedVoice);
 
         };
 
@@ -1067,6 +1144,10 @@ ${text}`;
 
         player.src =
             audioURL;
+
+        // Speed ကို audio player ထဲ ချိန်ပေးသည်
+        const currentSpeed = document.getElementById("speedSlider")?.value || 1.0;
+        player.playbackRate = parseFloat(currentSpeed);
 
 
         const download =
