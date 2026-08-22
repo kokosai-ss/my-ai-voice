@@ -450,22 +450,22 @@ audio{
             <div class="speaker-box">
                 <label>👩 Speaker 1 ([1]: မိန်းကလေး):</label>
                 <select id="speaker1Select">
+                    <option value="Kore">Kore (Firm - မိန်းကလေး)</option>
+                    <option value="Despina">Despina (Smooth - မိန်းကလေး)</option>
                     <option value="Leda">Leda (Youthful - မိန်းကလေး)</option>
                     <option value="Aoede">Aoede (Breezy - မိန်းကလေး)</option>
-                    <option value="Callirrhoe">Callirrhoe (Easy-going)</option>
-                    <option value="Despina">Despina (Smooth)</option>
-                    <option value="Vindemiatrix">Vindemiatrix (Gentle)</option>
+                    <option value="Callirrhoe">Callirrhoe (Easy-going - မိန်းကလေး)</option>
+                    <option value="Vindemiatrix">Vindemiatrix (Gentle - မိန်းကလေး)</option>
                 </select>
             </div>
 
             <div class="speaker-box">
                 <label>👨 Speaker 2 ([2]: ယောကျာ်းလေး):</label>
                 <select id="speaker2Select">
-                    <option value="Kore">Kore (Firm - ယောကျာ်းလေး)</option>
-                    <option value="Charon">Charon (Informative)</option>
-                    <option value="Fenrir">Fenrir (Excitable)</option>
-                    <option value="Orus">Orus (Firm)</option>
-                    <option value="Puck">Puck (Upbeat)</option>
+                    <option value="Puck">Puck (Upbeat - ယောကျာ်းလေး)</option>
+                    <option value="Fenrir">Fenrir (Excitable - ယောကျာ်းလေး)</option>
+                    <option value="Orus">Orus (Firm - ယောကျာ်းလေး)</option>
+                    <option value="Charon">Charon (Informative - ယောကျာ်းလေး)</option>
                 </select>
             </div>
         </div>
@@ -584,7 +584,7 @@ audio{
 
 <script>
 
-const API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-tts-preview:generateContent";
+const API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent";
 let audioURL = null;
 
 function updateSpeed(val) {
@@ -723,10 +723,17 @@ ${text}`;
             generationConfig: {
                 responseModalities: ["AUDIO"],
                 speechConfig: {
-                    voiceConfig: {
-                        prebuiltVoiceConfig: {
-                            voiceName: spk1
-                        }
+                    multiSpeakerConfig: {
+                        speakerVoiceConfigs: [
+                            {
+                                speaker: "Speaker 1",
+                                prebuiltVoiceConfig: { voiceName: spk1 }
+                            },
+                            {
+                                speaker: "Speaker 2",
+                                prebuiltVoiceConfig: { voiceName: spk2 }
+                            }
+                        ]
                     }
                 }
             }
