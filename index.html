@@ -380,7 +380,7 @@ audio{
         </p>
 
         <div class="credit">
-            @shburmesemoive ကို ဆက်သွယ်ပါ
+            @shburmesemovie ကို ဆက်သွယ်ပါ
         </div>
     </div>
 
@@ -579,7 +579,7 @@ audio{
 const MODEL = "gemini-3.1-flash-tts-preview";
 
 const API_URL =
-    "https://generativelanguage.googleapis.com/v1beta/interactions";
+    "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-tts-preview:generateContent";
 
 let selectedVoice = "Kore";
 
@@ -896,9 +896,6 @@ async function generateVoice(){
     const btn =
         document.getElementById("generateBtn");
 
-    const message =
-        document.getElementById("generateMessage");
-
     if(!key){
 
         showGenerateMessage(
@@ -919,74 +916,84 @@ async function generateVoice(){
         return;
     }
 
-
     btn.disabled = true;
 
     btn.innerHTML =
         '<span class="loading"></span>Generating...';
 
-    message.className = "message";
+    document.getElementById("generateMessage")
+        .className = "message";
 
     document.getElementById("result")
         .style.display = "none";
 
-
     try{
 
-        /*
-          Gemini TTS prompt
-        */
-
         const prompt =
-            `${style}
+`${style}
 
 Read the following text exactly as written.
 Do not translate it.
 Do not summarize it.
-Use clear natural Burmese pronunciation.
+Speak in natural Burmese pronunciation.
 
 Text:
 ${text}`;
 
-
         const body = {
 
-            model: MODEL,
+            contents: [
+                {
+                    parts: [
+                        {
+                            text: prompt
+                        }
+                    ]
+                }
+            ],
 
-            input: prompt,
+            generationConfig: {
 
-            response_format:{
-                type:"audio"
-            },
+                responseModalities: [
+                    "AUDIO"
+                ],
 
-            generation_config:{
-                speech_config:[
-                    {
-                        voice:selectedVoice
+                speechConfig: {
+
+                    voiceConfig: {
+
+                        prebuiltVoiceConfig: {
+
+                            voiceName: selectedVoice
+
+                        }
+
                     }
-                ]
+
+                }
+
             }
 
         };
 
 
         const response =
-            await fetch(API_URL,{
+            await fetch(API_URL, {
 
-                method:"POST",
+                method: "POST",
 
-                headers:{
+                headers: {
+
                     "Content-Type":
                         "application/json",
 
                     "x-goog-api-key":
-                        key,
+                        key
 
-                    "Api-Revision":
-                        "2026-05-20"
                 },
 
-                body:JSON.stringify(body)
+                body:
+                    JSON.stringify(body)
 
             });
 
@@ -1005,13 +1012,12 @@ ${text}`;
         }
 
 
-        /*
-          Current Interactions API
-          returns output_audio.data
-        */
-
         const base64 =
-            data?.output_audio?.data;
+            data?.candidates?.[0]
+                ?.content?.parts?.find(
+                    part => part.inlineData
+                )
+                ?.inlineData?.data;
 
 
         if(!base64){
@@ -1023,18 +1029,9 @@ ${text}`;
         }
 
 
-        /*
-          Base64 → PCM
-        */
-
         const pcm =
             base64ToUint8Array(base64);
 
-
-        /*
-          Gemini TTS PCM:
-          24kHz / mono / 16-bit
-        */
 
         const wav =
             pcmToWav(
@@ -1048,7 +1045,7 @@ ${text}`;
         const blob =
             new Blob(
                 [wav],
-                {type:"audio/wav"}
+                { type: "audio/wav" }
             );
 
 
@@ -1064,13 +1061,18 @@ ${text}`;
 
 
         const player =
-            document.getElementById("audioPlayer");
+            document.getElementById(
+                "audioPlayer"
+            );
 
-        player.src = audioURL;
+        player.src =
+            audioURL;
 
 
         const download =
-            document.getElementById("downloadBtn");
+            document.getElementById(
+                "downloadBtn"
+            );
 
         download.href =
             audioURL;
