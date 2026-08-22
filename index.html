@@ -12,32 +12,27 @@
         input, textarea, select { width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #334155; background-color: #0f172a; color: #ffffff; box-sizing: border-box; }
         button { width: 100%; padding: 12px; background-color: #0284c7; color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; margin-top: 15px; }
         button:hover { background-color: #0369a1; }
-        #speedSlider { margin-top: 10px; }
     </style>
 </head>
 <body>
 
 <div class="card">
-    <h2>🎙️ AI Voice Generator</h2>
+    <h2>🎙️ Gemini AI Voice Generator</h2>
     
     <label>Gemini API Key</label>
-    <input type="password" id="apiKey" placeholder="API Key ထည့်ပါ...">
+    <input type="password" id="apiKey" placeholder="AI Studio API Key ထည့်ပါ...">
 
-    <label>အသံအမျိုးအစား ရွေးပါ</label>
+    <label>အသံအမျိုးအစား (Voice Preset)</label>
     <select id="voiceSelect">
-        <option value="Puck">Puck (Male - Normal)</option>
+        <option value="Puck">Puck (Male)</option>
         <option value="Charon">Charon (Male - Deep)</option>
         <option value="Kore">Kore (Female - Calm)</option>
         <option value="Fenrir">Fenrir (Male - Energetic)</option>
         <option value="Aoede">Aoede (Female - Bright)</option>
     </select>
 
-    <label>အသံ အမြန်နှုန်း (Speed: 1x သည် ပုံမှန်)</label>
-    <input type="range" id="speedSlider" min="0.5" max="2" step="0.1" value="1" oninput="updateSpeed()">
-    <span id="speedValue" style="font-size:12px;">1x</span>
-
     <label>စာသား ရိုက်ထည့်ပါ (အင်္ဂလိပ် / ဗမာ)</label>
-    <textarea id="textInput" rows="4" placeholder="အသံပြောင်းချင်သော စာသားကို ရိုက်ထည့်ပါ..."></textarea>
+    <textarea id="textInput" rows="4" placeholder="Hello, welcome to my channel!"></textarea>
 
     <button id="submitBtn" onclick="generateSpeech()">အသံထုတ်မည်</button>
 
@@ -45,13 +40,6 @@
 </div>
 
 <script>
-function updateSpeed() {
-    const slider = document.getElementById('speedSlider');
-    const audio = document.getElementById('audioPlayer');
-    document.getElementById('speedValue').innerText = slider.value + 'x';
-    audio.playbackRate = slider.value;
-}
-
 async function generateSpeech() {
     const apiKey = document.getElementById('apiKey').value.trim();
     const text = document.getElementById('textInput').value.trim();
@@ -68,6 +56,7 @@ async function generateSpeech() {
     submitBtn.disabled = true;
 
     try {
+        // v1beta endpoint သုံးထားပါသည်
         const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -91,16 +80,17 @@ async function generateSpeech() {
             return;
         }
 
-        const part = data.candidates?.[0]?.content?.parts?.[0];
-        if (part && part.inlineData) {
+        const candidate = data.candidates?.[0];
+        const part = candidate?.content?.parts?.[0];
+
+        if (part && part.inlineData && part.inlineData.data) {
             const base64Audio = part.inlineData.data;
             const mimeType = part.inlineData.mimeType || "audio/wav";
             audioPlayer.src = `data:${mimeType};base64,${base64Audio}`;
             audioPlayer.style.display = "block";
-            audioPlayer.playbackRate = document.getElementById('speedSlider').value;
             audioPlayer.play();
         } else {
-            alert("အသံဖိုင် မရရှိပါ။ စာသားကို ပြန်စစ်ပေးပါ။");
+            alert("အသံဖိုင် မရရှိပါ။ API Key အသစ်တစ်ခု Google AI Studio ကနေ ပြန်ထုတ်ပြီး စမ်းကြည့်ပါ။");
         }
     } catch (err) { 
         alert("ချိတ်ဆက်မှု မအောင်မြင်ပါ: " + err.message); 
