@@ -708,13 +708,12 @@ async function generateVoice(){
     try{
         const prompt = `${style}
 
-Read the following conversation between two speakers:
-- Speaker 1 (female line marked with [1]:) voice using ${spk1}
-- Speaker 2 (male line marked with [2]:) voice using ${spk2}
+This is a dialogue between two characters:
+- Speaker 1 (female line marked with [1]:)
+- Speaker 2 (male line marked with [2]:)
 
-Rules:
-1. Speak clearly in natural Burmese pronunciation.
-2. Read [1]: lines with Speaker 1 voice and [2]: lines with Speaker 2 voice seamlessly. Do not speak the tag "[1]:" or "[2]:" out loud.
+Perform this script naturally in Burmese pronunciation.
+Do NOT read out the speaker tags [1]: or [2]: in the audio.
 
 Script:
 ${text}`;
