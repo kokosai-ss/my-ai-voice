@@ -391,7 +391,7 @@ audio{
     </div>
 
 
-    <!-- MAIN APP CONTENT (PASSWORD မှန်မှ ပွင့်မည်) -->
+    <!-- MAIN APP CONTENT -->
     <div id="appContent">
 
         <!-- API KEY -->
@@ -418,7 +418,7 @@ audio{
                     id="apiKey"
                     class="key-input"
                     type="password"
-                    placeholder="Key များကို ကော်မာ (,) ခြားပြီး ထည့်ပါ (ဥပမာ - Key1, Key2)"
+                    placeholder="Gemini API Key ထည့်ပါ..."
                     autocomplete="off"
                 >
 
@@ -605,10 +605,7 @@ audio{
 
 <script>
 
-// 🔑 သားရီး ထားချင်တဲ့ စကားဝှက်ကို ဒီနေရာမှာ ပြောင်းလို့ရပါတယ်
 const MY_PASSWORD = "1911999";
-
-// သားရီး မူလသုံးခဲ့တဲ့ API Endpoint အတိုင်း ပြန်ထားပေးထားပါတယ်
 const API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-tts-preview:generateContent";
 
 let audioURL = null;
@@ -664,7 +661,7 @@ function saveKey(){
         localStorage.setItem("gemini_api_key", key);
     }
     updateKeyStatus();
-    showKeyMessage("API Key(များ) ကို သိမ်းပြီးပါပြီ။", "success");
+    showKeyMessage("API Key ကို သိမ်းပြီးပါပြီ။", "success");
 }
 
 function changeKey(){
@@ -677,7 +674,7 @@ function removeKey(){
     localStorage.removeItem("gemini_api_key");
     document.getElementById("apiKey").value = "";
     updateKeyStatus();
-    showKeyMessage("API Key များကို ဖျက်ပြီးပါပြီ။", "success");
+    showKeyMessage("API Key ကို ဖျက်ပြီးပါပြီ။", "success");
 }
 
 function toggleKey(){
@@ -699,7 +696,7 @@ async function testKey(){
     }
     
     const keysList = rawKeys.split(",").map(k => k.trim()).filter(k => k.length > 0);
-    showKeyMessage("API Key များကို စစ်ဆေးနေပါတယ်...", "success");
+    showKeyMessage("API Key ကို စစ်ဆေးနေပါတယ်...", "success");
 
     try{
         const response = await fetch("https://generativelanguage.googleapis.com/v1beta/models", {
@@ -716,7 +713,7 @@ async function testKey(){
             localStorage.setItem("gemini_api_key", rawKeys);
         }
         updateKeyStatus();
-        showKeyMessage(`✅ API Key (${keysList.length} ခု) အလုပ်လုပ်ပါတယ်။`, "success");
+        showKeyMessage(`✅ API Key အလုပ်လုပ်ပါတယ်။`, "success");
     }catch(error){
         showKeyMessage("❌ " + error.message, "error");
     }
@@ -780,11 +777,10 @@ ${text}`;
 
     let success = false;
 
-    // Auto Key Rotate System
     for (let i = 0; i < keysList.length; i++) {
         const currentKey = keysList[i];
         try{
-            showGenerateMessage(`🔄 Key ${i + 1}/${keysList.length} ဖြင့် စမ်းသပ်နေပါသည်...`, "success");
+            showGenerateMessage(`🔄 Key ဖြင့် စမ်းသပ်နေပါသည်...`, "success");
 
             const response = await fetch(API_URL, {
                 method: "POST",
@@ -798,7 +794,7 @@ ${text}`;
             const data = await response.json();
 
             if(!response.ok){
-                throw new Error(data?.error?.message || `API Key ${i+1} Error`);
+                throw new Error(data?.error?.message || `API Key Error`);
             }
 
             const base64 = data?.candidates?.[0]?.content?.parts?.find(p => p.inlineData)?.inlineData?.data;
@@ -809,7 +805,7 @@ ${text}`;
 
             const pcm = base64ToUint8Array(base64);
             const wav = pcmToWav(pcm, 24000, 1, 16);
-            const blob = new Blob altered = new Blob([wav], { type: "audio/wav" });
+            const blob = new Blob([wav], { type: "audio/wav" });
 
             if(audioURL){
                 URL.revokeObjectURL(audioURL);
@@ -828,18 +824,18 @@ ${text}`;
             download.download = "gemini-dialogue.wav";
 
             document.getElementById("result").style.display = "block";
-            showGenerateMessage(`✅ Multi-Voice ဖန်တီးပြီးပါပြီ (Key ${i + 1} ကို အသုံးပြုထားပါသည်)`, "success");
+            showGenerateMessage(`✅ Multi-Voice ဖန်တီးပြီးပါပြီ။`, "success");
 
             success = true;
             break;
 
         }catch(error){
-            console.warn(`Key ${i+1} မရပါ:`, error.message);
+            console.warn(`Key Error:`, error.message);
         }
     }
 
     if (!success) {
-        showGenerateMessage("❌ ထည့်သွင်းထားသော Key များအားလုံး Limit ပြည့်နေပါသည် သို့မဟုတ် မှားယွင်းနေပါသည်။", "error");
+        showGenerateMessage("❌ API Key Limit ပြည့်နေပါသည် သို့မဟုတ် မှားယွင်းနေပါသည်။", "error");
     }
 
     btn.disabled = false;
