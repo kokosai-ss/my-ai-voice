@@ -3,81 +3,60 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Voice & Script Studio</title>
+    <title>AI Voice Generator</title>
     <style>
         body { font-family: sans-serif; background-color: #0f172a; color: #ffffff; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; padding: 20px; }
-        .card { background-color: #1e293b; padding: 20px; border-radius: 12px; width: 100%; max-width: 420px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+        .card { background-color: #1e293b; padding: 25px; border-radius: 12px; width: 100%; max-width: 400px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
         h2 { text-align: center; color: #38bdf8; margin-bottom: 20px; }
         label { font-size: 13px; color: #94a3b8; display: block; margin-bottom: 5px; margin-top: 10px; }
-        input, textarea, select { width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #334155; background-color: #0f172a; color: #ffffff; box-sizing: border-box; }
+        textarea, select { width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #334155; background-color: #0f172a; color: #ffffff; box-sizing: border-box; }
         button { width: 100%; padding: 12px; background-color: #0284c7; color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; margin-top: 15px; }
         button:hover { background-color: #0369a1; }
-        .btn-stop { background-color: #ef4444; margin-top: 8px; }
-        .btn-stop:hover { background-color: #dc2626; }
+        audio { width: 100%; margin-top: 15px; display: none; }
     </style>
 </head>
 <body>
 
 <div class="card">
-    <h2>🎙️ AI Voice & Script Studio</h2>
-    
-    <label>Gemini API Key (စာသား ပြင်ဆင်ရန်အတွက်)</label>
-    <input type="password" id="apiKey" placeholder="API Key ထည့်ပါ (မထည့်လည်း ရပါတယ်)">
+    <h2>🎙️ AI Voice Generator</h2>
 
-    <label>အသံ ရွေးချယ်ပါ</label>
-    <select id="voiceSelect"></select>
-
-    <label>အသံ အမြန်နှုန်း (Speed: <span id="speedVal">1x</span>)</label>
-    <input type="range" id="speedSlider" min="0.5" max="2" step="0.1" value="1" oninput="document.getElementById('speedVal').innerText = this.value + 'x'">
+    <label>ဘာသာစကား / အသံ ရွေးပါ</label>
+    <select id="langSelect">
+        <option value="en">English (အင်္ဂလိပ်)</option>
+        <option value="my">Myanmar (မြန်မာ)</option>
+        <option value="th">Thai (ထိုင်း)</option>
+        <option value="ja">Japanese (ဂျပန်)</option>
+        <option value="ko">Korean (ကိုရီးယား)</option>
+    </select>
 
     <label>စာသား ရိုက်ထည့်ပါ</label>
-    <textarea id="textInput" rows="5" placeholder="အသံထုတ်ချင်သော စာသားကို ဒီမှာ ရေးပါ..."></textarea>
+    <textarea id="textInput" rows="4" placeholder="အသံပြောင်းချင်သော စာသားကို ရိုက်ပါ..."></textarea>
 
-    <button onclick="speakText()">🔊 အသံထုတ်မည်</button>
-    <button class="btn-stop" onclick="stopSpeech()">⏹️ ရပ်မည်</button>
+    <button id="submitBtn" onclick="generateVoice()">အသံထုတ်မည်</button>
+
+    <audio id="audioPlayer" controls></audio>
 </div>
 
 <script>
-let voices = [];
-const voiceSelect = document.getElementById('voiceSelect');
-
-function loadVoices() {
-    voices = window.speechSynthesis.getVoices();
-    voiceSelect.innerHTML = '';
-    
-    voices.forEach((voice, i) => {
-        const option = document.createElement('option');
-        option.value = i;
-        option.textContent = `${voice.name} (${voice.lang})`;
-        voiceSelect.appendChild(option);
-    });
-}
-
-window.speechSynthesis.onvoiceschanged = loadVoices;
-loadVoices();
-
-function speakText() {
-    window.speechSynthesis.cancel();
-
+function generateVoice() {
     const text = document.getElementById('textInput').value.trim();
+    const lang = document.getElementById('langSelect').value;
+    const audioPlayer = document.getElementById('audioPlayer');
+
     if (!text) {
         alert("စာသား ရိုက်ထည့်ပါ သားကြီး!");
         return;
     }
 
-    const utterance = new SpeechSynthesisUtterance(text);
-    const selectedVoice = voices[voiceSelect.value];
-    
-    if (selectedVoice) {
-        utterance.voice = selectedVoice;
-    }
+    // Google Translate TTS Engine ကို တိုက်ရိုက် ခေါ်သုံးခြင်း
+    const encodedText = encodeURIComponent(text);
+    const audioUrl = `https://translate.google.com/translate_tts?ie=UTF-8&q=${encodedText}&tl=${lang}&client=tw-ob`;
 
-    utterance.rate = parseFloat(document.getElementById('speedSlider').value);
-    window.speechSynthesis.speak(utterance);
-}
-
-function stopSpeech() {
-    window.speechSynthesis.cancel();
+    audioPlayer.src = audioUrl;
+    audioPlayer.style.display = "block";
+    audioPlayer.play().catch(() => {
+        // Autoplay Block ဖြစ်ရင် Player ကနေ နှိပ်ဖွင့်နိုင်အောင်
+    });
 }
 </script>
 
