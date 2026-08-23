@@ -609,6 +609,7 @@ const MY_PASSWORD = "1911999";
 const API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-tts-preview:generateContent";
 
 let audioURL = null;
+let currentBlob = null;
 
 function unlockApp() {
     const inputPass = document.getElementById("passInput").value;
@@ -805,13 +806,13 @@ ${text}`;
 
             const pcm = base64ToUint8Array(base64);
             const wav = pcmToWav(pcm, 24000, 1, 16);
-            const blob = new Blob([wav], { type: "audio/wav" });
+            currentBlob = new Blob([wav], { type: "audio/wav" });
 
             if(audioURL){
                 URL.revokeObjectURL(audioURL);
             }
 
-            audioURL = URL.createObjectURL(blob);
+            audioURL = URL.createObjectURL(currentBlob);
 
             const player = document.getElementById("audioPlayer");
             player.src = audioURL;
@@ -819,11 +820,27 @@ ${text}`;
             const currentSpeed = document.getElementById("speedSlider")?.value || 1.0;
             player.playbackRate = parseFloat(currentSpeed);
 
-            const download = document.getElementById("downloadBtn");
+            const downloadBtn = document.getElementById("downloadBtn");
             const fileName = `Voice_${Date.now()}.wav`;
-            download.href = audioURL;
-            download.download = fileName;
-            download.setAttribute("target", "_blank");
+            
+            downloadBtn.href = audioURL;
+            downloadBtn.download = fileName;
+
+            // Android App (WebView) Direct Download Fix
+            downloadBtn.onclick = function(e) {
+                if (currentBlob) {
+                    const reader = new FileReader();
+                    reader.readAsDataURL(currentBlob);
+                    reader.onloadend = function() {
+                        const a = document.createElement('a');
+                        a.href = reader.result;
+                        a.download = fileName;
+                        document.body.appendChild(a);
+                        a.click();
+                        document.body.removeChild(a);
+                    };
+                }
+            };
 
             document.getElementById("result").style.display = "block";
             showGenerateMessage(`✅ Multi-Voice ဖန်တီးပြီးပါပြီ။`, "success");
