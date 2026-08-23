@@ -601,7 +601,7 @@ audio{
             <div class="section-title">
 
                 <h2>
-                    🎭 Choose Speakers
+                    🎭 Choose Speakers (အသံ စိတ်ကြိုက် ရွေးပါ)
                 </h2>
 
                 <span class="badge">
@@ -616,31 +616,19 @@ audio{
                 <div class="speaker-box">
 
                     <label>
-                        👩 Speaker 1 ([1]: မိန်းကလေး)
+                        🎙️ Speaker 1 ([1]: အတွက် အသံ):
                     </label>
 
                     <select id="speaker1Select">
-
-                        <option value="Kore">
-                            Kore (Firm)
-                        </option>
-
-                        <option value="Leda">
-                            Leda (Youthful)
-                        </option>
-
-                        <option value="Aoede">
-                            Aoede (Breezy)
-                        </option>
-
-                        <option value="Callirrhoe">
-                            Callirrhoe (Easy-going)
-                        </option>
-
-                        <option value="Despina">
-                            Despina (Smooth)
-                        </option>
-
+                        <option value="Puck">Puck (Upbeat - ယောကျာ်းလေး)</option>
+                        <option value="Charon">Charon (Informative - ယောကျာ်းလေး)</option>
+                        <option value="Fenrir">Fenrir (Excitable - ယောကျာ်းလေး)</option>
+                        <option value="Orus">Orus (Firm - ယောကျာ်းလေး)</option>
+                        <option value="Kore">Kore (Firm - မိန်းကလေး)</option>
+                        <option value="Leda">Leda (Youthful - မိန်းကလေး)</option>
+                        <option value="Aoede">Aoede (Breezy - မိန်းကလေး)</option>
+                        <option value="Callirrhoe">Callirrhoe (Easy-going - မိန်းကလေး)</option>
+                        <option value="Despina">Despina (Smooth - မိန်းကလေး)</option>
                     </select>
 
                 </div>
@@ -649,27 +637,19 @@ audio{
                 <div class="speaker-box">
 
                     <label>
-                        👨 Speaker 2 ([2]: ယောကျာ်းလေး)
+                        🎙️ Speaker 2 ([2]: အတွက် အသံ):
                     </label>
 
                     <select id="speaker2Select">
-
-                        <option value="Charon">
-                            Charon (Informative)
-                        </option>
-
-                        <option value="Fenrir">
-                            Fenrir (Excitable)
-                        </option>
-
-                        <option value="Orus">
-                            Orus (Firm)
-                        </option>
-
-                        <option value="Puck">
-                            Puck (Upbeat)
-                        </option>
-
+                        <option value="Charon">Charon (Informative - ယောကျာ်းလေး)</option>
+                        <option value="Puck">Puck (Upbeat - ယောကျာ်းလေး)</option>
+                        <option value="Fenrir">Fenrir (Excitable - ယောကျာ်းလေး)</option>
+                        <option value="Orus">Orus (Firm - ယောကျာ်းလေး)</option>
+                        <option value="Kore">Kore (Firm - မိန်းကလေး)</option>
+                        <option value="Leda">Leda (Youthful - မိန်းကလေး)</option>
+                        <option value="Aoede">Aoede (Breezy - မိန်းကလေး)</option>
+                        <option value="Callirrhoe">Callirrhoe (Easy-going - မိန်းကလေး)</option>
+                        <option value="Despina">Despina (Smooth - မိန်းကလေး)</option>
                     </select>
 
                 </div>
@@ -1333,8 +1313,7 @@ async function generateVoice(){
 
     /*
       IMPORTANT:
-      API prompt ထဲမှာ [1]/[2] ကို
-      Female / Male အဖြစ် သတ်မှတ်ထားတယ်။
+      API prompt ထဲမှာ Speaker1 နဲ့ Speaker2 အဖြစ် သတ်မှတ်ထားတယ်။
     */
 
     const prompt = `${style}
@@ -1344,11 +1323,9 @@ Perform the following Burmese dialogue as a natural conversation.
 There are exactly two speakers:
 
 Speaker1:
-This is the female character.
 All lines beginning with [1]: must be spoken by Speaker1.
 
 Speaker2:
-This is the male character.
 All lines beginning with [2]: must be spoken by Speaker2.
 
 Do NOT speak the labels [1]: or [2:].
@@ -1365,13 +1342,7 @@ ${text}`;
 
 
     /*
-      THIS IS THE IMPORTANT FIX.
-
-      အရင် code မှာ spk1 တစ်ခုတည်းပဲ
-      API ကိုပို့ထားတယ်။
-
-      အခု speaker နှစ်ယောက်လုံး
-      multiSpeakerVoiceConfig ထဲ ထည့်ထားတယ်။
+      multiSpeakerVoiceConfig ထဲမှာ Speaker 1 နဲ့ 2 ကို ရွေးချယ်ထားတဲ့ Voice နာမည်အတိုင်း ချိတ်ဆက်ပေးထားတယ်။
     */
 
     const body = {
@@ -1476,11 +1447,6 @@ ${text}`;
                 await response.json()
                     .catch(()=>({}));
 
-
-            /*
-              ERROR ကို အမှန်အတိုင်း
-              ထုတ်ပြမယ်
-            */
 
             if(!response.ok){
 
@@ -1953,11 +1919,6 @@ function saveHistory(item){
     );
 
 
-    /*
-      နောက်ဆုံး 30 ခုထိပဲ
-      သိမ်းထားမယ်
-    */
-
     const limited =
         history.slice(0,30);
 
@@ -2032,9 +1993,9 @@ function renderHistory(){
 
                 <div class="history-info">
 
-                    👩 ${escapeHTML(item.speaker1)}
+                    🎙️ ${escapeHTML(item.speaker1)}
                     &nbsp; | &nbsp;
-                    👨 ${escapeHTML(item.speaker2)}
+                    🎙️ ${escapeHTML(item.speaker2)}
                     &nbsp; | &nbsp;
                     ⚡ ${escapeHTML(item.speed)}x
 
