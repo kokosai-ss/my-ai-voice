@@ -820,8 +820,10 @@ ${text}`;
             player.playbackRate = parseFloat(currentSpeed);
 
             const download = document.getElementById("downloadBtn");
+            const fileName = `Voice_${Date.now()}.wav`;
             download.href = audioURL;
-            download.download = "gemini-dialogue.wav";
+            download.download = fileName;
+            download.setAttribute("target", "_blank");
 
             document.getElementById("result").style.display = "block";
             showGenerateMessage(`✅ Multi-Voice ဖန်တီးပြီးပါပြီ။`, "success");
