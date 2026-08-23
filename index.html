@@ -275,6 +275,7 @@ audio{
     background:#0c355d;
     color:#6edaff;
     border:1px solid #167bb9;
+    cursor:pointer;
 }
 
 .message{
@@ -312,47 +313,40 @@ audio{
     margin-right:8px;
 }
 
-/* History Card Styling */
-.history-item {
-    background: #071c33;
-    border: 1px solid #144e7c;
-    border-radius: 14px;
-    padding: 12px;
-    margin-top: 10px;
-}
-.history-time {
-    font-size: 11px;
-    color: #00baff;
-    margin-bottom: 4px;
-}
-.history-text {
-    font-size: 13px;
-    color: #bdd5e9;
-    margin-bottom: 8px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-.history-actions {
-    display: flex;
-    gap: 8px;
-    margin-top: 8px;
-}
-.history-btn {
-    flex: 1;
-    padding: 8px;
-    font-size: 12px;
-    border-radius: 8px;
-    border: 1px solid #167bb9;
-    background: #0c355d;
-    color: #6edaff;
-    text-align: center;
-    text-decoration: none;
-    cursor: pointer;
-}
-
 @keyframes spin{
     to{transform:rotate(360deg)}
+}
+
+/* HISTORY ITEM STYLING */
+.history-item{
+    background:#071c33;
+    border:1px solid #144e7c;
+    border-radius:16px;
+    padding:14px;
+    margin-top:12px;
+}
+
+.history-date{
+    font-size:12px;
+    color:#00baff;
+    margin-bottom:6px;
+}
+
+.history-text{
+    font-size:14px;
+    color:#d8ecff;
+    line-height:1.5;
+    margin-bottom:10px;
+    word-break:break-word;
+}
+
+.btn-clear-history{
+    background:transparent;
+    border:1px solid #a73b70;
+    color:#ff9ab8;
+    padding:6px 12px;
+    border-radius:12px;
+    font-size:12px;
 }
 
 .footer{
@@ -630,26 +624,26 @@ audio{
                     controls
                 ></audio>
 
-                <a
+                <button
                     id="downloadBtn"
                     class="download"
-                    download="speechmaker_audio.mp3"
+                    style="width: 100%; font-weight: bold;"
                 >
-                    ⬇️ Download MP3 Voice
-                </a>
+                    ⬇️ Download Voice
+                </button>
 
             </div>
 
         </div>
 
-        <!-- GENERATED HISTORY SECTION -->
+        <!-- HISTORY SECTION (အသံဖိုင်ဟောင်းများ) -->
         <div class="section">
             <div class="section-title">
                 <h2>📜 History (အတိတ်က လုပ်ခဲ့သမျှ အသံဖိုင်များ)</h2>
-                <button class="btn btn-danger" style="min-height:35px; padding:0 12px; font-size:12px;" onclick="clearHistory()">Clear History</button>
+                <button class="btn-clear-history" onclick="clearAllHistory()">Clear History</button>
             </div>
-            <div id="historyList">
-                <p style="color:#6688a5; font-size:13px;">မှတ်တမ်း မရှိသေးပါ။</p>
+            <div id="historyContainer">
+                <p style="color:#6688a5; font-size:13px; text-align:center;">History မရှိသေးပါ။</p>
             </div>
         </div>
 
@@ -668,19 +662,22 @@ const MY_PASSWORD = "1911999";
 const API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-tts-preview:generateContent";
 
 let audioURL = null;
-let db = null;
+let currentBlob = null;
 
-// IndexedDB Initialization for Audio History Storage
+// IndexedDB - Audio Blobs သိမ်းဆည်းရန် Database
+let db;
 const dbRequest = indexedDB.open("VoiceStudioDB", 1);
+
 dbRequest.onupgradeneeded = function(e) {
     db = e.target.result;
-    if (!db.objectStoreNames.contains("audio_history")) {
-        db.createObjectStore("audio_history", { keyPath: "id", autoIncrement: true });
+    if (!db.objectStoreNames.contains("audioHistory")) {
+        db.createObjectStore("audioHistory", { keyPath: "id", autoIncrement: true });
     }
 };
+
 dbRequest.onsuccess = function(e) {
     db = e.target.result;
-    loadHistory();
+    loadHistoryFromDB();
 };
 
 function unlockApp() {
@@ -694,7 +691,6 @@ function unlockApp() {
             document.getElementById("apiKey").value = saved;
         }
         updateKeyStatus();
-        loadHistory();
     } else {
         msgBox.textContent = "❌ Password မှားယွင်းနေပါသည်။";
         msgBox.className = "message error";
@@ -798,6 +794,20 @@ function updateCounter(){
     document.getElementById("counter").textContent = text.length;
 }
 
+// ဒေါင်းလုဒ် ဆွဲပေးသည့် Helper Function
+function triggerDownload(blob, filename) {
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(() => {
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    }, 100);
+}
+
 async function generateVoice(){
     const rawKeys = document.getElementById("apiKey").value.trim();
     const text = document.getElementById("textInput").value.trim();
@@ -877,35 +887,36 @@ ${text}`;
                 throw new Error("Gemini က Audio Data မပြန်လာပါ။");
             }
 
-            // MP3 Data URI Format စက်စက် အဖြစ် ပြောင်းလဲပေးခြင်း
-            const dataUri = `data:audio/mp3;base64,${base64}`;
+            const pcm = base64ToUint8Array(base64);
+            const wav = pcmToWav(pcm, 24000, 1, 16);
+            currentBlob = new Blob([wav], { type: "audio/wav" });
+
+            if(audioURL){
+                URL.revokeObjectURL(audioURL);
+            }
+
+            audioURL = URL.createObjectURL(currentBlob);
 
             const player = document.getElementById("audioPlayer");
-            player.src = dataUri;
+            player.src = audioURL;
 
             const currentSpeed = document.getElementById("speedSlider")?.value || 1.0;
             player.playbackRate = parseFloat(currentSpeed);
 
             const downloadBtn = document.getElementById("downloadBtn");
-            const fileName = `speechmaker_audio_${Date.now()}.mp3`;
+            const fileName = `Voice_${Date.now()}.wav`;
             
-            downloadBtn.href = dataUri;
-            downloadBtn.download = fileName;
-
-            downloadBtn.onclick = function(e) {
-                const a = document.createElement('a');
-                a.href = dataUri;
-                a.download = fileName;
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
+            downloadBtn.onclick = function() {
+                if (currentBlob) {
+                    triggerDownload(currentBlob, fileName);
+                }
             };
 
             document.getElementById("result").style.display = "block";
             showGenerateMessage(`✅ Multi-Voice ဖန်တီးပြီးပါပြီ။`, "success");
 
-            // Save Audio to IndexedDB History
-            saveToHistory(text, dataUri, fileName);
+            // Save to History Database
+            saveToHistory(text, currentBlob);
 
             success = true;
             break;
@@ -923,68 +934,127 @@ ${text}`;
     btn.innerHTML = "🔊 Generate Multi-Voice";
 }
 
-// History System Functions
-function saveToHistory(text, audioUri, fileName) {
+// History စနစ်ဆိုင်ရာ Functions
+function saveToHistory(text, blob) {
     if (!db) return;
-    const tx = db.transaction("audio_history", "readwrite");
-    const store = tx.objectStore("audio_history");
+    const transaction = db.transaction(["audioHistory"], "readwrite");
+    const store = transaction.objectStore("audioHistory");
     const record = {
         text: text,
-        audioData: audioUri,
-        fileName: fileName,
+        blob: blob,
         date: new Date().toLocaleString()
     };
     store.add(record);
-    tx.oncomplete = function() {
-        loadHistory();
+    transaction.oncomplete = function() {
+        loadHistoryFromDB();
     };
 }
 
-function loadHistory() {
+function loadHistoryFromDB() {
     if (!db) return;
-    const tx = db.transaction("audio_history", "readonly");
-    const store = tx.objectStore("audio_history");
+    const container = document.getElementById("historyContainer");
+    const transaction = db.transaction(["audioHistory"], "readonly");
+    const store = transaction.objectStore("audioHistory");
     const request = store.getAll();
 
     request.onsuccess = function() {
-        const list = request.result.reverse();
-        const historyContainer = document.getElementById("historyList");
-        if (list.length === 0) {
-            historyContainer.innerHTML = '<p style="color:#6688a5; font-size:13px;">မှတ်တမ်း မရှိသေးပါ။</p>';
+        const records = request.result;
+        if (!records || records.length === 0) {
+            container.innerHTML = '<p style="color:#6688a5; font-size:13px; text-align:center;">History မရှိသေးပါ။</p>';
             return;
         }
 
-        let html = '';
-        list.forEach(item => {
-            html += `
-                <div class="history-item">
-                    <div class="history-time">📅 ${item.date}</div>
-                    <div class="history-text">📝 ${escapeHtml(item.text)}</div>
-                    <audio src="${item.audioData}" controls style="margin-top:6px; height:35px;"></audio>
-                    <div class="history-actions">
-                        <a href="${item.audioData}" download="${item.fileName}" class="history-btn">⬇️ Download MP3</a>
-                    </div>
-                </div>
+        container.innerHTML = "";
+        // သစ်လွင်သော Record များကို အပေါ်တွင် ပြသရန် Reverse လုပ်သည်
+        records.reverse().forEach((item) => {
+            const blobUrl = URL.createObjectURL(item.blob);
+            const itemDiv = document.createElement("div");
+            itemDiv.className = "history-item";
+
+            const fileName = `Voice_${Date.now()}.wav`;
+
+            itemDiv.innerHTML = `
+                <div class="history-date">📅 ${item.date}</div>
+                <div class="history-text">📝 ${escapeHtml(item.text.substring(0, 80))}${item.text.length > 80 ? '...' : ''}</div>
+                <audio controls src="${blobUrl}"></audio>
+                <button class="download" style="width:100%; margin-top:8px; padding:10px; font-size:13px;" onclick="triggerDownloadFromHistory('${blobUrl}', '${fileName}')">
+                    ⬇️ Download WAV
+                </button>
             `;
+            container.appendChild(itemDiv);
         });
-        historyContainer.innerHTML = html;
     };
 }
 
-function clearHistory() {
+function triggerDownloadFromHistory(blobUrl, filename) {
+    const a = document.createElement("a");
+    a.href = blobUrl;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(() => {
+        document.body.removeChild(a);
+    }, 100);
+}
+
+function clearAllHistory() {
     if (!db) return;
-    if (confirm("History အကုန်လုံးကို ဖျက်မှာ သေချာပါသလား?")) {
-        const tx = db.transaction("audio_history", "readwrite");
-        const store = tx.objectStore("audio_history");
+    if (confirm("History အားလုံးကို ဖျက်ရန် သေချာပါသလား?")) {
+        const transaction = db.transaction(["audioHistory"], "readwrite");
+        const store = transaction.objectStore("audioHistory");
         store.clear();
-        tx.oncomplete = function() {
-            loadHistory();
+        transaction.oncomplete = function() {
+            loadHistoryFromDB();
         };
     }
 }
 
-function escapeHtml(str) {
-    return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+function escapeHtml(text) {
+    return text
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+
+function base64ToUint8Array(base64){
+    const binary = atob(base64);
+    const bytes = new Uint8Array(binary.length);
+    for(let i=0;i<binary.length;i++){
+        bytes[i] = binary.charCodeAt(i);
+    }
+    return bytes;
+}
+
+function pcmToWav(pcmData, sampleRate, channels, bitDepth){
+    const bytesPerSample = bitDepth / 8;
+    const blockAlign = channels * bytesPerSample;
+    const buffer = new ArrayBuffer(44 + pcmData.length);
+    const view = new DataView(buffer);
+
+    writeString(view, 0, "RIFF");
+    view.setUint32(4, 36 + pcmData.length, true);
+    writeString(view, 8, "WAVE");
+    writeString(view, 12, "fmt ");
+    view.setUint32(16, 16, true);
+    view.setUint16(20, 1, true);
+    view.setUint16(22, channels, true);
+    view.setUint32(24, sampleRate, true);
+    view.setUint32(28, sampleRate * blockAlign, true);
+    view.setUint16(32, blockAlign, true);
+    view.setUint16(34, bitDepth, true);
+    writeString(view, 36, "data");
+    view.setUint32(40, pcmData.length, true);
+
+    new Uint8Array(buffer, 44).set(pcmData);
+    return buffer;
+}
+
+function writeString(view, offset, string){
+    for(let i=0; i<string.length; i++){
+        view.setUint8(offset+i, string.charCodeAt(i));
+    }
 }
 
 function showGenerateMessage(text, type){
