@@ -312,6 +312,45 @@ audio{
     margin-right:8px;
 }
 
+/* History Card Styling */
+.history-item {
+    background: #071c33;
+    border: 1px solid #144e7c;
+    border-radius: 14px;
+    padding: 12px;
+    margin-top: 10px;
+}
+.history-time {
+    font-size: 11px;
+    color: #00baff;
+    margin-bottom: 4px;
+}
+.history-text {
+    font-size: 13px;
+    color: #bdd5e9;
+    margin-bottom: 8px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.history-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 8px;
+}
+.history-btn {
+    flex: 1;
+    padding: 8px;
+    font-size: 12px;
+    border-radius: 8px;
+    border: 1px solid #167bb9;
+    background: #0c355d;
+    color: #6edaff;
+    text-align: center;
+    text-decoration: none;
+    cursor: pointer;
+}
+
 @keyframes spin{
     to{transform:rotate(360deg)}
 }
@@ -459,7 +498,7 @@ audio{
         </div>
 
 
-        <!-- MULTI-SPEAKER SELECT (Speaker နှစ်ခုလုံးမှာ အသံစုံ ရွေးလို့ရအောင် ပြင်ထားသည်) -->
+        <!-- MULTI-SPEAKER SELECT -->
         <div class="section">
 
             <div class="section-title">
@@ -594,13 +633,24 @@ audio{
                 <a
                     id="downloadBtn"
                     class="download"
-                    download="gemini-dialogue-voice.wav"
+                    download="speechmaker_audio.mp3"
                 >
-                    ⬇️ Download Voice
+                    ⬇️ Download MP3 Voice
                 </a>
 
             </div>
 
+        </div>
+
+        <!-- GENERATED HISTORY SECTION -->
+        <div class="section">
+            <div class="section-title">
+                <h2>📜 History (အတိတ်က လုပ်ခဲ့သမျှ အသံဖိုင်များ)</h2>
+                <button class="btn btn-danger" style="min-height:35px; padding:0 12px; font-size:12px;" onclick="clearHistory()">Clear History</button>
+            </div>
+            <div id="historyList">
+                <p style="color:#6688a5; font-size:13px;">မှတ်တမ်း မရှိသေးပါ။</p>
+            </div>
         </div>
 
     </div>
@@ -618,7 +668,20 @@ const MY_PASSWORD = "1911999";
 const API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-tts-preview:generateContent";
 
 let audioURL = null;
-let currentBlob = null;
+let db = null;
+
+// IndexedDB Initialization for Audio History Storage
+const dbRequest = indexedDB.open("VoiceStudioDB", 1);
+dbRequest.onupgradeneeded = function(e) {
+    db = e.target.result;
+    if (!db.objectStoreNames.contains("audio_history")) {
+        db.createObjectStore("audio_history", { keyPath: "id", autoIncrement: true });
+    }
+};
+dbRequest.onsuccess = function(e) {
+    db = e.target.result;
+    loadHistory();
+};
 
 function unlockApp() {
     const inputPass = document.getElementById("passInput").value;
@@ -631,6 +694,7 @@ function unlockApp() {
             document.getElementById("apiKey").value = saved;
         }
         updateKeyStatus();
+        loadHistory();
     } else {
         msgBox.textContent = "❌ Password မှားယွင်းနေပါသည်။";
         msgBox.className = "message error";
@@ -813,45 +877,35 @@ ${text}`;
                 throw new Error("Gemini က Audio Data မပြန်လာပါ။");
             }
 
-            const pcm = base64ToUint8Array(base64);
-            const wav = pcmToWav(pcm, 24000, 1, 16);
-            currentBlob = new Blob([wav], { type: "audio/wav" });
-
-            if(audioURL){
-                URL.revokeObjectURL(audioURL);
-            }
-
-            audioURL = URL.createObjectURL(currentBlob);
+            // MP3 Data URI Format စက်စက် အဖြစ် ပြောင်းလဲပေးခြင်း
+            const dataUri = `data:audio/mp3;base64,${base64}`;
 
             const player = document.getElementById("audioPlayer");
-            player.src = audioURL;
+            player.src = dataUri;
 
             const currentSpeed = document.getElementById("speedSlider")?.value || 1.0;
             player.playbackRate = parseFloat(currentSpeed);
 
             const downloadBtn = document.getElementById("downloadBtn");
-            const fileName = `Voice_${Date.now()}.wav`;
+            const fileName = `speechmaker_audio_${Date.now()}.mp3`;
             
-            downloadBtn.href = audioURL;
+            downloadBtn.href = dataUri;
             downloadBtn.download = fileName;
 
             downloadBtn.onclick = function(e) {
-                if (currentBlob) {
-                    const reader = new FileReader();
-                    reader.readAsDataURL(currentBlob);
-                    reader.onloadend = function() {
-                        const a = document.createElement('a');
-                        a.href = reader.result;
-                        a.download = fileName;
-                        document.body.appendChild(a);
-                        a.click();
-                        document.body.removeChild(a);
-                    };
-                }
+                const a = document.createElement('a');
+                a.href = dataUri;
+                a.download = fileName;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
             };
 
             document.getElementById("result").style.display = "block";
             showGenerateMessage(`✅ Multi-Voice ဖန်တီးပြီးပါပြီ။`, "success");
+
+            // Save Audio to IndexedDB History
+            saveToHistory(text, dataUri, fileName);
 
             success = true;
             break;
@@ -869,43 +923,68 @@ ${text}`;
     btn.innerHTML = "🔊 Generate Multi-Voice";
 }
 
-function base64ToUint8Array(base64){
-    const binary = atob(base64);
-    const bytes = new Uint8Array(binary.length);
-    for(let i=0;i<binary.length;i++){
-        bytes[i] = binary.charCodeAt(i);
-    }
-    return bytes;
+// History System Functions
+function saveToHistory(text, audioUri, fileName) {
+    if (!db) return;
+    const tx = db.transaction("audio_history", "readwrite");
+    const store = tx.objectStore("audio_history");
+    const record = {
+        text: text,
+        audioData: audioUri,
+        fileName: fileName,
+        date: new Date().toLocaleString()
+    };
+    store.add(record);
+    tx.oncomplete = function() {
+        loadHistory();
+    };
 }
 
-function pcmToWav(pcmData, sampleRate, channels, bitDepth){
-    const bytesPerSample = bitDepth / 8;
-    const blockAlign = channels * bytesPerSample;
-    const buffer = new ArrayBuffer(44 + pcmData.length);
-    const view = new DataView(buffer);
+function loadHistory() {
+    if (!db) return;
+    const tx = db.transaction("audio_history", "readonly");
+    const store = tx.objectStore("audio_history");
+    const request = store.getAll();
 
-    writeString(view, 0, "RIFF");
-    view.setUint32(4, 36 + pcmData.length, true);
-    writeString(view, 8, "WAVE");
-    writeString(view, 12, "fmt ");
-    view.setUint32(16, 16, true);
-    view.setUint16(20, 1, true);
-    view.setUint16(22, channels, true);
-    view.setUint32(24, sampleRate, true);
-    view.setUint32(28, sampleRate * blockAlign, true);
-    view.setUint16(32, blockAlign, true);
-    view.setUint16(34, bitDepth, true);
-    writeString(view, 36, "data");
-    view.setUint32(40, pcmData.length, true);
+    request.onsuccess = function() {
+        const list = request.result.reverse();
+        const historyContainer = document.getElementById("historyList");
+        if (list.length === 0) {
+            historyContainer.innerHTML = '<p style="color:#6688a5; font-size:13px;">မှတ်တမ်း မရှိသေးပါ။</p>';
+            return;
+        }
 
-    new Uint8Array(buffer, 44).set(pcmData);
-    return buffer;
+        let html = '';
+        list.forEach(item => {
+            html += `
+                <div class="history-item">
+                    <div class="history-time">📅 ${item.date}</div>
+                    <div class="history-text">📝 ${escapeHtml(item.text)}</div>
+                    <audio src="${item.audioData}" controls style="margin-top:6px; height:35px;"></audio>
+                    <div class="history-actions">
+                        <a href="${item.audioData}" download="${item.fileName}" class="history-btn">⬇️ Download MP3</a>
+                    </div>
+                </div>
+            `;
+        });
+        historyContainer.innerHTML = html;
+    };
 }
 
-function writeString(view, offset, string){
-    for(let i=0; i<string.length; i++){
-        view.setUint8(offset+i, string.charCodeAt(i));
+function clearHistory() {
+    if (!db) return;
+    if (confirm("History အကုန်လုံးကို ဖျက်မှာ သေချာပါသလား?")) {
+        const tx = db.transaction("audio_history", "readwrite");
+        const store = tx.objectStore("audio_history");
+        store.clear();
+        tx.oncomplete = function() {
+            loadHistory();
+        };
     }
+}
+
+function escapeHtml(str) {
+    return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
 }
 
 function showGenerateMessage(text, type){
