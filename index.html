@@ -1351,7 +1351,13 @@ ${text}`;
                 16
             );
 
-            // WAV → MP3 128kbps
+            /*
+             * WAV ကို MP3 အဖြစ် ပြောင်းပြီး
+             * file size လျှော့မယ်။
+             *
+             * Voice quality မကျလွန်းအောင်
+             * 96kbps ကို သုံးထားပါတယ်။
+             */
             currentBlob =
             await compressWavBuffer(
                 wavBuffer
@@ -1454,11 +1460,25 @@ ${text}`;
 
 }
 
+/*
+ * WAV → MP3 Compression
+ *
+ * မူရင်း:
+ * 128kbps
+ *
+ * အသစ်:
+ * 96kbps
+ *
+ * Voice အသံအရည်အသွေးကို ထိန်းထားပြီး
+ * MP3 file size ကို ပိုသေးအောင်လုပ်ထားပါတယ်။
+ */
 async function compressWavBuffer(arrayBuffer){
+
+    let audioCtx = null;
 
     try{
 
-        const audioCtx =
+        audioCtx =
         new (
             window.AudioContext ||
             window.webkitAudioContext
@@ -1527,12 +1547,22 @@ async function compressWavBuffer(arrayBuffer){
 
         }
 
-        // MP3 Encoder
+        /*
+         * MP3 Encoder
+         *
+         * 96kbps
+         * Mono
+         * 16000Hz
+         *
+         * Voice / Dialogue အတွက်
+         * file size နဲ့ quality ကို
+         * balance လုပ်ထားပါတယ်။
+         */
         const mp3encoder =
         new lamejs.Mp3Encoder(
             1,
             targetSampleRate,
-            128
+            96
         );
 
         const mp3Data = [];
@@ -1583,25 +1613,45 @@ async function compressWavBuffer(arrayBuffer){
 
         }
 
-        return new Blob(
+        const resultBlob =
+        new Blob(
             mp3Data,
             {
                 type:"audio/mpeg"
             }
         );
 
+        if(audioCtx){
+
+            await audioCtx.close().catch(
+                ()=>{}
+            );
+
+        }
+
+        return resultBlob;
+
     }catch(e){
 
-        console.warn(
-            "MP3 Compression Fallback:",
+        console.error(
+            "MP3 Compression Error:",
             e
         );
 
-        return new Blob(
-            [arrayBuffer],
-            {
-                type:"audio/wav"
-            }
+        if(audioCtx){
+
+            await audioCtx.close().catch(
+                ()=>{}
+            );
+
+        }
+
+        /*
+         * WAV fallback မလုပ်တော့ပါ။
+         * WAV ပြန်ထွက်ရင် file size ကြီးသွားနိုင်လို့ပါ။
+         */
+        throw new Error(
+            "MP3 Compression မအောင်မြင်ပါ။ Browser ကို Refresh လုပ်ပြီး ပြန်စမ်းပါ။"
         );
 
     }
