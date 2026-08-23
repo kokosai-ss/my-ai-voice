@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>AI Voice Studio - Multi-Speaker</title>
 
-<!-- MP3 Encoder -->
 <script src="https://cdn.jsdelivr.net/npm/lamejs@1.2.1/lame.min.js"></script>
 
 <style>
@@ -288,6 +287,8 @@ audio{
     border-radius:14px;
     line-height:1.6;
     font-size:14px;
+    white-space:pre-wrap;
+    word-break:break-word;
 }
 
 .message.error{
@@ -302,6 +303,13 @@ audio{
     background:#113427;
     color:#6af0aa;
     border:1px solid #287b55;
+}
+
+.message.info{
+    display:block;
+    background:#102d45;
+    color:#7ed9ff;
+    border:1px solid #17659b;
 }
 
 .loading{
@@ -363,6 +371,7 @@ audio{
 }
 
 @media(max-width:480px){
+
     .container{
         padding:12px 10px 40px;
     }
@@ -396,6 +405,7 @@ audio{
 <div class="container">
 
 <div class="hero">
+
     <div class="hero-icon">🎙️</div>
 
     <h1>AI Voice Studio</h1>
@@ -408,13 +418,19 @@ audio{
     <div class="credit">
         @shburmesemovie ကို ဆက်သွယ်ပါ
     </div>
+
 </div>
 
 <div id="passwordSection" class="section">
 
     <div class="section-title">
+
         <h2>🔑 Access Protection</h2>
-        <span class="badge">Locked</span>
+
+        <span class="badge">
+            Locked
+        </span>
+
     </div>
 
     <p class="subtitle" style="margin-bottom:12px;">
@@ -422,11 +438,13 @@ audio{
     </p>
 
     <div class="input-wrap">
+
         <input
             id="passInput"
             type="password"
             placeholder="Password ရိုက်ထည့်ပါ..."
         >
+
     </div>
 
     <button
@@ -438,6 +456,7 @@ audio{
     </button>
 
     <div id="passMessage" class="message"></div>
+
 </div>
 
 <div id="appContent">
@@ -447,14 +466,18 @@ audio{
     <div class="section-title">
 
         <div>
+
             <h2>🎙️ AI Voice Generator</h2>
 
             <div class="subtitle">
                 Google Gemini Text-to-Speech
             </div>
+
         </div>
 
-        <span class="badge">Gemini TTS</span>
+        <span class="badge">
+            Gemini TTS
+        </span>
 
     </div>
 
@@ -807,13 +830,22 @@ audio{
 
 const MY_PASSWORD = "1911999";
 
+/* ================================
+   GEMINI TTS MODEL
+   ================================ */
+
 const API_URL =
-"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent";
+"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-tts:generateContent";
 
 let audioURL = null;
+
 let currentBlob = null;
 
 let db;
+
+/* ================================
+   INDEXED DB
+   ================================ */
 
 const dbRequest =
 indexedDB.open("VoiceStudioDB",1);
@@ -844,6 +876,10 @@ dbRequest.onsuccess = function(e){
 
 };
 
+/* ================================
+   PASSWORD
+   ================================ */
+
 function unlockApp(){
 
     const inputPass =
@@ -862,7 +898,8 @@ function unlockApp(){
             "appContent"
         ).style.display = "block";
 
-        const saved = getStoredKey();
+        const saved =
+        getStoredKey();
 
         if(saved){
 
@@ -886,6 +923,10 @@ function unlockApp(){
 
 }
 
+/* ================================
+   SPEED
+   ================================ */
+
 function updateSpeed(val){
 
     document.getElementById(
@@ -903,6 +944,10 @@ function updateSpeed(val){
     }
 
 }
+
+/* ================================
+   API KEY
+   ================================ */
 
 function getStoredKey(){
 
@@ -1042,6 +1087,10 @@ function showKeyMessage(text,type){
 
 }
 
+/* ================================
+   TEST KEY
+   ================================ */
+
 async function testKey(){
 
     const rawKeys =
@@ -1067,8 +1116,8 @@ async function testKey(){
     .filter(k => k.length > 0);
 
     showKeyMessage(
-        "API Key ကို စစ်ဆေးနေပါတယ်...",
-        "success"
+        "🔄 API Key ကို စစ်ဆေးနေပါတယ်...",
+        "info"
     );
 
     try{
@@ -1085,16 +1134,21 @@ async function testKey(){
             }
         );
 
+        const data =
+        await response.json().catch(
+            ()=>({})
+        );
+
         if(!response.ok){
 
-            const data =
-            await response.json().catch(
-                ()=>({})
+            const errorText =
+            formatApiError(
+                response.status,
+                data
             );
 
             throw new Error(
-                data?.error?.message ||
-                "API Key မမှန်ပါ။"
+                errorText
             );
 
         }
@@ -1122,13 +1176,17 @@ async function testKey(){
     }catch(error){
 
         showKeyMessage(
-            "❌ " + error.message,
+            error.message,
             "error"
         );
 
     }
 
 }
+
+/* ================================
+   COUNTER
+   ================================ */
 
 function updateCounter(){
 
@@ -1144,7 +1202,14 @@ function updateCounter(){
 
 }
 
-function triggerDownload(blob,filename){
+/* ================================
+   DOWNLOAD
+   ================================ */
+
+function triggerDownload(
+    blob,
+    filename
+){
 
     const url =
     URL.createObjectURL(blob);
@@ -1169,6 +1234,10 @@ function triggerDownload(blob,filename){
     },100);
 
 }
+
+/* ================================
+   GENERATE VOICE
+   ================================ */
 
 async function generateVoice(){
 
@@ -1237,24 +1306,49 @@ async function generateVoice(){
 
     document.getElementById(
         "generateMessage"
-    ).className = "message";
+    ).className =
+    "message";
 
     document.getElementById(
         "result"
-    ).style.display = "none";
+    ).style.display =
+    "none";
+
+    /*
+    ==================================
+    TTS PROMPT
+    ==================================
+    */
 
     const prompt =
-`You are a professional voice actor and multi-speaker audio generator.
-Style requirement: ${style}
+`Generate natural spoken audio for this Burmese dialogue.
 
-RULES FOR VOICE ACTING:
-1. Lines starting with [1]: MUST be spoken by Voice 1 (${spk1}).
-2. Lines starting with [2]: MUST be spoken by Voice 2 (${spk2}).
-3. Read the dialogue script naturally with high emotional quality according to the dialogue context.
-4. DO NOT read the tags '[1]:' or '[2]:' out loud in the audio output.
+Voice 1:
+${spk1}
 
-Script:
+Voice 2:
+${spk2}
+
+Style:
+${style}
+
+IMPORTANT:
+- Lines beginning with [1]: must be spoken by Voice 1.
+- Lines beginning with [2]: must be spoken by Voice 2.
+- Do NOT speak the [1]: or [2]: labels.
+- Keep the dialogue in Burmese.
+- Do not translate the dialogue.
+- Do not add extra narration.
+- Perform the dialogue naturally and emotionally.
+
+Dialogue:
 ${text}`;
+
+    /*
+    ==================================
+    IMPORTANT TTS CONFIG
+    ==================================
+    */
 
     const body = {
 
@@ -1269,12 +1363,58 @@ ${text}`;
         ],
 
         generationConfig:{
-            responseMimeType:"audio/wav"
+
+            responseModalities:[
+                "AUDIO"
+            ],
+
+            speechConfig:{
+
+                multiSpeakerVoiceConfig:{
+
+                    speakerVoiceConfigs:[
+
+                        {
+                            speaker:"Speaker 1",
+
+                            voiceConfig:{
+                                prebuiltVoiceConfig:{
+                                    voiceName:spk1
+                                }
+                            }
+
+                        },
+
+                        {
+                            speaker:"Speaker 2",
+
+                            voiceConfig:{
+                                prebuiltVoiceConfig:{
+                                    voiceName:spk2
+                                }
+                            }
+
+                        }
+
+                    ]
+
+                }
+
+            }
+
         }
 
     };
 
     let success = false;
+
+    let lastError = "";
+
+    /*
+    ==================================
+    TRY EACH API KEY
+    ==================================
+    */
 
     for(
         let i=0;
@@ -1288,8 +1428,10 @@ ${text}`;
         try{
 
             showGenerateMessage(
-                "🔄 Key ဖြင့် စမ်းသပ်နေပါသည်...",
-                "success"
+                "🔄 API Key " +
+                (i + 1) +
+                " ဖြင့် စမ်းသပ်နေပါတယ်...",
+                "info"
             );
 
             const response =
@@ -1312,31 +1454,80 @@ ${text}`;
             );
 
             const data =
-            await response.json();
+            await response.json().catch(
+                ()=>({})
+            );
+
+            /*
+            ==================================
+            SHOW REAL GOOGLE ERROR
+            ==================================
+            */
 
             if(!response.ok){
 
+                const realError =
+                formatApiError(
+                    response.status,
+                    data
+                );
+
+                lastError =
+                realError;
+
+                /*
+                Don't immediately hide
+                the real error.
+                */
+
+                showGenerateMessage(
+                    realError,
+                    "error"
+                );
+
+                continue;
+
+            }
+
+            /*
+            ==================================
+            FIND AUDIO
+            ==================================
+            */
+
+            const audioPart =
+            data
+            ?.candidates?.[0]
+            ?.content?.parts?.find(
+                p =>
+                p.inlineData &&
+                p.inlineData.data
+            );
+
+            if(!audioPart){
+
                 throw new Error(
-                    data?.error?.message ||
-                    "API Key Error"
+                    "❌ Gemini က Audio Data မပြန်လာပါ။\n\n" +
+                    "Response:\n" +
+                    JSON.stringify(
+                        data,
+                        null,
+                        2
+                    )
                 );
 
             }
 
             const base64 =
-            data
-            ?.candidates?.[0]
-            ?.content?.parts
-            ?.find(p => p.inlineData)
-            ?.inlineData?.data;
+            audioPart
+            .inlineData
+            .data;
 
-            if(!base64){
-
-                throw new Error(
-                    "Gemini က Audio Data မပြန်လာပါ။"
-                );
-
-            }
+            /*
+            ==================================
+            GEMINI TTS AUDIO IS PCM
+            ==================================
+            */
 
             const pcm =
             base64ToUint8Array(
@@ -1352,12 +1543,11 @@ ${text}`;
             );
 
             /*
-             * WAV ကို MP3 အဖြစ် ပြောင်းပြီး
-             * file size လျှော့မယ်။
-             *
-             * Voice quality မကျလွန်းအောင်
-             * 96kbps ကို သုံးထားပါတယ်။
-             */
+            ==================================
+            COMPRESS TO MP3
+            ==================================
+            */
+
             currentBlob =
             await compressWavBuffer(
                 wavBuffer
@@ -1390,7 +1580,9 @@ ${text}`;
             )?.value || 1.0;
 
             player.playbackRate =
-            parseFloat(currentSpeed);
+            parseFloat(
+                currentSpeed
+            );
 
             const downloadBtn =
             document.getElementById(
@@ -1437,17 +1629,34 @@ ${text}`;
 
             console.warn(
                 "Key Error:",
-                error.message
+                error
+            );
+
+            lastError =
+            error.message;
+
+            showGenerateMessage(
+                "❌ " +
+                error.message,
+                "error"
             );
 
         }
 
     }
 
+    /*
+    ==================================
+    ALL KEYS FAILED
+    ==================================
+    */
+
     if(!success){
 
         showGenerateMessage(
-            "❌ API Key Limit ပြည့်နေပါသည် သို့မဟုတ် မှားယွင်းနေပါသည်။",
+            "❌ Generate မအောင်မြင်ပါ။\n\n" +
+            "နောက်ဆုံးရရှိတဲ့ Error:\n" +
+            lastError,
             "error"
         );
 
@@ -1460,25 +1669,83 @@ ${text}`;
 
 }
 
-/*
- * WAV → MP3 Compression
- *
- * မူရင်း:
- * 128kbps
- *
- * အသစ်:
- * 96kbps
- *
- * Voice အသံအရည်အသွေးကို ထိန်းထားပြီး
- * MP3 file size ကို ပိုသေးအောင်လုပ်ထားပါတယ်။
- */
-async function compressWavBuffer(arrayBuffer){
+/* ================================
+   FORMAT REAL API ERROR
+   ================================ */
 
-    let audioCtx = null;
+function formatApiError(
+    status,
+    data
+){
+
+    const apiMessage =
+    data
+    ?.error
+    ?.message ||
+    data
+    ?.error
+    ?.status ||
+    "Unknown API Error";
+
+    let title =
+    "❌ API Error";
+
+    if(status === 400){
+
+        title =
+        "❌ 400 — Request / Model Error";
+
+    }else if(status === 401){
+
+        title =
+        "❌ 401 — API Key မမှန်ပါ";
+
+    }else if(status === 403){
+
+        title =
+        "❌ 403 — API Key Permission မရှိပါ";
+
+    }else if(status === 404){
+
+        title =
+        "❌ 404 — Model မတွေ့ပါ";
+
+    }else if(status === 429){
+
+        title =
+        "⚠️ 429 — API Limit / Quota ပြဿနာ";
+
+    }else if(status === 500){
+
+        title =
+        "❌ 500 — Google Server Error";
+
+    }else if(status === 503){
+
+        title =
+        "⚠️ 503 — Google Service ခဏမရပါ";
+
+    }
+
+    return (
+        title +
+        "\n\n" +
+        apiMessage
+    );
+
+}
+
+/* ================================
+   WAV → MP3
+   ================================ */
+
+async function compressWavBuffer(
+    arrayBuffer
+){
 
     try{
 
-        audioCtx =
+        const audioCtx =
         new (
             window.AudioContext ||
             window.webkitAudioContext
@@ -1547,22 +1814,11 @@ async function compressWavBuffer(arrayBuffer){
 
         }
 
-        /*
-         * MP3 Encoder
-         *
-         * 96kbps
-         * Mono
-         * 16000Hz
-         *
-         * Voice / Dialogue အတွက်
-         * file size နဲ့ quality ကို
-         * balance လုပ်ထားပါတယ်။
-         */
         const mp3encoder =
         new lamejs.Mp3Encoder(
             1,
             targetSampleRate,
-            96
+            128
         );
 
         const mp3Data = [];
@@ -1613,52 +1869,39 @@ async function compressWavBuffer(arrayBuffer){
 
         }
 
-        const resultBlob =
-        new Blob(
+        return new Blob(
             mp3Data,
             {
                 type:"audio/mpeg"
             }
         );
 
-        if(audioCtx){
-
-            await audioCtx.close().catch(
-                ()=>{}
-            );
-
-        }
-
-        return resultBlob;
-
     }catch(e){
 
-        console.error(
-            "MP3 Compression Error:",
+        console.warn(
+            "MP3 Compression Fallback:",
             e
         );
 
-        if(audioCtx){
-
-            await audioCtx.close().catch(
-                ()=>{}
-            );
-
-        }
-
-        /*
-         * WAV fallback မလုပ်တော့ပါ။
-         * WAV ပြန်ထွက်ရင် file size ကြီးသွားနိုင်လို့ပါ။
-         */
-        throw new Error(
-            "MP3 Compression မအောင်မြင်ပါ။ Browser ကို Refresh လုပ်ပြီး ပြန်စမ်းပါ။"
+        return new Blob(
+            [arrayBuffer],
+            {
+                type:"audio/wav"
+            }
         );
 
     }
 
 }
 
-function saveToHistory(text,blob){
+/* ================================
+   HISTORY
+   ================================ */
+
+function saveToHistory(
+    text,
+    blob
+){
 
     if(!db) return;
 
@@ -1863,6 +2106,10 @@ function clearAllHistory(){
 
 }
 
+/* ================================
+   HTML ESCAPE
+   ================================ */
+
 function escapeHtml(text){
 
     return text
@@ -1889,7 +2136,13 @@ function escapeHtml(text){
 
 }
 
-function base64ToUint8Array(base64){
+/* ================================
+   BASE64
+   ================================ */
+
+function base64ToUint8Array(
+    base64
+){
 
     const binary =
     atob(base64);
@@ -1913,6 +2166,10 @@ function base64ToUint8Array(base64){
     return bytes;
 
 }
+
+/* ================================
+   PCM → WAV
+   ================================ */
 
 function pcmToWav(
     pcmData,
@@ -2046,6 +2303,10 @@ function writeString(
     }
 
 }
+
+/* ================================
+   MESSAGE
+   ================================ */
 
 function showGenerateMessage(
     text,
