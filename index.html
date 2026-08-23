@@ -664,20 +664,9 @@ const API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-
 let audioURL = null;
 let currentBlob = null;
 
-// IndexedDB - Audio Blobs သိမ်းဆည်းရန် Database
-let db;
-const dbRequest = indexedDB.open("VoiceStudioDB", 1);
-
-dbRequest.onupgradeneeded = function(e) {
-    db = e.target.result;
-    if (!db.objectStoreNames.contains("audioHistory")) {
-        db.createObjectStore("audioHistory", { keyPath: "id", autoIncrement: true });
-    }
-};
-
-dbRequest.onsuccess = function(e) {
-    db = e.target.result;
-    loadHistoryFromDB();
+// Page လုဒ်ဖြစ်ချိန်တွင် History အဟောင်းများကို လာဖတ်မည်
+window.onload = function() {
+    loadHistoryFromLocalStorage();
 };
 
 function unlockApp() {
@@ -691,6 +680,7 @@ function unlockApp() {
             document.getElementById("apiKey").value = saved;
         }
         updateKeyStatus();
+        loadHistoryFromLocalStorage();
     } else {
         msgBox.textContent = "❌ Password မှားယွင်းနေပါသည်။";
         msgBox.className = "message error";
@@ -915,8 +905,8 @@ ${text}`;
             document.getElementById("result").style.display = "block";
             showGenerateMessage(`✅ Multi-Voice ဖန်တီးပြီးပါပြီ။`, "success");
 
-            // Save to History Database
-            saveToHistory(text, currentBlob);
+            // LocalStorage ထဲ သို့ မူရင်း အလုပ်လုပ်သော နည်းလမ်းအတိုင်း သိမ်းမည်
+            saveToLocalStorageHistory(text, base64);
 
             success = true;
             break;
@@ -934,78 +924,72 @@ ${text}`;
     btn.innerHTML = "🔊 Generate Multi-Voice";
 }
 
-// History စနစ်ဆိုင်ရာ Functions
-function saveToHistory(text, blob) {
-    if (!db) return;
-    const transaction = db.transaction(["audioHistory"], "readwrite");
-    const store = transaction.objectStore("audioHistory");
-    const record = {
+// LocalStorage ထဲ သို့ မူရင်း အလုပ်လုပ်သော နည်းလမ်းအတိုင်း သိမ်းဆည်းသည့် Functions
+function saveToLocalStorageHistory(text, base64Data) {
+    let history = JSON.parse(localStorage.getItem("voice_history") || "[]");
+    const newItem = {
+        id: Date.now(),
         text: text,
-        blob: blob,
+        base64: base64Data,
         date: new Date().toLocaleString()
     };
-    store.add(record);
-    transaction.oncomplete = function() {
-        loadHistoryFromDB();
-    };
+    
+    history.unshift(newItem);
+    if(history.length > 10) history.pop();
+
+    try {
+        localStorage.setItem("voice_history", JSON.stringify(history));
+        loadHistoryFromLocalStorage();
+    } catch(e) {
+        console.warn("Storage Full ဖြစ်နေပါသည်။", e);
+    }
 }
 
-function loadHistoryFromDB() {
-    if (!db) return;
+function loadHistoryFromLocalStorage() {
     const container = document.getElementById("historyContainer");
-    const transaction = db.transaction(["audioHistory"], "readonly");
-    const store = transaction.objectStore("audioHistory");
-    const request = store.getAll();
+    if (!container) return;
 
-    request.onsuccess = function() {
-        const records = request.result;
-        if (!records || records.length === 0) {
-            container.innerHTML = '<p style="color:#6688a5; font-size:13px; text-align:center;">History မရှိသေးပါ။</p>';
-            return;
-        }
+    let history = JSON.parse(localStorage.getItem("voice_history") || "[]");
 
-        container.innerHTML = "";
-        // သစ်လွင်သော Record များကို အပေါ်တွင် ပြသရန် Reverse လုပ်သည်
-        records.reverse().forEach((item) => {
-            const blobUrl = URL.createObjectURL(item.blob);
-            const itemDiv = document.createElement("div");
-            itemDiv.className = "history-item";
+    if (history.length === 0) {
+        container.innerHTML = '<p style="color:#6688a5; font-size:13px; text-align:center;">History မရှိသေးပါ။</p>';
+        return;
+    }
 
-            const fileName = `Voice_${Date.now()}.wav`;
+    container.innerHTML = "";
+    history.forEach((item) => {
+        const pcm = base64ToUint8Array(item.base64);
+        const wav = pcmToWav(pcm, 24000, 1, 16);
+        const blob = new Blob([wav], { type: "audio/wav" });
+        const blobUrl = URL.createObjectURL(blob);
+        const fileName = `Voice_${item.id}.wav`;
 
-            itemDiv.innerHTML = `
-                <div class="history-date">📅 ${item.date}</div>
-                <div class="history-text">📝 ${escapeHtml(item.text.substring(0, 80))}${item.text.length > 80 ? '...' : ''}</div>
-                <audio controls src="${blobUrl}"></audio>
-                <button class="download" style="width:100%; margin-top:8px; padding:10px; font-size:13px;" onclick="triggerDownloadFromHistory('${blobUrl}', '${fileName}')">
-                    ⬇️ Download WAV
-                </button>
-            `;
-            container.appendChild(itemDiv);
-        });
-    };
+        const itemDiv = document.createElement("div");
+        itemDiv.className = "history-item";
+
+        itemDiv.innerHTML = `
+            <div class="history-date">📅 ${item.date}</div>
+            <div class="history-text">📝 ${escapeHtml(item.text.substring(0, 80))}${item.text.length > 80 ? '...' : ''}</div>
+            <audio controls src="${blobUrl}"></audio>
+            <button class="download" style="width:100%; margin-top:8px; padding:10px; font-size:13px;" onclick="downloadHistoryFile('${item.base64}', '${fileName}')">
+                ⬇️ Download WAV
+            </button>
+        `;
+        container.appendChild(itemDiv);
+    });
 }
 
-function triggerDownloadFromHistory(blobUrl, filename) {
-    const a = document.createElement("a");
-    a.href = blobUrl;
-    a.download = filename;
-    document.body.appendChild(a);
-    a.click();
-    setTimeout(() => {
-        document.body.removeChild(a);
-    }, 100);
+function downloadHistoryFile(base64Data, filename) {
+    const pcm = base64ToUint8Array(base64Data);
+    const wav = pcmToWav(pcm, 24000, 1, 16);
+    const blob = new Blob([wav], { type: "audio/wav" });
+    triggerDownload(blob, filename);
 }
 
 function clearAllHistory() {
-    if (!db) return;
     if (confirm("History အားလုံးကို ဖျက်ရန် သေချာပါသလား?")) {
-        const transaction = db.transaction(["audioHistory"], "readwrite");
-        const store = transaction.objectStore("audioHistory");
-        store.clear();
-        transaction.oncomplete = function() {
-            loadHistoryFromDB();
-        };
+        localStorage.removeItem("voice_history");
+        loadHistoryFromLocalStorage();
     }
 }
 
