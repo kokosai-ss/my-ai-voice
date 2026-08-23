@@ -459,33 +459,42 @@ audio{
         </div>
 
 
-        <!-- MULTI-SPEAKER SELECT -->
+        <!-- MULTI-SPEAKER SELECT (Speaker နှစ်ခုလုံးမှာ အသံစုံ ရွေးလို့ရအောင် ပြင်ထားသည်) -->
         <div class="section">
 
             <div class="section-title">
-                <h2>🎭 Choose Speakers (အသံ ၂ မျိုး ရွေးပါ)</h2>
+                <h2>🎭 Choose Speakers (အသံ စိတ်ကြိုက် ရွေးပါ)</h2>
                 <span class="badge">Multi-Speaker</span>
             </div>
 
             <div class="speaker-select-grid">
                 <div class="speaker-box">
-                    <label>👩 Speaker 1 ([1]: မိန်းကလေး):</label>
+                    <label>🎙️ Speaker 1 ([1]: အတွက် အသံ):</label>
                     <select id="speaker1Select">
-                        <option value="Kore">Kore (Firm- မိန်းကလေး)</option>
+                        <option value="Puck">Puck (Upbeat - ယောကျာ်းလေး)</option>
+                        <option value="Charon">Charon (Informative - ယောကျာ်းလေး)</option>
+                        <option value="Fenrir">Fenrir (Excitable - ယောကျာ်းလေး)</option>
+                        <option value="Orus">Orus (Firm - ယောကျာ်းလေး)</option>
+                        <option value="Kore">Kore (Firm - မိန်းကလေး)</option>
                         <option value="Leda">Leda (Youthful - မိန်းကလေး)</option>
                         <option value="Aoede">Aoede (Breezy - မိန်းကလေး)</option>
-                        <option value="Callirrhoe">Callirrhoe (Easy-going)</option>
-                        <option value="Despina">Despina (Smooth)</option>
+                        <option value="Callirrhoe">Callirrhoe (Easy-going - မိန်းကလေး)</option>
+                        <option value="Despina">Despina (Smooth - မိန်းကလေး)</option>
                     </select>
                 </div>
 
                 <div class="speaker-box">
-                    <label>👨 Speaker 2 ([2]: ယောကျာ်းလေး):</label>
+                    <label>🎙️ Speaker 2 ([2]: အတွက် အသံ):</label>
                     <select id="speaker2Select">
-                        <option value="Charon">Charon (Informative)</option>
-                        <option value="Fenrir">Fenrir (Excitable)</option>
-                        <option value="Orus">Orus (Firm)</option>
-                        <option value="Puck">Puck (Upbeat)</option>
+                        <option value="Charon">Charon (Informative - ယောကျာ်းလေး)</option>
+                        <option value="Puck">Puck (Upbeat - ယောကျာ်းလေး)</option>
+                        <option value="Fenrir">Fenrir (Excitable - ယောကျာ်းလေး)</option>
+                        <option value="Orus">Orus (Firm - ယောကျာ်းလေး)</option>
+                        <option value="Kore">Kore (Firm - မိန်းကလေး)</option>
+                        <option value="Leda">Leda (Youthful - မိန်းကလေး)</option>
+                        <option value="Aoede">Aoede (Breezy - မိန်းကလေး)</option>
+                        <option value="Callirrhoe">Callirrhoe (Easy-going - မိန်းကလေး)</option>
+                        <option value="Despina">Despina (Smooth - မိန်းကလေး)</option>
                     </select>
                 </div>
             </div>
@@ -750,14 +759,14 @@ async function generateVoice(){
     document.getElementById("generateMessage").className = "message";
     document.getElementById("result").style.display = "none";
 
-    const prompt = `${style}
+    const prompt = `You are a professional Burmese voice actor and multi-speaker audio generator.
+Style requirement: ${style}
 
-This is a dialogue between two characters:
-- Speaker 1 (female line marked with [1]:)
-- Speaker 2 (male line marked with [2]:)
-
-Perform this script naturally in Burmese pronunciation.
-Do NOT read out the speaker tags [1]: or [2]: in the audio.
+RULES FOR VOICE ACTING:
+1. Lines starting with [1]: MUST be spoken by Voice 1 (${spk1}).
+2. Lines starting with [2]: MUST be spoken by Voice 2 (${spk2}).
+3. Read the Burmese script naturally with high emotional quality according to the dialogue context.
+4. DO NOT read the tags '[1]:' or '[2]:' out loud in the audio output.
 
 Script:
 ${text}`;
@@ -826,7 +835,6 @@ ${text}`;
             downloadBtn.href = audioURL;
             downloadBtn.download = fileName;
 
-            // Android App (WebView) Direct Download Fix
             downloadBtn.onclick = function(e) {
                 if (currentBlob) {
                     const reader = new FileReader();
