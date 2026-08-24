@@ -1551,24 +1551,31 @@ ${text}`;
                 parseFloat(speed);
 
 
-            const download =
-                document.getElementById(
-                    "downloadBtn"
-                );
+            const download = document.getElementById("downloadBtn");
+const fileName = `kokosai_audio_${Date.now()}.mp3`;
+
+download.onclick = async (e) => {
+    e.preventDefault();
+    try {
+        const response = await fetch(audioURL);
+        const blob = await response.blob();
+        const blobUrl = URL.createObjectURL(blob);
+        
+        const a = document.createElement('a');
+        a.href = blobUrl;
+        a.download = fileName;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(blobUrl);
+    } catch (err) {
+        console.error("Download Error:", err);
+    }
+};
 
 
-            const fileName =
-                `kokosai_audio_${Date.now()}.mp3`;
 
-
-
-            download.href =
-                audioURL;
-
-
-            download.download =
-                fileName;
-
+            
 
             document.getElementById(
                 "result"
