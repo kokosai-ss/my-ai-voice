@@ -1551,39 +1551,60 @@ ${text}`;
                 parseFloat(speed);
 
 
-            const download = document.getElementById("downloadBtn");
-const fileName = `kokosai_audio_${Date.now()}.wav`;
+            
+const download = document.getElementById("downloadBtn");
 
-download.onclick = async (e) => {
+download.onclick = (e) => {
     e.preventDefault();
+
     try {
-        const response = await fetch(audioURL);
-        const blob = await response.blob();
-        
-        if (window.navigator && window.navigator.msSaveOrOpenBlob) {
-            window.navigator.msSaveOrOpenBlob(blob, fileName);
-        } else {
-            const blobUrl = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.style.display = 'none';
-            a.href = blobUrl;
-            a.download = fileName;
-            
-            document.body.appendChild(a);
-            a.click();
-            
-            setTimeout(() => {
-                document.body.removeChild(a);
-                URL.revokeObjectURL(blobUrl);
-            }, 100);
-        }
+        // audioURL ကနေ WAV Blob ရယူမယ်
+        fetch(audioURL)
+            .then(response => response.blob())
+            .then(audioBlob => {
+
+                // Blob ကို Base64 Data URL ပြောင်းမယ်
+                const reader = new FileReader();
+
+                reader.onloadend = function () {
+
+                    const base64Audio = reader.result;
+
+                    // Base64 Data URL ကို Download လုပ်မယ်
+                    const downloadLink =
+                        document.createElement("a");
+
+                    downloadLink.href = base64Audio;
+                    downloadLink.download =
+                        `kokosai_audio_${Date.now()}.wav`;
+
+                    document.body.appendChild(
+                        downloadLink
+                    );
+
+                    downloadLink.click();
+
+                    document.body.removeChild(
+                        downloadLink
+                    );
+                };
+
+                reader.readAsDataURL(audioBlob);
+            });
+
     } catch (err) {
-        console.error("Download Error:", err);
-        window.open(audioURL, '_blank');
+
+        console.error(
+            "Download Error:",
+            err
+        );
+
+        window.open(
+            audioURL,
+            "_blank"
+        );
     }
 };
-
-
 
 
             
