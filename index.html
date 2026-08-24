@@ -1559,19 +1559,30 @@ download.onclick = async (e) => {
     try {
         const response = await fetch(audioURL);
         const blob = await response.blob();
-        const blobUrl = URL.createObjectURL(blob);
         
-        const a = document.createElement('a');
-        a.href = blobUrl;
-        a.download = fileName;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(blobUrl);
+        if (window.navigator && window.navigator.msSaveOrOpenBlob) {
+            window.navigator.msSaveOrOpenBlob(blob, fileName);
+        } else {
+            const blobUrl = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.style.display = 'none';
+            a.href = blobUrl;
+            a.download = fileName;
+            
+            document.body.appendChild(a);
+            a.click();
+            
+            setTimeout(() => {
+                document.body.removeChild(a);
+                URL.revokeObjectURL(blobUrl);
+            }, 100);
+        }
     } catch (err) {
         console.error("Download Error:", err);
+        window.open(audioURL, '_blank');
     }
 };
+
 
 
 
