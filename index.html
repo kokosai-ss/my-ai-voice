@@ -21,7 +21,37 @@ body{
 }
 
 /* =========================
-   SIDEBAR & HEADER STYLES
+   FULLSCREEN LOCK OVERLAY
+========================= */
+#passwordSection {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(2, 9, 20, 0.96);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    z-index: 99999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.lock-box {
+    background: rgba(7, 25, 49, 0.95);
+    border: 1px solid rgba(0, 140, 255, 0.4);
+    border-radius: 24px;
+    padding: 28px 22px;
+    width: 100%;
+    max-width: 400px;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.8), 0 0 25px rgba(0,140,255,0.15);
+    text-align: left;
+}
+
+/* =========================
+   HEADER & SIDEBAR STYLES
 ========================= */
 .app-header {
     display: flex;
@@ -64,11 +94,11 @@ body{
 
 .sidebar {
     height: 100%;
-    width: 300px;
+    width: 310px;
     position: fixed;
     z-index: 1000;
     top: 0;
-    left: -300px;
+    left: -310px;
     background-color: #06182e;
     border-right: 1px solid #008cff;
     color: #eaf6ff;
@@ -488,8 +518,9 @@ audio{
 .empty-history{
     text-align:center;
     color:#6688a5;
-    padding:20px 5px;
-    line-height:1.7;
+    padding:30px 10px;
+    font-size:15px;
+    font-weight:bold;
 }
 
 .footer{
@@ -526,35 +557,100 @@ audio{
 
 <body>
 
-<!-- HEADER WITH MENU & HISTORY BUTTONS -->
+<!-- FULLSCREEN ACCESS PROTECTION LOCK OVERLAY -->
+<div id="passwordSection">
+    <div class="lock-box">
+        <div class="section-title">
+            <h2>🔑 Access Protection</h2>
+            <span class="badge">Locked</span>
+        </div>
+
+        <p class="subtitle" style="margin-bottom:12px;">
+            SH Application သို့ ဝင်ရောက်ရန် စကားဝှက် ရိုက်ထည့်ပါ 
+        </p>
+
+        <div class="input-wrap">
+            <input
+                id="passInput"
+                type="password"
+                placeholder="Password ရိုက်ထည့်ပါ..."
+                onkeydown="if(event.key === 'Enter') unlockApp()"
+            >
+        </div>
+
+        <button
+            class="generate"
+            style="margin-top:12px;min-height:50px;"
+            onclick="unlockApp()"
+        >
+            Unlock Studio
+        </button>
+
+        <div id="passMessage" class="message"></div>
+    </div>
+</div>
+
+<!-- APP HEADER -->
 <header class="app-header">
     <button class="menu-toggle-btn" onclick="openSidebar()" title="Menu">☰</button>
     <div class="app-header-title">AI Voice Studio</div>
-    <button class="menu-toggle-btn" onclick="openHistoryModal()" title="Voice History">🕒</button>
+    <div style="width:42px;"></div>
 </header>
 
-<!-- SIDEBAR MENU -->
+<!-- SIDEBAR MENU (SETTINGS) -->
 <div id="mySidebar" class="sidebar">
     <div class="sidebar-header">
         <h2>⚙️ App Settings</h2>
         <button class="sidebar-close-btn" onclick="closeSidebar()">&times;</button>
     </div>
 
+    <!-- VOICE HISTORY BUTTON IN SIDEBAR -->
     <div class="sidebar-item">
-        <label>⚙️ App Mode:</label>
-        <button class="btn" style="width:100%; min-height:45px;" onclick="alert('Single Voice Mode Active')">🎙️ Single Voice TTS</button>
+        <label>📜 Audio Logs:</label>
+        <button class="btn" style="width:100%; min-height:48px;" onclick="closeSidebar(); openHistoryModal();">🕒 Voice History</button>
+    </div>
+
+    <!-- AUDIO FORMAT MOVED TO SIDEBAR -->
+    <div class="sidebar-item">
+        <label>📁 Audio Output Format:</label>
+        <select id="formatSelect">
+            <option value="wav">WAV Audio (.wav)</option>
+            <option value="mp3">MP3 Audio (.mp3)</option>
+        </select>
+    </div>
+
+    <!-- TEMPERATURE MOVED TO SIDEBAR -->
+    <div class="sidebar-item">
+        <div style="background:#071c33; padding:12px; border-radius:14px; border:1px solid #144e7c;">
+            <label style="display:flex; justify-content:space-between; align-items:center; cursor:pointer; color:#b7d5ee; font-size:14px; margin-bottom:0;">
+                <span>🎛️ Advanced Temperature</span>
+                <input type="checkbox" id="tempToggle" onchange="toggleTempSlider()" style="width:18px; height:18px; accent-color:#00aaff;">
+            </label>
+
+            <div id="tempSliderWrap" style="display:none; margin-top:12px;">
+                <div style="display:flex; justify-content:space-between; color:#8eb0cb; font-size:12px; margin-bottom:6px;">
+                    <span>0.2 (စာဖတ်)</span>
+                    <span id="tempVal" style="color:#00baff; font-weight:bold;">0.6</span>
+                    <span>0.8 (စက်ရုပ်သံ)</span>
+                </div>
+                <input type="range" id="tempSlider" min="0.2" max="0.8" step="0.1" value="0.6" oninput="document.getElementById('tempVal').textContent = this.value">
+            </div>
+        </div>
     </div>
 
     <div class="sidebar-item">
+        <label>⚙️ Mode Status:</label>
+        <div style="background:#071c33; padding:12px; border-radius:14px; border:1px solid #144e7c; font-size:13px; color:#00baff;">
+            🎙️ Single Voice TTS
+        </div>
+    </div>
+
+    <div class="sidebar-item" style="margin-top:30px;">
         <label>ℹ️ App Info:</label>
-        <p style="font-size:13px; color:#a9c5db; line-height:1.6;">
+        <p style="font-size:12px; color:#a9c5db; line-height:1.6;">
             Gemini TTS Studio v1.0<br>
             Single Voice BURMESE Support
         </p>
-    </div>
-
-    <div class="sidebar-item" style="margin-top:40px;">
-        <button class="btn btn-danger" style="width:100%; min-height:45px;" onclick="location.reload()">🔄 Reload App</button>
     </div>
 </div>
 
@@ -578,40 +674,7 @@ audio{
     </div>
 
 
-    <!-- PASSWORD -->
-    <div id="passwordSection" class="section">
-
-        <div class="section-title">
-            <h2>🔑 Access Protection</h2>
-            <span class="badge">Locked</span>
-        </div>
-
-        <p class="subtitle" style="margin-bottom:12px;">
-            SH Application သို့ ဝင်ရောက်ရန် စကားဝှက် ရိုက်ထည့်ပါ 
-        </p>
-
-        <div class="input-wrap">
-            <input
-                id="passInput"
-                type="password"
-                placeholder="Password ရိုက်ထည့်ပါ..."
-            >
-        </div>
-
-        <button
-            class="generate"
-            style="margin-top:12px;min-height:50px;"
-            onclick="unlockApp()"
-        >
-            Unlock Studio
-        </button>
-
-        <div id="passMessage" class="message"></div>
-
-    </div>
-
-
-    <!-- APP -->
+    <!-- MAIN APP CONTENT -->
     <div id="appContent">
 
 
@@ -745,18 +808,18 @@ audio{
                 </label>
 
                 <select id="voiceSelect">
-                    <optgroup label="👨‍🦱 ယောကျာ်းလေး အသံများ">
-                        <option value="Puck">Puck (Upbeat - ယောကျာ်းလေး)</option>
-                        <option value="Charon" selected>Charon (Informative - ယောကျာ်းလေး)</option>
-                        <option value="Fenrir">Fenrir (Excitable - ယောကျာ်းလေး)</option>
-                        <option value="Orus">Orus (Firm - ယောကျာ်းလေး)</option>
+                    <optgroup label="👨‍🦱 ယောက်ျားလေး အသံများ">
+                        <option value="Puck">Puck (တက်ကြွလှုပ်ရှား)</option>
+                        <option value="Charon" selected>Charon (သတင်း/ဗဟုသုတပေး)</option>
+                        <option value="Fenrir">Fenrir (စိတ်လှုပ်ရှားဖွယ်)</option>
+                        <option value="Orus">Orus (ပြတ်သားခိုင်မာ)</option>
                     </optgroup>
                     <optgroup label="👩‍🦰 မိန်းကလေး အသံများ">
-                        <option value="Kore">Kore (Firm - မိန်းကလေး)</option>
-                        <option value="Leda">Leda (Youthful - မိန်းကလေး)</option>
-                        <option value="Aoede">Aoede (Breezy - မိန်းကလေး)</option>
-                        <option value="Callirrhoe">Callirrhoe (Easy-going - မိန်းကလေး)</option>
-                        <option value="Despina">Despina (Smooth - မိန်းကလေး)</option>
+                        <option value="Kore">Kore (ပြတ်သားခိုင်မာ)</option>
+                        <option value="Leda">Leda (နုပျိုတက်ကြွ)</option>
+                        <option value="Aoede">Aoede (ပေါ့ပါးလန်းဆန်း)</option>
+                        <option value="Callirrhoe">Callirrhoe (အေးဆေးပေါ့ပါး)</option>
+                        <option value="Despina">Despina (ချောမွေ့ငြိမ့်ညောင်း)</option>
                     </optgroup>
                 </select>
             </div>
@@ -787,9 +850,7 @@ audio{
             <textarea
                 id="textInput"
                 maxlength="2000"
-                placeholder="အိမ်သာတက်ပြီး ပြန်ထွက်လာရုံနဲ့ ကိုယ်မသိတဲ့ခေတ်တစ်ခုထဲ ရောက်သွားမယ်ဆိုရင် ဘယ်လိုလုပ်မလဲ။
-
-စစ်သူကြီး ရှောင်းကျန့်ပေတစ်ယောက် အိမ်သာကနေ ပြန်ထွက်လာတာနဲ့ မျက်စိရှေ့က ကမ္ဘာကြီးဟာ တစ်ခဏအတွင်း ပြောင်းလဲသွားပါတော့တယ်။"
+                placeholder="ဖတ်ရှုစေချင်သော စာသားကို ဒီနေရာတွင် ရိုက်ထည့်ပါ..."
                 oninput="updateCounter()"
             ></textarea>
 
@@ -807,7 +868,7 @@ audio{
         </div>
 
 
-        <!-- STYLE & ADVANCED SETTINGS -->
+        <!-- VOICE STYLE & SPEED -->
         <div class="section">
 
             <div class="section-title">
@@ -876,34 +937,6 @@ audio{
                     oninput="updateSpeed(this.value)"
                 >
 
-            </div>
-
-            <!-- TEMPERATURE CONTROL (ADVANCED) -->
-            <div style="margin-top:15px; background:#071c33; padding:12px 14px; border-radius:17px; border:1px solid #144e7c;">
-                <label style="display:flex; justify-content:space-between; align-items:center; cursor:pointer; color:#b7d5ee; font-size:14px; margin-bottom:0;">
-                    <span>🎛️ Advanced Temperature Control</span>
-                    <input type="checkbox" id="tempToggle" onchange="toggleTempSlider()" style="width:18px; height:18px; accent-color:#00aaff;">
-                </label>
-
-                <div id="tempSliderWrap" style="display:none; margin-top:12px;">
-                    <div style="display:flex; justify-content:space-between; color:#8eb0cb; font-size:12px; margin-bottom:6px;">
-                        <span>0.2 (စာဖတ်)</span>
-                        <span id="tempVal" style="color:#00baff; font-weight:bold;">0.6</span>
-                        <span>0.8 (စက်ရုပ်သံ)</span>
-                    </div>
-                    <input type="range" id="tempSlider" min="0.2" max="0.8" step="0.1" value="0.6" oninput="document.getElementById('tempVal').textContent = this.value">
-                </div>
-            </div>
-
-            <!-- AUDIO FORMAT -->
-            <div style="margin-top:15px;">
-                <label style="display:block; margin-bottom:8px; color:#b7d5ee; font-size:14px;">
-                    📁 Audio Format
-                </label>
-                <select id="formatSelect">
-                    <option value="wav">WAV Audio (.wav)</option>
-                    <option value="mp3">MP3 Audio (.mp3)</option>
-                </select>
             </div>
 
 
@@ -991,7 +1024,7 @@ function openSidebar() {
 }
 
 function closeSidebar() {
-    document.getElementById("mySidebar").style.left = "-300px";
+    document.getElementById("mySidebar").style.left = "-310px";
     document.getElementById("overlay").style.display = "none";
 }
 
@@ -1394,8 +1427,6 @@ async function generateVoice(){
         document.getElementById("generateBtn");
 
 
-    /* VALIDATION */
-
     if(!rawKeys){
 
         showGenerateMessage(
@@ -1443,7 +1474,6 @@ async function generateVoice(){
     ).style.display = "none";
 
 
-    /* PROMPT WITH SSML AUTO-WRAP & SYSTEM NARRATION STYLE */
     const prompt = `${style}
 
 Clear, natural Burmese conversational tone with friendly, engaging, casual yet professional narration, moderate pace, warm and approachable voice, expressive but not exaggerated.
@@ -1453,7 +1483,6 @@ ${text}
 </speak>`;
 
 
-    /* TEMPERATURE CONFIGURATION */
     const useTemp = document.getElementById("tempToggle").checked;
     const customTemp = useTemp ? parseFloat(document.getElementById("tempSlider").value) : 0.6;
 
@@ -1499,8 +1528,6 @@ ${text}
 
     let lastError = "";
 
-
-    /* TRY EACH API KEY */
 
     for(let i=0;i<keysList.length;i++){
 
@@ -1587,15 +1614,11 @@ ${text}
             }
 
 
-            /* PCM */
-
             const pcm =
                 base64ToUint8Array(
                     base64
                 );
 
-
-            /* WAV */
 
             const wav =
                 pcmToWav(
@@ -1644,57 +1667,56 @@ ${text}
                 parseFloat(speed);
 
 
-            
-const download = document.getElementById("downloadBtn");
+            const download = document.getElementById("downloadBtn");
 
-download.onclick = (e) => {
-    e.preventDefault();
+            download.onclick = (e) => {
+                e.preventDefault();
 
-    try {
-        fetch(audioURL)
-            .then(response => response.blob())
-            .then(audioBlob => {
+                try {
+                    fetch(audioURL)
+                        .then(response => response.blob())
+                        .then(audioBlob => {
 
-                const reader = new FileReader();
+                            const reader = new FileReader();
 
-                reader.onloadend = function () {
+                            reader.onloadend = function () {
 
-                    const base64Audio = reader.result;
+                                const base64Audio = reader.result;
 
-                    const downloadLink =
-                        document.createElement("a");
+                                const downloadLink =
+                                    document.createElement("a");
 
-                    downloadLink.href = base64Audio;
-                    downloadLink.download =
-                        `sh_audio_${Date.now()}.${format}`;
+                                downloadLink.href = base64Audio;
+                                downloadLink.download =
+                                    `sh_audio_${Date.now()}.${format}`;
 
-                    document.body.appendChild(
-                        downloadLink
+                                document.body.appendChild(
+                                    downloadLink
+                                );
+
+                                downloadLink.click();
+
+                                document.body.removeChild(
+                                    downloadLink
+                                );
+                            };
+
+                            reader.readAsDataURL(audioBlob);
+                        });
+
+                } catch (err) {
+
+                    console.error(
+                        "Download Error:",
+                        err
                     );
 
-                    downloadLink.click();
-
-                    document.body.removeChild(
-                        downloadLink
+                    window.open(
+                        audioURL,
+                        "_blank"
                     );
-                };
-
-                reader.readAsDataURL(audioBlob);
-            });
-
-    } catch (err) {
-
-        console.error(
-            "Download Error:",
-            err
-        );
-
-        window.open(
-            audioURL,
-            "_blank"
-        );
-    }
-};
+                }
+            };
 
 
             document.getElementById(
@@ -1702,10 +1724,6 @@ download.onclick = (e) => {
             ).style.display =
                 "block";
 
-
-            /*
-              INDEXEDDB FULL AUDIO HISTORY SAVE
-            */
 
             await saveHistoryDB({
                 id: Date.now(),
@@ -1747,10 +1765,6 @@ download.onclick = (e) => {
     }
 
 
-    /*
-      ALL KEYS FAILED
-    */
-
     if(!success){
 
         showGenerateMessage(
@@ -1772,7 +1786,7 @@ download.onclick = (e) => {
 
 
 /* =========================
-   BASE64
+   BASE64 & WAV CONVERSION
 ========================= */
 
 function base64ToUint8Array(base64){
@@ -1802,10 +1816,6 @@ function base64ToUint8Array(base64){
 
 }
 
-
-/* =========================
-   PCM -> WAV
-========================= */
 
 function pcmToWav(
     pcmData,
@@ -1985,7 +1995,7 @@ function showGenerateMessage(
 
 
 /* =========================
-   INDEXEDDB AUDIO HISTORY STORAGE
+   INDEXEDDB HISTORY STORAGE
 ========================= */
 
 const DB_NAME = "VoiceStudioDB";
@@ -2083,8 +2093,7 @@ async function renderHistory() {
     if (history.length === 0) {
         list.innerHTML = `
             <div class="empty-history">
-                📭 History မရှိသေးပါ။<br>
-                အသံတစ်ခု Generate လုပ်လိုက်ရင် ဒီနေရာမှာ ပေါ်လာပါမယ်။
+                📭 History မရှိသေးပါ
             </div>
         `;
         return;
