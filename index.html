@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AI Voice Studio - Multi-Speaker</title>
+<title>AI Voice Studio - Single Voice</title>
 
 <style>
 *{
@@ -303,24 +303,18 @@ button{
     color:#ff9ab8;
 }
 
-.speaker-select-grid{
-    display:grid;
-    grid-template-columns:1fr 1fr;
-    gap:12px;
-}
-
 .speaker-box{
     background:#071c33;
-    padding:12px;
-    border-radius:15px;
+    padding:14px;
+    border-radius:17px;
     border:1px solid #144e7c;
 }
 
 .speaker-box label{
     display:block;
-    font-size:13px;
+    font-size:14px;
     color:#00baff;
-    margin-bottom:6px;
+    margin-bottom:8px;
     font-weight:bold;
 }
 
@@ -512,10 +506,6 @@ audio{
         padding:12px 10px 40px;
     }
 
-    .speaker-select-grid{
-        grid-template-columns:1fr;
-    }
-
     .hero{
         padding:22px 16px;
     }
@@ -550,14 +540,14 @@ audio{
 
     <div class="sidebar-item">
         <label>⚙️ App Mode:</label>
-        <button class="btn" style="width:100%; min-height:45px;" onclick="alert('Multi-Speaker Mode Active')">🎙️ Multi-Speaker TTS</button>
+        <button class="btn" style="width:100%; min-height:45px;" onclick="alert('Single Voice Mode Active')">🎙️ Single Voice TTS</button>
     </div>
 
     <div class="sidebar-item">
         <label>ℹ️ App Info:</label>
         <p style="font-size:13px; color:#a9c5db; line-height:1.6;">
             Gemini TTS Studio v1.0<br>
-            Multi-Speaker BURMESE Voice Support
+            Single Voice BURMESE Support
         </p>
     </div>
 
@@ -577,7 +567,7 @@ audio{
 
         <p>
             AI အသံတုဖန်တီးအသုံးပြု၍ စာလုံးများကို
-            နှစ်ယောက်ပြော (Multi-Speaker) အသံဖြင့် ဖတ်ပေးနိုင်သည်။
+            အသံတစ်သံတည်း (Narrator) သဘာဝကျကျ အသံဖြင့် ဖတ်ပေးနိုင်သည်။
         </p>
 
         <div class="credit">
@@ -732,65 +722,41 @@ audio{
         </div>
 
 
-        <!-- SPEAKERS -->
+        <!-- VOICE SELECTION -->
         <div class="section">
 
             <div class="section-title">
 
                 <h2>
-                    🎭 Choose Speakers (အသံ စိတ်ကြိုက် ရွေးပါ)
+                    🎭 Choose Voice (အသံ စိတ်ကြိုက် ရွေးပါ)
                 </h2>
 
                 <span class="badge">
-                    Multi-Speaker
+                    Single Voice
                 </span>
 
             </div>
 
+            <div class="speaker-box">
+                <label>
+                    🎙️ Narrator / စကားပြောမည့် အသံ ရွေးပါ:
+                </label>
 
-            <div class="speaker-select-grid">
-
-                <div class="speaker-box">
-
-                    <label>
-                        🎙️ Speaker 1 ([1]: အတွက် အသံ):
-                    </label>
-
-                    <select id="speaker1Select">
+                <select id="voiceSelect">
+                    <optgroup label="👨‍🦱 ယောကျာ်းလေး အသံများ">
                         <option value="Puck">Puck (Upbeat - ယောကျာ်းလေး)</option>
-                        <option value="Charon">Charon (Informative - ယောကျာ်းလေး)</option>
+                        <option value="Charon" selected>Charon (Informative - ယောကျာ်းလေး)</option>
                         <option value="Fenrir">Fenrir (Excitable - ယောကျာ်းလေး)</option>
                         <option value="Orus">Orus (Firm - ယောကျာ်းလေး)</option>
+                    </optgroup>
+                    <optgroup label="👩‍🦰 မိန်းကလေး အသံများ">
                         <option value="Kore">Kore (Firm - မိန်းကလေး)</option>
                         <option value="Leda">Leda (Youthful - မိန်းကလေး)</option>
                         <option value="Aoede">Aoede (Breezy - မိန်းကလေး)</option>
                         <option value="Callirrhoe">Callirrhoe (Easy-going - မိန်းကလေး)</option>
                         <option value="Despina">Despina (Smooth - မိန်းကလေး)</option>
-                    </select>
-
-                </div>
-
-
-                <div class="speaker-box">
-
-                    <label>
-                        🎙️ Speaker 2 ([2]: အတွက် အသံ):
-                    </label>
-
-                    <select id="speaker2Select">
-                        <option value="Charon">Charon (Informative - ယောကျာ်းလေး)</option>
-                        <option value="Puck">Puck (Upbeat - ယောကျာ်းလေး)</option>
-                        <option value="Fenrir">Fenrir (Excitable - ယောကျာ်းလေး)</option>
-                        <option value="Orus">Orus (Firm - ယောကျာ်းလေး)</option>
-                        <option value="Kore">Kore (Firm - မိန်းကလေး)</option>
-                        <option value="Leda">Leda (Youthful - မိန်းကလေး)</option>
-                        <option value="Aoede">Aoede (Breezy - မိန်းကလေး)</option>
-                        <option value="Callirrhoe">Callirrhoe (Easy-going - မိန်းကလေး)</option>
-                        <option value="Despina">Despina (Smooth - မိန်းကလေး)</option>
-                    </select>
-
-                </div>
-
+                    </optgroup>
+                </select>
             </div>
 
         </div>
@@ -804,11 +770,11 @@ audio{
                 <div>
 
                     <h2>
-                        📝 Dialogue Script
+                        📝 Narration Script
                     </h2>
 
                     <div class="subtitle">
-                        [1]: စာသား နှင့် [2]: စာသား ပုံစံဖြင့် ရိုက်ပါ
+                        ဖတ်ရှုစေချင်သော စာသားကို ရိုက်ထည့်ပါ
                     </div>
 
                 </div>
@@ -819,10 +785,9 @@ audio{
             <textarea
                 id="textInput"
                 maxlength="2000"
-                placeholder="ဥပမာ -
-[1]: မောင်... ဒီနေ့ ညစာ ဘာစားမလဲဟင်။
-[2]: မင်း စားချင်တာ ပြောလေ... မောင် ဝယ်ခဲ့ပေးမယ်။
-[1]: ဒါဆိုရင်တော့ ရှမ်းခေါက်ဆွဲပဲ စားချင်တယ်။"
+                placeholder="အိမ်သာတက်ပြီး ပြန်ထွက်လာရုံနဲ့ ကိုယ်မသိတဲ့ခေတ်တစ်ခုထဲ ရောက်သွားမယ်ဆိုရင် ဘယ်လိုလုပ်မလဲ။
+
+စစ်သူကြီး ရှောင်းကျန့်ပေတစ်ယောက် အိမ်သာကနေ ပြန်ထွက်လာတာနဲ့ မျက်စိရှေ့က ကမ္ဘာကြီးဟာ တစ်ခဏအတွင်း ပြောင်းလဲသွားပါတော့တယ်။"
                 oninput="updateCounter()"
             ></textarea>
 
@@ -854,15 +819,15 @@ audio{
 
             <select id="styleSelect">
 
-                <option value="Speak naturally and clearly as a dialogue conversation.">
+                <option value="Speak naturally and clearly as a movie narrator.">
                     Natural Dialogue - သဘာဝကျကျ
                 </option>
 
-                <option value="Speak warmly and gently as a conversation.">
+                <option value="Speak warmly and gently as a narrator.">
                     Warm - နူးညံ့စွာ
                 </option>
 
-                <option value="Speak like a dramatic movie dialogue.">
+                <option value="Speak like a dramatic movie narrator.">
                     Movie Dialogue - ဇာတ်လမ်းပုံစံ
                 </option>
 
@@ -928,7 +893,7 @@ audio{
                 id="generateBtn"
                 onclick="generateVoice()"
             >
-                🔊 Generate Multi-Voice
+                🔊 Generate Voice
             </button>
 
 
@@ -957,7 +922,7 @@ audio{
                 <a
                     id="downloadBtn"
                     class="download"
-                    download="gemini-dialogue-voice.wav"
+                    download="gemini-narration-voice.wav"
                 >
                     ⬇️ Download Voice
                 </a>
@@ -1005,7 +970,7 @@ audio{
 
 
     <div class="footer">
-        AI Voice Studio • Gemini TTS Multi-Speaker
+        AI Voice Studio • Gemini TTS Single Voice
     </div>
 
 </div>
@@ -1389,13 +1354,8 @@ async function generateVoice(){
             .value;
 
 
-    const spk1 =
-        document.getElementById("speaker1Select")
-            .value;
-
-
-    const spk2 =
-        document.getElementById("speaker2Select")
+    const spk =
+        document.getElementById("voiceSelect")
             .value;
 
 
@@ -1437,21 +1397,6 @@ async function generateVoice(){
     }
 
 
-    /* CHECK SPEAKER TAG */
-
-    if(!text.includes("[1]:") ||
-       !text.includes("[2]:")){
-
-        showGenerateMessage(
-            "❌ Script ထဲမှာ [1]: နဲ့ [2]: နှစ်ခုလုံး ပါရပါမယ်။",
-            "error"
-        );
-
-        return;
-
-    }
-
-
     const keysList =
         rawKeys
         .split(",")
@@ -1462,7 +1407,7 @@ async function generateVoice(){
     btn.disabled = true;
 
     btn.innerHTML =
-        '<span class="loading"></span>Generating Dialogue...';
+        '<span class="loading"></span>Generating Voice...';
 
 
     document.getElementById(
@@ -1477,26 +1422,9 @@ async function generateVoice(){
 
     const prompt = `${style}
 
-Perform the following Burmese dialogue as a natural conversation.
+Read the following Burmese script smoothly and naturally with clear pronunciation and appropriate conversational emotion.
 
-There are exactly two speakers:
-
-Speaker1:
-All lines beginning with [1]: must be spoken by Speaker1.
-
-Speaker2:
-All lines beginning with [2]: must be spoken by Speaker2.
-
-Do NOT speak the labels [1]: or [2:].
-Do NOT mention the speaker labels.
-Only speak the actual dialogue.
-
-Keep the exact order of the dialogue.
-Do not add new sentences.
-Do not remove dialogue.
-Use natural Burmese pronunciation and conversational emotion.
-
-Dialogue:
+Script:
 ${text}`;
 
 
@@ -1520,33 +1448,11 @@ ${text}`;
 
             speechConfig:{
 
-                multiSpeakerVoiceConfig:{
+                voiceConfig:{
 
-                    speakerVoiceConfigs:[
-
-                        {
-                            speaker:"Speaker1",
-
-                            voiceConfig:{
-                                prebuiltVoiceConfig:{
-                                    voiceName:spk1
-                                }
-                            }
-
-                        },
-
-                        {
-                            speaker:"Speaker2",
-
-                            voiceConfig:{
-                                prebuiltVoiceConfig:{
-                                    voiceName:spk2
-                                }
-                            }
-
-                        }
-
-                    ]
+                    prebuiltVoiceConfig:{
+                        voiceName:spk
+                    }
 
                 }
 
@@ -1775,9 +1681,7 @@ download.onclick = (e) => {
 
                 text:text,
 
-                speaker1:spk1,
-
-                speaker2:spk2,
+                voice:spk,
 
                 style:style,
 
@@ -1787,7 +1691,7 @@ download.onclick = (e) => {
 
 
             showGenerateMessage(
-                "✅ Multi-Voice အသံဖန်တီးပြီးပါပြီ။",
+                "✅ အသံဖန်တီးပြီးပါပြီ။",
                 "success"
             );
 
@@ -1833,7 +1737,7 @@ download.onclick = (e) => {
     btn.disabled = false;
 
     btn.innerHTML =
-        "🔊 Generate Multi-Voice";
+        "🔊 Generate Voice";
 
 }
 
@@ -2088,11 +1992,8 @@ function saveHistory(item){
         text:
             item.text,
 
-        speaker1:
-            item.speaker1,
-
-        speaker2:
-            item.speaker2,
+        voice:
+            item.voice,
 
         style:
             item.style,
@@ -2185,9 +2086,7 @@ function renderHistory(){
 
                 <div class="history-info">
 
-                    🎙️ ${escapeHTML(item.speaker1)}
-                    &nbsp; | &nbsp;
-                    🎙️ ${escapeHTML(item.speaker2)}
+                    🎙️ ${escapeHTML(item.voice || item.speaker1 || "Charon")}
                     &nbsp; | &nbsp;
                     ⚡ ${escapeHTML(item.speed)}x
 
@@ -2246,16 +2145,14 @@ function useHistory(id){
         item.text;
 
 
-    document.getElementById(
-        "speaker1Select"
-    ).value =
-        item.speaker1;
+    if(document.getElementById("voiceSelect")){
 
+        document.getElementById(
+            "voiceSelect"
+        ).value =
+            item.voice || item.speaker1 || "Charon";
 
-    document.getElementById(
-        "speaker2Select"
-    ).value =
-        item.speaker2;
+    }
 
 
     document.getElementById(
