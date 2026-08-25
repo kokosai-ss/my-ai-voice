@@ -638,6 +638,21 @@ audio{
         </div>
     </div>
 
+    <!-- AUDIO PROCESSING TOOLS (TEXT CLEANER & SILENCE TRIMMER) -->
+    <div class="sidebar-item">
+        <label>🛠️ Processing Optimizations:</label>
+        <div style="background:#071c33; padding:12px; border-radius:14px; border:1px solid #144e7c; display:flex; flex-direction:column; gap:10px;">
+            <label style="display:flex; align-items:center; gap:8px; cursor:pointer; color:#b7d5ee; font-size:13px; margin-bottom:0;">
+                <input type="checkbox" id="cleanerToggle" checked style="width:18px; height:18px; accent-color:#00aaff;">
+                <span>✨ Auto Text Cleaner</span>
+            </label>
+            <label style="display:flex; align-items:center; gap:8px; cursor:pointer; color:#b7d5ee; font-size:13px; margin-bottom:0;">
+                <input type="checkbox" id="trimmerToggle" checked style="width:18px; height:18px; accent-color:#00aaff;">
+                <span>✂️ Auto Silence Trimmer</span>
+            </label>
+        </div>
+    </div>
+
     <div class="sidebar-item">
         <label>⚙️ Mode Status:</label>
         <div style="background:#071c33; padding:12px; border-radius:14px; border:1px solid #144e7c; font-size:13px; color:#00baff;">
@@ -1390,6 +1405,72 @@ function updateCounter(){
 
 
 /* =========================
+   TEXT CLEANER LOGIC
+========================= */
+
+function cleanScriptText(rawText) {
+    if (!rawText) return "";
+    return rawText
+        .replace(/[\r\n]+/g, ' ')          // Line breaks များကို Space အဖြစ် ပြောင်းပေးသည်
+        .replace(/\s+/g, ' ')              // မလိုလားအပ်သော အပို Space များကို ရှင်းလွှတ်သည်
+        .replace(/([၊။])\1+/g, '$1')      // ပိုနေသော မြန်မာ ပုဒ်ဖြတ်/ပုဒ်ရပ် အပိုများကို ရှင်းထုတ်သည်
+        .trim();
+}
+
+
+/* =========================
+   WEB AUDIO API SILENCE TRIMMER LOGIC
+========================= */
+
+async function trimSilenceFromPCM(pcmUint8Array, sampleRate = 24000) {
+    const samplesCount = pcmUint8Array.length / 2;
+    if (samplesCount === 0) return pcmUint8Array;
+
+    const float32Array = new Float32Array(samplesCount);
+    const dataView = new DataView(pcmUint8Array.buffer, pcmUint8Array.byteOffset, pcmUint8Array.byteLength);
+
+    for (let i = 0; i < samplesCount; i++) {
+        const int16 = dataView.getInt16(i * 2, true);
+        float32Array[i] = int16 < 0 ? int16 / 32768 : int16 / 32767;
+    }
+
+    let start = 0;
+    let end = float32Array.length;
+    const threshold = 0.015;
+
+    // Leading Silence ကို ရှာဖွေပြီး ဖြတ်ထုတ်ခြင်း
+    for (let i = 0; i < float32Array.length; i++) {
+        if (Math.abs(float32Array[i]) > threshold) {
+            start = Math.max(0, i - 240); // 10ms padding ထိန်းပေးသည်
+            break;
+        }
+    }
+
+    // Trailing Silence ကို ရှာဖွေပြီး ဖြတ်ထုတ်ခြင်း
+    for (let i = float32Array.length - 1; i >= 0; i--) {
+        if (Math.abs(float32Array[i]) > threshold) {
+            end = Math.min(float32Array.length, i + 240);
+            break;
+        }
+    }
+
+    if (start >= end) return pcmUint8Array;
+
+    const trimmedSamples = float32Array.subarray(start, end);
+    const trimmedPCM = new Uint8Array(trimmedSamples.length * 2);
+    const trimmedView = new DataView(trimmedPCM.buffer);
+
+    for (let i = 0; i < trimmedSamples.length; i++) {
+        const s = Math.max(-1, Math.min(1, trimmedSamples[i]));
+        const val = s < 0 ? s * 32768 : s * 32767;
+        trimmedView.setInt16(i * 2, val, true);
+    }
+
+    return trimmedPCM;
+}
+
+
+/* =========================
    GENERATE
 ========================= */
 
@@ -1400,7 +1481,7 @@ async function generateVoice(){
             .value.trim();
 
 
-    const text =
+    let text =
         document.getElementById("textInput")
             .value.trim();
 
@@ -1448,6 +1529,14 @@ async function generateVoice(){
 
         return;
 
+    }
+
+
+    // --- FEATURE 1: Text Cleaner Execution ---
+    if (document.getElementById("cleanerToggle").checked) {
+        text = cleanScriptText(text);
+        document.getElementById("textInput").value = text;
+        updateCounter();
     }
 
 
@@ -1614,10 +1703,17 @@ ${text}
             }
 
 
-            const pcm =
+            let pcm =
                 base64ToUint8Array(
                     base64
                 );
+
+
+            // --- FEATURE 2: Silence Trimmer Execution ---
+            if (document.getElementById("trimmerToggle").checked) {
+                showGenerateMessage("✂️ အသံနားချိန် Silence များကို ညှပ်ထုတ်နေပါသည်...", "info");
+                pcm = await trimSilenceFromPCM(pcm, 24000);
+            }
 
 
             const wav =
