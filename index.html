@@ -463,18 +463,20 @@ audio{
 
 .history-buttons{
     display:grid;
-    grid-template-columns:1fr 1fr;
+    grid-template-columns:1fr 1fr 1fr;
     gap:8px;
     margin-top:12px;
 }
 
 .history-btn{
-    padding:11px;
+    padding:9px;
     border-radius:12px;
     background:#10365a;
     border:1px solid #17659b;
     color:#9be4ff;
     font-weight:bold;
+    font-size:13px;
+    cursor:pointer;
 }
 
 .history-delete{
@@ -524,11 +526,11 @@ audio{
 
 <body>
 
-<!-- HEADER WITH MENU BUTTON -->
+<!-- HEADER WITH MENU & HISTORY BUTTONS -->
 <header class="app-header">
-    <button class="menu-toggle-btn" onclick="openSidebar()">☰</button>
+    <button class="menu-toggle-btn" onclick="openSidebar()" title="Menu">☰</button>
     <div class="app-header-title">AI Voice Studio</div>
-    <div style="width:42px;"></div>
+    <button class="menu-toggle-btn" onclick="openHistoryModal()" title="Voice History">🕒</button>
 </header>
 
 <!-- SIDEBAR MENU -->
@@ -805,7 +807,7 @@ audio{
         </div>
 
 
-        <!-- STYLE -->
+        <!-- STYLE & ADVANCED SETTINGS -->
         <div class="section">
 
             <div class="section-title">
@@ -876,6 +878,23 @@ audio{
 
             </div>
 
+            <!-- TEMPERATURE CONTROL (ADVANCED) -->
+            <div style="margin-top:15px; background:#071c33; padding:12px 14px; border-radius:17px; border:1px solid #144e7c;">
+                <label style="display:flex; justify-content:space-between; align-items:center; cursor:pointer; color:#b7d5ee; font-size:14px; margin-bottom:0;">
+                    <span>🎛️ Advanced Temperature Control</span>
+                    <input type="checkbox" id="tempToggle" onchange="toggleTempSlider()" style="width:18px; height:18px; accent-color:#00aaff;">
+                </label>
+
+                <div id="tempSliderWrap" style="display:none; margin-top:12px;">
+                    <div style="display:flex; justify-content:space-between; color:#8eb0cb; font-size:12px; margin-bottom:6px;">
+                        <span>0.2 (စာဖတ်)</span>
+                        <span id="tempVal" style="color:#00baff; font-weight:bold;">0.6</span>
+                        <span>0.8 (စက်ရုပ်သံ)</span>
+                    </div>
+                    <input type="range" id="tempSlider" min="0.2" max="0.8" step="0.1" value="0.6" oninput="document.getElementById('tempVal').textContent = this.value">
+                </div>
+            </div>
+
             <!-- AUDIO FORMAT -->
             <div style="margin-top:15px;">
                 <label style="display:block; margin-bottom:8px; color:#b7d5ee; font-size:14px;">
@@ -931,41 +950,6 @@ audio{
 
         </div>
 
-
-        <!-- HISTORY -->
-        <div class="section">
-
-            <div class="section-title">
-
-                <div>
-
-                    <h2>
-                        📚 Voice History
-                    </h2>
-
-                    <div class="subtitle">
-                        ယခင်လုပ်ထားတဲ့ Script တွေကို ပြန်အသုံးပြုနိုင်ပါတယ်
-                    </div>
-
-                </div>
-
-                <button
-                    class="history-btn history-delete"
-                    onclick="clearHistory()"
-                    style="padding:8px 11px;"
-                >
-                    🧹 Clear
-                </button>
-
-            </div>
-
-
-            <div id="historyList">
-            </div>
-
-        </div>
-
-
     </div>
 
 
@@ -973,6 +957,26 @@ audio{
         AI Voice Studio • Gemini TTS Single Voice
     </div>
 
+</div>
+
+
+<!-- HISTORY POP-UP MODAL -->
+<div id="historyModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); backdrop-filter:blur(5px); z-index:2000; align-items:center; justify-content:center;">
+    <div style="background:#06182e; border:1px solid #008cff; border-radius:24px; width:92%; max-width:550px; max-height:85vh; display:flex; flex-direction:column; padding:20px; box-shadow:0 10px 30px rgba(0,0,0,0.8);">
+        
+        <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #144e7c; padding-bottom:12px; margin-bottom:15px;">
+            <h2 style="font-size:18px; color:#00baff; display:flex; align-items:center; gap:8px;">🕒 Voice History</h2>
+            <div style="display:flex; gap:8px; align-items:center;">
+                <button class="history-btn history-delete" onclick="clearHistory()" style="padding:6px 12px; font-size:12px;">🧹 Clear All</button>
+                <button onclick="closeHistoryModal()" style="background:none; border:none; color:#b7d5ee; font-size:24px; cursor:pointer;">&times;</button>
+            </div>
+        </div>
+
+        <div id="modalHistoryList" style="overflow-y:auto; flex:1; padding-right:5px;">
+            <!-- HISTORY ITEMS RENDERED HERE -->
+        </div>
+
+    </div>
 </div>
 
 
@@ -990,6 +994,27 @@ function closeSidebar() {
     document.getElementById("mySidebar").style.left = "-300px";
     document.getElementById("overlay").style.display = "none";
 }
+
+/* =========================
+   HISTORY MODAL FUNCTIONS
+========================= */
+function openHistoryModal() {
+    document.getElementById("historyModal").style.display = "flex";
+    renderHistory();
+}
+
+function closeHistoryModal() {
+    document.getElementById("historyModal").style.display = "none";
+}
+
+/* =========================
+   TEMPERATURE TOGGLE
+========================= */
+function toggleTempSlider() {
+    const isChecked = document.getElementById("tempToggle").checked;
+    document.getElementById("tempSliderWrap").style.display = isChecked ? "block" : "none";
+}
+
 
 const MY_PASSWORD = "1911999";
 
@@ -1031,8 +1056,6 @@ function unlockApp(){
         }
 
         updateKeyStatus();
-
-        renderHistory();
 
     }else{
 
@@ -1420,12 +1443,19 @@ async function generateVoice(){
     ).style.display = "none";
 
 
+    /* PROMPT WITH SSML AUTO-WRAP & SYSTEM NARRATION STYLE */
     const prompt = `${style}
 
-Read the following Burmese script smoothly and naturally with clear pronunciation and appropriate conversational emotion.
+Clear, natural Burmese conversational tone with friendly, engaging, casual yet professional narration, moderate pace, warm and approachable voice, expressive but not exaggerated.
 
-Script:
-${text}`;
+<speak xml:lang="my-MM">
+${text}
+</speak>`;
+
+
+    /* TEMPERATURE CONFIGURATION */
+    const useTemp = document.getElementById("tempToggle").checked;
+    const customTemp = useTemp ? parseFloat(document.getElementById("tempSlider").value) : 0.6;
 
 
     const body = {
@@ -1445,6 +1475,8 @@ ${text}`;
             responseModalities:[
                 "AUDIO"
             ],
+
+            temperature: customTemp,
 
             speechConfig:{
 
@@ -1665,8 +1697,6 @@ download.onclick = (e) => {
 };
 
 
-            
-
             document.getElementById(
                 "result"
             ).style.display =
@@ -1674,19 +1704,18 @@ download.onclick = (e) => {
 
 
             /*
-              HISTORY SAVE
+              INDEXEDDB FULL AUDIO HISTORY SAVE
             */
 
-            saveHistory({
-
-                text:text,
-
-                voice:spk,
-
-                style:style,
-
-                speed:speed
-
+            await saveHistoryDB({
+                id: Date.now(),
+                text: text,
+                voice: spk,
+                style: style,
+                speed: speed,
+                format: format,
+                audioBlob: blob,
+                date: new Date().toLocaleString()
             });
 
 
@@ -1956,292 +1985,168 @@ function showGenerateMessage(
 
 
 /* =========================
-   HISTORY
+   INDEXEDDB AUDIO HISTORY STORAGE
 ========================= */
 
-function getHistory(){
+const DB_NAME = "VoiceStudioDB";
+const DB_VERSION = 1;
+const STORE_NAME = "audio_history";
 
-    try{
+function openDB() {
+    return new Promise((resolve, reject) => {
+        const request = indexedDB.open(DB_NAME, DB_VERSION);
+        request.onupgradeneeded = (e) => {
+            const db = e.target.result;
+            if (!db.objectStoreNames.contains(STORE_NAME)) {
+                db.createObjectStore(STORE_NAME, { keyPath: "id" });
+            }
+        };
+        request.onsuccess = (e) => resolve(e.target.result);
+        request.onerror = (e) => reject(e.target.error);
+    });
+}
 
-        return JSON.parse(
-            localStorage.getItem(
-                "voice_history"
-            ) || "[]"
-        );
+async function saveHistoryDB(item) {
+    try {
+        const db = await openDB();
+        const tx = db.transaction(STORE_NAME, "readwrite");
+        const store = tx.objectStore(STORE_NAME);
+        await new Promise((resolve, reject) => {
+            const req = store.put(item);
+            req.onsuccess = resolve;
+            req.onerror = reject;
+        });
+    } catch (err) {
+        console.error("IndexedDB Save Error:", err);
+    }
+}
 
-    }catch(e){
-
+async function getHistoryDB() {
+    try {
+        const db = await openDB();
+        const tx = db.transaction(STORE_NAME, "readonly");
+        const store = tx.objectStore(STORE_NAME);
+        return new Promise((resolve, reject) => {
+            const req = store.getAll();
+            req.onsuccess = () => resolve(req.result.sort((a,b) => b.id - a.id));
+            req.onerror = reject;
+        });
+    } catch (err) {
+        console.error("IndexedDB Get Error:", err);
         return [];
-
     }
-
 }
 
-
-function saveHistory(item){
-
-    const history =
-        getHistory();
-
-
-    const newItem = {
-
-        id:
-            Date.now(),
-
-        text:
-            item.text,
-
-        voice:
-            item.voice,
-
-        style:
-            item.style,
-
-        speed:
-            item.speed,
-
-        date:
-            new Date().toLocaleString()
-
-    };
-
-
-    history.unshift(
-        newItem
-    );
-
-
-    const limited =
-        history.slice(0,30);
-
-
-    localStorage.setItem(
-        "voice_history",
-        JSON.stringify(limited)
-    );
-
-
-    renderHistory();
-
+async function deleteHistoryItem(id) {
+    try {
+        const db = await openDB();
+        const tx = db.transaction(STORE_NAME, "readwrite");
+        const store = tx.objectStore(STORE_NAME);
+        await new Promise((resolve, reject) => {
+            const req = store.delete(id);
+            req.onsuccess = resolve;
+            req.onerror = reject;
+        });
+        renderHistory();
+    } catch (err) {
+        console.error("IndexedDB Delete Error:", err);
+    }
 }
 
+async function clearHistory() {
+    const history = await getHistoryDB();
+    if(history.length === 0) return;
 
-function renderHistory(){
+    if(!confirm("History အားလုံးကို ဖျက်မှာ သေချာပါသလား?")) return;
 
-    const list =
-        document.getElementById(
-            "historyList"
-        );
-
-
-    if(!list){
-
-        return;
-
+    try {
+        const db = await openDB();
+        const tx = db.transaction(STORE_NAME, "readwrite");
+        const store = tx.objectStore(STORE_NAME);
+        await new Promise((resolve, reject) => {
+            const req = store.clear();
+            req.onsuccess = resolve;
+            req.onerror = reject;
+        });
+        renderHistory();
+    } catch (err) {
+        console.error("IndexedDB Clear Error:", err);
     }
+}
 
+async function renderHistory() {
+    const list = document.getElementById("modalHistoryList");
+    if (!list) return;
 
-    const history =
-        getHistory();
+    const history = await getHistoryDB();
 
-
-    if(history.length === 0){
-
+    if (history.length === 0) {
         list.innerHTML = `
             <div class="empty-history">
                 📭 History မရှိသေးပါ။<br>
                 အသံတစ်ခု Generate လုပ်လိုက်ရင် ဒီနေရာမှာ ပေါ်လာပါမယ်။
             </div>
         `;
-
         return;
-
     }
 
+    list.innerHTML = history.map(item => {
+        let audioSrc = "";
+        if(item.audioBlob) {
+            audioSrc = URL.createObjectURL(item.audioBlob);
+        }
 
-    list.innerHTML =
-        history.map(
-            item => `
-
+        return `
             <div class="history-item">
-
                 <div class="history-top">
-
-                    <div class="history-title">
-                        🎙️ Voice #${item.id}
-                    </div>
-
-                    <div class="history-date">
-                        ${escapeHTML(item.date)}
-                    </div>
-
+                    <div class="history-title">🎙️ Voice #${item.id}</div>
+                    <div class="history-date">${escapeHTML(item.date)}</div>
                 </div>
 
-
-                <div class="history-text">
-                    ${escapeHTML(item.text)}
-                </div>
-
+                <div class="history-text">${escapeHTML(item.text)}</div>
 
                 <div class="history-info">
-
-                    🎙️ ${escapeHTML(item.voice || item.speaker1 || "Charon")}
-                    &nbsp; | &nbsp;
-                    ⚡ ${escapeHTML(item.speed)}x
-
+                    🎙️ ${escapeHTML(item.voice || "Charon")} &nbsp;|&nbsp;
+                    ⚡ ${escapeHTML(item.speed)}x &nbsp;|&nbsp;
+                    📁 ${escapeHTML((item.format || "wav").toUpperCase())}
                 </div>
 
+                ${audioSrc ? `<audio controls src="${audioSrc}" style="width:100%; margin-top:8px;"></audio>` : ''}
 
                 <div class="history-buttons">
-
-                    <button
-                        class="history-btn"
-                        onclick="useHistory(${item.id})"
-                    >
-                        🔄 Use Again
+                    <button class="history-btn" onclick="useHistoryScript('${escapeHTML(item.text)}', '${escapeHTML(item.voice)}', '${escapeHTML(item.style)}', '${escapeHTML(item.speed)}')">
+                        🔄 Use
                     </button>
 
+                    ${audioSrc ? `<a class="history-btn" style="text-align:center; text-decoration:none;" href="${audioSrc}" download="sh_audio_${item.id}.${item.format || 'wav'}">⬇️ Save</a>` : ''}
 
-                    <button
-                        class="history-btn history-delete"
-                        onclick="deleteHistory(${item.id})"
-                    >
+                    <button class="history-btn history-delete" onclick="deleteHistoryItem(${item.id})">
                         🗑️ Delete
                     </button>
-
                 </div>
-
             </div>
-
-        `
-        ).join("");
-
+        `;
+    }).join("");
 }
 
-
-function useHistory(id){
-
-    const history =
-        getHistory();
-
-
-    const item =
-        history.find(
-            x => x.id === id
-        );
-
-
-    if(!item){
-
-        return;
-
+function useHistoryScript(text, voice, style, speed) {
+    document.getElementById("textInput").value = text;
+    if(document.getElementById("voiceSelect")) {
+        document.getElementById("voiceSelect").value = voice || "Charon";
     }
-
-
-    document.getElementById(
-        "textInput"
-    ).value =
-        item.text;
-
-
-    if(document.getElementById("voiceSelect")){
-
-        document.getElementById(
-            "voiceSelect"
-        ).value =
-            item.voice || item.speaker1 || "Charon";
-
-    }
-
-
-    document.getElementById(
-        "styleSelect"
-    ).value =
-        item.style;
-
-
-    document.getElementById(
-        "speedSlider"
-    ).value =
-        item.speed;
-
+    document.getElementById("styleSelect").value = style;
+    document.getElementById("speedSlider").value = speed;
 
     updateCounter();
+    updateSpeed(speed);
+    closeHistoryModal();
 
-
-    updateSpeed(
-        item.speed
-    );
-
-
-    window.scrollTo({
-        top:0,
-        behavior:"smooth"
-    });
-
+    window.scrollTo({ top: 0, behavior: "smooth" });
 
     showGenerateMessage(
-        "🔄 History ကို ပြန်ထည့်ပေးပြီးပါပြီ။ Generate ကို နှိပ်လိုက်ပါ။",
+        "🔄 History စာသားကို ပြန်ထည့်ပေးပြီးပါပြီ။ Generate ကို နှိပ်လိုက်ပါ။",
         "success"
     );
-
-}
-
-
-function deleteHistory(id){
-
-    const history =
-        getHistory()
-        .filter(
-            x => x.id !== id
-        );
-
-
-    localStorage.setItem(
-        "voice_history",
-        JSON.stringify(history)
-    );
-
-
-    renderHistory();
-
-}
-
-
-function clearHistory(){
-
-    const history =
-        getHistory();
-
-
-    if(history.length === 0){
-
-        return;
-
-    }
-
-
-    const ok =
-        confirm(
-            "History အားလုံးကို ဖျက်မှာသေချာလား?"
-        );
-
-
-    if(!ok){
-
-        return;
-
-    }
-
-
-    localStorage.removeItem(
-        "voice_history"
-    );
-
-
-    renderHistory();
-
 }
 
 
