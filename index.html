@@ -595,7 +595,7 @@ audio{
         </div>
 
         <p class="subtitle" style="margin-bottom:12px;">
-            SH Application သို့ ဝင်ရောက်ရန် စကားဝှက် ရိုက်ထည့်ပါ -
+            SH Application သို့ ဝင်ရောက်ရန် စကားဝှက် ရိုက်ထည့်ပါ 
         </p>
 
         <div class="input-wrap">
@@ -909,15 +909,6 @@ audio{
                     oninput="updateSpeed(this.value)"
                 >
 
-            </div>
-
-            <!-- TEMPERATURE SLIDER -->
-            <div style="margin-top:15px;">
-                <label style="display:flex; justify-content:space-between; margin-bottom:8px; color:#b7d5ee; font-size:14px;">
-                    <span>🌡️ Temperature</span>
-                    <span id="tempVal" style="color:#00baff;font-weight:bold;">1.0</span>
-                </label>
-                <input type="range" id="tempSlider" min="0.0" max="2.0" step="0.1" value="1.0" oninput="document.getElementById('tempVal').textContent = this.value">
             </div>
 
             <!-- AUDIO FORMAT -->
@@ -1412,9 +1403,6 @@ async function generateVoice(){
         document.getElementById("speedSlider")
             .value;
 
-    const temp =
-        parseFloat(document.getElementById("tempSlider").value || 1.0);
-
     const format =
         document.getElementById("formatSelect").value;
 
@@ -1525,8 +1513,6 @@ ${text}`;
         ],
 
         generationConfig:{
-
-            temperature: temp,
 
             responseModalities:[
                 "AUDIO"
