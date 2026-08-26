@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AI Voice Studio - Gemini Voice Studio</title>
+<title>AI Voice Studio - Gemini Multi-Voice Studio</title>
 
 <style>
 *{
@@ -20,9 +20,7 @@ body{
     min-height:100vh;
 }
 
-/* =========================
-   FULLSCREEN LOCK OVERLAY
-========================= */
+/* FULLSCREEN LOCK OVERLAY */
 #passwordSection {
     position: fixed;
     top: 0;
@@ -50,9 +48,7 @@ body{
     text-align: left;
 }
 
-/* =========================
-   HEADER & SIDEBAR STYLES
-========================= */
+/* HEADER & SIDEBAR STYLES */
 .app-header {
     display: flex;
     align-items: center;
@@ -333,32 +329,61 @@ button{
     color:#ff9ab8;
 }
 
-.speaker-box{
-    background:#071c33;
-    padding:14px;
-    border-radius:17px;
-    border:1px solid #144e7c;
+/* SPEECH BLOCK UI STYLES */
+.speech-block {
+    background: #06182e;
+    border: 1px solid #144e7c;
+    border-radius: 18px;
+    padding: 16px;
+    margin-bottom: 16px;
+    position: relative;
 }
 
-.speaker-box label{
-    display:block;
-    font-size:14px;
-    color:#00baff;
-    margin-bottom:8px;
-    font-weight:bold;
+.block-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
 }
 
-textarea{
-    min-height:190px;
-    resize:vertical;
-    line-height:1.7;
+.block-title {
+    font-size: 14px;
+    font-weight: bold;
+    color: #00baff;
 }
 
-.counter{
-    text-align:right;
-    color:#6688a5;
-    font-size:12px;
-    margin-top:6px;
+.block-remove-btn {
+    background: #321a2a;
+    border: 1px solid #78324d;
+    color: #ff9ab8;
+    border-radius: 10px;
+    padding: 4px 10px;
+    font-size: 12px;
+    cursor: pointer;
+}
+
+.speech-block textarea {
+    min-height: 100px;
+    margin-top: 10px;
+}
+
+.add-block-btn {
+    width: 100%;
+    padding: 14px;
+    border-radius: 16px;
+    background: #073660;
+    border: 1px dashed #008cff;
+    color: #00baff;
+    font-size: 15px;
+    font-weight: bold;
+    cursor: pointer;
+    margin-bottom: 18px;
+    transition: 0.2s;
+}
+
+.add-block-btn:hover {
+    background: #008cff;
+    color: white;
 }
 
 .generate{
@@ -591,7 +616,7 @@ audio{
 
 <header class="app-header">
     <button class="menu-toggle-btn" onclick="openSidebar()" title="Menu">☰</button>
-    <div class="app-header-title">AI Voice Studio</div>
+    <div class="app-header-title">AI Multi-Voice Studio</div>
     <div style="width:42px;"></div>
 </header>
 
@@ -617,11 +642,11 @@ audio{
     <div class="sidebar-item">
         <div style="background:#071c33; padding:12px; border-radius:14px; border:1px solid #144e7c;">
             <label style="display:flex; justify-content:space-between; align-items:center; cursor:pointer; color:#b7d5ee; font-size:14px; margin-bottom:0;">
-                <span>🎛️ Advanced Temperature</span>
+                <span>🎛️ Dynamic Temperature</span>
                 <input type="checkbox" id="tempToggle" onchange="toggleTempSlider()" checked style="width:18px; height:18px; accent-color:#00aaff;">
             </label>
 
-            <!-- 1. Temperature ကို Dynamic ချိန်လို့ရအောင် ပြင်ဆင်ထားသော UI -->
+            <!-- Temperature slider (Dynamic Value) -->
             <div id="tempSliderWrap" style="display:block; margin-top:12px;">
                 <div style="display:flex; justify-content:space-between; color:#8eb0cb; font-size:12px; margin-bottom:6px;">
                     <span>0.2 (ပုံမှန်စာဖတ်)</span>
@@ -650,14 +675,14 @@ audio{
     <div class="sidebar-item">
         <label>⚙️ Mode Status:</label>
         <div style="background:#071c33; padding:12px; border-radius:14px; border:1px solid #144e7c; font-size:13px; color:#00baff;">
-            🎙️ Gemini Studio Active
+            🎙️ Multi-Voice Blocks Active
         </div>
     </div>
 
     <div class="sidebar-item" style="margin-top:30px;">
         <label>ℹ️ App Info:</label>
         <p style="font-size:12px; color:#a9c5db; line-height:1.6;">
-            AI Voice Studio v2.0<br>
+            AI Multi-Voice Studio v2.0<br>
             Gemini Burmese Voice Support
         </p>
     </div>
@@ -670,11 +695,10 @@ audio{
     <div class="hero">
         <div class="hero-icon">🎙️</div>
 
-        <h1>AI Voice Studio</h1>
+        <h1>AI Multi-Voice Studio</h1>
 
         <p>
-            AI အသံတုဖန်တီးအသုံးပြု၍ စာလုံးများကို
-            Gemini မူရင်းအသံများဖြင့် သဘာဝကျကျ ပြောင်းလဲနိုင်သည်။
+            AI အသံတုများစွာဖြင့် Speech Block တစ်ခုစီတွင် မိမိနှစ်သက်ရာ Speaker Voice များကို သီးသန့်ရွေးချယ်၍ သဘာဝကျကျ စကားပြောခိုင်းနိုင်သည်။
         </p>
 
         <div class="credit">
@@ -691,8 +715,8 @@ audio{
 
                 <div class="section-title">
                     <div>
-                        <h2>🎙️ Gemini Voice Generator</h2>
-                        <div class="subtitle">Google Gemini Text-to-Speech</div>
+                        <h2>🎙️ Gemini Multi-Voice Generator</h2>
+                        <div class="subtitle">Google Gemini Text-to-Speech (Multi-Speaker)</div>
                     </div>
                     <span class="badge">Gemini TTS</span>
                 </div>
@@ -722,47 +746,22 @@ audio{
                 <div id="keyMessage" class="message"></div>
             </div>
 
-            <!-- 2. Speaker Name များကို စနစ်တကျ မြန်မာလို ဘောင်ခတ် ပေါင်းစပ်ပေးထားသော UI -->
-            <div class="section">
-                <div class="section-title">
-                    <h2>🎭 Choose Voice (အသံ စိတ်ကြိုက် ရွေးပါ)</h2>
-                    <span class="badge">Single Voice</span>
-                </div>
-
-                <div class="speaker-box">
-                    <label>🎙️ Narrator / စကားပြောမည့် အသံ ရွေးပါ:</label>
-                    <select id="voiceSelect">
-                        <optgroup label="👨‍🦱 ယောက်ျားလေး အသံများ">
-                            <option value="Puck">Puck (တက်ကြွလှုပ်ရှား လူငယ်သံ)</option>
-                            <option value="Charon" selected>Charon (သတင်း/ဗဟုသုတပေး တည်ငြိမ်သံ)</option>
-                            <option value="Fenrir">Fenrir (စိတ်လှုပ်ရှားဖွယ် ဇာတ်လမ်းသံ)</option>
-                            <option value="Orus">Orus (ပြတ်သားခိုင်မာ ရင့်ကျက်သံ)</option>
-                        </optgroup>
-                        <optgroup label="👩‍🦰 မိန်းကလေး အသံများ">
-                            <option value="Kore">Kore (ပြတ်သားခိုင်မာ လူငယ်သံ)</option>
-                            <option value="Leda">Leda (နုပျိုတက်ကြွ ချိုသာသံ)</option>
-                            <option value="Aoede">Aoede (ပေါ့ပါးလန်းဆန်း စကားပြောသံ)</option>
-                            <option value="Callirrhoe">Callirrhoe (အေးဆေးပေါ့ပါး သဘာဝသံ)</option>
-                            <option value="Despina">Despina (ချောမွေ့ငြိမ့်ညောင်း ဇာတ်လမ်းသံ)</option>
-                        </optgroup>
-                    </select>
-                </div>
-            </div>
-
+            <!-- SPEECH BLOCKS CONTAINER -->
             <div class="section">
                 <div class="section-title">
                     <div>
-                        <h2>📝 Narration Script</h2>
-                        <div class="subtitle">ဖတ်ရှုစေချင်သော စာသားကို ရိုက်ထည့်ပါ</div>
+                        <h2>🎭 Dialogue / Speech Blocks</h2>
+                        <div class="subtitle">စကားပြော block တစ်ခုစီအတွက် Speaker Voice သီးသန့် ရွေးပါ</div>
                     </div>
                 </div>
 
-                <textarea id="textInput" maxlength="2000" placeholder="ဖတ်ရှုစေချင်သော စာသားကို ဒီနေရာတွင် ရိုက်ထည့်ပါ..." oninput="updateCounter()"></textarea>
-                <div class="counter"><span id="counter">0</span> / 2000</div>
-            </div>
+                <div id="speechBlocksContainer">
+                    <!-- Blocks will be dynamic here -->
+                </div>
 
-            <div class="section">
-                <div class="section-title">
+                <button class="add-block-btn" onclick="addSpeechBlock()">➕ Speech Block တစ်ခု ထပ်တိုးမည်</button>
+
+                <div class="section-title" style="margin-top:10px;">
                     <h2>🎚️ Voice Style & Speed</h2>
                 </div>
 
@@ -781,7 +780,7 @@ audio{
                     <input type="range" id="speedSlider" min="0.5" max="2.0" step="0.1" value="1.0" oninput="updateSpeed(this.value)">
                 </div>
 
-                <button class="generate" id="generateBtn" onclick="generateVoice()">🔊 Generate Voice</button>
+                <button class="generate" id="generateBtn" onclick="generateVoice()">🔊 Generate Multi-Voice Audio</button>
                 <div id="generateMessage" class="message"></div>
 
                 <div id="result" class="result">
@@ -822,9 +821,7 @@ audio{
 
 <script>
 
-/* =========================
-   SIDEBAR FUNCTIONS
-========================= */
+/* SIDEBAR & OPTIONS */
 function openSidebar() {
     document.getElementById("mySidebar").style.left = "0";
     document.getElementById("overlay").style.display = "block";
@@ -835,9 +832,6 @@ function closeSidebar() {
     document.getElementById("overlay").style.display = "none";
 }
 
-/* =========================
-   HISTORY MODAL FUNCTIONS
-========================= */
 function openHistoryModal() {
     document.getElementById("historyModal").style.display = "flex";
     renderHistory();
@@ -847,26 +841,77 @@ function closeHistoryModal() {
     document.getElementById("historyModal").style.display = "none";
 }
 
-/* =========================
-   TEMPERATURE TOGGLE
-========================= */
 function toggleTempSlider() {
     const isChecked = document.getElementById("tempToggle").checked;
     document.getElementById("tempSliderWrap").style.display = isChecked ? "block" : "none";
 }
 
-
 const MY_PASSWORD = "1911999";
-
-const API_URL =
-"https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-tts-preview:generateContent";
-
+const API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-tts-preview:generateContent";
 let audioURL = null;
 
+let blockCount = 0;
 
-/* =========================
-   PASSWORD
-========================= */
+/* SPEAKER HTML TEMPLATE WITH BURMESE LABELS */
+const speakerSelectHTML = `
+    <select class="block-speaker-select">
+        <optgroup label="👨‍🦱 ယောက်ျားလေး အသံများ">
+            <option value="Puck">Puck (တက်ကြွလှုပ်ရှား လူငယ်သံ)</option>
+            <option value="Charon" selected>Charon (သတင်း/ဗဟုသုတပေး တည်ငြိမ်သံ)</option>
+            <option value="Fenrir">Fenrir (စိတ်လှုပ်ရှားဖွယ် ဇာတ်လမ်းသံ)</option>
+            <option value="Orus">Orus (ပြတ်သားခိုင်မာ ရင့်ကျက်သံ)</option>
+        </optgroup>
+        <optgroup label="👩‍🦰 မိန်းကလေး အသံများ">
+            <option value="Kore">Kore (ပြတ်သားခိုင်မာ လူငယ်သံ)</option>
+            <option value="Leda">Leda (နုပျိုတက်ကြွ ချိုသာသံ)</option>
+            <option value="Aoede">Aoede (ပေါ့ပါးလန်းဆန်း စကားပြောသံ)</option>
+            <option value="Callirrhoe">Callirrhoe (အေးဆေးပေါ့ပါး သဘာဝသံ)</option>
+            <option value="Despina">Despina (ချောမွေ့ငြိမ့်ညောင်း ဇာတ်လမ်းသံ)</option>
+        </optgroup>
+    </select>
+`;
+
+function addSpeechBlock(initialText = "", selectedSpeaker = "Charon") {
+    blockCount++;
+    const container = document.getElementById("speechBlocksContainer");
+
+    const blockDiv = document.createElement("div");
+    blockDiv.className = "speech-block";
+    blockDiv.id = `speechBlock_${blockCount}`;
+
+    blockDiv.innerHTML = `
+        <div class="block-header">
+            <span class="block-title">💬 Speech Block #${blockCount}</span>
+            ${container.children.length > 0 ? `<button class="block-remove-btn" onclick="removeSpeechBlock(${blockCount})">🗑️ ဖျက်မည်</button>` : ''}
+        </div>
+        <div style="margin-bottom:8px;">
+            <label style="display:block; font-size:12px; color:#8eb0cb; margin-bottom:4px;">🎙️ Speaker Voice ရွေးရန်:</label>
+            ${speakerSelectHTML}
+        </div>
+        <textarea class="block-text-input" placeholder="ဒီ block အတွက် ပြောရမည့် စာသား ရိုက်ထည့်ပါ...">${initialText}</textarea>
+    `;
+
+    container.appendChild(blockDiv);
+    
+    if(selectedSpeaker) {
+        blockDiv.querySelector('.block-speaker-select').value = selectedSpeaker;
+    }
+}
+
+function removeSpeechBlock(id) {
+    const block = document.getElementById(`speechBlock_${id}`);
+    if (block) {
+        block.remove();
+    }
+}
+
+// Initialize with one default block
+window.addEventListener("DOMContentLoaded", () => {
+    addSpeechBlock();
+});
+
+
+/* PASSWORD LOGIC */
 function unlockApp(){
     const inputPass = document.getElementById("passInput").value;
     const msgBox = document.getElementById("passMessage");
@@ -886,10 +931,6 @@ function unlockApp(){
     }
 }
 
-
-/* =========================
-   SPEED
-========================= */
 function updateSpeed(val){
     document.getElementById("speedVal").textContent = val + "x";
     const player = document.getElementById("audioPlayer");
@@ -898,10 +939,6 @@ function updateSpeed(val){
     }
 }
 
-
-/* =========================
-   API KEY
-========================= */
 function getStoredKey(){
     return localStorage.getItem("gemini_api_key") || "";
 }
@@ -958,10 +995,6 @@ function showKeyMessage(text,type){
     box.className = "message " + type;
 }
 
-
-/* =========================
-   TEST KEY
-========================= */
 async function testKey(){
     const rawKeys = document.getElementById("apiKey").value.trim();
     if(!rawKeys){
@@ -995,19 +1028,6 @@ async function testKey(){
     }
 }
 
-
-/* =========================
-   COUNTER
-========================= */
-function updateCounter(){
-    const text = document.getElementById("textInput").value;
-    document.getElementById("counter").textContent = text.length;
-}
-
-
-/* =========================
-   TEXT CLEANER LOGIC
-========================= */
 function cleanScriptText(rawText) {
     if (!rawText) return "";
     return rawText
@@ -1017,10 +1037,6 @@ function cleanScriptText(rawText) {
         .trim();
 }
 
-
-/* =========================
-   WEB AUDIO API SILENCE TRIMMER LOGIC
-========================= */
 async function trimSilenceFromPCM(pcmUint8Array, sampleRate = 24000) {
     const samplesCount = pcmUint8Array.length / 2;
     if (samplesCount === 0) return pcmUint8Array;
@@ -1066,17 +1082,45 @@ async function trimSilenceFromPCM(pcmUint8Array, sampleRate = 24000) {
     return trimmedPCM;
 }
 
-
-/* =========================
-   GEMINI GENERATE VOICE
-========================= */
+/* MAIN VOICE GENERATION LOGIC */
 async function generateVoice(){
     const rawKeys = document.getElementById("apiKey").value.trim();
-    let text = document.getElementById("textInput").value.trim();
     const style = document.getElementById("styleSelect").value;
-    const spk = document.getElementById("voiceSelect").value;
     const speed = document.getElementById("speedSlider").value;
     const format = document.getElementById("formatSelect").value;
+
+    const blockElements = document.querySelectorAll(".speech-block");
+    if (blockElements.length === 0) {
+        showGenerateMessage("📝 Speech Block အနည်းဆုံး တစ်ခု ထည့်ပါ။", "error");
+        return;
+    }
+
+    let blocksData = [];
+    let fullCombinedText = "";
+    let primaryVoice = "";
+
+    const isCleanerActive = document.getElementById("cleanerToggle").checked;
+
+    blockElements.forEach((el, index) => {
+        let textVal = el.querySelector(".block-text-input").value.trim();
+        const speakerVal = el.querySelector(".block-speaker-select").value;
+
+        if (isCleanerActive) {
+            textVal = cleanScriptText(textVal);
+            el.querySelector(".block-text-input").value = textVal;
+        }
+
+        if (textVal) {
+            if (!primaryVoice) primaryVoice = speakerVal;
+            blocksData.push({ text: textVal, speaker: speakerVal });
+            fullCombinedText += `[${speakerVal}]: ${textVal}\n`;
+        }
+    });
+
+    if (blocksData.length === 0) {
+        showGenerateMessage("📝 စကားပြော စာသားများ ရိုက်ထည့်ပါ...", "error");
+        return;
+    }
 
     const btn = document.getElementById("generateBtn");
 
@@ -1085,34 +1129,26 @@ async function generateVoice(){
         return;
     }
 
-    if(!text){
-        showGenerateMessage("📝 စကားပြောစာသား ထည့်ပါ။", "error");
-        return;
-    }
-
-    if (document.getElementById("cleanerToggle").checked) {
-        text = cleanScriptText(text);
-        document.getElementById("textInput").value = text;
-        updateCounter();
-    }
-
     const keysList = rawKeys.split(",").map(k => k.trim()).filter(k => k.length > 0);
 
     btn.disabled = true;
-    btn.innerHTML = '<span class="loading"></span>Generating Voice...';
+    btn.innerHTML = '<span class="loading"></span>Generating Multi-Voice Audio...';
 
     document.getElementById("generateMessage").className = "message";
     document.getElementById("result").style.display = "none";
 
+    // Build Prompt with Multiple Speakers
+    let speechContentPrompt = blocksData.map(b => `<speaker name="${b.speaker}">${b.text}</speaker>`).join("\n");
+
     const prompt = `${style}
 
-Clear, natural Burmese conversational tone with friendly, engaging, casual yet professional narration, moderate pace, warm and approachable voice, expressive but not exaggerated.
+Clear, natural Burmese conversational tone with friendly, engaging, casual narration.
 
 <speak xml:lang="my-MM">
-${text}
+${speechContentPrompt}
 </speak>`;
 
-    // Temperature Dynamic Logic (Slider က တန်ဖိုးကို တိုက်ရိုက် ရယူသုံးစွဲခြင်း)
+    // Temperature Dynamic Logic
     const useTemp = document.getElementById("tempToggle").checked;
     const customTemp = useTemp ? parseFloat(document.getElementById("tempSlider").value) : 0.6;
 
@@ -1123,7 +1159,7 @@ ${text}
             temperature: customTemp,
             speechConfig:{
                 voiceConfig:{
-                    prebuiltVoiceConfig:{ voiceName:spk }
+                    prebuiltVoiceConfig:{ voiceName: primaryVoice || "Charon" }
                 }
             }
         }
@@ -1185,7 +1221,7 @@ ${text}
                         reader.onloadend = function () {
                             const downloadLink = document.createElement("a");
                             downloadLink.href = reader.result;
-                            downloadLink.download = `sh_audio_${Date.now()}.${format}`;
+                            downloadLink.download = `sh_multi_audio_${Date.now()}.${format}`;
                             document.body.appendChild(downloadLink);
                             downloadLink.click();
                             document.body.removeChild(downloadLink);
@@ -1201,8 +1237,8 @@ ${text}
 
             await saveHistoryDB({
                 id: Date.now(),
-                text: text,
-                voice: spk,
+                text: fullCombinedText,
+                voice: `Multi (${blocksData.length} speakers)`,
                 style: style,
                 speed: speed,
                 format: format,
@@ -1224,13 +1260,10 @@ ${text}
     }
 
     btn.disabled = false;
-    btn.innerHTML = "🔊 Generate Voice";
+    btn.innerHTML = "🔊 Generate Multi-Voice Audio";
 }
 
-
-/* =========================
-   BASE64 & WAV CONVERSION
-========================= */
+/* HELPER FUNCTIONS */
 function base64ToUint8Array(base64){
     const binary = atob(base64);
     const bytes = new Uint8Array(binary.length);
@@ -1276,10 +1309,7 @@ function showGenerateMessage(text, type){
     box.className = "message " + type;
 }
 
-
-/* =========================
-   INDEXEDDB HISTORY STORAGE
-========================= */
+/* INDEXEDDB STORAGE */
 const DB_NAME = "VoiceStudioDB";
 const DB_VERSION = 1;
 const STORE_NAME = "audio_history";
@@ -1392,7 +1422,7 @@ async function renderHistory() {
                 <div class="history-text">${escapeHTML(item.text)}</div>
 
                 <div class="history-info">
-                    🎙️ ${escapeHTML(item.voice || "Charon")} &nbsp;|&nbsp;
+                    🎙️ ${escapeHTML(item.voice || "Multi-Voice")} &nbsp;|&nbsp;
                     ⚡ ${escapeHTML(item.speed)}x &nbsp;|&nbsp;
                     📁 ${escapeHTML((item.format || "wav").toUpperCase())}
                 </div>
@@ -1400,36 +1430,15 @@ async function renderHistory() {
                 ${audioSrc ? `<audio controls src="${audioSrc}" style="width:100%; margin-top:8px;"></audio>` : ''}
 
                 <div class="history-buttons">
-                    <button class="history-btn" onclick="useHistoryScript('${escapeHTML(item.text)}', '${escapeHTML(item.voice)}', '${escapeHTML(item.style)}', '${escapeHTML(item.speed)}')">
-                        🔄 Use
-                    </button>
-
                     ${audioSrc ? `<a class="history-btn" style="text-align:center; text-decoration:none;" href="${audioSrc}" download="sh_audio_${item.id}.${item.format || 'wav'}">⬇️ Save</a>` : ''}
 
-                    <button class="history-btn history-delete" onclick="deleteHistoryItem(${item.id})">
+                    <button class="history-btn history-delete" style="grid-column: span 2;" onclick="deleteHistoryItem(${item.id})">
                         🗑️ Delete
                     </button>
                 </div>
             </div>
         `;
     }).join("");
-}
-
-function useHistoryScript(text, voice, style, speed) {
-    document.getElementById("textInput").value = text;
-    if(document.getElementById("voiceSelect")) {
-        document.getElementById("voiceSelect").value = voice || "Charon";
-    }
-    document.getElementById("styleSelect").value = style;
-    document.getElementById("speedSlider").value = speed;
-
-    updateCounter();
-    updateSpeed(speed);
-    closeHistoryModal();
-
-    window.scrollTo({ top: 0, behavior: "smooth" });
-
-    showGenerateMessage("🔄 History စာသားကို ပြန်ထည့်ပေးပြီးပါပြီ။ Generate ကို နှိပ်လိုက်ပါ။", "success");
 }
 
 function escapeHTML(value){
