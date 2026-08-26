@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AI Voice Studio - Gemini & Voicer Studio</title>
+<title>AI Voice Studio - Gemini Voice Studio</title>
 
 <style>
 *{
@@ -197,46 +197,6 @@ body{
     color:#00baff;
     margin-top:12px;
     font-weight:bold;
-}
-
-/* =========================
-   PAGE TAB SWITCHER STYLES
-========================= */
-.nav-tabs {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 20px;
-    background: rgba(6, 26, 53, 0.8);
-    padding: 6px;
-    border-radius: 18px;
-    border: 1px solid rgba(0, 140, 255, 0.3);
-}
-
-.tab-btn {
-    flex: 1;
-    padding: 14px 10px;
-    border: none;
-    background: transparent;
-    color: #8eb0cb;
-    font-size: 15px;
-    font-weight: bold;
-    border-radius: 14px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-.tab-btn.active {
-    background: linear-gradient(135deg, #008cff, #0059b3);
-    color: #ffffff;
-    box-shadow: 0 4px 15px rgba(0, 140, 255, 0.35);
-}
-
-.page-content {
-    display: none;
-}
-
-.page-content.active {
-    display: block;
 }
 
 .section{
@@ -490,52 +450,6 @@ audio{
     to{transform:rotate(360deg)}
 }
 
-/* =========================
-   VOICER CARDS STYLES
-========================= */
-.voice-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 12px;
-}
-
-.voice-card {
-    background: #071c33;
-    border: 2px solid #144e7c;
-    border-radius: 16px;
-    padding: 16px;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    text-align: center;
-}
-
-.voice-card:hover {
-    border-color: #008cff;
-}
-
-.voice-card.active {
-    border-color: #00baff;
-    background: linear-gradient(135deg, rgba(0, 140, 255, 0.25), rgba(7, 28, 51, 0.9));
-    box-shadow: 0 0 15px rgba(0, 186, 255, 0.25);
-}
-
-.voice-avatar {
-    font-size: 32px;
-    margin-bottom: 6px;
-}
-
-.voice-name {
-    font-size: 15px;
-    font-weight: bold;
-    color: #ffffff;
-}
-
-.voice-desc {
-    font-size: 12px;
-    color: #8eb0cb;
-    margin-top: 4px;
-}
-
 .history-item{
     background:#071c33;
     border:1px solid #164e78;
@@ -735,7 +649,7 @@ audio{
     <div class="sidebar-item">
         <label>⚙️ Mode Status:</label>
         <div style="background:#071c33; padding:12px; border-radius:14px; border:1px solid #144e7c; font-size:13px; color:#00baff;">
-            🎙️ Multi-Engine Studio Active
+            🎙️ Gemini Studio Active
         </div>
     </div>
 
@@ -743,7 +657,7 @@ audio{
         <label>ℹ️ App Info:</label>
         <p style="font-size:12px; color:#a9c5db; line-height:1.6;">
             AI Voice Studio v2.0<br>
-            Gemini & Voicer Burmese Voice Support
+            Gemini Burmese Voice Support
         </p>
     </div>
 </div>
@@ -759,7 +673,7 @@ audio{
 
         <p>
             AI အသံတုဖန်တီးအသုံးပြု၍ စာလုံးများကို
-            Gemini မူရင်းအသံများနှင့် သီဟ/နီလာ မြန်မာအသံများဖြင့် သဘာဝကျကျ ပြောင်းလဲနိုင်သည်။
+            Gemini မူရင်းအသံများဖြင့် သဘာဝကျကျ ပြောင်းလဲနိုင်သည်။
         </p>
 
         <div class="credit">
@@ -769,12 +683,6 @@ audio{
 
 
     <div id="appContent">
-
-        <div class="nav-tabs">
-            <button class="tab-btn active" id="tabGemini" onclick="switchPage('geminiPage')">🎙️ Gemini Voice Studio</button>
-            <button class="tab-btn" id="tabVoicer" onclick="switchPage('voicerPage')">🇲🇲 Voicer Studio (သီဟ/နီလာ)</button>
-        </div>
-
 
         <div id="geminiPage" class="page-content active">
 
@@ -883,64 +791,10 @@ audio{
 
         </div>
 
-
-        <div id="voicerPage" class="page-content">
-
-            <div class="section">
-                <div class="section-title">
-                    <h2>🇲🇲 Voicer Studio (သီဟ & နီလာ)</h2>
-                    <span class="badge">Edge Neural Voice</span>
-                </div>
-
-                <div class="voice-grid">
-                    <div class="voice-card active" id="cardThiha" onclick="selectVoicerVoice('Thiha')">
-                        <div class="voice-avatar">👨‍🦱</div>
-                        <div class="voice-name">သီဟ (Thiha)</div>
-                        <div class="voice-desc">ယောက်ျားလေး အသံ (Neural)</div>
-                    </div>
-
-                    <div class="voice-card" id="cardNilar" onclick="selectVoicerVoice('Nilar')">
-                        <div class="voice-avatar">👩‍🦰</div>
-                        <div class="voice-name">နီလာ (Nilar)</div>
-                        <div class="voice-desc">မိန်းကလေး အသံ (Neural)</div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="section">
-                <div class="section-title">
-                    <h2>📝 စကားပြောစာသား (Narration Text)</h2>
-                </div>
-
-                <textarea id="voicerTextInput" placeholder="သီဟ သို့မဟုတ် နီလာ ဖတ်ရှုစေချင်သော မြန်မာစာသားကို ဒီမှာ ရိုက်ထည့်ပါ..." oninput="updateVoicerCounter()"></textarea>
-                <div class="counter"><span id="voicerCounter">0</span> စာလုံး</div>
-
-                <div style="margin-top:15px;">
-                    <label style="display:flex; justify-content:space-between; margin-bottom:8px; color:#b7d5ee; font-size:14px;">
-                        <span>⚡ စကားပြော အမြန်နှုန်း (Speed):</span>
-                        <span id="voicerSpeedVal" style="color:#00baff;font-weight:bold;">1.0x</span>
-                    </label>
-                    <input type="range" id="voicerSpeedSlider" min="0.5" max="1.8" step="0.1" value="1.0" oninput="document.getElementById('voicerSpeedVal').textContent = this.value + 'x'">
-                </div>
-
-                <div style="margin-top:15px;">
-                    <label style="display:flex; justify-content:space-between; margin-bottom:8px; color:#b7d5ee; font-size:14px;">
-                        <span>🎵 အသံ မြင့်/နိမ့် (Pitch):</span>
-                        <span id="voicerPitchVal" style="color:#00baff;font-weight:bold;">1.0</span>
-                    </label>
-                    <input type="range" id="voicerPitchSlider" min="0.5" max="1.5" step="0.1" value="1.0" oninput="document.getElementById('voicerPitchVal').textContent = this.value">
-                </div>
-
-                <button class="generate" id="voicerBtn" onclick="generateVoicerVoice()">🔊 အသံထုတ်ယူမည် / စကားပြောမည်</button>
-                <div id="voicerMessage" class="message"></div>
-            </div>
-
-        </div>
-
     </div>
 
     <div class="footer">
-        AI Voice Studio • Gemini & Voicer Burmese Support
+        AI Voice Studio • Gemini Burmese Support
     </div>
 
 </div>
@@ -958,31 +812,13 @@ audio{
         </div>
 
         <div id="modalHistoryList" style="overflow-y:auto; flex:1; padding-right:5px;">
-            </div>
+        </div>
 
     </div>
 </div>
 
 
 <script>
-
-/* =========================
-   PAGE SWITCHER LOGIC
-========================= */
-function switchPage(pageId) {
-    document.getElementById("geminiPage").classList.remove("active");
-    document.getElementById("voicerPage").classList.remove("active");
-    document.getElementById("tabGemini").classList.remove("active");
-    document.getElementById("tabVoicer").classList.remove("active");
-
-    if (pageId === 'geminiPage') {
-        document.getElementById("geminiPage").classList.add("active");
-        document.getElementById("tabGemini").classList.add("active");
-    } else {
-        document.getElementById("voicerPage").classList.add("active");
-        document.getElementById("tabVoicer").classList.add("active");
-    }
-}
 
 /* =========================
    SIDEBAR FUNCTIONS
@@ -1390,89 +1226,6 @@ ${text}
 
 
 /* =========================
-   VOICER (THIHA & NILAR) LOGIC
-========================= */
-let selectedVoicerVoice = "Thiha";
-let synth = window.speechSynthesis;
-
-function selectVoicerVoice(voiceName) {
-    selectedVoicerVoice = voiceName;
-    document.getElementById("cardThiha").classList.remove("active");
-    document.getElementById("cardNilar").classList.remove("active");
-
-    if (voiceName === "Thiha") {
-        document.getElementById("cardThiha").classList.add("active");
-    } else {
-        document.getElementById("cardNilar").classList.add("active");
-    }
-}
-
-function updateVoicerCounter() {
-    const text = document.getElementById("voicerTextInput").value;
-    document.getElementById("voicerCounter").textContent = text.length;
-}
-
-function showVoicerMessage(text, type) {
-    const box = document.getElementById("voicerMessage");
-    box.textContent = text;
-    box.className = "message " + type;
-}
-
-function generateVoicerVoice() {
-    let text = document.getElementById("voicerTextInput").value.trim();
-    if (!text) {
-        showVoicerMessage("⚠️ ကျေးဇူးပြု၍ စာသား ရိုက်ထည့်ပေးပါ သားကြီး!", "error");
-        return;
-    }
-
-    if (!('speechSynthesis' in window)) {
-        showVoicerMessage("❌ သင့် Browser က Speech Synthesis ကို မထောက်ပံ့ပါ။ Microsoft Edge ကို သုံးပေးပါ။", "error");
-        return;
-    }
-
-    synth.cancel();
-
-    if (document.getElementById("cleanerToggle").checked) {
-        text = cleanScriptText(text);
-        document.getElementById("voicerTextInput").value = text;
-        updateVoicerCounter();
-    }
-
-    const utterance = new SpeechSynthesisUtterance(text);
-    const speed = parseFloat(document.getElementById("voicerSpeedSlider").value);
-    const pitch = parseFloat(document.getElementById("voicerPitchSlider").value);
-
-    utterance.rate = speed;
-    utterance.pitch = pitch;
-
-    const allVoices = synth.getVoices();
-    const matchedVoice = allVoices.find(v => 
-        (v.name.includes("Thiha") && selectedVoicerVoice === "Thiha") || 
-        (v.name.includes("Nilar") && selectedVoicerVoice === "Nilar") ||
-        (v.lang.includes("my"))
-    );
-
-    if (matchedVoice) {
-        utterance.voice = matchedVoice;
-    } else {
-        utterance.lang = 'my-MM';
-    }
-
-    showVoicerMessage("⏳ စကားပြောနေပါသည်...", "info");
-
-    utterance.onend = function () {
-        showVoicerMessage("✅ အသံဖတ်ရှုပြီးပါပြီ!", "success");
-    };
-
-    utterance.onerror = function () {
-        showVoicerMessage("❌ အသံဖတ်ရာတွင် အမှားဖြစ်သွားပါသည်။", "error");
-    };
-
-    synth.speak(utterance);
-}
-
-
-/* =========================
    BASE64 & WAV CONVERSION
 ========================= */
 function base64ToUint8Array(base64){
@@ -1660,7 +1413,6 @@ async function renderHistory() {
 }
 
 function useHistoryScript(text, voice, style, speed) {
-    switchPage('geminiPage');
     document.getElementById("textInput").value = text;
     if(document.getElementById("voiceSelect")) {
         document.getElementById("voiceSelect").value = voice || "Charon";
