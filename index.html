@@ -11,6 +11,52 @@
     margin:0;
     padding:0;
 }
+/* Custom Dropdown UI */
+.custom-dropdown {
+    position: relative;
+    width: 100%;
+    margin-bottom: 15px;
+}
+.dropdown-trigger {
+    background: #101929;
+    border: 1px solid #24354d;
+    color: #fff;
+    padding: 12px 15px;
+    border-radius: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    font-size: 14px;
+}
+.dropdown-options {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: #182538;
+    border: 1px solid #24354d;
+    border-radius: 8px;
+    margin-top: 5px;
+    z-index: 999;
+    box-shadow: 0 8px 16px rgba(0,0,0,0.4);
+    overflow: hidden;
+}
+.dropdown-item {
+    padding: 12px 15px;
+    color: #d1e4f5;
+    font-size: 14px;
+    cursor: pointer;
+    white-space: nowrap;
+    border-bottom: 1px solid #202e42;
+}
+.dropdown-item:hover {
+    background: #24354d;
+    color: #00baff;
+}
+.hidden {
+    display: none;
+}
 
 body{
     font-family:Arial,"Noto Sans Myanmar","Pyidaungsu",sans-serif;
@@ -1055,51 +1101,62 @@ audio{
         </div>
 
         <!-- PAGE 2: MULTI-VOICE -->
-        <div id="multiTab" class="page-content">
-            <div class="section">
-                <div class="section-title">
-                    <div>
-                        <h2>🎭 Dialogue / Speech Blocks</h2>
-                        <div class="subtitle">စကားပြော block တစ်ခုစီအတွက် Speaker Voice သီးသန့် ရွေးပါ</div>
-                    </div>
-                    <span class="badge">Multi-Speaker</span>
-                </div>
+<div id="multiTab" class="page-content">
+    <div class="section">
+        <div class="section-title">
+            <div>
+                <h2>🎭 Dialogue / Speech Blocks</h2>
+                <div class="subtitle">စကားပြော block တစ်ခုစီအတွက် Speaker Voice သီးသန့် ရွေးပါ</div>
+            </div>
+            <span class="badge">Multi-Speaker</span>
+        </div>
 
-                <div id="speechBlocksContainer">
-                    <!-- Dynamic Speech Blocks (#3 Card Style) -->
-                </div>
+        <div id="speechBlocksContainer">
+            <!-- Dynamic Speech Blocks (#3 Card Style) -->
+        </div>
 
-                <button class="add-block-btn" id="addBlockBtn" onclick="addSpeechBlock()">+ Add Speech Block (1)</button>
+        <button class="add-block-btn" id="addBlockBtn" onclick="addSpeechBlock()">+ Add Speech Block (1)</button>
 
-                <div class="section-title" style="margin-top:10px;">
-                    <h2>🎚️ Voice Style & Speed</h2>
-                </div>
+        <div class="section-title" style="margin-top:10px;">
+            <h2>🎚️ Voice Style & Speed</h2>
+        </div>
 
-                <select id="styleSelect">
-                    <option value="Speak naturally and clearly as a movie narrator.">Natural Dialogue - သဘာဝကျကျ</option>
-                    <option value="Speak warmly and gently as a narrator.">Warm - နူးညံ့စွာ</option>
-                    <option value="Speak like a dramatic movie narrator.">Movie Dialogue - ဇာတ်လမ်းပုံစံ</option>
-                    <option value="Speak with excitement and high energy.">Excited - စိတ်လှုပ်ရှားစွာ</option>
-                </select>
-
-                <div style="margin-top:15px;">
-                    <label style="display:flex; justify-content:space-between; margin-bottom:8px; color:#b7d5ee; font-size:14px;">
-                        <span>⚡ Voice Speed</span>
-                        <span id="speedVal" style="color:#00baff;font-weight:bold;">1.0x</span>
-                    </label>
-                    <input type="range" id="speedSlider" min="0.5" max="2.0" step="0.1" value="1.0" oninput="updateSpeed(this.value)">
-                </div>
-
-                <button class="generate" id="generateBtn" onclick="generateVoice()">🔊 Generate Multi-Voice Audio</button>
-                <div id="generateMessage" class="message"></div>
-
-                <div id="result" class="result">
-                    <strong>🎧 Generated Voice</strong>
-                    <audio id="audioPlayer" controls></audio>
-                    <a id="downloadBtn" class="download" download="gemini-narration-voice.wav">⬇️ Download Voice</a>
-                </div>
+        <!-- Custom Dropdown (Select Tag အစား UI မပြိုအောင် ပြင်ထားသည်) -->
+        <div class="custom-dropdown" id="customStyleSelect">
+            <div class="dropdown-trigger" onclick="toggleDropdown()">
+                <span id="selectedStyleText">Natural Dialogue - သဘာဝကျကျ</span>
+                <span class="arrow">▼</span>
+            </div>
+            <div class="dropdown-options hidden" id="dropdownOptions">
+                <div class="dropdown-item" onclick="selectOption('Speak naturally and clearly as a movie narrator.', 'Natural Dialogue - သဘာဝကျကျ')">Natural Dialogue - သဘာဝကျကျ</div>
+                <div class="dropdown-item" onclick="selectOption('Speak warmly and gently as a narrator.', 'Warm - နူးညံ့စွာ')">Warm - နူးညံ့စွာ</div>
+                <div class="dropdown-item" onclick="selectOption('Speak like a dramatic movie narrator.', 'Movie Dialogue - ဇာတ်လမ်းပုံစံ')">Movie Dialogue - ဇာတ်လမ်းပုံစံ</div>
+                <div class="dropdown-item" onclick="selectOption('Speak with excitement and high energy.', 'Excited - စိတ်လှုပ်ရှားစွာ')">Excited - စိတ်လှုပ်ရှားစွာ</div>
             </div>
         </div>
+        <!-- Hidden input to store selected style prompt value -->
+        <input type="hidden" id="styleSelect" value="Speak naturally and clearly as a movie narrator.">
+
+        <div style="margin-top:15px;">
+            <label style="display:flex; justify-content:space-between; margin-bottom:8px; color:#b7d5ee; font-size:14px;">
+                <span>⚡ Voice Speed</span>
+                <span id="speedVal" style="color:#00baff;font-weight:bold;">1.0x</span>
+            </label>
+            <input type="range" id="speedSlider" min="0.5" max="2.0" step="0.1" value="1.0" oninput="updateSpeed(this.value)">
+        </div>
+
+        <button class="generate" id="generateBtn" onclick="generateVoice()">🔊 Generate Multi-Voice Audio</button>
+        <div id="generateMessage" class="message"></div>
+
+        <div id="result" class="result">
+            <strong>🎧 Generated Voice</strong>
+            <audio id="audioPlayer" controls></audio>
+            <!-- Download Button -->
+            <a id="downloadBtn" class="download" style="display:none;" onclick="triggerDownload(event)">⬇️ Download Voice</a>
+        </div>
+    </div>
+</div>
+
 
     </div>
 
@@ -1913,6 +1970,55 @@ Clear, natural Burmese conversational tone with friendly, engaging, casual narra
     btn.disabled = false;
     btn.innerHTML = "🔊 Generate Single-Voice Audio";
 }
+    btn.innerHTML = "🔊 Generate Single-Voice";
+}
+
+// Dropdown Control
+function toggleDropdown() {
+    document.getElementById('dropdownOptions').classList.toggle('hidden');
+}
+
+function selectOption(val, text) {
+    document.getElementById('styleSelect').value = val;
+    document.getElementById('selectedStyleText').innerText = text;
+    document.getElementById('dropdownOptions').classList.add('hidden');
+}
+
+// Global variable for current audio blob
+let currentAudioBlob = null;
+
+// Voice Generate လုပ်ပြီးတာနဲ့ Audio Blob ကို သိမ်းဆည်းရန်
+function handleAudioGenerated(audioBlob) {
+    currentAudioBlob = audioBlob;
+    const audioUrl = URL.createObjectURL(audioBlob);
+    
+    const audioPlayer = document.getElementById("audioPlayer");
+    const downloadBtn = document.getElementById("downloadBtn");
+    
+    audioPlayer.src = audioUrl;
+    downloadBtn.style.display = "inline-block";
+}
+
+// Download Button Click Handler (WebView Download Null Fix)
+function triggerDownload(e) {
+    if (e) e.preventDefault();
+    if (!currentAudioBlob) return;
+
+    const reader = new FileReader();
+    reader.onloadend = function() {
+        const base64Data = reader.result;
+        const a = document.createElement('a');
+        a.href = base64Data;
+        a.download = "gemini-narration-voice.wav";
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+    };
+    reader.readAsDataURL(currentAudioBlob);
+}
+
+/* HELPER FUNCTIONS */
+function base64ToUint8Array(base64){
 
 /* HELPER FUNCTIONS */
 function base64ToUint8Array(base64){
