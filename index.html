@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AI Voice Studio - Gemini Multi-Voice Studio</title>
+<title>AI Voice Studio - Gemini Voice Studio</title>
 
 <style>
 *{
@@ -364,55 +364,140 @@ button{
     color:#ff9ab8;
 }
 
-/* SPEECH BLOCK UI STYLES */
-.speech-block {
-    background: #06182e;
-    border: 1px solid #144e7c;
-    border-radius: 18px;
-    padding: 16px;
-    margin-bottom: 16px;
-    position: relative;
+/* CUSTOM STYLE FOR SPEECH BLOCK #3 (AI VOICE CARD STYLE) */
+.speech-block-card {
+    background: #041226;
+    border: 1px solid #0a4f8a;
+    border-radius: 20px;
+    padding: 18px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.5);
 }
 
-.block-header {
+.block-card-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 12px;
+    margin-bottom: 14px;
 }
 
-.block-title {
-    font-size: 14px;
+.block-card-title {
+    font-size: 16px;
     font-weight: bold;
     color: #00baff;
+    display: flex;
+    align-items: center;
+    gap: 8px;
 }
 
-.block-remove-btn {
-    background: #321a2a;
-    border: 1px solid #78324d;
-    color: #ff9ab8;
-    border-radius: 10px;
-    padding: 4px 10px;
-    font-size: 12px;
+.block-card-body {
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+    margin-bottom: 14px;
+}
+
+.mic-avatar-circle {
+    width: 65px;
+    height: 65px;
+    border-radius: 50%;
+    border: 2px solid #008cff;
+    background: radial-gradient(circle, #083c72 0%, #031730 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+    flex-shrink: 0;
+    box-shadow: 0 0 15px rgba(0,140,255,0.3);
+}
+
+.speaker-select-trigger {
+    width: 100%;
+    background: #071c33;
+    border: 1px solid #087ed4;
+    border-radius: 14px;
+    padding: 14px;
+    color: #eaf6ff;
+    font-size: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     cursor: pointer;
 }
 
-.speech-block textarea {
-    min-height: 100px;
-    margin-top: 10px;
+.speaker-select-trigger:hover {
+    border-color: #00bfff;
+}
+
+.block-textarea {
+    width: 100%;
+    min-height: 90px;
+    background: #06182e;
+    border: 1px solid #0f406d;
+    border-radius: 14px;
+    padding: 14px;
+    color: #eaf6ff;
+    font-size: 15px;
+    resize: vertical;
+    margin-bottom: 14px;
+}
+
+.block-card-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 1px solid rgba(15, 64, 109, 0.5);
+    padding-top: 12px;
+}
+
+.card-controls-left {
+    display: flex;
+    gap: 8px;
+}
+
+.btn-card-ctrl {
+    background: #08284b;
+    border: 1px solid #0c589c;
+    color: #aed9ff;
+    padding: 8px 14px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.btn-card-ctrl:hover {
+    background: #008cff;
+    color: white;
+}
+
+.btn-card-delete {
+    background: #3d0c1e;
+    border: 1px solid #8c1d40;
+    color: #ff8cae;
+    padding: 8px 16px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.btn-card-delete:hover {
+    background: #8c1d40;
+    color: white;
 }
 
 .add-block-btn {
     width: 100%;
-    padding: 14px;
-    border-radius: 16px;
+    padding: 16px;
+    border-radius: 18px;
     background: #073660;
     border: 1px dashed #008cff;
     color: #00baff;
-    font-size: 15px;
+    font-size: 16px;
     font-weight: bold;
     cursor: pointer;
-    margin-bottom: 18px;
+    margin-bottom: 20px;
     transition: 0.2s;
 }
 
@@ -508,6 +593,133 @@ audio{
 
 @keyframes spin{
     to{transform:rotate(360deg)}
+}
+
+/* CUSTOM VOICE SELECTOR MODAL & BOXES */
+.voice-picker-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(2, 9, 20, 0.88);
+    backdrop-filter: blur(8px);
+    z-index: 10000;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+}
+
+.voice-picker-content {
+    background: #06182e;
+    border: 1px solid #008cff;
+    border-radius: 24px;
+    width: 100%;
+    max-width: 520px;
+    max-height: 85vh;
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.8);
+}
+
+.voice-picker-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #144e7c;
+    padding-bottom: 12px;
+    margin-bottom: 16px;
+}
+
+.voice-picker-header h3 {
+    font-size: 18px;
+    color: #00baff;
+}
+
+.voice-grid {
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding-right: 4px;
+}
+
+.voice-category-title {
+    font-size: 13px;
+    font-weight: bold;
+    color: #8eb0cb;
+    margin-top: 8px;
+    margin-bottom: 2px;
+}
+
+.voice-card-option {
+    background: #082242;
+    border: 1px solid #0f4d85;
+    border-radius: 14px;
+    padding: 14px;
+    cursor: pointer;
+    transition: 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.voice-card-option:hover {
+    border-color: #00baff;
+    background: #0a2d58;
+}
+
+.voice-card-option.selected {
+    border: 2px solid #00baff;
+    background: linear-gradient(135deg, #093769, #072244);
+    box-shadow: 0 0 12px rgba(0,186,255,0.25);
+}
+
+.voice-card-info {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.voice-card-name {
+    font-size: 16px;
+    font-weight: bold;
+    color: #ffffff;
+}
+
+.voice-card-desc {
+    font-size: 13px;
+    color: #8eb0cb;
+}
+
+.voice-card-radio {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: 2px solid #087ed4;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.voice-card-option.selected .voice-card-radio {
+    border-color: #00baff;
+    background: #00baff;
+}
+
+.voice-card-radio::after {
+    content: "";
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: white;
+    display: none;
+}
+
+.voice-card-option.selected .voice-card-radio::after {
+    display: block;
 }
 
 .history-item{
@@ -611,6 +823,14 @@ audio{
         padding:16px;
         border-radius:20px;
     }
+
+    .block-card-body {
+        flex-direction: column;
+    }
+
+    .mic-avatar-circle {
+        margin: 0 auto;
+    }
 }
 </style>
 </head>
@@ -681,7 +901,6 @@ audio{
                 <input type="checkbox" id="tempToggle" onchange="toggleTempSlider()" checked style="width:18px; height:18px; accent-color:#00aaff;">
             </label>
 
-            <!-- Temperature slider (Dynamic Value) -->
             <div id="tempSliderWrap" style="display:block; margin-top:12px;">
                 <div style="display:flex; justify-content:space-between; color:#8eb0cb; font-size:12px; margin-bottom:6px;">
                     <span>0.2 (ပုံမှန်စာဖတ်)</span>
@@ -710,7 +929,7 @@ audio{
     <div class="sidebar-item">
         <label>⚙️ Mode Status:</label>
         <div style="background:#071c33; padding:12px; border-radius:14px; border:1px solid #144e7c; font-size:13px; color:#00baff;">
-            🎙️ Multi & Single Voice Active
+            🎙️ Single & Multi Voice Active
         </div>
     </div>
 
@@ -775,61 +994,14 @@ audio{
             <div id="keyMessage" class="message"></div>
         </div>
 
-        <!-- TAB BUTTONS -->
+        <!-- TAB BUTTONS (SWAPPED: SINGLE FIRST, MULTI SECOND) -->
         <div class="tab-navigation">
-            <button class="tab-btn active" onclick="switchTab('multiTab')">🎭 Multi-Voice Studio</button>
-            <button class="tab-btn" onclick="switchTab('singleTab')">🎙️ Single-Voice Reader</button>
+            <button class="tab-btn active" onclick="switchTab('singleTab')">🎙️ Single-Voice Reader</button>
+            <button class="tab-btn" onclick="switchTab('multiTab')">🎭 Multi-Voice Studio</button>
         </div>
 
-        <!-- PAGE 1: MULTI-VOICE -->
-        <div id="multiTab" class="page-content active">
-            <div class="section">
-                <div class="section-title">
-                    <div>
-                        <h2>🎭 Dialogue / Speech Blocks</h2>
-                        <div class="subtitle">စကားပြော block တစ်ခုစီအတွက် Speaker Voice သီးသန့် ရွေးပါ</div>
-                    </div>
-                    <span class="badge">Multi-Speaker</span>
-                </div>
-
-                <div id="speechBlocksContainer">
-                    <!-- Dynamic Blocks -->
-                </div>
-
-                <button class="add-block-btn" onclick="addSpeechBlock()">➕ Speech Block တစ်ခု ထပ်တိုးမည်</button>
-
-                <div class="section-title" style="margin-top:10px;">
-                    <h2>🎚️ Voice Style & Speed</h2>
-                </div>
-
-                <select id="styleSelect">
-                    <option value="Speak naturally and clearly as a movie narrator.">Natural Dialogue - သဘာဝကျကျ</option>
-                    <option value="Speak warmly and gently as a narrator.">Warm - နူးညံ့စွာ</option>
-                    <option value="Speak like a dramatic movie narrator.">Movie Dialogue - ဇာတ်လမ်းပုံစံ</option>
-                    <option value="Speak with excitement and high energy.">Excited - စိတ်လှုပ်ရှားစွာ</option>
-                </select>
-
-                <div style="margin-top:15px;">
-                    <label style="display:flex; justify-content:space-between; margin-bottom:8px; color:#b7d5ee; font-size:14px;">
-                        <span>⚡ Voice Speed</span>
-                        <span id="speedVal" style="color:#00baff;font-weight:bold;">1.0x</span>
-                    </label>
-                    <input type="range" id="speedSlider" min="0.5" max="2.0" step="0.1" value="1.0" oninput="updateSpeed(this.value)">
-                </div>
-
-                <button class="generate" id="generateBtn" onclick="generateVoice()">🔊 Generate Multi-Voice Audio</button>
-                <div id="generateMessage" class="message"></div>
-
-                <div id="result" class="result">
-                    <strong>🎧 Generated Voice</strong>
-                    <audio id="audioPlayer" controls></audio>
-                    <a id="downloadBtn" class="download" download="gemini-narration-voice.wav">⬇️ Download Voice</a>
-                </div>
-            </div>
-        </div>
-
-        <!-- PAGE 2: SINGLE-VOICE -->
-        <div id="singleTab" class="page-content">
+        <!-- PAGE 1: SINGLE-VOICE (DEFAULT FRONT) -->
+        <div id="singleTab" class="page-content active">
             <div class="section">
                 <div class="section-title">
                     <div>
@@ -841,21 +1013,10 @@ audio{
 
                 <div style="margin-bottom:14px;">
                     <label style="display:block; font-size:13px; color:#8eb0cb; margin-bottom:6px;">🎙️ Speaker Voice ရွေးရန်:</label>
-                    <select id="singleSpeakerSelect">
-                        <optgroup label="👨‍🦱 ယောက်ျားလေး အသံများ">
-                            <option value="Puck">Puck (တက်ကြွလှုပ်ရှား လူငယ်သံ)</option>
-                            <option value="Charon" selected>Charon (သတင်း/ဗဟုသုတပေး တည်ငြိမ်သံ)</option>
-                            <option value="Fenrir">Fenrir (စိတ်လှုပ်ရှားဖွယ် ဇာတ်လမ်းသံ)</option>
-                            <option value="Orus">Orus (ပြတ်သားခိုင်မာ ရင့်ကျက်သံ)</option>
-                        </optgroup>
-                        <optgroup label="👩‍🦰 မိန်းကလေး အသံများ">
-                            <option value="Kore">Kore (ပြတ်သားခိုင်မာ လူငယ်သံ)</option>
-                            <option value="Leda">Leda (နုပျိုတက်ကြွ ချိုသာသံ)</option>
-                            <option value="Aoede">Aoede (ပေါ့ပါးလန်းဆန်း စကားပြောသံ)</option>
-                            <option value="Callirrhoe">Callirrhoe (အေးဆေးပေါ့ပါး သဘာဝသံ)</option>
-                            <option value="Despina">Despina (ချောမွေ့ငြိမ့်ညောင်း ဇာတ်လမ်းသံ)</option>
-                        </optgroup>
-                    </select>
+                    <div class="speaker-select-trigger" onclick="openVoicePicker('single')">
+                        <span id="singleSelectedSpeakerText">Charon (သတင်း/ဗဟုသုတပေး တည်ငြိမ်သံ)</span>
+                        <span>▼</span>
+                    </div>
                 </div>
 
                 <div style="margin-bottom:14px;">
@@ -893,6 +1054,53 @@ audio{
             </div>
         </div>
 
+        <!-- PAGE 2: MULTI-VOICE -->
+        <div id="multiTab" class="page-content">
+            <div class="section">
+                <div class="section-title">
+                    <div>
+                        <h2>🎭 Dialogue / Speech Blocks</h2>
+                        <div class="subtitle">စကားပြော block တစ်ခုစီအတွက် Speaker Voice သီးသန့် ရွေးပါ</div>
+                    </div>
+                    <span class="badge">Multi-Speaker</span>
+                </div>
+
+                <div id="speechBlocksContainer">
+                    <!-- Dynamic Speech Blocks (#3 Card Style) -->
+                </div>
+
+                <button class="add-block-btn" id="addBlockBtn" onclick="addSpeechBlock()">+ Add Speech Block (1)</button>
+
+                <div class="section-title" style="margin-top:10px;">
+                    <h2>🎚️ Voice Style & Speed</h2>
+                </div>
+
+                <select id="styleSelect">
+                    <option value="Speak naturally and clearly as a movie narrator.">Natural Dialogue - သဘာဝကျကျ</option>
+                    <option value="Speak warmly and gently as a narrator.">Warm - နူးညံ့စွာ</option>
+                    <option value="Speak like a dramatic movie narrator.">Movie Dialogue - ဇာတ်လမ်းပုံစံ</option>
+                    <option value="Speak with excitement and high energy.">Excited - စိတ်လှုပ်ရှားစွာ</option>
+                </select>
+
+                <div style="margin-top:15px;">
+                    <label style="display:flex; justify-content:space-between; margin-bottom:8px; color:#b7d5ee; font-size:14px;">
+                        <span>⚡ Voice Speed</span>
+                        <span id="speedVal" style="color:#00baff;font-weight:bold;">1.0x</span>
+                    </label>
+                    <input type="range" id="speedSlider" min="0.5" max="2.0" step="0.1" value="1.0" oninput="updateSpeed(this.value)">
+                </div>
+
+                <button class="generate" id="generateBtn" onclick="generateVoice()">🔊 Generate Multi-Voice Audio</button>
+                <div id="generateMessage" class="message"></div>
+
+                <div id="result" class="result">
+                    <strong>🎧 Generated Voice</strong>
+                    <audio id="audioPlayer" controls></audio>
+                    <a id="downloadBtn" class="download" download="gemini-narration-voice.wav">⬇️ Download Voice</a>
+                </div>
+            </div>
+        </div>
+
     </div>
 
     <div class="footer">
@@ -901,6 +1109,93 @@ audio{
 
 </div>
 
+<!-- CUSTOM VOICE PICKER MODAL WITH CARD BOXES -->
+<div id="voicePickerModal" class="voice-picker-modal">
+    <div class="voice-picker-content">
+        <div class="voice-picker-header">
+            <h3>🎙️ Select Speaker Voice</h3>
+            <button onclick="closeVoicePicker()" style="background:none; border:none; color:#b7d5ee; font-size:24px; cursor:pointer;">&times;</button>
+        </div>
+        
+        <div class="voice-grid">
+            <div class="voice-category-title">👨‍🦱 ယောက်ျားလေး အသံများ</div>
+            
+            <div class="voice-card-option" data-voice="Puck" onclick="selectVoiceOption('Puck', 'Puck (တက်ကြွလှုပ်ရှား လူငယ်သံ)')">
+                <div class="voice-card-info">
+                    <span class="voice-card-name">Puck</span>
+                    <span class="voice-card-desc">တက်ကြွလှုပ်ရှား လူငယ်သံ</span>
+                </div>
+                <div class="voice-card-radio"></div>
+            </div>
+
+            <div class="voice-card-option" data-voice="Charon" onclick="selectVoiceOption('Charon', 'Charon (သတင်း/ဗဟုသုတပေး တည်ငြိမ်သံ)')">
+                <div class="voice-card-info">
+                    <span class="voice-card-name">Charon</span>
+                    <span class="voice-card-desc">သတင်း/ဗဟုသုတပေး တည်ငြိမ်သံ</span>
+                </div>
+                <div class="voice-card-radio"></div>
+            </div>
+
+            <div class="voice-card-option" data-voice="Fenrir" onclick="selectVoiceOption('Fenrir', 'Fenrir (စိတ်လှုပ်ရှားဖွယ် ဇာတ်လမ်းသံ)')">
+                <div class="voice-card-info">
+                    <span class="voice-card-name">Fenrir</span>
+                    <span class="voice-card-desc">စိတ်လှုပ်ရှားဖွယ် ဇာတ်လမ်းသံ</span>
+                </div>
+                <div class="voice-card-radio"></div>
+            </div>
+
+            <div class="voice-card-option" data-voice="Orus" onclick="selectVoiceOption('Orus', 'Orus (ပြတ်သားခိုင်မာ ရင့်ကျက်သံ)')">
+                <div class="voice-card-info">
+                    <span class="voice-card-name">Orus</span>
+                    <span class="voice-card-desc">ပြတ်သားခိုင်မာ ရင့်ကျက်သံ</span>
+                </div>
+                <div class="voice-card-radio"></div>
+            </div>
+
+            <div class="voice-category-title">👩‍🦰 မိန်းကလေး အသံများ</div>
+
+            <div class="voice-card-option" data-voice="Kore" onclick="selectVoiceOption('Kore', 'Kore (ပြတ်သားခိုင်မာ လူငယ်သံ)')">
+                <div class="voice-card-info">
+                    <span class="voice-card-name">Kore</span>
+                    <span class="voice-card-desc">ပြတ်သားခိုင်မာ လူငယ်သံ</span>
+                </div>
+                <div class="voice-card-radio"></div>
+            </div>
+
+            <div class="voice-card-option" data-voice="Leda" onclick="selectVoiceOption('Leda', 'Leda (နုပျိုတက်ကြွ ချိုသာသံ)')">
+                <div class="voice-card-info">
+                    <span class="voice-card-name">Leda</span>
+                    <span class="voice-card-desc">နုပျိုတက်ကြွ ချိုသာသံ</span>
+                </div>
+                <div class="voice-card-radio"></div>
+            </div>
+
+            <div class="voice-card-option" data-voice="Aoede" onclick="selectVoiceOption('Aoede', 'Aoede (ပေါ့ပါးလန်းဆန်း စကားပြောသံ)')">
+                <div class="voice-card-info">
+                    <span class="voice-card-name">Aoede</span>
+                    <span class="voice-card-desc">ပေါ့ပါးလန်းဆန်း စကားပြောသံ</span>
+                </div>
+                <div class="voice-card-radio"></div>
+            </div>
+
+            <div class="voice-card-option" data-voice="Callirrhoe" onclick="selectVoiceOption('Callirrhoe', 'Callirrhoe (အေးဆေးပေါ့ပါး သဘာဝသံ)')">
+                <div class="voice-card-info">
+                    <span class="voice-card-name">Callirrhoe</span>
+                    <span class="voice-card-desc">အေးဆေးပေါ့ပါး သဘာဝသံ</span>
+                </div>
+                <div class="voice-card-radio"></div>
+            </div>
+
+            <div class="voice-card-option" data-voice="Despina" onclick="selectVoiceOption('Despina', 'Despina (ချောမွေ့ငြိမ့်ညောင်း ဇာတ်လမ်းသံ)')">
+                <div class="voice-card-info">
+                    <span class="voice-card-name">Despina</span>
+                    <span class="voice-card-desc">ချောမွေ့ငြိမ့်ညောင်း ဇာတ်လမ်းသံ</span>
+                </div>
+                <div class="voice-card-radio"></div>
+            </div>
+        </div>
+    </div>
+</div>
 
 <div id="historyModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); backdrop-filter:blur(5px); z-index:2000; align-items:center; justify-content:center;">
     <div style="background:#06182e; border:1px solid #008cff; border-radius:24px; width:92%; max-width:550px; max-height:85vh; display:flex; flex-direction:column; padding:20px; box-shadow:0 10px 30px rgba(0,0,0,0.8);">
@@ -922,17 +1217,61 @@ audio{
 
 <script>
 
+let activePickerTarget = null; // 'single' or block ID number
+let singleVoiceValue = "Charon";
+
+/* VOICE PICKER MODAL LOGIC */
+function openVoicePicker(target) {
+    activePickerTarget = target;
+    const modal = document.getElementById("voicePickerModal");
+    modal.style.display = "flex";
+
+    let currentVal = "";
+    if (target === 'single') {
+        currentVal = singleVoiceValue;
+    } else {
+        const block = document.getElementById(`speechBlock_${target}`);
+        if(block) currentVal = block.getAttribute("data-speaker");
+    }
+
+    document.querySelectorAll(".voice-card-option").forEach(card => {
+        if(card.getAttribute("data-voice") === currentVal) {
+            card.classList.add("selected");
+        } else {
+            card.classList.remove("selected");
+        }
+    });
+}
+
+function closeVoicePicker() {
+    document.getElementById("voicePickerModal").style.display = "none";
+}
+
+function selectVoiceOption(voiceVal, displayLabel) {
+    if (activePickerTarget === 'single') {
+        singleVoiceValue = voiceVal;
+        document.getElementById("singleSelectedSpeakerText").textContent = displayLabel;
+    } else {
+        const block = document.getElementById(`speechBlock_${activePickerTarget}`);
+        if(block) {
+            block.setAttribute("data-speaker", voiceVal);
+            block.querySelector(".block-speaker-label").textContent = displayLabel;
+        }
+    }
+    closeVoicePicker();
+}
+
 /* TAB SWITCHING */
 function switchTab(tabId) {
     document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
     document.querySelectorAll('.page-content').forEach(page => page.classList.remove('active'));
     
-    if(tabId === 'multiTab') {
+    if(tabId === 'singleTab') {
         document.querySelectorAll('.tab-btn')[0].classList.add('active');
-        document.getElementById('multiTab').classList.add('active');
+        document.getElementById('singleTab').classList.add('active');
     } else {
         document.querySelectorAll('.tab-btn')[1].classList.add('active');
-        document.getElementById('singleTab').classList.add('active');
+        document.getElementById('multiTab').classList.add('active');
     }
 }
 
@@ -966,62 +1305,96 @@ const API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-
 let audioURL = null;
 let singleAudioURL = null;
 
-let blockCount = 0;
-
-/* SPEAKER HTML TEMPLATE WITH BURMESE LABELS */
-const speakerSelectHTML = `
-    <select class="block-speaker-select">
-        <optgroup label="👨‍🦱 ယောက်ျားလေး အသံများ">
-            <option value="Puck">Puck (တက်ကြွလှုပ်ရှား လူငယ်သံ)</option>
-            <option value="Charon" selected>Charon (သတင်း/ဗဟုသုတပေး တည်ငြိမ်သံ)</option>
-            <option value="Fenrir">Fenrir (စိတ်လှုပ်ရှားဖွယ် ဇာတ်လမ်းသံ)</option>
-            <option value="Orus">Orus (ပြတ်သားခိုင်မာ ရင့်ကျက်သံ)</option>
-        </optgroup>
-        <optgroup label="👩‍🦰 မိန်းကလေး အသံများ">
-            <option value="Kore">Kore (ပြတ်သားခိုင်မာ လူငယ်သံ)</option>
-            <option value="Leda">Leda (နုပျိုတက်ကြွ ချိုသာသံ)</option>
-            <option value="Aoede">Aoede (ပေါ့ပါးလန်းဆန်း စကားပြောသံ)</option>
-            <option value="Callirrhoe">Callirrhoe (အေးဆေးပေါ့ပါး သဘာဝသံ)</option>
-            <option value="Despina">Despina (ချောမွေ့ငြိမ့်ညောင်း ဇာတ်လမ်းသံ)</option>
-        </optgroup>
-    </select>
-`;
+let blockCounter = 0;
 
 function addSpeechBlock(initialText = "", selectedSpeaker = "Charon") {
-    blockCount++;
+    blockCounter++;
     const container = document.getElementById("speechBlocksContainer");
 
     const blockDiv = document.createElement("div");
-    blockDiv.className = "speech-block";
-    blockDiv.id = `speechBlock_${blockCount}`;
+    blockDiv.className = "speech-block-card";
+    blockDiv.id = `speechBlock_${blockCounter}`;
+    blockDiv.setAttribute("data-speaker", selectedSpeaker);
+
+    const speakerLabelMap = {
+        "Puck": "Puck (တက်ကြွလှုပ်ရှား လူငယ်သံ)",
+        "Charon": "Charon (သတင်း/ဗဟုသုတပေး တည်ငြိမ်သံ)",
+        "Fenrir": "Fenrir (စိတ်လှုပ်ရှားဖွယ် ဇာတ်လမ်းသံ)",
+        "Orus": "Orus (ပြတ်သားခိုင်မာ ရင့်ကျက်သံ)",
+        "Kore": "Kore (ပြတ်သားခိုင်မာ လူငယ်သံ)",
+        "Leda": "Leda (နုပျိုတက်ကြွ ချိုသာသံ)",
+        "Aoede": "Aoede (ပေါ့ပါးလန်းဆန်း စကားပြောသံ)",
+        "Callirrhoe": "Callirrhoe (အေးဆေးပေါ့ပါး သဘာဝသံ)",
+        "Despina": "Despina (ချောမွေ့ငြိမ့်ညောင်း ဇာတ်လမ်းသံ)"
+    };
 
     blockDiv.innerHTML = `
-        <div class="block-header">
-            <span class="block-title">💬 Speech Block #${blockCount}</span>
-            ${container.children.length > 0 ? `<button class="block-remove-btn" onclick="removeSpeechBlock(${blockCount})">🗑️ ဖျက်မည်</button>` : ''}
+        <div class="block-card-header">
+            <span class="block-card-title">💬 <span class="block-number-text">Speech Block (1)</span></span>
         </div>
-        <div style="margin-bottom:8px;">
-            <label style="display:block; font-size:12px; color:#8eb0cb; margin-bottom:4px;">🎙️ Speaker Voice ရွေးရန်:</label>
-            ${speakerSelectHTML}
+        <div class="block-card-body">
+            <div class="mic-avatar-circle">🎙️</div>
+            <div style="flex:1; width:100%;">
+                <label style="display:block; font-size:12px; color:#8eb0cb; margin-bottom:6px;">Speaker Voice ရွေးရန်:</label>
+                <div class="speaker-select-trigger" onclick="openVoicePicker(${blockCounter})">
+                    <span class="block-speaker-label">${speakerLabelMap[selectedSpeaker] || selectedSpeaker}</span>
+                    <span>▼</span>
+                </div>
+            </div>
         </div>
-        <textarea class="block-text-input" placeholder="ဒီ block အတွက် ပြောရမည့် စာသား ရိုက်ထည့်ပါ...">${initialText}</textarea>
+        <textarea class="block-textarea block-text-input" placeholder="ဒီ block အတွက် ပြောရမည့် စာသား ရိုက်ထည့်ပါ...">${initialText}</textarea>
+        
+        <div class="block-card-footer">
+            <div class="card-controls-left">
+                <button class="btn-card-ctrl" onclick="moveBlockUp(${blockCounter})">↑ Move Up</button>
+                <button class="btn-card-ctrl" onclick="moveBlockDown(${blockCounter})">↓ Move Down</button>
+            </div>
+            <button class="btn-card-delete" onclick="removeSpeechBlock(${blockCounter})">Delete</button>
+        </div>
     `;
 
     container.appendChild(blockDiv);
-    
-    if(selectedSpeaker) {
-        blockDiv.querySelector('.block-speaker-select').value = selectedSpeaker;
-    }
+    reindexBlocks();
 }
 
 function removeSpeechBlock(id) {
     const block = document.getElementById(`speechBlock_${id}`);
     if (block) {
         block.remove();
+        reindexBlocks();
     }
 }
 
-// Initialize with one default block
+function moveBlockUp(id) {
+    const block = document.getElementById(`speechBlock_${id}`);
+    if (block && block.previousElementSibling) {
+        block.parentNode.insertBefore(block, block.previousElementSibling);
+        reindexBlocks();
+    }
+}
+
+function moveBlockDown(id) {
+    const block = document.getElementById(`speechBlock_${id}`);
+    if (block && block.nextElementSibling) {
+        block.parentNode.insertBefore(block.nextElementSibling, block);
+        reindexBlocks();
+    }
+}
+
+function reindexBlocks() {
+    const blocks = document.querySelectorAll(".speech-block-card");
+    blocks.forEach((el, index) => {
+        const numText = el.querySelector(".block-number-text");
+        if(numText) numText.textContent = `Speech Block (${index + 1})`;
+    });
+
+    const addBtn = document.getElementById("addBlockBtn");
+    if(addBtn) {
+        addBtn.textContent = `+ Add Speech Block (${blocks.length + 1})`;
+    }
+}
+
+// Initialize default block
 window.addEventListener("DOMContentLoaded", () => {
     addSpeechBlock();
 });
@@ -1213,7 +1586,7 @@ async function generateVoice(){
     const speed = document.getElementById("speedSlider").value;
     const format = document.getElementById("formatSelect").value;
 
-    const blockElements = document.querySelectorAll(".speech-block");
+    const blockElements = document.querySelectorAll(".speech-block-card");
     if (blockElements.length === 0) {
         showGenerateMessage("📝 Speech Block အနည်းဆုံး တစ်ခု ထည့်ပါ။", "error");
         return;
@@ -1225,9 +1598,9 @@ async function generateVoice(){
 
     const isCleanerActive = document.getElementById("cleanerToggle").checked;
 
-    blockElements.forEach((el, index) => {
+    blockElements.forEach((el) => {
         let textVal = el.querySelector(".block-text-input").value.trim();
-        const speakerVal = el.querySelector(".block-speaker-select").value;
+        const speakerVal = el.getAttribute("data-speaker") || "Charon";
 
         if (isCleanerActive) {
             textVal = cleanScriptText(textVal);
@@ -1388,7 +1761,7 @@ ${speechContentPrompt}
 /* SINGLE-VOICE GENERATION LOGIC */
 async function generateSingleVoice(){
     const rawKeys = document.getElementById("apiKey").value.trim();
-    const voice = document.getElementById("singleSpeakerSelect").value;
+    const voice = singleVoiceValue;
     let textVal = document.getElementById("singleTextInput").value.trim();
     const style = document.getElementById("singleStyleSelect").value;
     const speed = document.getElementById("singleSpeedSlider").value;
