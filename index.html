@@ -4,7 +4,63 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>AI Voice Studio v2.5</title>
-  <link rel="stylesheet" href="style.css">
+  <style>
+    :root {
+      --bg: #0d1117;
+      --card-bg: #161b22;
+      --border: #30363d;
+      --accent: #238636;
+      --accent-hover: #2ea043;
+      --text: #c9d1d9;
+      --heading: #ffffff;
+      --danger: #da3633;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--bg); color: var(--text); padding: 20px; }
+    .container { max-width: 900px; margin: 0 auto; }
+
+    /* Auth Screen */
+    #auth-screen {
+      position: fixed; inset: 0; background: var(--bg); z-index: 1000;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+    }
+    .auth-box { background: var(--card-bg); border: 1px solid var(--border); padding: 30px; border-radius: 8px; width: 320px; text-align: center; }
+    .auth-box input { width: 100%; padding: 10px; margin: 15px 0; background: var(--bg); border: 1px solid var(--border); color: #fff; border-radius: 4px; text-align: center; }
+
+    /* Main UI */
+    header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 15px; margin-bottom: 20px; }
+    h1 { color: var(--heading); font-size: 1.5rem; }
+    
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
+    .card { background: var(--card-bg); border: 1px solid var(--border); padding: 20px; border-radius: 8px; }
+
+    label { display: block; margin-bottom: 8px; font-weight: 600; color: var(--heading); }
+    input[type="text"], input[type="password"], select, textarea {
+      width: 100%; padding: 10px; background: var(--bg); border: 1px solid var(--border); color: #fff; border-radius: 4px; margin-bottom: 15px; font-size: 0.9rem;
+    }
+
+    .mode-toggle { display: flex; gap: 10px; margin-bottom: 15px; }
+    .mode-btn { flex: 1; padding: 10px; background: var(--bg); border: 1px solid var(--border); color: var(--text); cursor: pointer; border-radius: 4px; }
+    .mode-btn.active { background: #1f6feb; color: #fff; border-color: #1f6feb; }
+
+    .btn { background: var(--accent); color: #fff; border: none; padding: 12px 20px; border-radius: 4px; cursor: pointer; width: 100%; font-weight: bold; }
+    .btn:hover { background: var(--accent-hover); }
+    .btn-secondary { background: #21262d; border: 1px solid var(--border); color: var(--text); }
+    .btn-secondary:hover { background: #30363d; }
+
+    .options { display: flex; gap: 15px; align-items: center; margin-bottom: 15px; }
+    .options label { font-size: 0.85rem; font-weight: normal; cursor: pointer; display: flex; align-items: center; gap: 5px; margin: 0; }
+
+    /* Dialogue Row */
+    .dialogue-row { display: flex; gap: 10px; margin-bottom: 10px; }
+    .dialogue-row select { width: 130px; margin: 0; }
+    .dialogue-row input { flex: 1; margin: 0; }
+
+    /* Audio List & History */
+    .history-item { display: flex; justify-content: space-between; align-items: center; background: var(--bg); border: 1px solid var(--border); padding: 10px; margin-bottom: 8px; border-radius: 4px; }
+    audio { height: 35px; }
+  </style>
 </head>
 <body>
 
@@ -88,232 +144,178 @@
     </div>
   </div>
 
-  <script src="script.js"></script>
+  <script>
+    const PASS = "1911999";
+    const ENDPOINT = "gemini-3.1-flash-tts-preview";
+    let currentMode = 'single';
+    let db = null;
+
+    // --- Authentication ---
+    function checkAuth() {
+      const input = document.getElementById('pass-input').value;
+      if (input === PASS) {
+        document.getElementById('auth-screen').style.display = 'none';
+        document.getElementById('app').style.display = 'block';
+        initDB();
+      } else {
+        alert("Incorrect password!");
+      }
+    }
+
+    // --- Mode Control ---
+    function setMode(mode) {
+      currentMode = mode;
+      document.getElementById('btn-single').classList.toggle('active', mode === 'single');
+      document.getElementById('btn-multi').classList.toggle('active', mode === 'multi');
+      document.getElementById('single-ui').style.display = mode === 'single' ? 'block' : 'none';
+      document.getElementById('multi-ui').style.display = mode === 'multi' ? 'block' : 'none';
+    }
+
+    function addDialogueRow() {
+      const container = document.getElementById('dialogue-container');
+      const row = document.createElement('div');
+      row.className = 'dialogue-row';
+      row.innerHTML = `
+        <select class="m-voice">
+          <option value="Puck">Puck</option><option value="Charon">Charon</option>
+          <option value="Fenrir">Fenrir</option><option value="Orus">Orus</option>
+          <option value="Kore">Kore</option><option value="Leda">Leda</option>
+          <option value="Aoede">Aoede</option><option value="Callirrhoe">Callirrhoe</option>
+          <option value="Despina">Despina</option>
+        </select>
+        <input type="text" class="m-text" placeholder="Speaker line...">
+      `;
+      container.appendChild(row);
+    }
+
+    // --- Text Cleaner ---
+    function cleanText() {
+      if (currentMode === 'single') {
+        let txt = document.getElementById('single-text').value;
+        document.getElementById('single-text').value = cleanString(txt);
+      } else {
+        document.querySelectorAll('.m-text').forEach(el => {
+          el.value = cleanString(el.value);
+        });
+      }
+    }
+
+    function cleanString(str) {
+      return str.replace(/[\*\_~`]/g, '').replace(/\s+/g, ' ').trim();
+    }
+
+    // --- Silence Trimming Utility (PCM/WebAudio) ---
+    async function trimSilenceFromBuffer(audioBuffer) {
+      const channelData = audioBuffer.getChannelData(0);
+      let start = 0;
+      let end = channelData.length - 1;
+      const threshold = 0.01;
+
+      while (start < end && Math.abs(channelData[start]) < threshold) start++;
+      while (end > start && Math.abs(channelData[end]) < threshold) end--;
+
+      const trimmedLength = end - start;
+      if (trimmedLength <= 0) return audioBuffer;
+
+      const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      const trimmedBuffer = audioCtx.createBuffer(audioBuffer.numberOfChannels, trimmedLength, audioBuffer.sampleRate);
+      for (let c = 0; c < audioBuffer.numberOfChannels; c++) {
+        trimmedBuffer.copyToChannel(audioBuffer.getChannelData(c).subarray(start, end), c);
+      }
+      return trimmedBuffer;
+    }
+
+    // --- API Request & Audio Generation ---
+    async function generateSpeech() {
+      const apiKey = document.getElementById('api-key').value.trim();
+      if (!apiKey) return alert("Please enter your Gemini API Key");
+
+      const btn = document.getElementById('generate-btn');
+      btn.innerText = "Generating...";
+      btn.disabled = true;
+
+      try {
+        let payload = {};
+        if (currentMode === 'single') {
+          const text = document.getElementById('single-text').value;
+          const voice = document.getElementById('single-voice').value;
+          payload = { contents: [{ parts: [{ text }] }], voiceConfig: { voice } };
+        } else {
+          const rows = document.querySelectorAll('.dialogue-row');
+          const lines = Array.from(rows).map(r => ({
+            voice: r.querySelector('.m-voice').value,
+            text: r.querySelector('.m-text').value
+          })).filter(l => l.text.trim() !== "");
+          payload = { dialogue: lines };
+        }
+
+        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${ENDPOINT}:generateAudio?key=${apiKey}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        if (!response.ok) throw new Error("Generation Failed");
+
+        const blob = await response.blob();
+        renderAudio(blob);
+        saveHistory(blob);
+
+      } catch (err) {
+        alert("Error: " + err.message + "\n(Note: Ensure correct Endpoint & API Key)");
+      } finally {
+        btn.innerText = "Generate Audio";
+        btn.disabled = false;
+      }
+    }
+
+    function renderAudio(blob) {
+      const url = URL.createObjectURL(blob);
+      const container = document.getElementById('player-box');
+      container.innerHTML = `<audio controls src="${url}" autoplay style="width:100%;"></audio>`;
+    }
+
+    // --- IndexedDB History ---
+    function initDB() {
+      const req = indexedDB.open("VoiceStudioDB", 1);
+      req.onupgradeneeded = (e) => {
+        db = e.target.result;
+        if (!db.objectStoreNames.contains("history")) {
+          db.createObjectStore("history", { keyPath: "id", autoIncrement: true });
+        }
+      };
+      req.onsuccess = (e) => {
+        db = e.target.result;
+        loadHistory();
+      };
+    }
+
+    function saveHistory(blob) {
+      if (!db) return;
+      const tx = db.transaction("history", "readwrite");
+      const store = tx.objectStore("history");
+      const record = { date: new Date().toLocaleTimeString(), blob };
+      store.add(record);
+      tx.oncomplete = loadHistory;
+    }
+
+    function loadHistory() {
+      if (!db) return;
+      const tx = db.transaction("history", "readonly");
+      const store = tx.objectStore("history");
+      const req = store.getAll();
+      req.onsuccess = () => {
+        const list = document.getElementById('history-list');
+        list.innerHTML = "";
+        req.result.reverse().forEach(item => {
+          const url = URL.createObjectURL(item.blob);
+          const div = document.createElement('div');
+          div.className = 'history-item';
+          div.innerHTML = `<span>${item.date}</span> <audio controls src="${url}"></audio>`;
+          list.appendChild(div);
+        });
+      };
+    }
+  </script>
 </body>
 </html>
-:root {
-  --bg: #0d1117;
-  --card-bg: #161b22;
-  --border: #30363d;
-  --accent: #238636;
-  --accent-hover: #2ea043;
-  --text: #c9d1d9;
-  --heading: #ffffff;
-  --danger: #da3633;
-}
-
-* { box-sizing: border-box; margin: 0; padding: 0; }
-body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--bg); color: var(--text); padding: 20px; }
-.container { max-width: 900px; margin: 0 auto; }
-
-/* Auth Screen */
-#auth-screen {
-  position: fixed; inset: 0; background: var(--bg); z-index: 1000;
-  display: flex; flex-direction: column; align-items: center; justify-content: center;
-}
-.auth-box { background: var(--card-bg); border: 1px solid var(--border); padding: 30px; border-radius: 8px; width: 320px; text-align: center; }
-.auth-box input { width: 100%; padding: 10px; margin: 15px 0; background: var(--bg); border: 1px solid var(--border); color: #fff; border-radius: 4px; text-align: center; }
-
-/* Main UI */
-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 15px; margin-bottom: 20px; }
-h1 { color: var(--heading); font-size: 1.5rem; }
-
-.grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
-.card { background: var(--card-bg); border: 1px solid var(--border); padding: 20px; border-radius: 8px; }
-
-label { display: block; margin-bottom: 8px; font-weight: 600; color: var(--heading); }
-input[type="text"], input[type="password"], select, textarea {
-  width: 100%; padding: 10px; background: var(--bg); border: 1px solid var(--border); color: #fff; border-radius: 4px; margin-bottom: 15px; font-size: 0.9rem;
-}
-
-.mode-toggle { display: flex; gap: 10px; margin-bottom: 15px; }
-.mode-btn { flex: 1; padding: 10px; background: var(--bg); border: 1px solid var(--border); color: var(--text); cursor: pointer; border-radius: 4px; }
-.mode-btn.active { background: #1f6feb; color: #fff; border-color: #1f6feb; }
-
-.btn { background: var(--accent); color: #fff; border: none; padding: 12px 20px; border-radius: 4px; cursor: pointer; width: 100%; font-weight: bold; }
-.btn:hover { background: var(--accent-hover); }
-.btn-secondary { background: #21262d; border: 1px solid var(--border); color: var(--text); }
-.btn-secondary:hover { background: #30363d; }
-
-.options { display: flex; gap: 15px; align-items: center; margin-bottom: 15px; }
-.options label { font-size: 0.85rem; font-weight: normal; cursor: pointer; display: flex; align-items: center; gap: 5px; margin: 0; }
-
-/* Dialogue Row */
-.dialogue-row { display: flex; gap: 10px; margin-bottom: 10px; }
-.dialogue-row select { width: 130px; margin: 0; }
-.dialogue-row input { flex: 1; margin: 0; }
-
-/* Audio List & History */
-.history-item { display: flex; justify-content: space-between; align-items: center; background: var(--bg); border: 1px solid var(--border); padding: 10px; margin-bottom: 8px; border-radius: 4px; }
-audio { height: 35px; }
-const PASS = "1911999";
-const ENDPOINT = "gemini-3.1-flash-tts-preview";
-let currentMode = 'single';
-let db = null;
-
-// --- Authentication ---
-function checkAuth() {
-  const input = document.getElementById('pass-input').value;
-  if (input === PASS) {
-    document.getElementById('auth-screen').style.display = 'none';
-    document.getElementById('app').style.display = 'block';
-    initDB();
-  } else {
-    alert("Incorrect password!");
-  }
-}
-
-// --- Mode Control ---
-function setMode(mode) {
-  currentMode = mode;
-  document.getElementById('btn-single').classList.toggle('active', mode === 'single');
-  document.getElementById('btn-multi').classList.toggle('active', mode === 'multi');
-  document.getElementById('single-ui').style.display = mode === 'single' ? 'block' : 'none';
-  document.getElementById('multi-ui').style.display = mode === 'multi' ? 'block' : 'none';
-}
-
-function addDialogueRow() {
-  const container = document.getElementById('dialogue-container');
-  const row = document.createElement('div');
-  row.className = 'dialogue-row';
-  row.innerHTML = `
-    <select class="m-voice">
-      <option value="Puck">Puck</option><option value="Charon">Charon</option>
-      <option value="Fenrir">Fenrir</option><option value="Orus">Orus</option>
-      <option value="Kore">Kore</option><option value="Leda">Leda</option>
-      <option value="Aoede">Aoede</option><option value="Callirrhoe">Callirrhoe</option>
-      <option value="Despina">Despina</option>
-    </select>
-    <input type="text" class="m-text" placeholder="Speaker line...">
-  `;
-  container.appendChild(row);
-}
-
-// --- Text Cleaner ---
-function cleanText() {
-  if (currentMode === 'single') {
-    let txt = document.getElementById('single-text').value;
-    document.getElementById('single-text').value = cleanString(txt);
-  } else {
-    document.querySelectorAll('.m-text').forEach(el => {
-      el.value = cleanString(el.value);
-    });
-  }
-}
-
-function cleanString(str) {
-  return str.replace(/[\*\_~`]/g, '').replace(/\s+/g, ' ').trim();
-}
-
-// --- Silence Trimming Utility (PCM/WebAudio) ---
-async function trimSilenceFromBuffer(audioBuffer) {
-  const channelData = audioBuffer.getChannelData(0);
-  let start = 0;
-  let end = channelData.length - 1;
-  const threshold = 0.01;
-
-  while (start < end && Math.abs(channelData[start]) < threshold) start++;
-  while (end > start && Math.abs(channelData[end]) < threshold) end--;
-
-  const trimmedLength = end - start;
-  if (trimmedLength <= 0) return audioBuffer;
-
-  const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-  const trimmedBuffer = audioCtx.createBuffer(audioBuffer.numberOfChannels, trimmedLength, audioBuffer.sampleRate);
-  for (let c = 0; c < audioBuffer.numberOfChannels; c++) {
-    trimmedBuffer.copyToChannel(audioBuffer.getChannelData(c).subarray(start, end), c);
-  }
-  return trimmedBuffer;
-}
-
-// --- API Request & Audio Generation ---
-async function generateSpeech() {
-  const apiKey = document.getElementById('api-key').value.trim();
-  if (!apiKey) return alert("Please enter your Gemini API Key");
-
-  const btn = document.getElementById('generate-btn');
-  btn.innerText = "Generating...";
-  btn.disabled = true;
-
-  try {
-    let payload = {};
-    if (currentMode === 'single') {
-      const text = document.getElementById('single-text').value;
-      const voice = document.getElementById('single-voice').value;
-      payload = { contents: [{ parts: [{ text }] }], voiceConfig: { voice } };
-    } else {
-      const rows = document.querySelectorAll('.dialogue-row');
-      const lines = Array.from(rows).map(r => ({
-        voice: r.querySelector('.m-voice').value,
-        text: r.querySelector('.m-text').value
-      })).filter(l => l.text.trim() !== "");
-      payload = { dialogue: lines };
-    }
-
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${ENDPOINT}:generateAudio?key=${apiKey}`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
-    });
-
-    if (!response.ok) throw new Error("Generation Failed");
-
-    const blob = await response.blob();
-    renderAudio(blob);
-    saveHistory(blob);
-
-  } catch (err) {
-    alert("Error: " + err.message + "\n(Note: Ensure correct Endpoint & API Key)");
-  } finally {
-    btn.innerText = "Generate Audio";
-    btn.disabled = false;
-  }
-}
-
-function renderAudio(blob) {
-  const url = URL.createObjectURL(blob);
-  const container = document.getElementById('player-box');
-  container.innerHTML = `<audio controls src="${url}" autoplay style="width:100%;"></audio>`;
-}
-
-// --- IndexedDB History ---
-function initDB() {
-  const req = indexedDB.open("VoiceStudioDB", 1);
-  req.onupgradeneeded = (e) => {
-    db = e.target.result;
-    if (!db.objectStoreNames.contains("history")) {
-      db.createObjectStore("history", { keyPath: "id", autoIncrement: true });
-    }
-  };
-  req.onsuccess = (e) => {
-    db = e.target.result;
-    loadHistory();
-  };
-}
-
-function saveHistory(blob) {
-  if (!db) return;
-  const tx = db.transaction("history", "readwrite");
-  const store = tx.objectStore("history");
-  const record = { date: new Date().toLocaleTimeString(), blob };
-  store.add(record);
-  tx.oncomplete = loadHistory;
-}
-
-function loadHistory() {
-  if (!db) return;
-  const tx = db.transaction("history", "readonly");
-  const store = tx.objectStore("history");
-  const req = store.getAll();
-  req.onsuccess = () => {
-    const list = document.getElementById('history-list');
-    list.innerHTML = "";
-    req.result.reverse().forEach(item => {
-      const url = URL.createObjectURL(item.blob);
-      const div = document.createElement('div');
-      div.className = 'history-item';
-      div.innerHTML = `<span>${item.date}</span> <audio controls src="${url}"></audio>`;
-      list.appendChild(div);
-    });
-  };
-}
