@@ -1123,18 +1123,38 @@ audio{
                 </div>
 
                 <!-- Custom Dropdown -->
-                <div class="custom-dropdown" id="customStyleSelect">
-                    <div class="dropdown-trigger" onclick="toggleDropdown()">
-                        <span id="selectedStyleText">Natural Dialogue - သဘာဝကျကျ</span>
-                        <span class="arrow">▼</span>
-                    </div>
-                    <div class="dropdown-options hidden" id="dropdownOptions">
-                        <div class="dropdown-item" onclick="selectOption('Speak naturally and clearly as a movie narrator.', 'Natural Dialogue - သဘာဝကျကျ')">Natural Dialogue - သဘာဝကျကျ</div>
-                        <div class="dropdown-item" onclick="selectOption('Speak warmly and gently as a narrator.', 'Warm - နူးညံ့စွာ')">Warm - နူးညံ့စွာ</div>
-                        <div class="dropdown-item" onclick="selectOption('Speak like a dramatic movie narrator.', 'Movie Dialogue - ဇာတ်လမ်းပုံစံ')">Movie Dialogue - ဇာတ်လမ်းပုံစံ</div>
-                        <div class="dropdown-item" onclick="selectOption('Speak with excitement and high energy.', 'Excited - စိတ်လှုပ်ရှားစွာ')">Excited - စိတ်လှုပ်ရှားစွာ</div>
-                    </div>
-                </div>
+                <!-- Voice Style Cards Area -->
+<div class="style-cards-container">
+  
+  <div class="style-card active" onclick="document.getElementById('styleSelect').value='Speak naturally and clearly as a movie narrator.'">
+    <div class="style-card-content">
+      <div class="style-title">Natural Dialogue</div>
+      <div class="style-desc">သဘာဝကျကျ စကားပြောဟန်</div>
+    </div>
+  </div>
+
+  <div class="style-card" onclick="document.getElementById('styleSelect').value='Speak warmly and gently as a narrator.'">
+    <div class="style-card-content">
+      <div class="style-title">Warm</div>
+      <div class="style-desc">နွေးထွေးယုယသော စကားပြောအသံ</div>
+    </div>
+  </div>
+
+  <div class="style-card" onclick="document.getElementById('styleSelect').value='Speak like a dramatic movie narrator.'">
+    <div class="style-card-content">
+      <div class="style-title">Movie Dialogue</div>
+      <div class="style-desc">Movie Recap နှင့် ဇာတ်လမ်းပြောပြသည့် ပုံစံ</div>
+    </div>
+  </div>
+
+  <div class="style-card" onclick="document.getElementById('styleSelect').value='Speak with excitement and high energy.'">
+    <div class="style-card-content">
+      <div class="style-title">Excited</div>
+      <div class="style-desc">စိတ်လှုပ်ရှား တက်ကြွသော အသံ</div>
+    </div>
+  </div>
+
+</div>
                 <input type="hidden" id="styleSelect" value="Speak naturally and clearly as a movie narrator.">
 
                 <div style="margin-top:15px;">
