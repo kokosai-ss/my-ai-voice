@@ -933,13 +933,50 @@ audio{
         <button class="btn" style="width:100%; min-height:48px;" onclick="closeSidebar(); openHistoryModal();">🕒 Voice History</button>
     </div>
 
-    <div class="sidebar-item">
-        <label>📁 Audio Output Format:</label>
-        <select id="formatSelect">
-            <option value="wav">WAV Audio (.wav)</option>
-            <option value="mp3">MP3 Audio (.mp3)</option>
-        </select>
+    <!-- Audio Output Format (Segmented Control) -->
+<div class="sidebar-item">
+  <label style="color: #8b9bb4; font-size: 13px; display: block; margin-bottom: 8px;">📁 Audio Output Format:</label>
+
+  <div style="display: flex; gap: 8px; background: #0b1a30; padding: 4px; border-radius: 10px; border: 1px solid #1c355e;">
+    <div id="btnWav" onclick="setAudioFormat('wav')" style="flex: 1; padding: 10px 8px; text-align: center; border-radius: 8px; font-size: 13px; font-weight: bold; cursor: pointer; color: #ffffff; background: #0088ff; transition: all 0.2s ease;">
+      🎵 WAV (.wav)
     </div>
+    <div id="btnMp3" onclick="setAudioFormat('mp3')" style="flex: 1; padding: 10px 8px; text-align: center; border-radius: 8px; font-size: 13px; font-weight: bold; cursor: pointer; color: #8b9bb4; background: transparent; transition: all 0.2s ease;">
+      🎧 MP3 (.mp3)
+    </div>
+  </div>
+
+  <!-- Hidden Native Select (Backend Logic မပျက်စေရန်) -->
+  <select id="formatSelect" style="display: none;">
+    <option value="wav" selected>WAV Audio (.wav)</option>
+    <option value="mp3">MP3 Audio (.mp3)</option>
+  </select>
+</div>
+
+<script>
+function setAudioFormat(formatValue) {
+  const btnWav = document.getElementById('btnWav');
+  const btnMp3 = document.getElementById('btnMp3');
+  const select = document.getElementById('formatSelect');
+
+  if (formatValue === 'wav') {
+    btnWav.style.background = '#0088ff';
+    btnWav.style.color = '#ffffff';
+    btnMp3.style.background = 'transparent';
+    btnMp3.style.color = '#8b9bb4';
+  } else {
+    btnMp3.style.background = '#0088ff';
+    btnMp3.style.color = '#ffffff';
+    btnWav.style.background = 'transparent';
+    btnWav.style.color = '#8b9bb4';
+  }
+
+  if (select) {
+    select.value = formatValue;
+    select.dispatchEvent(new Event('change'));
+  }
+}
+</script>
 
     <div class="sidebar-item">
         <div style="background:#071c33; padding:12px; border-radius:14px; border:1px solid #144e7c;">
@@ -1075,12 +1112,67 @@ audio{
                     <h2>🎚️ Voice Style & Speed</h2>
                 </div>
 
-                <select id="singleStyleSelect">
-                    <option value="Speak naturally and clearly as a movie narrator.">Natural Dialogue - သဘာဝကျကျ</option>
-                    <option value="Speak warmly and gently as a narrator.">Warm - နူးညံ့စွာ</option>
-                    <option value="Speak like a dramatic movie narrator.">Movie Dialogue - ဇာတ်လမ်းပုံစံ</option>
-                    <option value="Speak with excitement and high energy.">Excited - စိတ်လှုပ်ရှားစွာ</option>
-                </select>
+                <!-- Single-Voice Modal & Trigger System -->
+<div class="style-trigger-box" onclick="openSingleStyleModal()">
+  <span id="singleSelectedStyleDisplay" style="font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Natural Dialogue - သဘာဝကျကျ</span>
+  <span style="color: #8b9bb4; font-size: 12px;">▼</span>
+</div>
+
+<!-- Hidden Input for Single-Voice Backend -->
+<input type="hidden" id="singleStyleSelect" value="Speak naturally and clearly as a movie narrator.">
+
+<!-- Modal Popup Window for Single-Voice -->
+<div id="singleStyleModalOverlay" class="style-modal-overlay">
+  <div class="style-modal-content">
+    <div class="style-modal-header">
+      <h3>🎛️ Select Voice Style</h3>
+      <span class="style-close-btn" onclick="closeSingleStyleModal()">&times;</span>
+    </div>
+    
+    <div class="style-modal-cards">
+      <div class="modal-style-card active" onclick="selectSingleStyleOption(this, 'Natural Dialogue - သဘာဝကျကျ', 'Speak naturally and clearly as a movie narrator.')">
+        <h4>Natural Dialogue</h4>
+        <p>သဘာဝကျကျ စကားပြောဟန်</p>
+      </div>
+
+      <div class="modal-style-card" onclick="selectSingleStyleOption(this, 'Warm - နွေးထွေးစွာ', 'Speak warmly and gently as a narrator.')">
+        <h4>Warm</h4>
+        <p>နွေးထွေးယုယသော စကားပြောအသံ</p>
+      </div>
+
+      <div class="modal-style-card" onclick="selectSingleStyleOption(this, 'Movie Dialogue - ဇာတ်လမ်းပုံစံ', 'Speak like a dramatic movie narrator.')">
+        <h4>Movie Dialogue</h4>
+        <p>Movie Recap နှင့် ဇာတ်လမ်းပြောပြသည့် ပုံစံ</p>
+      </div>
+
+      <div class="modal-style-card" onclick="selectSingleStyleOption(this, 'Excited - စိတ်လှုပ်ရှားစွာ', 'Speak with excitement and high energy.')">
+        <h4>Excited</h4>
+        <p>စိတ်လှုပ်ရှား တက်ကြွသော အသံ</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function openSingleStyleModal() {
+  document.getElementById('singleStyleModalOverlay').style.display = 'flex';
+}
+
+function closeSingleStyleModal() {
+  document.getElementById('singleStyleModalOverlay').style.display = 'none';
+}
+
+function selectSingleStyleOption(element, displayText, promptValue) {
+  document.getElementById('singleSelectedStyleDisplay').innerText = displayText;
+  document.getElementById('singleStyleSelect').value = promptValue;
+  
+  const modalCards = element.parentElement.querySelectorAll('.modal-style-card');
+  modalCards.forEach(card => card.classList.remove('active'));
+  element.classList.add('active');
+  
+  closeSingleStyleModal();
+}
+</script>
 
                 <div style="margin-top:15px;">
                     <label style="display:flex; justify-content:space-between; margin-bottom:8px; color:#b7d5ee; font-size:14px;">
@@ -1219,6 +1311,12 @@ audio{
   margin: 0;
   color: #8b9bb4;
   font-size: 12px;
+    /* Dropdown စာသားများကို တစ်တန်းတည်း လှလှပပ ငြိမ်နေစေရန် */
+.dropdown-trigger span, #selectedStyleText, .style-trigger-box span {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 13px;
 }
 </style>
 
