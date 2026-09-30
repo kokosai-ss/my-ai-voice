@@ -1,7 +1,12 @@
 <!DOCTYPE html>
 <html lang="my">
 <head>
- ​<style>   
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SH AI Voice Studio</title>
+  <!-- FontAwesome Icons Link -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>   
 #cyberpunk-lockscreen {
   position: fixed;
   top: 0; left: 0;
@@ -101,7 +106,7 @@
 
 .footer-text { font-size: 12px; color: #6c8ebf; letter-spacing: 1px; }
 
-    /* Glassmorphism Effect (မှန်ကြည်ရောင် UI) */
+/* Glassmorphism Effect (မှန်ကြည်ရောင် UI) */
 .glass-box {
   background: rgba(11, 26, 48, 0.65) !important;
   backdrop-filter: blur(12px) !important;
@@ -114,7 +119,8 @@
     margin:0;
     padding:0;
 }
-    /* Single နဲ့ Multi နှစ်ခုလုံး ၁၀၀% ဒီဇိုင်းတူညီစေမည့် Trigger Box CSS */
+
+/* Single နဲ့ Multi နှစ်ခုလုံး ၁၀၀% ဒီဇိုင်းတူညီစေမည့် Trigger Box CSS */
 .style-trigger-box {
   width: 100%;
   box-sizing: border-box;
@@ -140,6 +146,7 @@
   flex: 1;
   margin-right: 8px;
 }
+
 /* Custom Dropdown UI */
 .custom-dropdown {
     position: relative;
@@ -193,34 +200,6 @@ body{
         radial-gradient(circle at top,#123b70 0%,#061426 42%,#020914 100%);
     color:#eaf6ff;
     min-height:100vh;
-}
-
-/* FULLSCREEN LOCK OVERLAY */
-#passwordSection {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    background: rgba(2, 9, 20, 0.96);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    z-index: 99999;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 20px;
-}
-
-.lock-box {
-    background: rgba(7, 25, 49, 0.95);
-    border: 1px solid rgba(0, 140, 255, 0.4);
-    border-radius: 24px;
-    padding: 28px 22px;
-    width: 100%;
-    max-width: 400px;
-    box-shadow: 0 15px 35px rgba(0,0,0,0.8), 0 0 25px rgba(0,140,255,0.15);
-    text-align: left;
 }
 
 /* HEADER & SIDEBAR STYLES */
@@ -982,6 +961,85 @@ audio{
     display:none;
 }
 
+/* Voice Style Modal Styles */
+.style-modal-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(4px);
+  z-index: 9999;
+  justify-content: center;
+  align-items: center;
+}
+
+.style-modal-content {
+  background: #0b1728;
+  border: 1px solid #1e3a5f;
+  border-radius: 16px;
+  width: 90%;
+  max-width: 400px;
+  padding: 20px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+}
+
+.style-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+  border-bottom: 1px solid #1c355e;
+  padding-bottom: 10px;
+}
+
+.style-modal-header h3 {
+  margin: 0;
+  color: #38bdf8;
+  font-size: 16px;
+}
+
+.style-close-btn {
+  color: #94a3b8;
+  font-size: 22px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.style-modal-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.modal-style-card {
+  background: #112238;
+  border: 1px solid #1e3a5f;
+  border-radius: 12px;
+  padding: 12px 16px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.modal-style-card.active {
+  border: 2px solid #0088ff;
+  background: #152d4a;
+}
+
+.modal-style-card h4 {
+  margin: 0 0 4px 0;
+  color: #ffffff;
+  font-size: 14px;
+}
+
+.modal-style-card p {
+  margin: 0;
+  color: #8b9bb4;
+  font-size: 12px;
+}
+
 @media(max-width:480px){
     .container{
         padding:12px 10px 40px;
@@ -1012,6 +1070,7 @@ audio{
 </head>
 
 <body>
+
 <!-- Lock Screen Display Start -->
 <div id="cyberpunk-lockscreen">
   <div class="lock-container">
@@ -1033,13 +1092,14 @@ audio{
         </svg>
       </div>
 
-      <div class="card-title">
+      <div style="margin-bottom: 20px;">
         <h2 class="card-title">Enter Password to Access<br>SH AI Voice Studio</h2>
-<p class="card-subtitle">Authentication required to grant access.</p>
+        <p class="card-subtitle">Authentication required to grant access.</p>
+      </div>
 
       <div class="input-group">
         <i class="fa-solid fa-lock left-icon"></i>
-        <input type="password" id="passInput" placeholder="Password ရိုက်ထည့်ပါ...">
+        <input type="password" id="passInput" placeholder="Password ရိုက်ထည့်ပါ..." onkeydown="if(event.key === 'Enter') checkUnlockPassword()">
         <!-- 👁️ မျက်လုံး Icon လေး အလုပ်လုပ်အောင် id="eyeIcon" ထည့်ထားပေးပါသည် -->
         <i class="fa-regular fa-eye right-icon" id="eyeIcon" onclick="togglePasswordVisibility()"></i>
       </div>
@@ -1060,37 +1120,6 @@ audio{
   </div>
 </div>
 <!-- Lock Screen Display End -->
-<div id="passwordSection">
-    <div class="lock-box">
-        <div class="section-title">
-            <h2>🔑 Access Protection</h2>
-            <span class="badge">Locked</span>
-        </div>
-
-        <p class="subtitle" style="margin-bottom:12px;">
-            SH Application သို့ ဝင်ရောက်ရန် စကားဝှက် ရိုက်ထည့်ပါ 
-        </p>
-
-        <div class="input-wrap">
-            <input
-                id="passInput"
-                type="password"
-                placeholder="Password ရိုက်ထည့်ပါ..."
-                onkeydown="if(event.key === 'Enter') unlockApp()"
-            >
-        </div>
-
-        <button
-            class="generate"
-            style="margin-top:12px;min-height:50px;"
-            onclick="unlockApp()"
-        >
-            Unlock Studio
-        </button>
-
-        <div id="passMessage" class="message"></div>
-    </div>
-</div>
 
 <header class="app-header">
     <button class="menu-toggle-btn" onclick="openSidebar()" title="Menu">☰</button>
@@ -1110,49 +1139,24 @@ audio{
     </div>
 
     <!-- Audio Output Format (Segmented Control) -->
-<div class="sidebar-item">
-  <label style="color: #8b9bb4; font-size: 13px; display: block; margin-bottom: 8px;">📁 Audio Output Format:</label>
+    <div class="sidebar-item">
+      <label style="color: #8b9bb4; font-size: 13px; display: block; margin-bottom: 8px;">📁 Audio Output Format:</label>
 
-  <div style="display: flex; gap: 8px; background: #0b1a30; padding: 4px; border-radius: 10px; border: 1px solid #1c355e;">
-    <div id="btnWav" onclick="setAudioFormat('wav')" style="flex: 1; padding: 10px 8px; text-align: center; border-radius: 8px; font-size: 13px; font-weight: bold; cursor: pointer; color: #ffffff; background: #0088ff; transition: all 0.2s ease;">
-      🎵 WAV (.wav)
+      <div style="display: flex; gap: 8px; background: #0b1a30; padding: 4px; border-radius: 10px; border: 1px solid #1c355e;">
+        <div id="btnWav" onclick="setAudioFormat('wav')" style="flex: 1; padding: 10px 8px; text-align: center; border-radius: 8px; font-size: 13px; font-weight: bold; cursor: pointer; color: #ffffff; background: #0088ff; transition: all 0.2s ease;">
+          🎵 WAV (.wav)
+        </div>
+        <div id="btnMp3" onclick="setAudioFormat('mp3')" style="flex: 1; padding: 10px 8px; text-align: center; border-radius: 8px; font-size: 13px; font-weight: bold; cursor: pointer; color: #8b9bb4; background: transparent; transition: all 0.2s ease;">
+          🎧 MP3 (.mp3)
+        </div>
+      </div>
+
+      <!-- Hidden Native Select (Backend Logic မပျက်စေရန်) -->
+      <select id="formatSelect" style="display: none;">
+        <option value="wav" selected>WAV Audio (.wav)</option>
+        <option value="mp3">MP3 Audio (.mp3)</option>
+      </select>
     </div>
-    <div id="btnMp3" onclick="setAudioFormat('mp3')" style="flex: 1; padding: 10px 8px; text-align: center; border-radius: 8px; font-size: 13px; font-weight: bold; cursor: pointer; color: #8b9bb4; background: transparent; transition: all 0.2s ease;">
-      🎧 MP3 (.mp3)
-    </div>
-  </div>
-
-  <!-- Hidden Native Select (Backend Logic မပျက်စေရန်) -->
-  <select id="formatSelect" style="display: none;">
-    <option value="wav" selected>WAV Audio (.wav)</option>
-    <option value="mp3">MP3 Audio (.mp3)</option>
-  </select>
-</div>
-
-<script>
-function setAudioFormat(formatValue) {
-  const btnWav = document.getElementById('btnWav');
-  const btnMp3 = document.getElementById('btnMp3');
-  const select = document.getElementById('formatSelect');
-
-  if (formatValue === 'wav') {
-    btnWav.style.background = '#0088ff';
-    btnWav.style.color = '#ffffff';
-    btnMp3.style.background = 'transparent';
-    btnMp3.style.color = '#8b9bb4';
-  } else {
-    btnMp3.style.background = '#0088ff';
-    btnMp3.style.color = '#ffffff';
-    btnWav.style.background = 'transparent';
-    btnWav.style.color = '#8b9bb4';
-  }
-
-  if (select) {
-    select.value = formatValue;
-    select.dispatchEvent(new Event('change'));
-  }
-}
-</script>
 
     <div class="sidebar-item">
         <div style="background:#071c33; padding:12px; border-radius:14px; border:1px solid #144e7c;">
@@ -1214,12 +1218,11 @@ function setAudioFormat(formatValue) {
         <p>
             SH AI Voice သုံးပြီး စကားပြောအသံများ (Multi-Voice) နှင့် 
           (Single-Voice) ကို စိတ်ကြိုက် ဖန်တီးပါ။
-        </p 
-            <div class="credit">
+        </p> 
+        <div class="credit">
             @shburmesemovie ကို ဆက်သွယ်ပါ
         </div>
     </div>
-
 
     <div id="appContent">
 
@@ -1288,67 +1291,46 @@ function setAudioFormat(formatValue) {
                     <h2>🎚️ Voice Style & Speed</h2>
                 </div>
 
-                <!-- Single-Voice Modal & Trigger System -->
-<div class="style-trigger-box" onclick="openSingleStyleModal()">
-  <span id="singleSelectedStyleDisplay" style="font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Natural Dialogue - သဘာဝကျကျ</span>
-  <span style="color: #8b9bb4; font-size: 12px;">▼</span>
-</div>
+                <!-- Single-Voice Trigger System -->
+                <div class="style-trigger-box" onclick="openSingleStyleModal()">
+                  <span id="singleSelectedStyleDisplay" style="font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Natural Dialogue - သဘာဝကျကျ</span>
+                  <span style="color: #8b9bb4; font-size: 12px;">▼</span>
+                </div>
 
-<!-- Hidden Input for Single-Voice Backend -->
-<input type="hidden" id="singleStyleSelect" value="Speak naturally and clearly as a movie narrator.">
+                <!-- Hidden Input for Single-Voice Backend -->
+                <input type="hidden" id="singleStyleSelect" value="Speak naturally and clearly as a movie narrator.">
 
-<!-- Modal Popup Window for Single-Voice -->
-<div id="singleStyleModalOverlay" class="style-modal-overlay">
-  <div class="style-modal-content">
-    <div class="style-modal-header">
-      <h3>🎛️ Select Voice Style</h3>
-      <span class="style-close-btn" onclick="closeSingleStyleModal()">&times;</span>
-    </div>
-    
-    <div class="style-modal-cards">
-      <div class="modal-style-card active" onclick="selectSingleStyleOption(this, 'Natural Dialogue - သဘာဝကျကျ', 'Speak naturally and clearly as a movie narrator.')">
-        <h4>Natural Dialogue</h4>
-        <p>သဘာဝကျကျ စကားပြောဟန်</p>
-      </div>
+                <!-- Modal Popup Window for Single-Voice -->
+                <div id="singleStyleModalOverlay" class="style-modal-overlay">
+                  <div class="style-modal-content">
+                    <div class="style-modal-header">
+                      <h3>🎛️ Select Voice Style</h3>
+                      <span class="style-close-btn" onclick="closeSingleStyleModal()">&times;</span>
+                    </div>
+                    
+                    <div class="style-modal-cards">
+                      <div class="modal-style-card active" onclick="selectSingleStyleOption(this, 'Natural Dialogue - သဘာဝကျကျ', 'Speak naturally and clearly as a movie narrator.')">
+                        <h4>Natural Dialogue</h4>
+                        <p>သဘာဝကျကျ စကားပြောဟန်</p>
+                      </div>
 
-      <div class="modal-style-card" onclick="selectSingleStyleOption(this, 'Warm - နွေးထွေးစွာ', 'Speak warmly and gently as a narrator.')">
-        <h4>Warm</h4>
-        <p>နွေးထွေးယုယသော စကားပြောအသံ</p>
-      </div>
+                      <div class="modal-style-card" onclick="selectSingleStyleOption(this, 'Warm - နွေးထွေးစွာ', 'Speak warmly and gently as a narrator.')">
+                        <h4>Warm</h4>
+                        <p>နွေးထွေးယုယသော စကားပြောအသံ</p>
+                      </div>
 
-      <div class="modal-style-card" onclick="selectSingleStyleOption(this, 'Movie Dialogue - ဇာတ်လမ်းပုံစံ', 'Speak like a dramatic movie narrator.')">
-        <h4>Movie Dialogue</h4>
-        <p>Movie Recap နှင့် ဇာတ်လမ်းပြောပြသည့် ပုံစံ</p>
-      </div>
+                      <div class="modal-style-card" onclick="selectSingleStyleOption(this, 'Movie Dialogue - ဇာတ်လမ်းပုံစံ', 'Speak like a dramatic movie narrator.')">
+                        <h4>Movie Dialogue</h4>
+                        <p>Movie Recap နှင့် ဇာတ်လမ်းပြောပြသည့် ပုံစံ</p>
+                      </div>
 
-      <div class="modal-style-card" onclick="selectSingleStyleOption(this, 'Excited - စိတ်လှုပ်ရှားစွာ', 'Speak with excitement and high energy.')">
-        <h4>Excited</h4>
-        <p>စိတ်လှုပ်ရှား တက်ကြွသော အသံ</p>
-      </div>
-    </div>
-  </div>
-</div>
-
-<script>
-function openSingleStyleModal() {
-  document.getElementById('singleStyleModalOverlay').style.display = 'flex';
-}
-
-function closeSingleStyleModal() {
-  document.getElementById('singleStyleModalOverlay').style.display = 'none';
-}
-
-function selectSingleStyleOption(element, displayText, promptValue) {
-  document.getElementById('singleSelectedStyleDisplay').innerText = displayText;
-  document.getElementById('singleStyleSelect').value = promptValue;
-  
-  const modalCards = element.parentElement.querySelectorAll('.modal-style-card');
-  modalCards.forEach(card => card.classList.remove('active'));
-  element.classList.add('active');
-  
-  closeSingleStyleModal();
-}
-</script>
+                      <div class="modal-style-card" onclick="selectSingleStyleOption(this, 'Excited - စိတ်လှုပ်ရှားစွာ', 'Speak with excitement and high energy.')">
+                        <h4>Excited</h4>
+                        <p>စိတ်လှုပ်ရှား တက်ကြွသော အသံ</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
 
                 <div style="margin-top:15px;">
                     <label style="display:flex; justify-content:space-between; margin-bottom:8px; color:#b7d5ee; font-size:14px;">
@@ -1390,177 +1372,46 @@ function selectSingleStyleOption(element, displayText, promptValue) {
                     <h2>🔊 Voice Style & Speed</h2>
                 </div>
 
-                <!-- Custom Dropdown -->
-<!-- Voice Style Modal & Trigger System -->
-<style>
-/* Main Screen Trigger Box */
-.style-trigger-box {
-  background-color: #0b1a30;
-  border: 1px solid #1c355e;
-  border-radius: 10px;
-  padding: 12px 16px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  cursor: pointer;
-  color: #ffffff;
-  margin-top: 8px;
-  margin-bottom: 15px;
-}
+                <!-- Main Screen Display Trigger Box -->
+                <div class="style-trigger-box" onclick="openStyleModal()">
+                  <span id="selectedStyleDisplay" style="font-size: 14px;">Natural Dialogue - သဘာဝကျကျ</span>
+                  <span style="color: #8b9bb4; font-size: 12px;">▼</span>
+                </div>
 
-/* Modal Background Overlay */
-.style-modal-overlay {
-  display: none;
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.75);
-  backdrop-filter: blur(4px);
-  z-index: 9999;
-  justify-content: center;
-  align-items: center;
-}
+                <!-- Hidden Input for Backend API -->
+                <input type="hidden" id="styleSelect" value="Speak naturally and clearly as a movie narrator.">
 
-/* Modal Content Box */
-.style-modal-content {
-  background: #0b1728;
-  border: 1px solid #1e3a5f;
-  border-radius: 16px;
-  width: 90%;
-  max-width: 400px;
-  padding: 20px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-}
+                <!-- Modal Popup Window -->
+                <div id="styleModalOverlay" class="style-modal-overlay">
+                  <div class="style-modal-content">
+                    <div class="style-modal-header">
+                      <h3>🎛️ Select Voice Style</h3>
+                      <span class="style-close-btn" onclick="closeStyleModal()">&times;</span>
+                    </div>
+                    
+                    <div class="style-modal-cards">
+                      <div class="modal-style-card active" onclick="selectStyleOption(this, 'Natural Dialogue - သဘာဝကျကျ', 'Speak naturally and clearly as a movie narrator.')">
+                        <h4>Natural Dialogue</h4>
+                        <p>သဘာဝကျကျ စကားပြောဟန်</p>
+                      </div>
 
-.style-modal-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 15px;
-  border-bottom: 1px solid #1c355e;
-  padding-bottom: 10px;
-}
+                      <div class="modal-style-card" onclick="selectStyleOption(this, 'Warm - နွေးထွေးစွာ', 'Speak warmly and gently as a narrator.')">
+                        <h4>Warm</h4>
+                        <p>နွေးထွေးယုယသော စကားပြောအသံ</p>
+                      </div>
 
-.style-modal-header h3 {
-  margin: 0;
-  color: #38bdf8;
-  font-size: 16px;
-}
+                      <div class="modal-style-card" onclick="selectStyleOption(this, 'Movie Dialogue - ဇာတ်လမ်းပုံစံ', 'Speak like a dramatic movie narrator.')">
+                        <h4>Movie Dialogue</h4>
+                        <p>Movie Recap နှင့် ဇာတ်လမ်းပြောပြသည့် ပုံစံ</p>
+                      </div>
 
-.style-close-btn {
-  color: #94a3b8;
-  font-size: 22px;
-  cursor: pointer;
-  font-weight: bold;
-}
-
-/* Modal Cards */
-.style-modal-cards {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.modal-style-card {
-  background: #112238;
-  border: 1px solid #1e3a5f;
-  border-radius: 12px;
-  padding: 12px 16px;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.modal-style-card.active {
-  border: 2px solid #0088ff;
-  background: #152d4a;
-}
-
-.modal-style-card h4 {
-  margin: 0 0 4px 0;
-  color: #ffffff;
-  font-size: 14px;
-}
-
-.modal-style-card p {
-  margin: 0;
-  color: #8b9bb4;
-  font-size: 12px;
-    /* Dropdown စာသားများကို တစ်တန်းတည်း လှလှပပ ငြိမ်နေစေရန် */
-.dropdown-trigger span, #selectedStyleText, .style-trigger-box span {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  font-size: 13px;
-}
-</style>
-
-<!-- Main Screen Display Trigger Box -->
-<div class="style-trigger-box" onclick="openStyleModal()">
-  <span id="selectedStyleDisplay" style="font-size: 14px;">Natural Dialogue - သဘာဝကျကျ</span>
-  <span style="color: #8b9bb4; font-size: 12px;">▼</span>
-</div>
-
-<!-- Hidden Input for Backend API -->
-<input type="hidden" id="styleSelect" value="Speak naturally and clearly as a movie narrator.">
-
-<!-- Modal Popup Window -->
-<div id="styleModalOverlay" class="style-modal-overlay">
-  <div class="style-modal-content">
-    <div class="style-modal-header">
-      <h3>🎛️ Select Voice Style</h3>
-      <span class="style-close-btn" onclick="closeStyleModal()">&times;</span>
-    </div>
-    
-    <div class="style-modal-cards">
-      <div class="modal-style-card active" onclick="selectStyleOption(this, 'Natural Dialogue - သဘာဝကျကျ', 'Speak naturally and clearly as a movie narrator.')">
-        <h4>Natural Dialogue</h4>
-        <p>သဘာဝကျကျ စကားပြောဟန်</p>
-      </div>
-
-      <div class="modal-style-card" onclick="selectStyleOption(this, 'Warm - နွေးထွေးစွာ', 'Speak warmly and gently as a narrator.')">
-        <h4>Warm</h4>
-        <p>နွေးထွေးယုယသော စကားပြောအသံ</p>
-      </div>
-
-      <div class="modal-style-card" onclick="selectStyleOption(this, 'Movie Dialogue - ဇာတ်လမ်းပုံစံ', 'Speak like a dramatic movie narrator.')">
-        <h4>Movie Dialogue</h4>
-        <p>Movie Recap နှင့် ဇာတ်လမ်းပြောပြသည့် ပုံစံ</p>
-      </div>
-
-      <div class="modal-style-card" onclick="selectStyleOption(this, 'Excited - စိတ်လှုပ်ရှားစွာ', 'Speak with excitement and high energy.')">
-        <h4>Excited</h4>
-        <p>စိတ်လှုပ်ရှား တက်ကြွသော အသံ</p>
-      </div>
-    </div>
-  </div>
-</div>
-
-<script>
-function openStyleModal() {
-  document.getElementById('styleModalOverlay').style.display = 'flex';
-}
-
-function closeStyleModal() {
-  document.getElementById('styleModalOverlay').style.display = 'none';
-}
-
-function selectStyleOption(element, displayText, promptValue) {
-  // 1. Main Display Text ပြောင်းရန်
-  document.getElementById('selectedStyleDisplay').innerText = displayText;
-  
-  // 2. Backend သို့ ပို့မည့် Hidden Input တန်ဖိုး ထည့်ရန်
-  document.getElementById('styleSelect').value = promptValue;
-  
-  // 3. Card မီးလင်းသည့် Active Status ပြောင်းရန်
-  document.querySelectorAll('.modal-style-card').forEach(card => card.classList.remove('active'));
-  element.classList.add('active');
-  
-  // 4. Modal ပိတ်ရန်
-  closeStyleModal();
-}
-</script>
+                      <div class="modal-style-card" onclick="selectStyleOption(this, 'Excited - စိတ်လှုပ်ရှားစွာ', 'Speak with excitement and high energy.')">
+                        <h4>Excited</h4>
+                        <p>စိတ်လှုပ်ရှား တက်ကြွသော အသံ</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
 
                 <div style="margin-top:15px;">
                     <label style="display:flex; justify-content:space-between; margin-bottom:8px; color:#b7d5ee; font-size:14px;">
@@ -1704,6 +1555,116 @@ const API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-
 let audioURL = null;
 let singleAudioURL = null;
 let blockCounter = 0;
+
+/* LOCK SCREEN CONTROLS */
+function togglePasswordVisibility() {
+    const input = document.getElementById('passInput');
+    const eyeIcon = document.getElementById('eyeIcon');
+    if (input.type === 'password') {
+        input.type = 'text';
+        if (eyeIcon) {
+            eyeIcon.classList.remove('fa-eye');
+            eyeIcon.classList.add('fa-eye-slash');
+        }
+    } else {
+        input.type = 'password';
+        if (eyeIcon) {
+            eyeIcon.classList.remove('fa-eye-slash');
+            eyeIcon.classList.add('fa-eye');
+        }
+    }
+}
+
+function checkUnlockPassword() {
+    const input = document.getElementById('passInput').value;
+
+    if (input === '') {
+        alert('ကျေးဇူးပြု၍ စကားဝှက် ရိုက်ထည့်ပါ!');
+    } else if (input === MY_PASSWORD) {
+        const lockScreen = document.getElementById('cyberpunk-lockscreen');
+        if (lockScreen) {
+            lockScreen.style.transition = 'opacity 0.5s ease';
+            lockScreen.style.opacity = '0';
+            setTimeout(() => {
+                lockScreen.style.display = 'none';
+            }, 500);
+        }
+
+        const appContent = document.getElementById("appContent");
+        if (appContent) {
+            appContent.style.display = "block";
+        }
+
+        const saved = getStoredKey();
+        if (saved) {
+            document.getElementById("apiKey").value = saved;
+        }
+        updateKeyStatus();
+    } else {
+        alert('စကားဝှက် မှားယွင်းနေပါသည်။');
+    }
+}
+
+/* FORMAT & STYLE MODAL LOGICS */
+function setAudioFormat(formatValue) {
+  const btnWav = document.getElementById('btnWav');
+  const btnMp3 = document.getElementById('btnMp3');
+  const select = document.getElementById('formatSelect');
+
+  if (formatValue === 'wav') {
+    btnWav.style.background = '#0088ff';
+    btnWav.style.color = '#ffffff';
+    btnMp3.style.background = 'transparent';
+    btnMp3.style.color = '#8b9bb4';
+  } else {
+    btnMp3.style.background = '#0088ff';
+    btnMp3.style.color = '#ffffff';
+    btnWav.style.background = 'transparent';
+    btnWav.style.color = '#8b9bb4';
+  }
+
+  if (select) {
+    select.value = formatValue;
+    select.dispatchEvent(new Event('change'));
+  }
+}
+
+function openSingleStyleModal() {
+  document.getElementById('singleStyleModalOverlay').style.display = 'flex';
+}
+
+function closeSingleStyleModal() {
+  document.getElementById('singleStyleModalOverlay').style.display = 'none';
+}
+
+function selectSingleStyleOption(element, displayText, promptValue) {
+  document.getElementById('singleSelectedStyleDisplay').innerText = displayText;
+  document.getElementById('singleStyleSelect').value = promptValue;
+  
+  const modalCards = element.parentElement.querySelectorAll('.modal-style-card');
+  modalCards.forEach(card => card.classList.remove('active'));
+  element.classList.add('active');
+  
+  closeSingleStyleModal();
+}
+
+function openStyleModal() {
+  document.getElementById('styleModalOverlay').style.display = 'flex';
+}
+
+function closeStyleModal() {
+  document.getElementById('styleModalOverlay').style.display = 'none';
+}
+
+function selectStyleOption(element, displayText, promptValue) {
+  document.getElementById('selectedStyleDisplay').innerText = displayText;
+  document.getElementById('styleSelect').value = promptValue;
+  
+  document.querySelectorAll('#styleModalOverlay .modal-style-card').forEach(card => card.classList.remove('active'));
+  element.classList.add('active');
+  
+  closeStyleModal();
+}
 
 /* VOICE PICKER MODAL LOGIC */
 function openVoicePicker(target) {
@@ -1876,26 +1837,6 @@ function reindexBlocks() {
 window.addEventListener("DOMContentLoaded", () => {
     addSpeechBlock();
 });
-
-/* PASSWORD LOGIC */
-function unlockApp(){
-    const inputPass = document.getElementById("passInput").value;
-    const msgBox = document.getElementById("passMessage");
-
-    if(inputPass === MY_PASSWORD){
-        document.getElementById("passwordSection").style.display = "none";
-        document.getElementById("appContent").style.display = "block";
-
-        const saved = getStoredKey();
-        if(saved){
-            document.getElementById("apiKey").value = saved;
-        }
-        updateKeyStatus();
-    }else{
-        msgBox.textContent = "❌ Password မှားယွင်းနေပါသည်။";
-        msgBox.className = "message error";
-    }
-}
 
 function updateSpeed(val){
     document.getElementById("speedVal").textContent = val + "x";
@@ -2372,17 +2313,6 @@ Clear, natural Burmese conversational tone with friendly, engaging, casual narra
     btn.innerHTML = "🔊 Generate Single-Voice Audio";
 }
 
-// Dropdown Control
-function toggleDropdown() {
-    document.getElementById('dropdownOptions').classList.toggle('hidden');
-}
-
-function selectOption(val, text) {
-    document.getElementById('styleSelect').value = val;
-    document.getElementById('selectedStyleText').innerText = text;
-    document.getElementById('dropdownOptions').classList.add('hidden');
-}
-
 // Download Button Click Handler
 function triggerDownload(e) {
     if (e) e.preventDefault();
@@ -2595,51 +2525,5 @@ function escapeHTML(value){
         .replace(/'/g,"&#039;");
 }
 </script>
-
-    <script>
-   // ✅ Corrected and updated with your password: 1911999
-function togglePasswordVisibility() {
-    const input = document.getElementById('passInput');
-    const eyeIcon = document.getElementById('eyeIcon');
-    if (input.type === 'password') {
-        input.type = 'text';
-        if (eyeIcon) {
-            eyeIcon.classList.remove('fa-eye');
-            eyeIcon.classList.add('fa-eye-slash');
-        }
-    } else {
-        input.type = 'password';
-        if (eyeIcon) {
-            eyeIcon.classList.remove('fa-eye-slash');
-            eyeIcon.classList.add('fa-eye');
-        }
-    }
-}
-
-function checkUnlockPassword() {
-    const input = document.getElementById('passInput').value;
-    // 🔐 မင်းသတ်မှတ်လိုက်တဲ့ Password အစစ်
-    const correctPassword = "1911999"; 
-
-    if (input === '') {
-        alert('ကျေးဇူးပြု၍ စကားဝှက် ရိုက်ထည့်ပါ!');
-    } else if (input === correctPassword) {
-        // စကားဝှက် မှန်ပါက Lock Screen ကို ပျောက်သွားစေမည်
-        const lockScreen = document.getElementById('customLockScreen');
-        if (lockScreen) {
-            lockScreen.style.transition = 'opacity 0.5s ease';
-            lockScreen.style.opacity = '0';
-            setTimeout(() => {
-                lockScreen.style.display = 'none';
-            }, 500);
-        }
-    } else {
-        // စကားဝှက် မှားပါက
-        alert('စကားဝှက် မှားယွင်းနေပါသည်။');
-    }
-}
-
-</script>
-
 </body>
 </html>
