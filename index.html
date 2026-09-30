@@ -1,92 +1,127 @@
 <!DOCTYPE html>
 <html lang="my">
 <head>
-    <!-- FontAwesome Icons & Google Fonts -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800&family=Padauk:wght@400;700&display=swap" rel="stylesheet">
+ ​<style>   
+#cyberpunk-lockscreen {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw; height: 100vh;
+  /* Cyberpunk Sci-Fi Background */
+  background: #020817 url('https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=1600&auto=format&fit=crop') no-repeat center center/cover;
+  z-index: 999999;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #ffffff;
+  font-family: 'Padauk', 'Orbitron', sans-serif;
+}
 
-<style>
-  #cyberpunk-lockscreen {
-    position: fixed;
-    top: 0; left: 0;
-    width: 100vw; height: 100vh;
-    background: #020813 url('https://images.unsplash.com/photo-1506744038136-46273834b3fb?q=80&w=1000&auto=format&fit=crop') no-repeat center center/cover;
-    z-index: 999999;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    color: #ffffff;
-    font-family: 'Padauk', 'Orbitron', sans-serif;
-  }
-  #cyberpunk-lockscreen::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0; bottom: 0;
-    background: radial-gradient(circle at center, rgba(2, 12, 32, 0.7) 0%, rgba(1, 4, 11, 0.95) 100%);
-    z-index: 1;
-  }
-  .lock-container {
-    position: relative;
-    z-index: 2;
-    width: 100%; max-width: 420px;
-    padding: 20px;
-    display: flex; flex-direction: column; align-items: center; text-align: center;
-  }
-  .brand-logo {
-    width: 100px; height: 100px; border-radius: 50%;
-    object-fit: cover; box-shadow: 0 0 25px rgba(0, 183, 255, 0.8); margin-bottom: 10px;
-  }
-  .brand-title {
-    font-family: 'Orbitron', sans-serif; font-size: 24px; font-weight: 800;
-    color: #ffffff; text-shadow: 0 0 12px rgba(0, 200, 255, 0.8);
-  }
-  .brand-subtitle { font-size: 12px; color: #8ab4f8; letter-spacing: 2px; margin-bottom: 20px; }
-  .lock-card {
-    width: 100%; background: rgba(5, 18, 38, 0.65);
-    backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
-    border: 1.5px solid rgba(0, 183, 255, 0.4); border-radius: 28px;
-    padding: 25px 20px; box-shadow: 0 0 35px rgba(0, 140, 255, 0.25);
-    display: flex; flex-direction: column; align-items: center;
-  }
-  .lock-icon-circle {
-    width: 70px; height: 70px; border-radius: 50%;
-    border: 2px solid rgba(0, 217, 255, 0.6); display: flex;
-    justify-content: center; align-items: center;
-    box-shadow: 0 0 20px rgba(0, 183, 255, 0.5); margin-bottom: 15px;
-  }
-  .lock-icon-circle i { font-size: 30px; color: #00d2ff; text-shadow: 0 0 10px #00d2ff; }
-  .card-title { font-size: 16px; font-weight: bold; line-height: 1.4; margin-bottom: 6px; color: #fff; }
-  .card-subtitle { font-size: 11px; color: #a0c4ff; margin-bottom: 18px; }
-  .input-group { width: 100%; position: relative; margin-bottom: 16px; }
-  .input-group input {
-    width: 100%; padding: 12px 42px; background: rgba(2, 12, 28, 0.85);
-    border: 1.5px solid #00a2ff; border-radius: 30px; color: #fff;
-    font-size: 14px; outline: none; box-shadow: 0 0 10px rgba(0, 162, 255, 0.3);
-  }
-  .input-group .left-icon { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: #00a2ff; }
-  .input-group .right-icon { position: absolute; right: 16px; top: 50%; transform: translateY(-50%); color: #8ab4f8; cursor: pointer; }
-  .unlock-btn {
-    width: 100%; padding: 12px; background: linear-gradient(90deg, #0052d4, #4364f7, #6fb1fc);
-    border: none; border-radius: 30px; color: #fff; font-size: 16px; font-weight: bold;
-    cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 8px;
-    box-shadow: 0 0 20px rgba(0, 162, 255, 0.6);
-  }
-  .waveform { display: flex; align-items: center; gap: 4px; margin-top: 20px; margin-bottom: 10px; }
-  .bar { width: 3px; height: 14px; background: #00d2ff; border-radius: 2px; animation: wave 1.2s infinite ease-in-out; }
-  .bar:nth-child(1) { animation-delay: 0.0s; }
-  .bar:nth-child(2) { animation-delay: 0.2s; }
-  .bar:nth-child(3) { animation-delay: 0.4s; }
-  .bar:nth-child(4) { animation-delay: 0.1s; }
-  .bar:nth-child(5) { animation-delay: 0.3s; }
-  @keyframes wave { 0%, 100% { height: 5px; } 50% { height: 18px; } }
-  .footer-text { font-size: 10px; color: #6c8ebf; letter-spacing: 1px; }
-</style>
+/* Background မီးရောင်ဖြာ Overlay */
+#cyberpunk-lockscreen::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: radial-gradient(circle at center, rgba(0, 162, 255, 0.15) 0%, rgba(2, 8, 23, 0.85) 70%, rgba(1, 4, 12, 0.98) 100%);
+  z-index: 1;
+}
 
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SH AI Voice Studio - Gemini Voice Studio</title>
+.lock-container {
+  position: relative;
+  z-index: 2;
+  width: 100%; max-width: 420px;
+  padding: 20px;
+  display: flex; flex-direction: column; align-items: center; text-align: center;
+}
 
-<style>
+.brand-logo {
+  width: 100px; height: 100px; border-radius: 50%;
+  object-fit: cover; box-shadow: 0 0 30px rgba(0, 212, 255, 0.9); margin-bottom: 10px;
+}
+
+.brand-title {
+  font-family: 'Orbitron', sans-serif; font-size: 24px; font-weight: 800;
+  color: #ffffff; text-shadow: 0 0 15px rgba(0, 212, 255, 0.9);
+}
+
+.brand-subtitle { font-size: 12px; color: #8ab4f8; letter-spacing: 2px; margin-bottom: 20px; }
+
+.lock-card {
+  width: 100%; background: rgba(5, 18, 38, 0.7);
+  backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
+  border: 1.5px solid rgba(0, 212, 255, 0.4); border-radius: 28px;
+  padding: 28px 20px; box-shadow: 0 0 40px rgba(0, 162, 255, 0.3);
+  display: flex; flex-direction: column; align-items: center;
+}
+
+/* 🌊 အလယ်က သော့အဝိုင်းနဲ့ အသံလှိုင်း (Soundwave Ripple) Animation */
+.lock-icon-circle {
+  position: relative;
+  width: 85px; height: 85px; border-radius: 50%;
+  background: rgba(0, 212, 255, 0.1);
+  border: 2px solid #00d2ff;
+  display: flex; justify-content: center; align-items: center;
+  box-shadow: 0 0 25px rgba(0, 212, 255, 0.8), inset 0 0 15px rgba(0, 212, 255, 0.5);
+  margin-bottom: 20px;
+}
+
+/* အသံလှိုင်း ဖြာထွက်မည့် Ripple Ring (၁) */
+.lock-icon-circle::before, .lock-icon-circle::after {
+  content: '';
+  position: absolute;
+  top: -2px; left: -2px; right: -2px; bottom: -2px;
+  border-radius: 50%;
+  border: 2px solid rgba(0, 212, 255, 0.8);
+  animation: soundwaveRipple 2.4s infinite ease-out;
+  pointer-events: none;
+}
+
+/* အသံလှိုင်း ဖြာထွက်မည့် Ripple Ring (၂) */
+.lock-icon-circle::after {
+  animation-delay: 1.2s;
+}
+
+/* Ripple Wave Animation Keyframe */
+@keyframes soundwaveRipple {
+  0% {
+    transform: scale(1);
+    opacity: 0.9;
+    box-shadow: 0 0 10px rgba(0, 212, 255, 0.8);
+  }
+  100% {
+    transform: scale(1.75);
+    opacity: 0;
+    box-shadow: 0 0 25px rgba(0, 212, 255, 0);
+  }
+}
+
+.card-title { font-size: 16px; font-weight: bold; line-height: 1.4; margin-bottom: 6px; color: #fff; }
+.card-subtitle { font-size: 11px; color: #a0c4ff; margin-bottom: 20px; }
+
+.input-group { width: 100%; position: relative; margin-bottom: 18px; }
+.input-group input {
+  width: 100%; padding: 13px 45px; background: rgba(2, 12, 28, 0.85);
+  border: 1.5px solid #00a2ff; border-radius: 30px; color: #fff;
+  font-size: 14px; outline: none; box-shadow: 0 0 12px rgba(0, 162, 255, 0.35);
+}
+.input-group .left-icon { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: #00a2ff; }
+.input-group .right-icon { position: absolute; right: 16px; top: 50%; transform: translateY(-50%); color: #8ab4f8; cursor: pointer; z-index: 10; }
+
+.unlock-btn {
+  width: 100%; padding: 13px; background: linear-gradient(90deg, #0052d4, #4364f7, #00d2ff);
+  border: none; border-radius: 30px; color: #fff; font-size: 16px; font-weight: bold;
+  cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 8px;
+  box-shadow: 0 0 25px rgba(0, 162, 255, 0.7);
+}
+
+.waveform { display: flex; align-items: center; gap: 4px; margin-top: 20px; margin-bottom: 10px; }
+.bar { width: 3px; height: 14px; background: #00d2ff; border-radius: 2px; animation: wave 1.2s infinite ease-in-out; }
+.bar:nth-child(1) { animation-delay: 0.0s; }
+.bar:nth-child(2) { animation-delay: 0.2s; }
+.bar:nth-child(3) { animation-delay: 0.4s; }
+.bar:nth-child(4) { animation-delay: 0.1s; }
+.bar:nth-child(5) { animation-delay: 0.3s; }
+@keyframes wave { 0%, 100% { height: 5px; } 50% { height: 18px; } }
+.footer-text { font-size: 10px; color: #6c8ebf; letter-spacing: 1px; }
     /* Glassmorphism Effect (မှန်ကြည်ရောင် UI) */
 .glass-box {
   background: rgba(11, 26, 48, 0.65) !important;
@@ -998,7 +1033,55 @@ audio{
 </head>
 
 <body>
+<!-- Lock Screen Display Start -->
+<div id="cyberpunk-lockscreen">
+  <div class="lock-container">
+    <img src="Logo.png.png" alt="SH Logo" class="brand-logo">
+    <h1 class="brand-title"><span style="color: #00d2ff;">SH</span> AI Voice Studio</h1>
+    <p class="brand-subtitle">Your Voice • Your Story • Our AI</p>
 
+    <div class="lock-card">
+      <!-- 🌊 3D Neon SVG သော့နှင့် အသံလှိုင်းအဝိုင်း -->
+      <div class="lock-icon-circle">
+        <svg width="42" height="42" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="filter: drop-shadow(0 0 8px #00d2ff);">
+          <defs>
+            <linearGradient id="neonLockGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#00ffff" />
+              <stop offset="100%" stop-color="#0066ff" />
+            </linearGradient>
+          </defs>
+          <path d="M6 10V7C6 3.68629 8.68629 1 12 1C15.3137 1 18 3.68629 18 7V10H19C20.1046 10 21 10.8954 21 12V20C21 21.1046 20.1046 22 19 22H5C3.89543 22 3 21.1046 3 20V12C3 10.8954 3.89543 10 5 10H6ZM8 10H16V7C16 4.79086 14.2091 3 12 3C9.79086 3 8 4.79086 8 7V10ZM12 17C12.8284 17 13.5 16.3284 13.5 15.5C13.5 14.6716 12.8284 14 12 14C11.1716 14 10.5 14.6716 10.5 15.5C10.5 16.3284 11.1716 17 12 17Z" fill="url(#neonLockGrad)"/>
+        </svg>
+      </div>
+
+      <div class="card-title">
+        SH AI Voice Studio သို့<br>ဝင်ရောက်ရန် စကားဝှက် ရိုက်ထည့်ပါ
+      </div>
+      <p class="card-subtitle">သင်၏ အကောင့်လုံခြုံရေးအတွက် စကားဝှက် လိုအပ်ပါသည်။</p>
+
+      <div class="input-group">
+        <i class="fa-solid fa-lock left-icon"></i>
+        <input type="password" id="passInput" placeholder="Password ရိုက်ထည့်ပါ...">
+        <!-- 👁️ မျက်လုံး Icon လေး အလုပ်လုပ်အောင် id="eyeIcon" ထည့်ထားပေးပါသည် -->
+        <i class="fa-regular fa-eye right-icon" id="eyeIcon" onclick="togglePasswordVisibility()"></i>
+      </div>
+
+      <button class="unlock-btn" onclick="checkUnlockPassword()">
+        <i class="fa-solid fa-unlock-keyhole"></i> Unlock
+      </button>
+
+      <div class="waveform">
+        <div class="bar"></div>
+        <div class="bar"></div>
+        <div class="bar"></div>
+        <div class="bar"></div>
+        <div class="bar"></div>
+      </div>
+      <p class="footer-text">Better Voice • Bigger Dreams</p>
+    </div>
+  </div>
+</div>
+<!-- Lock Screen Display End -->
 <div id="passwordSection">
     <div class="lock-box">
         <div class="section-title">
@@ -1326,7 +1409,7 @@ function selectSingleStyleOption(element, displayText, promptValue) {
                 <button class="add-block-btn" id="addBlockBtn" onclick="addSpeechBlock()">+ Add Speech Block (1)</button>
 
                 <div class="section-title" style="margin-top:10px;">
-                    <h2>🎚️ Voice Style & Speed</h2>
+                    <h2>🔊 Voice Style & Speed</h2>
                 </div>
 
                 <!-- Custom Dropdown -->
@@ -2534,68 +2617,50 @@ function escapeHTML(value){
         .replace(/'/g,"&#039;");
 }
 </script>
-<!-- Lock Screen Display Start -->
-<div id="cyberpunk-lockscreen">
-  <div class="lock-container">
-    <img src="Logo.png.png" alt="SH Logo" class="brand-logo">
-    <h1 class="brand-title"><span style="color: #00d2ff;">SH</span> AI Voice Studio</h1>
-    <p class="brand-subtitle">Your Voice • Your Story • Our AI</p>
 
-    <div class="lock-card">
-      <div class="lock-icon-circle">
-        <i class="fa-solid fa-lock"></i>
-      </div>
-      <div class="card-title">
-        SH AI Voice Studio သို့<br>ဝင်ရောက်ရန် စကားဝှက် ရိုက်ထည့်ပါ
-      </div>
-      <p class="card-subtitle">သင်၏ အကောင့်လုံခြုံရေးအတွက် စကားဝှက် လိုအပ်ပါသည်။</p>
-
-      <div class="input-group">
-        <i class="fa-solid fa-lock left-icon"></i>
-        <input type="password" id="passInput" placeholder="Password ရိုက်ထည့်ပါ...">
-        <i class="fa-regular fa-eye right-icon" onclick="togglePasswordVisibility()"></i>
-      </div>
-
-      <button class="unlock-btn" onclick="checkUnlockPassword()">
-        <i class="fa-solid fa-unlock-keyhole"></i> Unlock
-      </button>
-
-      <div class="waveform">
-        <div class="bar"></div>
-        <div class="bar"></div>
-        <div class="bar"></div>
-        <div class="bar"></div>
-        <div class="bar"></div>
-      </div>
-      <p class="footer-text">Better Voice • Bigger Dreams</p>
-    </div>
-  </div>
-</div>
-<!-- Lock Screen Display End -->
     <script>
-  function togglePasswordVisibility() {
+   // ✅ Corrected and updated with your password: 1911999
+function togglePasswordVisibility() {
     const input = document.getElementById('passInput');
+    const eyeIcon = document.getElementById('eyeIcon');
     if (input.type === 'password') {
-      input.type = 'text';
+        input.type = 'text';
+        if (eyeIcon) {
+            eyeIcon.classList.remove('fa-eye');
+            eyeIcon.classList.add('fa-eye-slash');
+        }
     } else {
-      input.type = 'password';
+        input.type = 'password';
+        if (eyeIcon) {
+            eyeIcon.classList.remove('fa-eye-slash');
+            eyeIcon.classList.add('fa-eye');
+        }
     }
-  }
+}
 
-  function checkUnlockPassword() {
+function checkUnlockPassword() {
     const input = document.getElementById('passInput').value;
+    // 🔐 မင်းသတ်မှတ်လိုက်တဲ့ Password အစစ်
+    const correctPassword = "1911999"; 
+
     if (input === '') {
-      alert('ကျေးဇူးပြု၍ စကားဝှက် ရိုက်ထည့်ပါ!');
+        alert('ကျေးဇူးပြု၍ စကားဝှက် ရိုက်ထည့်ပါ!');
+    } else if (input === correctPassword) {
+        // စကားဝှက် မှန်ပါက Lock Screen ကို ပျောက်သွားစေမည်
+        const lockScreen = document.getElementById('customLockScreen');
+        if (lockScreen) {
+            lockScreen.style.transition = 'opacity 0.5s ease';
+            lockScreen.style.opacity = '0';
+            setTimeout(() => {
+                lockScreen.style.display = 'none';
+            }, 500);
+        }
     } else {
-      // Password ရိုက်ထည့်ပြီးရင် Lock Screen ကို ဖျောက်ပြီး မူရင်း App ကို ပွင့်စေမည်
-      const lockScreen = document.getElementById('cyberpunk-lockscreen');
-      lockScreen.style.transition = 'opacity 0.5s ease';
-      lockScreen.style.opacity = '0';
-      setTimeout(() => {
-        lockScreen.style.display = 'none';
-      }, 500);
+        // စကားဝှက် မှားပါက
+        alert('စကားဝှက် မှားယွင်းနေပါသည်။');
     }
-  }
+}
+
 </script>
 
 </body>
