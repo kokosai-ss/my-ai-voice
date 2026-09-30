@@ -61,12 +61,25 @@
 .lock-icon-circle {
 position: relative;
   width: 110px; height: 110px; border-radius: 50%;
-  background: rgba(0, 212, 255, 0.1);
-  border: 2.5px solid #00d2ff;
-  display: flex; justify-content: center; align-items: center;
-  box-shadow: 0 0 35px #00d2ff, inset 0 0 25px rgba(0, 212, 255, 0.45);
+  /* 3D ပုံစံပေါ်အောင် Gradient အရောင်စပ်သုံးခြင်း */
+  background: linear-gradient(135deg, rgba(0, 212, 255, 0.25), rgba(0, 30, 60, 0.8));
+    /* အပြင်ဘောင်ကို ပိုထင်ရှားစေခြင်း */
+  border: 2px solid rgba(0, 212, 255, 0.8);
+  
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  
+  /* 3D ဖောင်းကြွအရိပ်နှင့် အလင်းအမှောင် ထည့်သွင်းခြင်း */
+  box-shadow: 
+    0 12px 30px rgba(0, 0, 0, 0.6), /* အပြင်ဘက် ကျရောက်မည့် အရိပ် */
+    0 0 40px rgba(0, 212, 255, 0.5), /* အပြင်ဘက် လင်းလက်မည့် အလင်းတန်း */
+    inset 0 4px 8px rgba(255, 255, 255, 0.4), /* အပေါ်ဘက်မှ အလင်းထိုးကျသကဲ့သို့ 3D အထူအပါး ပုံစံ */
+    inset 0 -4px 8px rgba(0, 0, 0, 0.7); /* အောက်ဘက် အမှောင်စွန်း */
+    
   margin-bottom: 24px;
-}    
+}   
+ 
 /* အသံလှိုင်း ဖြာထွက်မည့် Ripple Ring (၁) */
 .lock-icon-circle::before, .lock-icon-circle::after {
   content: '';
@@ -128,13 +141,13 @@ position: relative;
 
 /* 🎵 Waveform Sound Wave */
 .waveform { display: flex; align-items: center; justify-content: center; gap: 5px; margin-top: 25px; margin-bottom: 8px; }
-.bar { width: 4px; height: 18px; background: #00d2ff; border-radius: 3px; animation: wave 1.2s infinite ease-in-out; box-shadow: 0 0 10px #00d2ff; }
+.bar { width: 4px; height: 14px; background: #00d2ff; border-radius: 3px; animation: wave 1.3s infinite ease-in-out; box-shadow: 0 0 10px #00d2ff; }
 .bar:nth-child(1) { animation-delay: 0.0s; }
 .bar:nth-child(2) { animation-delay: 0.2s; }
 .bar:nth-child(3) { animation-delay: 0.4s; }
 .bar:nth-child(4) { animation-delay: 0.1s; }
 .bar:nth-child(5) { animation-delay: 0.3s; }
-@keyframes wave { 0%, 100% { height: 8px; } 50% { height: 24px; } }
+@keyframes wave { 0%, 100% { height: 10px; } 50% { height: 20px; } }
 
 .footer-text { font-size: 12px; color: #6c8ebf; letter-spacing: 1px; }
 /* Audio Wave လိုင်း Pulse ဖြစ်ပြီး လှုပ်ရှားစေမယ့် CSS */
@@ -194,7 +207,7 @@ position: relative;
   }
 
   50% {
-    height: 28px;
+    height: 20px;
 
     opacity: 1;
 
