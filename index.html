@@ -1,6 +1,87 @@
 <!DOCTYPE html>
 <html lang="my">
 <head>
+    <!-- FontAwesome Icons & Google Fonts -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800&family=Padauk:wght@400;700&display=swap" rel="stylesheet">
+
+<style>
+  #cyberpunk-lockscreen {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100vw; height: 100vh;
+    background: #020813 url('https://images.unsplash.com/photo-1506744038136-46273834b3fb?q=80&w=1000&auto=format&fit=crop') no-repeat center center/cover;
+    z-index: 999999;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #ffffff;
+    font-family: 'Padauk', 'Orbitron', sans-serif;
+  }
+  #cyberpunk-lockscreen::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: radial-gradient(circle at center, rgba(2, 12, 32, 0.7) 0%, rgba(1, 4, 11, 0.95) 100%);
+    z-index: 1;
+  }
+  .lock-container {
+    position: relative;
+    z-index: 2;
+    width: 100%; max-width: 420px;
+    padding: 20px;
+    display: flex; flex-direction: column; align-items: center; text-align: center;
+  }
+  .brand-logo {
+    width: 100px; height: 100px; border-radius: 50%;
+    object-fit: cover; box-shadow: 0 0 25px rgba(0, 183, 255, 0.8); margin-bottom: 10px;
+  }
+  .brand-title {
+    font-family: 'Orbitron', sans-serif; font-size: 24px; font-weight: 800;
+    color: #ffffff; text-shadow: 0 0 12px rgba(0, 200, 255, 0.8);
+  }
+  .brand-subtitle { font-size: 12px; color: #8ab4f8; letter-spacing: 2px; margin-bottom: 20px; }
+  .lock-card {
+    width: 100%; background: rgba(5, 18, 38, 0.65);
+    backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+    border: 1.5px solid rgba(0, 183, 255, 0.4); border-radius: 28px;
+    padding: 25px 20px; box-shadow: 0 0 35px rgba(0, 140, 255, 0.25);
+    display: flex; flex-direction: column; align-items: center;
+  }
+  .lock-icon-circle {
+    width: 70px; height: 70px; border-radius: 50%;
+    border: 2px solid rgba(0, 217, 255, 0.6); display: flex;
+    justify-content: center; align-items: center;
+    box-shadow: 0 0 20px rgba(0, 183, 255, 0.5); margin-bottom: 15px;
+  }
+  .lock-icon-circle i { font-size: 30px; color: #00d2ff; text-shadow: 0 0 10px #00d2ff; }
+  .card-title { font-size: 16px; font-weight: bold; line-height: 1.4; margin-bottom: 6px; color: #fff; }
+  .card-subtitle { font-size: 11px; color: #a0c4ff; margin-bottom: 18px; }
+  .input-group { width: 100%; position: relative; margin-bottom: 16px; }
+  .input-group input {
+    width: 100%; padding: 12px 42px; background: rgba(2, 12, 28, 0.85);
+    border: 1.5px solid #00a2ff; border-radius: 30px; color: #fff;
+    font-size: 14px; outline: none; box-shadow: 0 0 10px rgba(0, 162, 255, 0.3);
+  }
+  .input-group .left-icon { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: #00a2ff; }
+  .input-group .right-icon { position: absolute; right: 16px; top: 50%; transform: translateY(-50%); color: #8ab4f8; cursor: pointer; }
+  .unlock-btn {
+    width: 100%; padding: 12px; background: linear-gradient(90deg, #0052d4, #4364f7, #6fb1fc);
+    border: none; border-radius: 30px; color: #fff; font-size: 16px; font-weight: bold;
+    cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 8px;
+    box-shadow: 0 0 20px rgba(0, 162, 255, 0.6);
+  }
+  .waveform { display: flex; align-items: center; gap: 4px; margin-top: 20px; margin-bottom: 10px; }
+  .bar { width: 3px; height: 14px; background: #00d2ff; border-radius: 2px; animation: wave 1.2s infinite ease-in-out; }
+  .bar:nth-child(1) { animation-delay: 0.0s; }
+  .bar:nth-child(2) { animation-delay: 0.2s; }
+  .bar:nth-child(3) { animation-delay: 0.4s; }
+  .bar:nth-child(4) { animation-delay: 0.1s; }
+  .bar:nth-child(5) { animation-delay: 0.3s; }
+  @keyframes wave { 0%, 100% { height: 5px; } 50% { height: 18px; } }
+  .footer-text { font-size: 10px; color: #6c8ebf; letter-spacing: 1px; }
+</style>
+
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>SH AI Voice Studio - Gemini Voice Studio</title>
@@ -2452,6 +2533,69 @@ function escapeHTML(value){
         .replace(/"/g,"&quot;")
         .replace(/'/g,"&#039;");
 }
+</script>
+<!-- Lock Screen Display Start -->
+<div id="cyberpunk-lockscreen">
+  <div class="lock-container">
+    <img src="Logo.png.png" alt="SH Logo" class="brand-logo">
+    <h1 class="brand-title"><span style="color: #00d2ff;">SH</span> AI Voice Studio</h1>
+    <p class="brand-subtitle">Your Voice • Your Story • Our AI</p>
+
+    <div class="lock-card">
+      <div class="lock-icon-circle">
+        <i class="fa-solid fa-lock"></i>
+      </div>
+      <div class="card-title">
+        SH AI Voice Studio သို့<br>ဝင်ရောက်ရန် စကားဝှက် ရိုက်ထည့်ပါ
+      </div>
+      <p class="card-subtitle">သင်၏ အကောင့်လုံခြုံရေးအတွက် စကားဝှက် လိုအပ်ပါသည်။</p>
+
+      <div class="input-group">
+        <i class="fa-solid fa-lock left-icon"></i>
+        <input type="password" id="passInput" placeholder="Password ရိုက်ထည့်ပါ...">
+        <i class="fa-regular fa-eye right-icon" onclick="togglePasswordVisibility()"></i>
+      </div>
+
+      <button class="unlock-btn" onclick="checkUnlockPassword()">
+        <i class="fa-solid fa-unlock-keyhole"></i> Unlock
+      </button>
+
+      <div class="waveform">
+        <div class="bar"></div>
+        <div class="bar"></div>
+        <div class="bar"></div>
+        <div class="bar"></div>
+        <div class="bar"></div>
+      </div>
+      <p class="footer-text">Better Voice • Bigger Dreams</p>
+    </div>
+  </div>
+</div>
+<!-- Lock Screen Display End -->
+    <script>
+  function togglePasswordVisibility() {
+    const input = document.getElementById('passInput');
+    if (input.type === 'password') {
+      input.type = 'text';
+    } else {
+      input.type = 'password';
+    }
+  }
+
+  function checkUnlockPassword() {
+    const input = document.getElementById('passInput').value;
+    if (input === '') {
+      alert('ကျေးဇူးပြု၍ စကားဝှက် ရိုက်ထည့်ပါ!');
+    } else {
+      // Password ရိုက်ထည့်ပြီးရင် Lock Screen ကို ဖျောက်ပြီး မူရင်း App ကို ပွင့်စေမည်
+      const lockScreen = document.getElementById('cyberpunk-lockscreen');
+      lockScreen.style.transition = 'opacity 0.5s ease';
+      lockScreen.style.opacity = '0';
+      setTimeout(() => {
+        lockScreen.style.display = 'none';
+      }, 500);
+    }
+  }
 </script>
 
 </body>
