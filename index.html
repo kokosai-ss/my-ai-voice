@@ -3012,6 +3012,20 @@ async function shPreviewVoice(voice,button){
   finally{button.disabled=false;button.textContent='▶ Play';}
 }
 window.addEventListener('DOMContentLoaded',()=>{shRenderVoiceLibrary();});
+window.addEventListener('DOMContentLoaded', (event) => {
+    switchView('mainDashboard');
+});
+
+function switchView(viewId) {
+    const views = document.querySelectorAll('.view-container');
+    views.forEach(v => {
+        v.style.display = 'none';
+    });
+    const target = document.getElementById(viewId);
+    if (target) {
+        target.style.display = 'block';
+    }
+}
 
 </script>
       <!-- Neon Glass Bottom Navigation Bar -->
