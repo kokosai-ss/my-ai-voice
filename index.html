@@ -1388,6 +1388,8 @@ body{background:radial-gradient(circle at 50% -10%,rgba(32,104,255,.16),transpar
     </div>
 
 </div>
+  </div>
+<div id="voiceStudio" class="app-view" style="display: none;">
 
         <!-- 1. အပြင်ဘက်မှာ အမြဲပေါ်နေမယ့် Header နဲ့ Tab ခလုတ်များ -->
 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; padding: 0 4px;">
@@ -1524,6 +1526,16 @@ body{background:radial-gradient(circle at 50% -10%,rgba(32,104,255,.16),transpar
             <span style="background: rgba(0,210,255,0.15); color: #00d2ff; padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: bold; border: 1px solid rgba(0,210,255,0.3);">Multi-Mode</span>
         </div>
 
+        <!-- 1. Voice Style Section (Single လိုပဲ အပေါ်နားမှာ တစ်န်းတည်း ဖြစ်သွားအောင် ဒီမှာ အရင်တင်လိုက်မယ်) -->
+        <div style="margin-bottom: 14px;">
+            <label style="display: block; color: #b7d5ee; font-size: 13px; margin-bottom: 6px;">🎭 Global Voice Style</label>
+            <div class="style-trigger-box" onclick="openStyleModal()" style="background: rgba(10, 15, 30, 0.65); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 10px 12px; display: flex; justify-content: space-between; align-items: center; cursor: pointer;">
+                <span id="selectedStyleDisplay" style="font-size: 13px; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Natural Dialogue - သဘာဝကျကျ</span>
+                <span style="color: #8b9bb4; font-size: 11px;">▼</span>
+            </div>
+            <input type="hidden" id="styleSelect" value="Speak naturally and clearly as a movie narrator.">
+        </div>
+
         <!-- Dynamic Speech Blocks Container -->
         <div id="speechBlocksContainer">
             <!-- Dynamic Speech Blocks will appear here -->
@@ -1533,16 +1545,6 @@ body{background:radial-gradient(circle at 50% -10%,rgba(32,104,255,.16),transpar
         <button id="addBlockBtn" onclick="addSpeechBlock()" style="width: 100%; padding: 12px; background: rgba(0,210,255,0.1); border: 1px dashed rgba(0,210,255,0.4); border-radius: 12px; color: #00d2ff; font-weight: bold; cursor: pointer; margin-bottom: 15px; font-size: 13px; transition: 0.2s;">
             + Add Speech Block (1)
         </button>
-
-        <!-- Voice Style Section -->
-        <div style="margin-bottom: 14px;">
-            <label style="display: block; color: #b7d5ee; font-size: 13px; margin-bottom: 6px;">🎭 Global Voice Style</label>
-            <div onclick="openStyleModal()" style="background: rgba(5, 15, 30, 0.8); border: 1px solid rgba(0,210,255,0.25); border-radius: 12px; padding: 12px 14px; display: flex; justify-content: space-between; align-items: center; cursor: pointer;">
-                <span id="selectedStyleDisplay" style="font-size: 13px; color: #fff;">Natural Dialogue - သဘာဝကျကျ</span>
-                <span style="color: #8b9bb4; font-size: 11px;">▼</span>
-            </div>
-            <input type="hidden" id="styleSelect" value="Speak naturally and clearly as a movie narrator.">
-        </div>
 
         <!-- Voice Speed Section -->
         <div style="margin-bottom: 18px;">
@@ -1568,14 +1570,38 @@ body{background:radial-gradient(circle at 50% -10%,rgba(32,104,255,.16),transpar
         </div>
 
     </div>
-</div>
 
-   <div class="footer">
-       SH AI Voice Studio • Gemini Burmese Support
+    <!-- Modal Popup Window (Global Style အတွက်) -->
+    <div id="styleModalOverlay" class="style-modal-overlay">
+      <div class="style-modal-content">
+        <div class="style-modal-header">
+          <h3>🎛️ Select Global Voice Style</h3>
+          <span class="style-close-btn" onclick="closeStyleModal()">&times;</span>
+        </div>
+        
+        <div class="style-modal-cards">
+          <div class="modal-style-card" onclick="selectStyleOption(this, 'Natural Dialogue - သဘာဝကျကျ', 'Speak naturally and clearly as a movie narrator.')">
+            <h4>Natural Dialogue</h4>
+            <p>သဘာဝကျကျ စကားပြောဟန်</p>
+          </div>
+          <div class="modal-style-card active" onclick="selectStyleOption(this, 'Warm - နွေးထွေးစွာ', 'Speak warmly and gently as a narrator.')">
+            <h4>Warm (နွေးထွေးစွာ)</h4>
+            <p>နွေးထွေးယုယသော စကားပြောအသံ</p>
+          </div>
+          <div class="modal-style-card" onclick="selectStyleOption(this, 'Movie Dialogue - ဇာတ်လမ်းပုံစံ', 'Speak like a dramatic movie narrator.')">
+            <h4>Movie Dialogue</h4>
+            <p>Movie Recap နှင့် ဇာတ်လမ်းပြောပြသည့် ပုံစံ</p>
+          </div>
+          <div class="modal-style-card" onclick="selectStyleOption(this, 'Excited -စိတ်လှုပ်ရှားစွာ', 'Speak with excitement and high energy.')">
+            <h4>Excited</h4>
+            <p>စိတ်လှုပ်ရှား တက်ကြွသော အသံ</p>
+          </div>
+        </div>
+      </div>
     </div>
-
 </div>
-      
+  
+      </div>
 <!-- Lock Screen Display Start -->
 <div id="cyberpunk-lockscreen">
   <div class="lock-container">
