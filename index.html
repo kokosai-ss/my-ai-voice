@@ -1249,6 +1249,19 @@ body{background:radial-gradient(circle at 50% -10%,rgba(32,104,255,.16),transpar
 @media(max-width:520px){.voice-library-grid{grid-template-columns:1fr 1fr}.premium-hero h2{font-size:22px!important}.container{padding-left:11px!important;padding-right:11px!important}.premium-stats{grid-template-columns:repeat(3,1fr)}}
 @media(max-width:370px){.voice-library-grid{grid-template-columns:1fr}.premium-actions{grid-template-columns:1fr}.premium-stats{grid-template-columns:1fr 1fr}.premium-stat:last-child{grid-column:1/-1}}
 
+
+/* ===== SH PREMIUM V3: APP PAGES ===== */
+.app-page{display:none!important;animation:shPageIn .18s ease-out;}
+.app-page.active{display:block!important;}
+@keyframes shPageIn{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
+.premium-topbar{position:sticky!important;top:0!important;}
+.premium-voice-avatar{object-position:center center!important;}
+.page-nav-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:14px;}
+.page-nav-btn{border:1px solid rgba(73,158,255,.25);border-radius:15px;padding:13px;background:rgba(16,39,68,.72);color:#eaf6ff;font-weight:700;font-size:12px;cursor:pointer;text-align:left;}
+.page-nav-btn.primary{background:linear-gradient(135deg,#1269ff,#13bfe7);border-color:rgba(94,223,255,.7);}
+.settings-page-card{margin-top:12px;}
+.settings-note{color:#7892ae;font-size:11px;line-height:1.6;margin:6px 0 0;}
+@media(max-width:370px){.page-nav-grid{grid-template-columns:1fr}}
 </style>
 </head>
 
@@ -1423,8 +1436,12 @@ body{background:radial-gradient(circle at 50% -10%,rgba(32,104,255,.16),transpar
     <h2>Make your story sound alive.</h2>
     <p>Voice ရွေး၊ စာထည့်၊ AI Voice ထုတ်။ မင်းရဲ့ SH Recap workflow အတွက် တစ်နေရာတည်းကနေ သုံးနိုင်အောင် စီထားတဲ့ Studio ပုံစံ။</p>
     <div class="premium-actions">
-      <button class="premium-action primary" type="button" onclick="switchTab('singleTab');document.getElementById('singleTab').scrollIntoView({behavior:'smooth',block:'start'});">🎙️ Single Voice</button>
-      <button class="premium-action" type="button" onclick="switchTab('multiTab');document.getElementById('multiTab').scrollIntoView({behavior:'smooth',block:'start'});">👥 Multi Voice</button>
+      <button class="premium-action primary" type="button" onclick="shGoPage('single')">🎙️ Single Voice</button>
+      <button class="premium-action" type="button" onclick="shGoPage('multi')">👥 Multi Voice</button>
+    </div>
+    <div class="page-nav-grid">
+      <button class="page-nav-btn" type="button" onclick="shGoPage('voices')">🎧 Voice Library</button>
+      <button class="page-nav-btn" type="button" onclick="shGoPage('settings')">⚙️ Settings</button>
     </div>
     <div class="premium-stats">
       <div class="premium-stat"><strong>9</strong><span>AI VOICES</span></div>
@@ -1441,7 +1458,7 @@ body{background:radial-gradient(circle at 50% -10%,rgba(32,104,255,.16),transpar
     <div class="voice-library-grid" id="premiumVoiceGrid"></div>
   </div>
 
-  <div class="premium-section-label"><strong>🎛️ Studio Workspace</strong><span>YOUR EXISTING TOOLS</span></div>
+  
 </div>
 
 
@@ -2808,8 +2825,7 @@ function shChooseVoice(voice){
   singleVoiceValue=voice;
   const labels={Puck:'Puck (တက်ကြွလှုပ်ရှား လူငယ်သံ)',Charon:'Charon (သတင်း/ဗဟုသုတပေး တည်ငြိမ်သံ)',Fenrir:'Fenrir (စိတ်လှုပ်ရှားဖွယ် ဇာတ်လမ်းသံ)',Orus:'Orus (ပြတ်သားခိုင်မာ ရင့်ကျက်သံ)',Kore:'Kore (ပြတ်သားခိုင်မာ လူငယ်သံ)',Leda:'Leda (နုပျိုတက်ကြွ ချိုသာသံ)',Aoede:'Aoede (ပေါ့ပါးလန်းဆန်း စကားပြောသံ)',Callirrhoe:'Callirrhoe (အေးဆေးပေါ့ပါး သဘာဝသံ)',Despina:'Despina (ချောမွေ့ငြိမ့်ညောင်း ဇာတ်လမ်းသံ)'};
   const el=document.getElementById('singleSelectedSpeakerText');if(el)el.textContent=labels[voice]||voice;
-  switchTab('singleTab');
-  document.getElementById('singleTab')?.scrollIntoView({behavior:'smooth',block:'start'});
+  shGoPage('single');
 }
 async function shPreviewVoice(voice,button){
   try{
@@ -2839,7 +2855,64 @@ async function shPreviewVoice(voice,button){
   }catch(e){alert('Preview မအောင်မြင်ပါ။\n\n'+(e.message||e));}
   finally{button.disabled=false;button.textContent='▶ Play';}
 }
-window.addEventListener('DOMContentLoaded',()=>{shRenderVoiceLibrary();});
+function shSetupPages(){
+  const app=document.getElementById('appContent');
+  if(!app || document.getElementById('shPageHome')) return;
+  const premium=document.getElementById('premiumShell');
+  const sections=[...app.children].filter(el=>el!==premium);
+  const apiSection=sections.find(el=>el.classList?.contains('section'));
+  const tabNav=sections.find(el=>el.classList?.contains('tab-navigation'));
+  const single=document.getElementById('singleTab');
+  const multi=document.getElementById('multiTab');
+  const footer=sections.find(el=>el.classList?.contains('footer'));
+
+  const make=(id)=>{const d=document.createElement('div');d.id=id;d.className='app-page';return d;};
+  const home=make('shPageHome'), voices=make('shPageVoices'), singlePage=make('shPageSingle'), multiPage=make('shPageMulti'), settings=make('shPageSettings');
+  app.insertBefore(home,app.firstChild);
+  app.insertBefore(voices,home.nextSibling);
+  app.insertBefore(singlePage,voices.nextSibling);
+  app.insertBefore(multiPage,singlePage.nextSibling);
+  app.insertBefore(settings,multiPage.nextSibling);
+
+  if(premium) home.appendChild(premium);
+  if(apiSection){
+    settings.appendChild(apiSection);
+    const settingsNote=document.createElement('p');settingsNote.className='settings-note';settingsNote.textContent='API Key နှင့် App processing settings တွေကို ဒီတစ်နေရာတည်းမှာပဲ စီထားပါတယ်။';settings.appendChild(settingsNote);
+  }
+  // Move voice library out of home so it becomes a real page.
+  const library=home.querySelector('.voice-library');
+  if(library){voices.appendChild(library);}
+  // Keep the studio controls as separate pages; no long scrolling from Home.
+  if(tabNav) tabNav.style.display='none';
+  if(single) singlePage.appendChild(single);
+  if(multi) multiPage.appendChild(multi);
+  if(footer) footer.style.display='none';
+
+  // Sidebar becomes navigation + one Settings entry; no duplicate settings page.
+  const side=document.getElementById('mySidebar');
+  if(side && !document.getElementById('shSideNav')){
+    const nav=document.createElement('div');nav.id='shSideNav';
+    nav.innerHTML=`<div class="sidebar-item"><label>📱 Studio Pages</label>
+      <button class="btn" style="width:100%;min-height:44px;margin-bottom:7px" onclick="closeSidebar();shGoPage('home')">🏠 Home</button>
+      <button class="btn" style="width:100%;min-height:44px;margin-bottom:7px" onclick="closeSidebar();shGoPage('voices')">🎧 Voice Library</button>
+      <button class="btn" style="width:100%;min-height:44px;margin-bottom:7px" onclick="closeSidebar();shGoPage('single')">🎙️ Single Voice</button>
+      <button class="btn" style="width:100%;min-height:44px;margin-bottom:7px" onclick="closeSidebar();shGoPage('multi')">👥 Multi Voice</button>
+      <button class="btn" style="width:100%;min-height:44px;margin-bottom:7px" onclick="closeSidebar();openHistoryModal()">🕒 History</button>
+      <button class="btn" style="width:100%;min-height:44px" onclick="closeSidebar();shGoPage('settings')">⚙️ Settings</button></div>`;
+    side.insertBefore(nav,side.children[1] || null);
+  }
+  shGoPage('home');
+}
+function shGoPage(page){
+  const map={home:'shPageHome',voices:'shPageVoices',single:'shPageSingle',multi:'shPageMulti',settings:'shPageSettings'};
+  Object.values(map).forEach(id=>document.getElementById(id)?.classList.remove('active'));
+  document.getElementById(map[page]||map.home)?.classList.add('active');
+  if(page==='single') switchTab('singleTab');
+  if(page==='multi') switchTab('multiTab');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+window.addEventListener('DOMContentLoaded',()=>{shSetupPages();shRenderVoiceLibrary();});
 
 </script>
 </body>
