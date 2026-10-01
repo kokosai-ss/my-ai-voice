@@ -1370,27 +1370,22 @@ body{background:radial-gradient(circle at 50% -10%,rgba(32,104,255,.16),transpar
             </div>
         </div>
     </div>
-
-    <!-- API Status Bar (Neon Glass) -->
-    <div style="background: rgba(13, 27, 42, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(16, 185, 129, 0.35); box-shadow: 0 4px 20px rgba(16, 185, 129, 0.1); padding: 14px 16px; border-radius: 14px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-        <div style="display: flex; align-items: center; gap: 12px;">
-            <div style="width: 32px; height: 32px; border-radius: 8px; background: rgba(16, 185, 129, 0.2); color: #34d399; display: flex; align-items: center; justify-content: center; border: 1px solid rgba(52, 211, 153, 0.4);">
-                <i class="fa-solid fa-key" style="font-size: 12px;"></i>
-            </div>
-            <div>
-                <h4 style="font-size: 12px; font-weight: bold; color: #fff; margin: 0 0 2px 0;">API Status</h4>
-                <p style="font-size: 10px; color: #34d399; margin: 0;">● API Key Connected</p>
-            </div>
+<!-- API Status Bar (Neon Glass) -->
+<div style="background: rgba(13, 27, 42, 0.85); border: 1px solid rgba(0, 186, 255, 0.3); border-radius: 16px; padding: 15px 20px; margin-bottom: 15px; display: flex; align-items: center; justify-content: space-between;">
+    <div style="display: flex; align-items: center; gap: 12px;">
+        <div style="width: 32px; height: 32px; background: rgba(0,186,255,0.15); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #00baff;">
+            <i class="fa-solid fa-key"></i>
         </div>
-  
+        <div>
+            <h4 style="font-size: 13px; color: #fff; margin: 0;">API Status</h4>
+            <p style="font-size: 11px; color: #00ff88; margin: 2px 0 0 0;">● API Key Connected</p>
+        </div>
     </div>
+    <button onclick="switchView('settings', this)" style="background: rgba(0,186,255,0.15); color: #00baff; border: 1px solid #00baff; border-radius: 8px; padding: 6px 12px; font-size: 11px; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 5px; box-shadow: 0 0 8px rgba(0,186,255,0.2);">
+        Manage Keys <i class="fa-solid fa-arrow-right"></i>
+    </button>
+</div>
 
-</div>
-  </div>
-  <button onclick="switchView('settings', this)" class="...">
-    Manage Keys <i class="fa-solid fa-arrow-right"></i>
-</button>
-</div>
 <div id="voiceStudio" class="app-view" style="display: none;">
 
         <!-- 1. အပြင်ဘက်မှာ အမြဲပေါ်နေမယ့် Header နဲ့ Tab ခလုတ်များ -->
@@ -1609,7 +1604,7 @@ body{background:radial-gradient(circle at 50% -10%,rgba(32,104,255,.16),transpar
   <div class="lock-container">
     <img src="Logo.png.png" alt="SH Logo" class="brand-logo">
     <h1 class="brand-title"><span style="color: #00d2ff;">SH</span> AI Voice Studio</h1>
-    <p class="brand-subtitle">Your Voice • Your Story • Our AI</p>
+    <p class="brand-subtitle">AI VOICE • MULTI VOICE • BURMESE</p>
 
     <div class="lock-card">
       <!-- 🌊 3D Neon SVG သော့နှင့် အသံလှိုင်းအဝိုင်း -->
