@@ -3016,17 +3016,6 @@ window.addEventListener('DOMContentLoaded', (event) => {
     switchView('mainDashboard');
 });
 
-function switchView(viewId) {
-    const views = document.querySelectorAll('.view-container');
-    views.forEach(v => {
-        v.style.display = 'none';
-    });
-    const target = document.getElementById(viewId);
-    if (target) {
-        target.style.display = 'block';
-    }
-}
-
 </script>
       <!-- Neon Glass Bottom Navigation Bar -->
     <div style="position: fixed; bottom: 0; left: 0; right: 0; background: rgba(13, 27, 42, 0.9); backdrop-filter: blur(16px); border-top: 1px solid rgba(0, 210, 255, 0.3); display: flex; justify-content: space-around; padding: 10px 0; z-index: 1000; box-shadow: 0 -5px 20px rgba(0, 0, 0, 0.5);">
