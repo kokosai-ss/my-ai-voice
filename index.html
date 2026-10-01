@@ -1253,12 +1253,19 @@ body{background:radial-gradient(circle at 50% -10%,rgba(32,104,255,.16),transpar
 </head>
 
 <body>
-
 <!-- ========================================== -->
-<!-- 1. MAIN DASHBOARD (Final Clean Version) -->
+<!-- 1. MAIN DASHBOARD (Complete & Final) -->
 <!-- ========================================== -->
 <div id="mainDashboard" style="display: block; padding: 16px; font-family: 'Myanmar Sans Pro', sans-serif; color: #fff;">
     
+    <!-- အသံလှိုင်း Animation အတွက် CSS -->
+    <style>
+    @keyframes soundWave {
+        0% { transform: scaleY(0.3); opacity: 0.3; }
+        100% { transform: scaleY(1.2); opacity: 1; box-shadow: 0 0 10px #00d2ff; }
+    }
+    </style>
+
     <!-- Top Header Bar with Logo.png.png -->
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; background: rgba(13, 27, 42, 0.7); backdrop-filter: blur(12px); padding: 12px 16px; border-radius: 16px; border: 1px solid rgba(0, 210, 255, 0.3); box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);">
         <div style="display: flex; align-items: center; gap: 12px;">
@@ -1266,14 +1273,14 @@ body{background:radial-gradient(circle at 50% -10%,rgba(32,104,255,.16),transpar
                 <i class="fa-solid fa-bars"></i>
             </button>
             <div style="display: flex; align-items: center; gap: 10px;">
-                <!-- Logo.png.png ထည့်သွင်းထားသောနေရာ -->
+                <!-- Logo.png.png (အဝိုင်းပုံစံဖြင့် ထည့်သွင်းထားသည်) -->
                 <img src="Logo.png.png" alt="SH Logo" style="width: 38px; height: 38px; border-radius: 50%; object-fit: cover; border: 1px solid rgba(0, 210, 255, 0.5); box-shadow: 0 0 10px rgba(0,186,255,0.4);">
                 <div>
                     <div style="display: flex; align-items: center; gap: 8px;">
                         <span style="font-size: 16px; font-weight: bold; color: #fff; letter-spacing: 0.5px;">SH AI Studio</span>
                         <span style="background: rgba(16, 185, 129, 0.2); color: #34d399; font-size: 9px; padding: 2px 8px; border-radius: 20px; border: 1px solid rgba(52, 211, 153, 0.4);">● Online</span>
                     </div>
-                    <p style="font-size: 10px; color: #8eb0cb; margin: 2px 0 0 0;">AI VOICE • MULTI VOICE • BURMESE</p>
+                    <p style="font-size: 10px; color: #8eb0cb; margin: 2px 0 0 0;">Your Voice • Your Story • AI Powered</p>
                 </div>
             </div>
         </div>
@@ -1282,15 +1289,27 @@ body{background:radial-gradient(circle at 50% -10%,rgba(32,104,255,.16),transpar
         </div>
     </div>
 
-    <!-- Welcome Hero Banner (Clean Mic with Glow Effect) -->
-    <div style="background: linear-gradient(135deg, rgba(13, 27, 42, 0.8), rgba(5, 15, 30, 0.9)); backdrop-filter: blur(16px); border: 1px solid rgba(0, 210, 255, 0.4); box-shadow: 0 0 25px rgba(0, 140, 255, 0.25); border-radius: 20px; padding: 20px; display: flex; justify-content: space-between; align-items: center; position: relative; overflow: hidden; margin-bottom: 16px;">
-        <div style="z-index: 2; max-width: 60%;">
-            <h2 style="font-size: 18px; font-weight: bold; color: #fff; margin-bottom: 6px; text-shadow: 0 0 10px rgba(0,210,255,0.5);">MAKE YOUR STORY SOUNG ALIVE  </h2>
-            <p style="font-size: 11px; color: #b7d5ee; line-height: 1.5; margin: 0;">သင်၏ AI အသံများကို မြန်မာလို အလွယ်တကူ ဖန်တီးလိုက်ပါ။ Telegram:@shburmesemovie</p>
-        </div>
-        <div style="z-index: 2; position: relative; display: flex; align-items: center; justify-content: center;">
-            <div style="position: absolute; width: 50px; height: 50px; background: rgba(0, 170, 255, 0.35); border-radius: 50%; filter: blur(10px);"></div>
-            <img src="mic.jpg" alt="Mic Logo" style="width: 70px; height: 70px; object-fit: contain; filter: drop-shadow(0 0 15px rgba(0, 170, 255, 0.9)); mix-blend-mode: screen; position: relative; z-index: 2;">
+    <!-- Welcome Hero Banner (Animated Soundwave + Transparent mic.png) -->
+    <div style="background: linear-gradient(135deg, rgba(13, 27, 42, 0.85), rgba(5, 15, 30, 0.95)); backdrop-filter: blur(16px); border: 1px solid rgba(0, 210, 255, 0.4); box-shadow: 0 0 25px rgba(0, 140, 255, 0.25); border-radius: 20px; padding: 20px; display: flex; justify-content: space-between; align-items: center; position: relative; overflow: hidden; margin-bottom: 16px;">
+          <div style="z-index: 2; max-width: 65%;">
+    <h2 style="font-size: 13px; font-weight: bold; color: #fff; margin-bottom: 6px; white-space: nowrap; text-shadow: 0 0 10px rgba(0,210,255,0.5);">MAKE YOUR STORY SOUND ALIVE</h2>
+    <p style="font-size: 10px; color: #b7d5ee; line-height: 1.4; margin: 0;">သင်၏ AI အသံများကို မြန်မာလို အလွယ်တကူ ဖန်တီးလိုက်ပါ။ Telegram:@shburmesemovie</p>
+</div>
+
+        <!-- Mic with Background Soundwave Effect -->
+        <div style="z-index: 2; width: 90px; height: 90px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; position: relative;">
+            
+            <!-- နောက်ခံအသံလှိုင်း Animation တန်းများ -->
+            <div style="position: absolute; display: flex; align-items: center; gap: 4px; z-index: 1;">
+                <div style="width: 3px; height: 20px; background: #00d2ff; border-radius: 2px; animation: soundWave 0.8s infinite alternate;"></div>
+                <div style="width: 3px; height: 38px; background: #00ffff; border-radius: 2px; animation: soundWave 0.5s infinite alternate 0.2s;"></div>
+                <div style="width: 3px; height: 50px; background: #00baff; border-radius: 2px; animation: soundWave 0.7s infinite alternate 0.1s;"></div>
+                <div style="width: 3px; height: 38px; background: #00ffff; border-radius: 2px; animation: soundWave 0.6s infinite alternate 0.3s;"></div>
+                <div style="width: 3px; height: 20px; background: #00d2ff; border-radius: 2px; animation: soundWave 0.9s infinite alternate 0.15s;"></div>
+            </div>
+            
+            <!-- နောက်ခံဖျက်ပြီးသား mic.png ပုံ -->
+            <img src="mic.png" alt="Mic Logo" style="width: 65px; height: 65px; object-fit: contain; filter: drop-shadow(0 0 12px rgba(0, 210, 255, 0.9)); position: relative; z-index: 2;">
         </div>
     </div>
 
@@ -1352,7 +1371,7 @@ body{background:radial-gradient(circle at 50% -10%,rgba(32,104,255,.16),transpar
         </button>
     </div>
 
-</div>        
+</div>
 
 <!-- Lock Screen Display Start -->
 <div id="cyberpunk-lockscreen">
