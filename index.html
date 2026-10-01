@@ -2755,12 +2755,28 @@ function writeString(view, offset, string){
     }
 }
   function switchView(viewId) {
-    const views = document.querySelectorAll('.view-container');
-    views.forEach(v => v.style.display = 'none');
+    // ၁။ View အားလုံးကို ဖျောက်မယ်
+    document.querySelectorAll('.view-container').forEach(el => {
+        el.style.display = 'none';
+    });
     
-    const target = document.getElementById(viewId);
-    if (target) {
-        target.style.display = 'block';
+    // ၂။ ရွေးလိုက်တဲ့ View ကို ဖော်မယ်
+    const targetView = document.getElementById(viewId);
+    if (targetView) {
+        targetView.style.display = 'block';
+    }
+
+    // ၃။ Navigation Bar ခလုတ်တွေရဲ့ Active အရောင်ကို လိုက်ပြောင်းမယ်
+    document.querySelectorAll('.nav-btn').forEach(btn => {
+        btn.classList.remove('text-cyan-400'); // Active ဖြစ်နေတဲ့ အရောင်ကို ဖြုတ်မယ်
+        btn.classList.add('text-slate-400');   // မရွေးထားတဲ့ ပုံမှန်အရောင်ကို ထည့်မယ်
+    });
+
+    // ၄။ အခု နှိပ်လိုက်တဲ့ ခလုတ်ကို အပြာရောင် (Active) ဖြစ်စေမယ်
+    // (ဥပမာ- Home ဆို Home, Studio ဆို Studio ကို အရောင်ပြောင်းရန်)
+    event.currentTarget.classList.remove('text-slate-400');
+    event.currentTarget.classList.add('text-cyan-400');
+}
     }
 }
 function showGenerateMessage(text, type){
@@ -3018,33 +3034,32 @@ window.addEventListener('DOMContentLoaded', (event) => {
 
 </script>
       <!-- Neon Glass Bottom Navigation Bar -->
-    <div style="position: fixed; bottom: 0; left: 0; right: 0; background: rgba(13, 27, 42, 0.9); backdrop-filter: blur(16px); border-top: 1px solid rgba(0, 210, 255, 0.3); display: flex; justify-content: space-around; padding: 10px 0; z-index: 1000; box-shadow: 0 -5px 20px rgba(0, 0, 0, 0.5);">
-        
-        <!-- Home -->
-        <div onclick="switchView('mainDashboard')" style="text-align: center; cursor: pointer; color: #00baff; transition: 0.3s;">
-            <i class="fa-solid fa-house" style="font-size: 16px; margin-bottom: 3px; filter: drop-shadow(0 0 5px rgba(0,186,255,0.6));"></i>
-            <div style="font-size: 9px; font-weight: bold;">Home</div>
-        </div>
-
-        <!-- Studio -->
-        <div onclick="switchView('voiceStudio')" style="text-align: center; cursor: pointer; color: #8eb0cb; transition: 0.3s;">
-            <i class="fa-solid fa-microphone" style="font-size: 16px; margin-bottom: 3px;"></i>
-            <div style="font-size: 9px;">Studio</div>
-        </div>
-
-        <!-- Generator -->
-        <div onclick="switchView('voiceGenerator')" style="text-align: center; cursor: pointer; color: #8eb0cb; transition: 0.3s;">
-            <i class="fa-solid fa-bolt" style="font-size: 16px; margin-bottom: 3px;"></i>
-            <div style="font-size: 9px;">Generator</div>
-        </div>
-
-        <!-- Settings / Keys -->
-        <div onclick="switchView('settings')" style="text-align: center; cursor: pointer; color: #8eb0cb; transition: 0.3s;">
-            <i class="fa-solid fa-gear" style="font-size: 16px; margin-bottom: 3px;"></i>
-            <div style="font-size: 9px;">Settings</div>
-        </div>
-
+<div style="position: fixed; bottom: 0; left: 0; right: 0; background: rgba(13, 27, 42, 0.9); backdrop-filter: blur(16px); border-top: 1px solid rgba(0, 210, 255, 0.3); display: flex; justify-content: space-around; padding: 10px 0; z-index: 1000; box-shadow: 0 -5px 20px rgba(0, 0, 0, 0.5);">
+    
+    <!-- Home -->
+    <div class="nav-btn" onclick="switchView('mainDashboard')" style="text-align: center; cursor: pointer; color: #00baff; transition: 0.3s;">
+        <i class="fa-solid fa-house" style="font-size: 16px; margin-bottom: 3px; filter: drop-shadow(0 0 5px rgba(0,186,255,0.6));"></i>
+        <div style="font-size: 9px; font-weight: bold;">Home</div>
     </div>
+
+    <!-- Studio -->
+    <div class="nav-btn" onclick="switchView('voiceStudio')" style="text-align: center; cursor: pointer; color: #8eb0cb; transition: 0.3s;">
+        <i class="fa-solid fa-microphone" style="font-size: 16px; margin-bottom: 3px;"></i>
+        <div style="font-size: 9px;">Studio</div>
+    </div>
+
+    <!-- Generator -->
+    <div class="nav-btn" onclick="switchView('voiceGenerator')" style="text-align: center; cursor: pointer; color: #8eb0cb; transition: 0.3s;">
+        <i class="fa-solid fa-bolt" style="font-size: 16px; margin-bottom: 3px;"></i>
+        <div style="font-size: 9px;">Generator</div>
+    </div>
+
+    <!-- Settings / Keys -->
+    <div class="nav-btn" onclick="switchView('settings')" style="text-align: center; cursor: pointer; color: #8eb0cb; transition: 0.3s;">
+        <i class="fa-solid fa-gear" style="font-size: 16px; margin-bottom: 3px;"></i>
+        <div style="font-size: 9px;">Settings</div>
+    </div>
+</div>
 
 </body>
 </html>
