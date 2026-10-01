@@ -1175,6 +1175,18 @@ audio{
         margin: 0 auto;
     }
 }
+
+/* SAVED VOICE DEMO PREVIEW */
+.voice-card-option { position:relative; padding-right:118px; }
+.voice-card-avatar { width:54px; height:54px; border-radius:50%; object-fit:cover; border:1px solid #1b79b8; box-shadow:0 0 12px rgba(0,186,255,.18); flex:0 0 auto; }
+.voice-card-main { display:flex; align-items:center; gap:12px; min-width:0; }
+.voice-card-info { min-width:0; }
+.voice-preview-btn { position:absolute; right:14px; top:50%; transform:translateY(-50%); border:1px solid #159bd8; background:#06223b; color:#dff7ff; border-radius:12px; padding:8px 10px; font-size:12px; cursor:pointer; z-index:3; }
+.voice-preview-btn:hover { background:#0a3658; }
+.voice-preview-btn.saved { border-color:#20d6a2; color:#aaffdf; }
+.voice-preview-btn.loading { opacity:.65; pointer-events:none; }
+.voice-demo-status { margin:10px 0 0; color:#7fa8c4; font-size:11px; text-align:center; min-height:16px; }
+@media (max-width:560px){ .voice-card-option{padding-right:105px;} .voice-card-avatar{width:46px;height:46px;} .voice-preview-btn{right:10px;padding:7px 8px;} }
 </style>
 </head>
 
@@ -1559,80 +1571,64 @@ audio{
         
         <div class="voice-grid">
             <div class="voice-category-title">👨‍🦱 ယောက်ျားလေး အသံများ</div>
-            
+
             <div class="voice-card-option" data-voice="Puck" onclick="selectVoiceOption('Puck', 'Puck (တက်ကြွလှုပ်ရှား လူငယ်သံ)')">
-                <div class="voice-card-info">
-                    <span class="voice-card-name">Puck</span>
-                    <span class="voice-card-desc">တက်ကြွလှုပ်ရှား လူငယ်သံ</span>
-                </div>
+                <div class="voice-card-main"><img class="voice-card-avatar" src="puck.jpg" alt="Puck"><div class="voice-card-info"><span class="voice-card-name">Puck</span><span class="voice-card-desc">တက်ကြွလှုပ်ရှား လူငယ်သံ</span></div></div>
+                <button class="voice-preview-btn" type="button" onclick="previewVoice(event,'Puck')">▶ Preview</button>
                 <div class="voice-card-radio"></div>
             </div>
 
             <div class="voice-card-option" data-voice="Charon" onclick="selectVoiceOption('Charon', 'Charon (သတင်း/ဗဟုသုတပေး တည်ငြိမ်သံ)')">
-                <div class="voice-card-info">
-                    <span class="voice-card-name">Charon</span>
-                    <span class="voice-card-desc">သတင်း/ဗဟုသုတပေး တည်ငြိမ်သံ</span>
-                </div>
+                <div class="voice-card-main"><img class="voice-card-avatar" src="charon.jpg" alt="Charon"><div class="voice-card-info"><span class="voice-card-name">Charon</span><span class="voice-card-desc">သတင်း/ဗဟုသုတပေး တည်ငြိမ်သံ</span></div></div>
+                <button class="voice-preview-btn" type="button" onclick="previewVoice(event,'Charon')">▶ Preview</button>
                 <div class="voice-card-radio"></div>
             </div>
 
             <div class="voice-card-option" data-voice="Fenrir" onclick="selectVoiceOption('Fenrir', 'Fenrir (စိတ်လှုပ်ရှားဖွယ် ဇာတ်လမ်းသံ)')">
-                <div class="voice-card-info">
-                    <span class="voice-card-name">Fenrir</span>
-                    <span class="voice-card-desc">စိတ်လှုပ်ရှားဖွယ် ဇာတ်လမ်းသံ</span>
-                </div>
+                <div class="voice-card-main"><img class="voice-card-avatar" src="fenrir.jpg" alt="Fenrir"><div class="voice-card-info"><span class="voice-card-name">Fenrir</span><span class="voice-card-desc">စိတ်လှုပ်ရှားဖွယ် ဇာတ်လမ်းသံ</span></div></div>
+                <button class="voice-preview-btn" type="button" onclick="previewVoice(event,'Fenrir')">▶ Preview</button>
                 <div class="voice-card-radio"></div>
             </div>
 
             <div class="voice-card-option" data-voice="Orus" onclick="selectVoiceOption('Orus', 'Orus (ပြတ်သားခိုင်မာ ရင့်ကျက်သံ)')">
-                <div class="voice-card-info">
-                    <span class="voice-card-name">Orus</span>
-                    <span class="voice-card-desc">ပြတ်သားခိုင်မာ ရင့်ကျက်သံ</span>
-                </div>
+                <div class="voice-card-main"><img class="voice-card-avatar" src="orus.jpg" alt="Orus"><div class="voice-card-info"><span class="voice-card-name">Orus</span><span class="voice-card-desc">ပြတ်သားခိုင်မာ ရင့်ကျက်သံ</span></div></div>
+                <button class="voice-preview-btn" type="button" onclick="previewVoice(event,'Orus')">▶ Preview</button>
                 <div class="voice-card-radio"></div>
             </div>
 
             <div class="voice-category-title">👩‍🦰 မိန်းကလေး အသံများ</div>
 
             <div class="voice-card-option" data-voice="Kore" onclick="selectVoiceOption('Kore', 'Kore (ပြတ်သားခိုင်မာ လူငယ်သံ)')">
-                <div class="voice-card-info">
-                    <span class="voice-card-name">Kore</span>
-                    <span class="voice-card-desc">ပြတ်သားခိုင်မာ လူငယ်သံ</span>
-                </div>
+                <div class="voice-card-main"><img class="voice-card-avatar" src="kore.jpg" alt="Kore"><div class="voice-card-info"><span class="voice-card-name">Kore</span><span class="voice-card-desc">ပြတ်သားခိုင်မာ လူငယ်သံ</span></div></div>
+                <button class="voice-preview-btn" type="button" onclick="previewVoice(event,'Kore')">▶ Preview</button>
                 <div class="voice-card-radio"></div>
             </div>
 
             <div class="voice-card-option" data-voice="Leda" onclick="selectVoiceOption('Leda', 'Leda (နုပျိုတက်ကြွ ချိုသာသံ)')">
-                <div class="voice-card-info">
-                    <span class="voice-card-name">Leda</span>
-                    <span class="voice-card-desc">နုပျိုတက်ကြွ ချိုသာသံ</span>
-                </div>
+                <div class="voice-card-main"><img class="voice-card-avatar" src="leda.jpg" alt="Leda"><div class="voice-card-info"><span class="voice-card-name">Leda</span><span class="voice-card-desc">နုပျိုတက်ကြွ ချိုသာသံ</span></div></div>
+                <button class="voice-preview-btn" type="button" onclick="previewVoice(event,'Leda')">▶ Preview</button>
                 <div class="voice-card-radio"></div>
             </div>
 
             <div class="voice-card-option" data-voice="Aoede" onclick="selectVoiceOption('Aoede', 'Aoede (ပေါ့ပါးလန်းဆန်း စကားပြောသံ)')">
-                <div class="voice-card-info">
-                    <span class="voice-card-name">Aoede</span>
-                    <span class="voice-card-desc">ပေါ့ပါးလန်းဆန်း စကားပြောသံ</span>
-                </div>
+                <div class="voice-card-main"><img class="voice-card-avatar" src="aoede.jpg" alt="Aoede"><div class="voice-card-info"><span class="voice-card-name">Aoede</span><span class="voice-card-desc">ပေါ့ပါးလန်းဆန်း စကားပြောသံ</span></div></div>
+                <button class="voice-preview-btn" type="button" onclick="previewVoice(event,'Aoede')">▶ Preview</button>
                 <div class="voice-card-radio"></div>
             </div>
 
             <div class="voice-card-option" data-voice="Callirrhoe" onclick="selectVoiceOption('Callirrhoe', 'Callirrhoe (အေးဆေးပေါ့ပါး သဘာဝသံ)')">
-                <div class="voice-card-info">
-                    <span class="voice-card-name">Callirrhoe</span>
-                    <span class="voice-card-desc">အေးဆေးပေါ့ပါး သဘာဝသံ</span>
-                </div>
+                <div class="voice-card-main"><img class="voice-card-avatar" src="callirrhoe.jpg" alt="Callirrhoe"><div class="voice-card-info"><span class="voice-card-name">Callirrhoe</span><span class="voice-card-desc">အေးဆေးပေါ့ပါး သဘာဝသံ</span></div></div>
+                <button class="voice-preview-btn" type="button" onclick="previewVoice(event,'Callirrhoe')">▶ Preview</button>
                 <div class="voice-card-radio"></div>
             </div>
 
             <div class="voice-card-option" data-voice="Despina" onclick="selectVoiceOption('Despina', 'Despina (ချောမွေ့ငြိမ့်ညောင်း ဇာတ်လမ်းသံ)')">
-                <div class="voice-card-info">
-                    <span class="voice-card-name">Despina</span>
-                    <span class="voice-card-desc">ချောမွေ့ငြိမ့်ညောင်း ဇာတ်လမ်းသံ</span>
-                </div>
+                <div class="voice-card-main"><img class="voice-card-avatar" src="despina.jpg" alt="Despina"><div class="voice-card-info"><span class="voice-card-name">Despina</span><span class="voice-card-desc">ချောမွေ့ငြိမ့်ညောင်း ဇာတ်လမ်းသံ</span></div></div>
+                <button class="voice-preview-btn" type="button" onclick="previewVoice(event,'Despina')">▶ Preview</button>
                 <div class="voice-card-radio"></div>
             </div>
+
+            <div id="voiceDemoStatus" class="voice-demo-status">▶ Preview ကို ပထမဆုံးတစ်ခါသာ API သုံးပြီး သိမ်းထားမည်။ နောက်တစ်ခါများ API မခေါ်တော့ပါ။</div>
         </div>
     </div>
 </div>
@@ -1814,6 +1810,145 @@ function selectVoiceOption(voiceVal, displayLabel) {
         }
     }
     closeVoicePicker();
+}
+
+
+/* SAVED VOICE DEMO: API is used only on the first Preview for each voice.
+   The generated WAV is stored in IndexedDB and every later Preview plays that saved blob. */
+const VOICE_DEMO_TEXTS = {
+    Puck: "မင်္ဂလာပါ၊ ကျွန်တော့နာမည်ကတော့ ပတ်ခ်ပါ။",
+    Charon: "မင်္ဂလာပါ၊ ကျွန်တော့နာမည်ကတော့ ချာကွန်ပါ။",
+    Fenrir: "မင်္ဂလာပါ၊ ကျွန်တော့နာမည်ကတော့ ဖန်နီယာပါ။",
+    Orus: "မင်္ဂလာပါ၊ ကျွန်တော့နာမည်ကတော့ အိုရပ်စ်ပါ။",
+    Kore: "မင်္ဂလာပါ၊ ကျွန်တော့နာမည်ကတော့ ကိုးရီးပါ။",
+    Leda: "မင်္ဂလာပါ၊ ကျွန်တော့နာမည်ကတော့ လီဒါပါ။",
+    Aoede: "မင်္ဂလာပါ၊ ကျွန်တော့နာမည်ကတော့ အိုအီဒီပါ။",
+    Callirrhoe: "မင်္ဂလာပါ၊ ကျွန်တော့နာမည်ကတော့ ကလီရိုပါ။",
+    Despina: "မင်္ဂလာပါ၊ ကျွန်တော့နာမည်ကတော့ ဒက်စ်ပီနာပါ။"
+};
+
+function getVoiceDemo(voice) {
+    return new Promise(async (resolve) => {
+        try {
+            const db = await openDB();
+            const tx = db.transaction(VOICE_DEMO_STORE, "readonly");
+            const req = tx.objectStore(VOICE_DEMO_STORE).get(voice);
+            req.onsuccess = () => resolve(req.result || null);
+            req.onerror = () => resolve(null);
+        } catch (e) {
+            console.warn("Voice demo read error", e);
+            resolve(null);
+        }
+    });
+}
+
+function saveVoiceDemo(voice, blob) {
+    return new Promise(async (resolve, reject) => {
+        try {
+            const db = await openDB();
+            const tx = db.transaction(VOICE_DEMO_STORE, "readwrite");
+            tx.objectStore(VOICE_DEMO_STORE).put({
+                voice,
+                text: VOICE_DEMO_TEXTS[voice] || "မင်္ဂလာပါ။",
+                audioBlob: blob,
+                savedAt: new Date().toISOString()
+            });
+            tx.oncomplete = () => resolve();
+            tx.onerror = () => reject(tx.error);
+        } catch (e) { reject(e); }
+    });
+}
+
+function setVoicePreviewButton(voice, state) {
+    const card = document.querySelector(`.voice-card-option[data-voice="${voice}"]`);
+    if (!card) return;
+    const btn = card.querySelector(".voice-preview-btn");
+    if (!btn) return;
+    btn.classList.toggle("saved", state === "saved");
+    btn.classList.toggle("loading", state === "loading");
+    btn.textContent = state === "loading" ? "⏳" : (state === "saved" ? "▶ Saved" : "▶ Preview");
+}
+
+async function previewVoice(event, voice) {
+    if (event) { event.preventDefault(); event.stopPropagation(); }
+
+    const status = document.getElementById("voiceDemoStatus");
+    const cached = await getVoiceDemo(voice);
+
+    if (cached && cached.audioBlob) {
+        const url = URL.createObjectURL(cached.audioBlob);
+        const audio = new Audio(url);
+        audio.playbackRate = 1;
+        audio.onended = () => URL.revokeObjectURL(url);
+        await audio.play();
+        setVoicePreviewButton(voice, "saved");
+        if (status) status.textContent = `▶ ${voice} — သိမ်းထားပြီးသား Demo ကိုဖွင့်နေပါတယ်။ API မသုံးပါ။`;
+        return;
+    }
+
+    const rawKeys = document.getElementById("apiKey")?.value.trim() || "";
+    if (!rawKeys) {
+        if (status) status.textContent = "🔑 ပထမဆုံး Demo သိမ်းရန် Gemini API Key ထည့်ထားရပါမယ်။";
+        return;
+    }
+
+    const keysList = rawKeys.split(",").map(k => k.trim()).filter(Boolean);
+    setVoicePreviewButton(voice, "loading");
+    if (status) status.textContent = `⏳ ${voice} Demo ကို ပထမဆုံးတစ်ခါ Generate လုပ်ပြီး အသံကို App ထဲမှာ အသေသိမ်းနေပါတယ်...`;
+
+    const text = VOICE_DEMO_TEXTS[voice] || `မင်္ဂလာပါ၊ ကျွန်တော့နာမည်ကတော့ ${voice} ပါ။`;
+    const prompt = `Clear, natural Burmese conversational tone.\n<speak xml:lang="my-MM"><speaker name="${voice}">${text}</speaker></speak>`;
+    const body = {
+        contents:[{ parts:[{ text:prompt }] }],
+        generationConfig:{
+            responseModalities:["AUDIO"],
+            temperature:0.6,
+            speechConfig:{ voiceConfig:{ prebuiltVoiceConfig:{ voiceName:voice } } }
+        }
+    };
+
+    let lastError = "";
+    for (const currentKey of keysList) {
+        try {
+            const response = await fetch(API_URL, {
+                method:"POST",
+                headers:{ "Content-Type":"application/json", "x-goog-api-key":currentKey },
+                body:JSON.stringify(body)
+            });
+            const data = await response.json().catch(()=>({}));
+            if (!response.ok) throw new Error(data?.error?.message || `HTTP ${response.status}`);
+
+            const base64 = data?.candidates?.[0]?.content?.parts?.find(p => p.inlineData)?.inlineData?.data;
+            if (!base64) throw new Error("Gemini က Demo Audio မပြန်လာပါ။");
+
+            const pcm = base64ToUint8Array(base64);
+            const wav = pcmToWav(pcm, 24000, 1, 16);
+            const blob = new Blob([wav], {type:"audio/wav"});
+            await saveVoiceDemo(voice, blob);
+
+            setVoicePreviewButton(voice, "saved");
+            if (status) status.textContent = `✅ ${voice} Demo ကို အသေသိမ်းပြီးပါပြီ။ နောက်တစ်ခါ ▶ နှိပ်ရင် API မခေါ်တော့ပါ။`;
+
+            const url = URL.createObjectURL(blob);
+            const audio = new Audio(url);
+            audio.playbackRate = 1;
+            audio.onended = () => URL.revokeObjectURL(url);
+            await audio.play();
+            return;
+        } catch (e) {
+            lastError = e?.message || "Unknown error";
+        }
+    }
+
+    setVoicePreviewButton(voice, "normal");
+    if (status) status.textContent = `❌ ${voice} Demo မသိမ်းနိုင်ပါ: ${lastError}`;
+}
+
+async function markSavedVoiceDemos() {
+    for (const voice of Object.keys(VOICE_DEMO_TEXTS)) {
+        const cached = await getVoiceDemo(voice);
+        if (cached?.audioBlob) setVoicePreviewButton(voice, "saved");
+    }
 }
 
 /* TAB SWITCHING */
@@ -2495,8 +2630,9 @@ function showSingleGenerateMessage(text, type){
 
 /* INDEXEDDB STORAGE */
 const DB_NAME = "VoiceStudioDB";
-const DB_VERSION = 1;
+const DB_VERSION = 2;
 const STORE_NAME = "audio_history";
+const VOICE_DEMO_STORE = "voice_demos";
 
 function openDB() {
     return new Promise((resolve, reject) => {
@@ -2505,6 +2641,9 @@ function openDB() {
             const db = e.target.result;
             if (!db.objectStoreNames.contains(STORE_NAME)) {
                 db.createObjectStore(STORE_NAME, { keyPath: "id" });
+            }
+            if (!db.objectStoreNames.contains(VOICE_DEMO_STORE)) {
+                db.createObjectStore(VOICE_DEMO_STORE, { keyPath: "voice" });
             }
         };
         request.onsuccess = (e) => resolve(e.target.result);
@@ -2633,6 +2772,8 @@ function escapeHTML(value){
         .replace(/"/g,"&quot;")
         .replace(/'/g,"&#039;");
 }
+
+markSavedVoiceDemos();
 </script>
 </body>
 </html>
