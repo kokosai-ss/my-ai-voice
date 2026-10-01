@@ -2956,5 +2956,34 @@ async function shPreviewVoice(voice,button){
 window.addEventListener('DOMContentLoaded',()=>{shRenderVoiceLibrary();});
 
 </script>
+      <!-- Neon Glass Bottom Navigation Bar -->
+    <div style="position: fixed; bottom: 0; left: 0; right: 0; background: rgba(13, 27, 42, 0.9); backdrop-filter: blur(16px); border-top: 1px solid rgba(0, 210, 255, 0.3); display: flex; justify-content: space-around; padding: 10px 0; z-index: 1000; box-shadow: 0 -5px 20px rgba(0, 0, 0, 0.5);">
+        
+        <!-- Home -->
+        <div onclick="switchView('mainDashboard')" style="text-align: center; cursor: pointer; color: #00baff; transition: 0.3s;">
+            <i class="fa-solid fa-house" style="font-size: 16px; margin-bottom: 3px; filter: drop-shadow(0 0 5px rgba(0,186,255,0.6));"></i>
+            <div style="font-size: 9px; font-weight: bold;">Home</div>
+        </div>
+
+        <!-- Studio -->
+        <div onclick="switchView('voiceStudio')" style="text-align: center; cursor: pointer; color: #8eb0cb; transition: 0.3s;">
+            <i class="fa-solid fa-microphone" style="font-size: 16px; margin-bottom: 3px;"></i>
+            <div style="font-size: 9px;">Studio</div>
+        </div>
+
+        <!-- Generator -->
+        <div onclick="switchView('voiceGenerator')" style="text-align: center; cursor: pointer; color: #8eb0cb; transition: 0.3s;">
+            <i class="fa-solid fa-bolt" style="font-size: 16px; margin-bottom: 3px;"></i>
+            <div style="font-size: 9px;">Generator</div>
+        </div>
+
+        <!-- Settings / Keys -->
+        <div onclick="switchView('settings')" style="text-align: center; cursor: pointer; color: #8eb0cb; transition: 0.3s;">
+            <i class="fa-solid fa-gear" style="font-size: 16px; margin-bottom: 3px;"></i>
+            <div style="font-size: 9px;">Settings</div>
+        </div>
+
+    </div>
+
 </body>
 </html>
