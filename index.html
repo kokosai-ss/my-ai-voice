@@ -1176,33 +1176,78 @@ audio{
     }
 }
 
-/* SAVED VOICE DEMO PREVIEW */
-.voice-card-option { position:relative; padding-right:118px; }
-.voice-card-avatar { width:54px; height:54px; border-radius:50%; object-fit:cover; border:1px solid #1b79b8; box-shadow:0 0 12px rgba(0,186,255,.18); flex:0 0 auto; }
-.voice-card-main { display:flex; align-items:center; gap:12px; min-width:0; }
-.voice-card-info { min-width:0; }
-.voice-preview-btn { position:absolute; right:14px; top:50%; transform:translateY(-50%); border:1px solid #159bd8; background:#06223b; color:#dff7ff; border-radius:12px; padding:8px 10px; font-size:12px; cursor:pointer; z-index:3; }
-.voice-preview-btn:hover { background:#0a3658; }
-.voice-preview-btn.saved { border-color:#20d6a2; color:#aaffdf; }
-.voice-preview-btn.loading { opacity:.65; pointer-events:none; }
-.voice-demo-status { margin:10px 0 0; color:#7fa8c4; font-size:11px; text-align:center; min-height:16px; }
-@media (max-width:560px){ .voice-card-option{padding-right:105px;} .voice-card-avatar{width:46px;height:46px;} .voice-preview-btn{right:10px;padding:7px 8px;} }
-
-/* ===== SH AI STUDIO VISIBLE VOICE LIBRARY ===== */
-.voice-library{margin:18px 0 20px;padding:18px;border:1px solid rgba(0,186,255,.22);border-radius:24px;background:linear-gradient(180deg,rgba(7,28,51,.96),rgba(4,17,32,.96));box-shadow:0 12px 35px rgba(0,0,0,.22)}
-.voice-library-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px}
-.voice-library-title{display:flex;align-items:center;gap:10px}.voice-library-title .vicon{width:42px;height:42px;border-radius:14px;display:grid;place-items:center;background:linear-gradient(145deg,#0b3d62,#071c33);border:1px solid #17618f;font-size:21px}.voice-library-title h3{margin:0;color:#e9f8ff;font-size:17px}.voice-library-title p{margin:3px 0 0;color:#7fa4bf;font-size:12px}
-.voice-cache-pill{padding:7px 10px;border-radius:999px;border:1px solid rgba(32,214,162,.35);background:rgba(32,214,162,.08);color:#8ff1d0;font-size:11px;white-space:nowrap}
-.voice-library-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
-.voice-library-card{position:relative;min-width:0;padding:12px;border-radius:19px;border:1px solid #16486a;background:linear-gradient(145deg,#0a2742,#06182e);cursor:pointer;transition:.18s;overflow:hidden}
-.voice-library-card:hover{transform:translateY(-2px);border-color:#1aa9e8;box-shadow:0 8px 24px rgba(0,170,255,.13)}
-.voice-library-card.selected{border-color:#00baff;box-shadow:0 0 0 1px rgba(0,186,255,.2),0 10px 28px rgba(0,170,255,.12)}
-.voice-avatar-wrap{display:flex;align-items:center;gap:10px;margin-bottom:10px}.voice-avatar{width:52px;height:52px;border-radius:15px;object-fit:cover;border:1px solid #28739c;background:#071c33;flex:0 0 auto}.voice-meta{min-width:0}.voice-name{display:block;color:#f1fbff;font-weight:800;font-size:15px;line-height:1.15}.voice-desc{display:block;color:#83a9c1;font-size:10.5px;line-height:1.35;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.voice-card-actions{display:flex;gap:7px}.voice-select-btn,.voice-demo-btn{flex:1;border-radius:11px;padding:8px 7px;font-size:11px;cursor:pointer}.voice-select-btn{border:1px solid #19577b;background:#08243c;color:#ccefff}.voice-demo-btn{border:1px solid #147ca8;background:#06314d;color:#dff7ff}.voice-demo-btn.saved{border-color:#20d6a2;background:rgba(32,214,162,.08);color:#9ef3d7}.voice-demo-btn.loading{opacity:.65;pointer-events:none}
-.voice-selected-dot{position:absolute;top:10px;right:10px;width:8px;height:8px;border-radius:50%;background:#00baff;box-shadow:0 0 10px #00baff;display:none}.voice-library-card.selected .voice-selected-dot{display:block}
-.voice-library-note{margin-top:12px;color:#7195ad;font-size:11px;line-height:1.45;text-align:center}
-@media(max-width:650px){.voice-library-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.voice-library{padding:14px}.voice-library-head{align-items:flex-start}.voice-cache-pill{font-size:10px;padding:6px 8px}.voice-avatar{width:46px;height:46px}}
-@media(max-width:390px){.voice-library-grid{grid-template-columns:1fr}.voice-library-head{display:block}.voice-cache-pill{display:inline-block;margin-top:8px}}
+/* ================= SH AI STUDIO PREMIUM UI ================= */
+:root{
+  --sh-bg:#050b16;
+  --sh-panel:rgba(9,20,38,.78);
+  --sh-panel2:rgba(12,28,51,.88);
+  --sh-line:rgba(72,150,255,.20);
+  --sh-cyan:#38d9ff;
+  --sh-blue:#4b7dff;
+  --sh-text:#f4f8ff;
+  --sh-muted:#8fa8c5;
+  --sh-green:#51e6a4;
+}
+body{background:radial-gradient(circle at 50% -10%,rgba(32,104,255,.16),transparent 38%),var(--sh-bg)!important;color:var(--sh-text)!important;}
+.container{width:min(100%,760px)!important;padding:16px 14px 46px!important;}
+.container>.hero{display:none!important;}
+#appContent{display:none;}
+#appContent>.premium-shell{display:block;}
+.premium-shell{margin:0 0 18px;}
+.premium-topbar{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 4px 16px;position:sticky;top:0;z-index:50;background:linear-gradient(180deg,rgba(5,11,22,.97),rgba(5,11,22,.78),transparent);backdrop-filter:blur(12px);}
+.premium-brand{display:flex;align-items:center;gap:11px;min-width:0;}
+.premium-logo{width:44px;height:44px;border-radius:14px;object-fit:cover;border:1px solid rgba(56,217,255,.55);box-shadow:0 0 22px rgba(56,217,255,.22);}
+.premium-brand h1{font-size:18px!important;margin:0!important;line-height:1.15;color:#fff!important;text-shadow:0 0 18px rgba(56,217,255,.22);}
+.premium-brand small{display:block;color:var(--sh-muted);font-size:10px;margin-top:4px;letter-spacing:.6px;}
+.premium-menu{width:42px;height:42px;border-radius:13px;border:1px solid var(--sh-line);background:rgba(16,33,57,.72);color:#cfe8ff;font-size:18px;}
+.premium-hero{position:relative;overflow:hidden;padding:20px;border:1px solid rgba(65,147,255,.23);border-radius:25px;background:linear-gradient(145deg,rgba(13,34,63,.96),rgba(6,15,29,.94));box-shadow:0 20px 60px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.03);}
+.premium-hero:before{content:"";position:absolute;width:180px;height:180px;right:-80px;top:-90px;border-radius:50%;background:rgba(56,217,255,.14);filter:blur(5px);}
+.premium-kicker{color:var(--sh-cyan);font-size:11px;font-weight:800;letter-spacing:1.7px;text-transform:uppercase;margin-bottom:8px;}
+.premium-hero h2{margin:0 0 7px!important;color:#fff!important;font-size:25px!important;line-height:1.2!important;}
+.premium-hero p{margin:0;color:#9db5d1;font-size:12px;line-height:1.65;max-width:520px;}
+.premium-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px;}
+.premium-action{border:1px solid rgba(73,158,255,.25);border-radius:15px;padding:12px;background:rgba(16,39,68,.72);color:#eaf6ff;font-weight:700;font-size:12px;cursor:pointer;box-shadow:inset 0 1px 0 rgba(255,255,255,.03);}
+.premium-action.primary{background:linear-gradient(135deg,#1269ff,#13bfe7);border-color:rgba(94,223,255,.7);box-shadow:0 10px 28px rgba(18,105,255,.24);}
+.premium-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-top:12px;}
+.premium-stat{padding:12px 10px;border:1px solid var(--sh-line);border-radius:17px;background:rgba(8,20,36,.72);}
+.premium-stat strong{display:block;color:#fff;font-size:15px;}
+.premium-stat span{display:block;color:#7590ad;font-size:10px;margin-top:4px;}
+.voice-library{margin-top:14px;border:1px solid rgba(65,147,255,.20);border-radius:25px;background:linear-gradient(145deg,rgba(9,22,40,.93),rgba(5,13,25,.95));padding:15px;box-shadow:0 18px 55px rgba(0,0,0,.3);}
+.library-head{display:flex;align-items:flex-end;justify-content:space-between;gap:10px;margin-bottom:13px;}
+.library-head h3{margin:0;color:#fff;font-size:18px;}
+.library-head p{margin:4px 0 0;color:#7892ae;font-size:10px;}
+.library-badge{border:1px solid rgba(81,230,164,.25);background:rgba(81,230,164,.08);color:var(--sh-green);border-radius:999px;padding:7px 9px;font-size:9px;font-weight:800;white-space:nowrap;}
+.voice-library-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.premium-voice-card{position:relative;min-width:0;padding:11px;border:1px solid rgba(73,140,220,.18);border-radius:20px;background:linear-gradient(145deg,rgba(15,34,58,.9),rgba(8,19,34,.94));transition:.22s;overflow:hidden;}
+.premium-voice-card:hover{transform:translateY(-2px);border-color:rgba(56,217,255,.52);box-shadow:0 12px 30px rgba(0,0,0,.28),0 0 24px rgba(56,217,255,.08);}
+.voice-avatar-wrap{position:relative;margin-bottom:9px;}
+.premium-voice-avatar{width:100%;aspect-ratio:1.15/1;border-radius:15px;object-fit:cover;display:block;background:#09182b;border:1px solid rgba(125,177,255,.14);}
+.voice-cached-dot{position:absolute;right:7px;top:7px;width:9px;height:9px;border-radius:50%;background:#566b84;box-shadow:0 0 0 4px rgba(0,0,0,.22);}
+.premium-voice-card.cached .voice-cached-dot{background:var(--sh-green);box-shadow:0 0 12px rgba(81,230,164,.75),0 0 0 4px rgba(0,0,0,.22);}
+.voice-name-row{display:flex;align-items:center;justify-content:space-between;gap:6px;}
+.voice-name-row strong{font-size:14px;color:#fff;}
+.voice-mini-tag{font-size:8px;color:#80a1c4;border:1px solid rgba(128,161,196,.18);border-radius:999px;padding:3px 5px;white-space:nowrap;}
+.voice-desc{font-size:9px;color:#7994b1;margin:5px 0 9px;min-height:26px;line-height:1.45;}
+.voice-card-actions{display:grid;grid-template-columns:1fr 1fr;gap:6px;}
+.voice-card-actions button{border:1px solid rgba(74,146,225,.2);border-radius:11px;padding:8px 5px;background:rgba(16,38,64,.9);color:#d8efff;font-size:10px;font-weight:800;cursor:pointer;}
+.voice-card-actions .preview{background:linear-gradient(135deg,rgba(20,110,255,.95),rgba(18,190,226,.9));border-color:rgba(70,220,255,.55);}
+.voice-card-actions button:disabled{opacity:.65;cursor:wait;}
+.premium-section-label{display:flex;align-items:center;justify-content:space-between;margin:18px 3px 9px;}
+.premium-section-label strong{font-size:13px;color:#dff4ff;}
+.premium-section-label span{font-size:9px;color:#6e89a5;}
+/* Restyle the existing app so it sits under the premium dashboard. */
+.section{background:linear-gradient(145deg,rgba(10,24,43,.88),rgba(6,15,28,.92))!important;border:1px solid rgba(72,150,255,.16)!important;border-radius:23px!important;box-shadow:0 15px 45px rgba(0,0,0,.22)!important;}
+.section-title h2{color:#f2f8ff!important;}
+.subtitle{color:#7f9ab8!important;}
+.tab-navigation{background:rgba(6,15,28,.9)!important;border:1px solid rgba(72,150,255,.16)!important;border-radius:17px!important;padding:5px!important;}
+.tab-btn{border-radius:13px!important;color:#7f9ab8!important;}
+.tab-btn.active{background:linear-gradient(135deg,#1165ff,#0bbbd9)!important;color:#fff!important;box-shadow:0 8px 25px rgba(17,101,255,.2)!important;}
+.speech-block-card{background:linear-gradient(145deg,rgba(12,28,49,.92),rgba(7,17,31,.95))!important;border:1px solid rgba(72,150,255,.17)!important;border-radius:21px!important;box-shadow:0 12px 35px rgba(0,0,0,.22)!important;}
+.speaker-select-trigger{background:rgba(7,18,32,.85)!important;border-color:rgba(72,150,255,.24)!important;border-radius:13px!important;}
+.block-textarea,textarea{background:rgba(5,14,26,.86)!important;border-color:rgba(72,150,255,.20)!important;border-radius:15px!important;}
+.btn,.generate,.btn-card-ctrl{border-radius:13px!important;}
+@media(max-width:520px){.voice-library-grid{grid-template-columns:1fr 1fr}.premium-hero h2{font-size:22px!important}.container{padding-left:11px!important;padding-right:11px!important}.premium-stats{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:370px){.voice-library-grid{grid-template-columns:1fr}.premium-actions{grid-template-columns:1fr}.premium-stats{grid-template-columns:1fr 1fr}.premium-stat:last-child{grid-column:1/-1}}
 
 </style>
 </head>
@@ -1364,6 +1409,42 @@ audio{
 
     <div id="appContent">
 
+<div class="premium-shell" id="premiumShell">
+  <div class="premium-topbar">
+    <div class="premium-brand">
+      <img class="premium-logo" src="Logo.png.png" onerror="this.style.display='none'" alt="SH">
+      <div><h1>SH AI Studio</h1><small>AI VOICE • MULTI VOICE • BURMESE</small></div>
+    </div>
+    <button class="premium-menu" type="button" onclick="openSidebar()">☰</button>
+  </div>
+
+  <div class="premium-hero">
+    <div class="premium-kicker">PERSONAL VOICE WORKSPACE</div>
+    <h2>Make your story sound alive.</h2>
+    <p>Voice ရွေး၊ စာထည့်၊ AI Voice ထုတ်။ မင်းရဲ့ SH Recap workflow အတွက် တစ်နေရာတည်းကနေ သုံးနိုင်အောင် စီထားတဲ့ Studio ပုံစံ။</p>
+    <div class="premium-actions">
+      <button class="premium-action primary" type="button" onclick="switchTab('singleTab');document.getElementById('singleTab').scrollIntoView({behavior:'smooth',block:'start'});">🎙️ Single Voice</button>
+      <button class="premium-action" type="button" onclick="switchTab('multiTab');document.getElementById('multiTab').scrollIntoView({behavior:'smooth',block:'start'});">👥 Multi Voice</button>
+    </div>
+    <div class="premium-stats">
+      <div class="premium-stat"><strong>9</strong><span>AI VOICES</span></div>
+      <div class="premium-stat"><strong>1×</strong><span>DEMO API USE</span></div>
+      <div class="premium-stat"><strong>∞</strong><span>LOCAL PLAY</span></div>
+    </div>
+  </div>
+
+  <div class="voice-library">
+    <div class="library-head">
+      <div><h3>Voice Library</h3><p>အသံမရွေးခင် အရင်နားထောင်ပါ</p></div>
+      <span class="library-badge">● CACHED PREVIEW</span>
+    </div>
+    <div class="voice-library-grid" id="premiumVoiceGrid"></div>
+  </div>
+
+  <div class="premium-section-label"><strong>🎛️ Studio Workspace</strong><span>YOUR EXISTING TOOLS</span></div>
+</div>
+
+
         <!-- SHARED API KEY SECTION -->
         <div class="section">
 
@@ -1410,32 +1491,6 @@ audio{
                         <div class="subtitle">စာသားတစ်ခုလုံးကို အသံတစ်ခုတည်းဖြင့် တိုက်ရိုက်ဖတ်ခိုင်းမည်</div>
                     </div>
                     <span class="badge">Single Voice</span>
-                </div>
-
-
-                <div class="voice-library">
-                    <div class="voice-library-head">
-                        <div class="voice-library-title">
-                            <div class="vicon">🎙️</div>
-                            <div>
-                                <h3>Voice Library</h3>
-                                <p>အသံရွေးပြီး Preview နားထောင်ပါ</p>
-                            </div>
-                        </div>
-                        <div class="voice-cache-pill">● Demo ကို ၁ ခါပဲ API သုံးမယ်</div>
-                    </div>
-                    <div class="voice-library-grid" id="visibleVoiceLibrary">
-                        <div class="voice-library-card" data-visible-voice="Puck" onclick="selectVisibleVoice('Puck')"><span class="voice-selected-dot"></span><div class="voice-avatar-wrap"><img class="voice-avatar" src="puck.jpg" alt="Puck"><div class="voice-meta"><span class="voice-name">Puck</span><span class="voice-desc">တက်ကြွလှုပ်ရှား လူငယ်သံ</span></div></div><div class="voice-card-actions"><button class="voice-select-btn" type="button" onclick="event.stopPropagation();selectVisibleVoice('Puck')">ရွေးမယ်</button><button class="voice-demo-btn" data-demo-voice="Puck" type="button" onclick="event.stopPropagation();previewVoice(event,'Puck')">▶ Preview</button></div></div>
-                        <div class="voice-library-card" data-visible-voice="Charon" onclick="selectVisibleVoice('Charon')"><span class="voice-selected-dot"></span><div class="voice-avatar-wrap"><img class="voice-avatar" src="charon.jpg" alt="Charon"><div class="voice-meta"><span class="voice-name">Charon</span><span class="voice-desc">တည်ငြိမ်ပြီး ရှင်းလင်းသံ</span></div></div><div class="voice-card-actions"><button class="voice-select-btn" type="button" onclick="event.stopPropagation();selectVisibleVoice('Charon')">ရွေးမယ်</button><button class="voice-demo-btn" data-demo-voice="Charon" type="button" onclick="event.stopPropagation();previewVoice(event,'Charon')">▶ Preview</button></div></div>
-                        <div class="voice-library-card" data-visible-voice="Fenrir" onclick="selectVisibleVoice('Fenrir')"><span class="voice-selected-dot"></span><div class="voice-avatar-wrap"><img class="voice-avatar" src="fenrir.jpg" alt="Fenrir"><div class="voice-meta"><span class="voice-name">Fenrir</span><span class="voice-desc">စိတ်လှုပ်ရှားဖွယ် ဇာတ်လမ်းသံ</span></div></div><div class="voice-card-actions"><button class="voice-select-btn" type="button" onclick="event.stopPropagation();selectVisibleVoice('Fenrir')">ရွေးမယ်</button><button class="voice-demo-btn" data-demo-voice="Fenrir" type="button" onclick="event.stopPropagation();previewVoice(event,'Fenrir')">▶ Preview</button></div></div>
-                        <div class="voice-library-card" data-visible-voice="Orus" onclick="selectVisibleVoice('Orus')"><span class="voice-selected-dot"></span><div class="voice-avatar-wrap"><img class="voice-avatar" src="orus.jpg" alt="Orus"><div class="voice-meta"><span class="voice-name">Orus</span><span class="voice-desc">ပြတ်သားခိုင်မာ ရင့်ကျက်သံ</span></div></div><div class="voice-card-actions"><button class="voice-select-btn" type="button" onclick="event.stopPropagation();selectVisibleVoice('Orus')">ရွေးမယ်</button><button class="voice-demo-btn" data-demo-voice="Orus" type="button" onclick="event.stopPropagation();previewVoice(event,'Orus')">▶ Preview</button></div></div>
-                        <div class="voice-library-card" data-visible-voice="Kore" onclick="selectVisibleVoice('Kore')"><span class="voice-selected-dot"></span><div class="voice-avatar-wrap"><img class="voice-avatar" src="kore.jpg" alt="Kore"><div class="voice-meta"><span class="voice-name">Kore</span><span class="voice-desc">ပြတ်သားခိုင်မာ လူငယ်သံ</span></div></div><div class="voice-card-actions"><button class="voice-select-btn" type="button" onclick="event.stopPropagation();selectVisibleVoice('Kore')">ရွေးမယ်</button><button class="voice-demo-btn" data-demo-voice="Kore" type="button" onclick="event.stopPropagation();previewVoice(event,'Kore')">▶ Preview</button></div></div>
-                        <div class="voice-library-card" data-visible-voice="Leda" onclick="selectVisibleVoice('Leda')"><span class="voice-selected-dot"></span><div class="voice-avatar-wrap"><img class="voice-avatar" src="leda.jpg" alt="Leda"><div class="voice-meta"><span class="voice-name">Leda</span><span class="voice-desc">နုပျိုတက်ကြွ ချိုသာသံ</span></div></div><div class="voice-card-actions"><button class="voice-select-btn" type="button" onclick="event.stopPropagation();selectVisibleVoice('Leda')">ရွေးမယ်</button><button class="voice-demo-btn" data-demo-voice="Leda" type="button" onclick="event.stopPropagation();previewVoice(event,'Leda')">▶ Preview</button></div></div>
-                        <div class="voice-library-card" data-visible-voice="Aoede" onclick="selectVisibleVoice('Aoede')"><span class="voice-selected-dot"></span><div class="voice-avatar-wrap"><img class="voice-avatar" src="aoede.jpg" alt="Aoede"><div class="voice-meta"><span class="voice-name">Aoede</span><span class="voice-desc">ပေါ့ပါးလန်းဆန်း စကားပြောသံ</span></div></div><div class="voice-card-actions"><button class="voice-select-btn" type="button" onclick="event.stopPropagation();selectVisibleVoice('Aoede')">ရွေးမယ်</button><button class="voice-demo-btn" data-demo-voice="Aoede" type="button" onclick="event.stopPropagation();previewVoice(event,'Aoede')">▶ Preview</button></div></div>
-                        <div class="voice-library-card" data-visible-voice="Callirrhoe" onclick="selectVisibleVoice('Callirrhoe')"><span class="voice-selected-dot"></span><div class="voice-avatar-wrap"><img class="voice-avatar" src="callirrhoe.jpg" alt="Callirrhoe"><div class="voice-meta"><span class="voice-name">Callirrhoe</span><span class="voice-desc">အေးဆေးပေါ့ပါး သဘာဝသံ</span></div></div><div class="voice-card-actions"><button class="voice-select-btn" type="button" onclick="event.stopPropagation();selectVisibleVoice('Callirrhoe')">ရွေးမယ်</button><button class="voice-demo-btn" data-demo-voice="Callirrhoe" type="button" onclick="event.stopPropagation();previewVoice(event,'Callirrhoe')">▶ Preview</button></div></div>
-                        <div class="voice-library-card" data-visible-voice="Despina" onclick="selectVisibleVoice('Despina')"><span class="voice-selected-dot"></span><div class="voice-avatar-wrap"><img class="voice-avatar" src="despina.jpg" alt="Despina"><div class="voice-meta"><span class="voice-name">Despina</span><span class="voice-desc">ချောမွေ့ငြိမ့်ညောင်း ဇာတ်လမ်းသံ</span></div></div><div class="voice-card-actions"><button class="voice-select-btn" type="button" onclick="event.stopPropagation();selectVisibleVoice('Despina')">ရွေးမယ်</button><button class="voice-demo-btn" data-demo-voice="Despina" type="button" onclick="event.stopPropagation();previewVoice(event,'Despina')">▶ Preview</button></div></div>
-                    </div>
-                    <div class="voice-library-note" id="voiceDemoStatus">▶ Preview ကို ပထမဆုံးတစ်ခါသာ API သုံးပြီး Demo အသံကို သိမ်းမယ်။ နောက်ပိုင်း Play/Preview တိုင်း သိမ်းထားတဲ့အသံကိုပဲ ဖွင့်မယ်။</div>
                 </div>
 
                 <div style="margin-bottom:14px;">
@@ -1614,64 +1669,80 @@ audio{
         
         <div class="voice-grid">
             <div class="voice-category-title">👨‍🦱 ယောက်ျားလေး အသံများ</div>
-
+            
             <div class="voice-card-option" data-voice="Puck" onclick="selectVoiceOption('Puck', 'Puck (တက်ကြွလှုပ်ရှား လူငယ်သံ)')">
-                <div class="voice-card-main"><img class="voice-card-avatar" src="puck.jpg" alt="Puck"><div class="voice-card-info"><span class="voice-card-name">Puck</span><span class="voice-card-desc">တက်ကြွလှုပ်ရှား လူငယ်သံ</span></div></div>
-                <button class="voice-preview-btn" type="button" onclick="previewVoice(event,'Puck')">▶ Preview</button>
+                <div class="voice-card-info">
+                    <span class="voice-card-name">Puck</span>
+                    <span class="voice-card-desc">တက်ကြွလှုပ်ရှား လူငယ်သံ</span>
+                </div>
                 <div class="voice-card-radio"></div>
             </div>
 
             <div class="voice-card-option" data-voice="Charon" onclick="selectVoiceOption('Charon', 'Charon (သတင်း/ဗဟုသုတပေး တည်ငြိမ်သံ)')">
-                <div class="voice-card-main"><img class="voice-card-avatar" src="charon.jpg" alt="Charon"><div class="voice-card-info"><span class="voice-card-name">Charon</span><span class="voice-card-desc">သတင်း/ဗဟုသုတပေး တည်ငြိမ်သံ</span></div></div>
-                <button class="voice-preview-btn" type="button" onclick="previewVoice(event,'Charon')">▶ Preview</button>
+                <div class="voice-card-info">
+                    <span class="voice-card-name">Charon</span>
+                    <span class="voice-card-desc">သတင်း/ဗဟုသုတပေး တည်ငြိမ်သံ</span>
+                </div>
                 <div class="voice-card-radio"></div>
             </div>
 
             <div class="voice-card-option" data-voice="Fenrir" onclick="selectVoiceOption('Fenrir', 'Fenrir (စိတ်လှုပ်ရှားဖွယ် ဇာတ်လမ်းသံ)')">
-                <div class="voice-card-main"><img class="voice-card-avatar" src="fenrir.jpg" alt="Fenrir"><div class="voice-card-info"><span class="voice-card-name">Fenrir</span><span class="voice-card-desc">စိတ်လှုပ်ရှားဖွယ် ဇာတ်လမ်းသံ</span></div></div>
-                <button class="voice-preview-btn" type="button" onclick="previewVoice(event,'Fenrir')">▶ Preview</button>
+                <div class="voice-card-info">
+                    <span class="voice-card-name">Fenrir</span>
+                    <span class="voice-card-desc">စိတ်လှုပ်ရှားဖွယ် ဇာတ်လမ်းသံ</span>
+                </div>
                 <div class="voice-card-radio"></div>
             </div>
 
             <div class="voice-card-option" data-voice="Orus" onclick="selectVoiceOption('Orus', 'Orus (ပြတ်သားခိုင်မာ ရင့်ကျက်သံ)')">
-                <div class="voice-card-main"><img class="voice-card-avatar" src="orus.jpg" alt="Orus"><div class="voice-card-info"><span class="voice-card-name">Orus</span><span class="voice-card-desc">ပြတ်သားခိုင်မာ ရင့်ကျက်သံ</span></div></div>
-                <button class="voice-preview-btn" type="button" onclick="previewVoice(event,'Orus')">▶ Preview</button>
+                <div class="voice-card-info">
+                    <span class="voice-card-name">Orus</span>
+                    <span class="voice-card-desc">ပြတ်သားခိုင်မာ ရင့်ကျက်သံ</span>
+                </div>
                 <div class="voice-card-radio"></div>
             </div>
 
             <div class="voice-category-title">👩‍🦰 မိန်းကလေး အသံများ</div>
 
             <div class="voice-card-option" data-voice="Kore" onclick="selectVoiceOption('Kore', 'Kore (ပြတ်သားခိုင်မာ လူငယ်သံ)')">
-                <div class="voice-card-main"><img class="voice-card-avatar" src="kore.jpg" alt="Kore"><div class="voice-card-info"><span class="voice-card-name">Kore</span><span class="voice-card-desc">ပြတ်သားခိုင်မာ လူငယ်သံ</span></div></div>
-                <button class="voice-preview-btn" type="button" onclick="previewVoice(event,'Kore')">▶ Preview</button>
+                <div class="voice-card-info">
+                    <span class="voice-card-name">Kore</span>
+                    <span class="voice-card-desc">ပြတ်သားခိုင်မာ လူငယ်သံ</span>
+                </div>
                 <div class="voice-card-radio"></div>
             </div>
 
             <div class="voice-card-option" data-voice="Leda" onclick="selectVoiceOption('Leda', 'Leda (နုပျိုတက်ကြွ ချိုသာသံ)')">
-                <div class="voice-card-main"><img class="voice-card-avatar" src="leda.jpg" alt="Leda"><div class="voice-card-info"><span class="voice-card-name">Leda</span><span class="voice-card-desc">နုပျိုတက်ကြွ ချိုသာသံ</span></div></div>
-                <button class="voice-preview-btn" type="button" onclick="previewVoice(event,'Leda')">▶ Preview</button>
+                <div class="voice-card-info">
+                    <span class="voice-card-name">Leda</span>
+                    <span class="voice-card-desc">နုပျိုတက်ကြွ ချိုသာသံ</span>
+                </div>
                 <div class="voice-card-radio"></div>
             </div>
 
             <div class="voice-card-option" data-voice="Aoede" onclick="selectVoiceOption('Aoede', 'Aoede (ပေါ့ပါးလန်းဆန်း စကားပြောသံ)')">
-                <div class="voice-card-main"><img class="voice-card-avatar" src="aoede.jpg" alt="Aoede"><div class="voice-card-info"><span class="voice-card-name">Aoede</span><span class="voice-card-desc">ပေါ့ပါးလန်းဆန်း စကားပြောသံ</span></div></div>
-                <button class="voice-preview-btn" type="button" onclick="previewVoice(event,'Aoede')">▶ Preview</button>
+                <div class="voice-card-info">
+                    <span class="voice-card-name">Aoede</span>
+                    <span class="voice-card-desc">ပေါ့ပါးလန်းဆန်း စကားပြောသံ</span>
+                </div>
                 <div class="voice-card-radio"></div>
             </div>
 
             <div class="voice-card-option" data-voice="Callirrhoe" onclick="selectVoiceOption('Callirrhoe', 'Callirrhoe (အေးဆေးပေါ့ပါး သဘာဝသံ)')">
-                <div class="voice-card-main"><img class="voice-card-avatar" src="callirrhoe.jpg" alt="Callirrhoe"><div class="voice-card-info"><span class="voice-card-name">Callirrhoe</span><span class="voice-card-desc">အေးဆေးပေါ့ပါး သဘာဝသံ</span></div></div>
-                <button class="voice-preview-btn" type="button" onclick="previewVoice(event,'Callirrhoe')">▶ Preview</button>
+                <div class="voice-card-info">
+                    <span class="voice-card-name">Callirrhoe</span>
+                    <span class="voice-card-desc">အေးဆေးပေါ့ပါး သဘာဝသံ</span>
+                </div>
                 <div class="voice-card-radio"></div>
             </div>
 
             <div class="voice-card-option" data-voice="Despina" onclick="selectVoiceOption('Despina', 'Despina (ချောမွေ့ငြိမ့်ညောင်း ဇာတ်လမ်းသံ)')">
-                <div class="voice-card-main"><img class="voice-card-avatar" src="despina.jpg" alt="Despina"><div class="voice-card-info"><span class="voice-card-name">Despina</span><span class="voice-card-desc">ချောမွေ့ငြိမ့်ညောင်း ဇာတ်လမ်းသံ</span></div></div>
-                <button class="voice-preview-btn" type="button" onclick="previewVoice(event,'Despina')">▶ Preview</button>
+                <div class="voice-card-info">
+                    <span class="voice-card-name">Despina</span>
+                    <span class="voice-card-desc">ချောမွေ့ငြိမ့်ညောင်း ဇာတ်လမ်းသံ</span>
+                </div>
                 <div class="voice-card-radio"></div>
             </div>
-
-            <div id="voiceDemoStatus" class="voice-demo-status">▶ Preview ကို ပထမဆုံးတစ်ခါသာ API သုံးပြီး သိမ်းထားမည်။ နောက်တစ်ခါများ API မခေါ်တော့ပါ။</div>
         </div>
     </div>
 </div>
@@ -1853,166 +1924,6 @@ function selectVoiceOption(voiceVal, displayLabel) {
         }
     }
     closeVoicePicker();
-}
-
-
-/* SAVED VOICE DEMO: API is used only on the first Preview for each voice.
-   The generated WAV is stored in IndexedDB and every later Preview plays that saved blob. */
-const VOICE_DEMO_TEXTS = {
-    Puck: "မင်္ဂလာပါ၊ ကျွန်တော့နာမည်ကတော့ ပတ်ခ်ပါ။",
-    Charon: "မင်္ဂလာပါ၊ ကျွန်တော့နာမည်ကတော့ ချာကွန်ပါ။",
-    Fenrir: "မင်္ဂလာပါ၊ ကျွန်တော့နာမည်ကတော့ ဖန်နီယာပါ။",
-    Orus: "မင်္ဂလာပါ၊ ကျွန်တော့နာမည်ကတော့ အိုရပ်စ်ပါ။",
-    Kore: "မင်္ဂလာပါ၊ ကျွန်တော့နာမည်ကတော့ ကိုးရီးပါ။",
-    Leda: "မင်္ဂလာပါ၊ ကျွန်တော့နာမည်ကတော့ လီဒါပါ။",
-    Aoede: "မင်္ဂလာပါ၊ ကျွန်တော့နာမည်ကတော့ အိုအီဒီပါ။",
-    Callirrhoe: "မင်္ဂလာပါ၊ ကျွန်တော့နာမည်ကတော့ ကလီရိုပါ။",
-    Despina: "မင်္ဂလာပါ၊ ကျွန်တော့နာမည်ကတော့ ဒက်စ်ပီနာပါ။"
-};
-
-function getVoiceDemo(voice) {
-    return new Promise(async (resolve) => {
-        try {
-            const db = await openDB();
-            const tx = db.transaction(VOICE_DEMO_STORE, "readonly");
-            const req = tx.objectStore(VOICE_DEMO_STORE).get(voice);
-            req.onsuccess = () => resolve(req.result || null);
-            req.onerror = () => resolve(null);
-        } catch (e) {
-            console.warn("Voice demo read error", e);
-            resolve(null);
-        }
-    });
-}
-
-function saveVoiceDemo(voice, blob) {
-    return new Promise(async (resolve, reject) => {
-        try {
-            const db = await openDB();
-            const tx = db.transaction(VOICE_DEMO_STORE, "readwrite");
-            tx.objectStore(VOICE_DEMO_STORE).put({
-                voice,
-                text: VOICE_DEMO_TEXTS[voice] || "မင်္ဂလာပါ။",
-                audioBlob: blob,
-                savedAt: new Date().toISOString()
-            });
-            tx.oncomplete = () => resolve();
-            tx.onerror = () => reject(tx.error);
-        } catch (e) { reject(e); }
-    });
-}
-
-function setVoicePreviewButton(voice, state) {
-    const card = document.querySelector(`.voice-card-option[data-voice="${voice}"]`);
-    if (!card) return;
-    const btn = card.querySelector(".voice-preview-btn");
-    if (!btn) return;
-    btn.classList.toggle("saved", state === "saved");
-    btn.classList.toggle("loading", state === "loading");
-    btn.textContent = state === "loading" ? "⏳" : (state === "saved" ? "▶ Saved" : "▶ Preview");
-    document.querySelectorAll(`[data-demo-voice="${voice}"]`).forEach(b=>{ b.textContent = state === "loading" ? "⏳" : (state === "saved" ? "▶ Saved" : "▶ Preview"); b.classList.toggle("saved",state==="saved"); b.classList.toggle("loading",state==="loading"); });
-}
-
-
-function selectVisibleVoice(voice){
-    const labels={
-      Puck:'Puck (တက်ကြွလှုပ်ရှား လူငယ်သံ)',
-      Charon:'Charon (သတင်း/ဗဟုသုတပေး တည်ငြိမ်သံ)',
-      Fenrir:'Fenrir (စိတ်လှုပ်ရှားဖွယ် ဇာတ်လမ်းသံ)',
-      Orus:'Orus (ပြတ်သားခိုင်မာ ရင့်ကျက်သံ)',
-      Kore:'Kore (ပြတ်သားခိုင်မာ လူငယ်သံ)',
-      Leda:'Leda (နုပျိုတက်ကြွ ချိုသာသံ)',
-      Aoede:'Aoede (ပေါ့ပါးလန်းဆန်း စကားပြောသံ)',
-      Callirrhoe:'Callirrhoe (အေးဆေးပေါ့ပါး သဘာဝသံ)',
-      Despina:'Despina (ချောမွေ့ငြိမ့်ညောင်း ဇာတ်လမ်းသံ)'
-    };
-    singleVoiceValue=voice;
-    const t=document.getElementById('singleSelectedSpeakerText'); if(t) t.textContent=labels[voice]||voice;
-    document.querySelectorAll('[data-visible-voice]').forEach(c=>c.classList.toggle('selected',c.dataset.visibleVoice===voice));
-    document.querySelectorAll('.voice-card-option').forEach(c=>c.classList.toggle('selected',c.dataset.voice===voice));
-}
-
-async function previewVoice(event, voice) {
-    if (event) { event.preventDefault(); event.stopPropagation(); }
-
-    const status = document.getElementById("voiceDemoStatus");
-    const cached = await getVoiceDemo(voice);
-
-    if (cached && cached.audioBlob) {
-        const url = URL.createObjectURL(cached.audioBlob);
-        const audio = new Audio(url);
-        audio.playbackRate = 1;
-        audio.onended = () => URL.revokeObjectURL(url);
-        await audio.play();
-        setVoicePreviewButton(voice, "saved");
-        if (status) status.textContent = `▶ ${voice} — သိမ်းထားပြီးသား Demo ကိုဖွင့်နေပါတယ်။ API မသုံးပါ။`;
-        return;
-    }
-
-    const rawKeys = document.getElementById("apiKey")?.value.trim() || "";
-    if (!rawKeys) {
-        if (status) status.textContent = "🔑 ပထမဆုံး Demo သိမ်းရန် Gemini API Key ထည့်ထားရပါမယ်။";
-        return;
-    }
-
-    const keysList = rawKeys.split(",").map(k => k.trim()).filter(Boolean);
-    setVoicePreviewButton(voice, "loading");
-    if (status) status.textContent = `⏳ ${voice} Demo ကို ပထမဆုံးတစ်ခါ Generate လုပ်ပြီး အသံကို App ထဲမှာ အသေသိမ်းနေပါတယ်...`;
-
-    const text = VOICE_DEMO_TEXTS[voice] || `မင်္ဂလာပါ၊ ကျွန်တော့နာမည်ကတော့ ${voice} ပါ။`;
-    const prompt = `Clear, natural Burmese conversational tone.\n<speak xml:lang="my-MM"><speaker name="${voice}">${text}</speaker></speak>`;
-    const body = {
-        contents:[{ parts:[{ text:prompt }] }],
-        generationConfig:{
-            responseModalities:["AUDIO"],
-            temperature:0.6,
-            speechConfig:{ voiceConfig:{ prebuiltVoiceConfig:{ voiceName:voice } } }
-        }
-    };
-
-    let lastError = "";
-    for (const currentKey of keysList) {
-        try {
-            const response = await fetch(API_URL, {
-                method:"POST",
-                headers:{ "Content-Type":"application/json", "x-goog-api-key":currentKey },
-                body:JSON.stringify(body)
-            });
-            const data = await response.json().catch(()=>({}));
-            if (!response.ok) throw new Error(data?.error?.message || `HTTP ${response.status}`);
-
-            const base64 = data?.candidates?.[0]?.content?.parts?.find(p => p.inlineData)?.inlineData?.data;
-            if (!base64) throw new Error("Gemini က Demo Audio မပြန်လာပါ။");
-
-            const pcm = base64ToUint8Array(base64);
-            const wav = pcmToWav(pcm, 24000, 1, 16);
-            const blob = new Blob([wav], {type:"audio/wav"});
-            await saveVoiceDemo(voice, blob);
-
-            setVoicePreviewButton(voice, "saved");
-            if (status) status.textContent = `✅ ${voice} Demo ကို အသေသိမ်းပြီးပါပြီ။ နောက်တစ်ခါ ▶ နှိပ်ရင် API မခေါ်တော့ပါ။`;
-
-            const url = URL.createObjectURL(blob);
-            const audio = new Audio(url);
-            audio.playbackRate = 1;
-            audio.onended = () => URL.revokeObjectURL(url);
-            await audio.play();
-            return;
-        } catch (e) {
-            lastError = e?.message || "Unknown error";
-        }
-    }
-
-    setVoicePreviewButton(voice, "normal");
-    if (status) status.textContent = `❌ ${voice} Demo မသိမ်းနိုင်ပါ: ${lastError}`;
-}
-
-async function markSavedVoiceDemos() {
-    for (const voice of Object.keys(VOICE_DEMO_TEXTS)) {
-        const cached = await getVoiceDemo(voice);
-        if (cached?.audioBlob) setVoicePreviewButton(voice, "saved");
-        selectVisibleVoice(singleVoiceValue);
-    }
 }
 
 /* TAB SWITCHING */
@@ -2694,9 +2605,8 @@ function showSingleGenerateMessage(text, type){
 
 /* INDEXEDDB STORAGE */
 const DB_NAME = "VoiceStudioDB";
-const DB_VERSION = 2;
+const DB_VERSION = 1;
 const STORE_NAME = "audio_history";
-const VOICE_DEMO_STORE = "voice_demos";
 
 function openDB() {
     return new Promise((resolve, reject) => {
@@ -2705,9 +2615,6 @@ function openDB() {
             const db = e.target.result;
             if (!db.objectStoreNames.contains(STORE_NAME)) {
                 db.createObjectStore(STORE_NAME, { keyPath: "id" });
-            }
-            if (!db.objectStoreNames.contains(VOICE_DEMO_STORE)) {
-                db.createObjectStore(VOICE_DEMO_STORE, { keyPath: "voice" });
             }
         };
         request.onsuccess = (e) => resolve(e.target.result);
@@ -2837,7 +2744,103 @@ function escapeHTML(value){
         .replace(/'/g,"&#039;");
 }
 
-markSavedVoiceDemos();
+/* ================= SH PREMIUM VOICE DEMO CACHE ================= */
+const SH_DEMO_DB = 'SHVoiceDemoDB';
+const SH_DEMO_VERSION = 1;
+const SH_DEMO_STORE = 'voice_demos';
+const SH_DEMO_TEXT = {
+  Puck: 'မင်္ဂလာပါ၊ ကျွန်တော့်နာမည်ကတော့ ပတ်ခ်ပါ။',
+  Charon: 'မင်္ဂလာပါ၊ ကျွန်တော့်နာမည်ကတော့ ချာကွန်ပါ။',
+  Fenrir: 'မင်္ဂလာပါ၊ ကျွန်တော့်နာမည်ကတော့ ဖန်နီယာပါ။',
+  Orus: 'မင်္ဂလာပါ၊ ကျွန်တော့်နာမည်ကတော့ အိုရပ်စ်ပါ။',
+  Kore: 'မင်္ဂလာပါ၊ ကျွန်တော့်နာမည်ကတော့ ကိုးရီးပါ။',
+  Leda: 'မင်္ဂလာပါ၊ ကျွန်တော့်နာမည်ကတော့ လီဒါပါ။',
+  Aoede: 'မင်္ဂလာပါ၊ ကျွန်တော့်နာမည်ကတော့ အော်ဒီပါ။',
+  Callirrhoe: 'မင်္ဂလာပါ၊ ကျွန်တော့်နာမည်ကတော့ ကလီရိုးပါ။',
+  Despina: 'မင်္ဂလာပါ၊ ကျွန်တော့်နာမည်ကတော့ ဒက်စပီနာပါ။'
+};
+const SH_VOICES = [
+  ['Charon','တည်ငြိမ်ပြီး ရှင်းလင်းတဲ့ အသံ','charon.jpg'],
+  ['Puck','တက်ကြွလှုပ်ရှား လူငယ်သံ','puck.jpg'],
+  ['Fenrir','စိတ်လှုပ်ရှားဖွယ် ဇာတ်လမ်းသံ','fenrir.jpg'],
+  ['Orus','ပြတ်သားခိုင်မာ ရင့်ကျက်သံ','orus.jpg'],
+  ['Kore','ပြတ်သားခိုင်မာ လူငယ်သံ','kore.jpg'],
+  ['Leda','နုပျိုတက်ကြွ ချိုသာသံ','leda.jpg'],
+  ['Aoede','ပေါ့ပါးလန်းဆန်း စကားပြောသံ','aoede.jpg'],
+  ['Callirrhoe','အေးဆေးပေါ့ပါး သဘာဝသံ','callirrhoe.jpg'],
+  ['Despina','ချောမွေ့ငြိမ့်ညောင်း ဇာတ်လမ်းသံ','despina.jpg']
+];
+function shOpenDemoDB(){
+  return new Promise((resolve,reject)=>{
+    const r=indexedDB.open(SH_DEMO_DB,SH_DEMO_VERSION);
+    r.onupgradeneeded=e=>{const db=e.target.result;if(!db.objectStoreNames.contains(SH_DEMO_STORE))db.createObjectStore(SH_DEMO_STORE,{keyPath:'voice'});};
+    r.onsuccess=()=>resolve(r.result); r.onerror=()=>reject(r.error);
+  });
+}
+async function shGetDemo(voice){
+  const db=await shOpenDemoDB();
+  return new Promise((resolve,reject)=>{const tx=db.transaction(SH_DEMO_STORE,'readonly');const r=tx.objectStore(SH_DEMO_STORE).get(voice);r.onsuccess=()=>resolve(r.result||null);r.onerror=()=>reject(r.error);});
+}
+async function shSaveDemo(voice,blob){
+  const db=await shOpenDemoDB();
+  return new Promise((resolve,reject)=>{const tx=db.transaction(SH_DEMO_STORE,'readwrite');tx.objectStore(SH_DEMO_STORE).put({voice,blob,createdAt:Date.now()});tx.oncomplete=()=>resolve();tx.onerror=()=>reject(tx.error);});
+}
+function shMarkCached(voice,cached=true){
+  const card=document.querySelector(`.premium-voice-card[data-voice="${voice}"]`);
+  if(card)card.classList.toggle('cached',cached);
+  const btn=card?.querySelector('.preview');
+  if(btn && cached)btn.textContent='▶ Play';
+}
+async function shRefreshCacheMarks(){
+  for(const [voice] of SH_VOICES){try{if(await shGetDemo(voice))shMarkCached(voice,true);}catch(e){}}
+}
+function shRenderVoiceLibrary(){
+  const grid=document.getElementById('premiumVoiceGrid'); if(!grid)return;
+  grid.innerHTML=SH_VOICES.map(([voice,desc,img])=>`<article class="premium-voice-card" data-voice="${voice}">
+    <div class="voice-avatar-wrap"><img class="premium-voice-avatar" src="${img}" alt="${voice}" onerror="this.src='Logo.png.png'"><span class="voice-cached-dot"></span></div>
+    <div class="voice-name-row"><strong>${voice}</strong><span class="voice-mini-tag">GEMINI TTS</span></div>
+    <div class="voice-desc">${desc}</div>
+    <div class="voice-card-actions"><button class="preview" type="button" onclick="shPreviewVoice('${voice}',this)">▶ Preview</button><button type="button" onclick="shChooseVoice('${voice}')">✓ Use</button></div>
+  </article>`).join('');
+  shRefreshCacheMarks();
+}
+function shChooseVoice(voice){
+  singleVoiceValue=voice;
+  const labels={Puck:'Puck (တက်ကြွလှုပ်ရှား လူငယ်သံ)',Charon:'Charon (သတင်း/ဗဟုသုတပေး တည်ငြိမ်သံ)',Fenrir:'Fenrir (စိတ်လှုပ်ရှားဖွယ် ဇာတ်လမ်းသံ)',Orus:'Orus (ပြတ်သားခိုင်မာ ရင့်ကျက်သံ)',Kore:'Kore (ပြတ်သားခိုင်မာ လူငယ်သံ)',Leda:'Leda (နုပျိုတက်ကြွ ချိုသာသံ)',Aoede:'Aoede (ပေါ့ပါးလန်းဆန်း စကားပြောသံ)',Callirrhoe:'Callirrhoe (အေးဆေးပေါ့ပါး သဘာဝသံ)',Despina:'Despina (ချောမွေ့ငြိမ့်ညောင်း ဇာတ်လမ်းသံ)'};
+  const el=document.getElementById('singleSelectedSpeakerText');if(el)el.textContent=labels[voice]||voice;
+  switchTab('singleTab');
+  document.getElementById('singleTab')?.scrollIntoView({behavior:'smooth',block:'start'});
+}
+async function shPreviewVoice(voice,button){
+  try{
+    const cached=await shGetDemo(voice);
+    if(cached?.blob){shMarkCached(voice,true);const u=URL.createObjectURL(cached.blob);const a=new Audio(u);a.onended=()=>URL.revokeObjectURL(u);await a.play();return;}
+    const raw=(document.getElementById('apiKey')?.value||'').trim();
+    if(!raw){alert('အရင်ဆုံး Gemini API Key ထည့်ပြီး Save လုပ်ပါ။');return;}
+    const keys=raw.split(',').map(k=>k.trim()).filter(Boolean);
+    button.disabled=true;button.textContent='⏳ Creating...';
+    const prompt=`Clear, natural Burmese voice demo. Say exactly this sentence naturally: ${SH_DEMO_TEXT[voice]||`မင်္ဂလာပါ၊ ကျွန်တော့်နာမည်ကတော့ ${voice} ပါ။`}`;
+    const body={contents:[{parts:[{text:prompt}]}],generationConfig:{responseModalities:['AUDIO'],temperature:0.6,speechConfig:{voiceConfig:{prebuiltVoiceConfig:{voiceName:voice}}}}};
+    let blob=null,last='';
+    for(const key of keys){
+      try{
+        const res=await fetch(API_URL,{method:'POST',headers:{'Content-Type':'application/json','x-goog-api-key':key},body:JSON.stringify(body)});
+        const data=await res.json().catch(()=>({}));
+        if(!res.ok)throw new Error(data?.error?.message||`HTTP ${res.status}`);
+        const b64=data?.candidates?.[0]?.content?.parts?.find(p=>p.inlineData)?.inlineData?.data;
+        if(!b64)throw new Error('Audio Data မပြန်လာပါ။');
+        const wav=pcmToWav(base64ToUint8Array(b64),24000,1,16);
+        blob=new Blob([wav],{type:'audio/wav'});break;
+      }catch(e){last=e.message||'Unknown error';}
+    }
+    if(!blob)throw new Error(last||'Preview မအောင်မြင်ပါ။');
+    await shSaveDemo(voice,blob);shMarkCached(voice,true);
+    const u=URL.createObjectURL(blob);const a=new Audio(u);a.onended=()=>URL.revokeObjectURL(u);await a.play();
+  }catch(e){alert('Preview မအောင်မြင်ပါ။\n\n'+(e.message||e));}
+  finally{button.disabled=false;button.textContent='▶ Play';}
+}
+window.addEventListener('DOMContentLoaded',()=>{shRenderVoiceLibrary();});
+
 </script>
 </body>
 </html>
