@@ -1382,13 +1382,15 @@ body{background:radial-gradient(circle at 50% -10%,rgba(32,104,255,.16),transpar
                 <p style="font-size: 10px; color: #34d399; margin: 0;">● API Key Connected</p>
             </div>
         </div>
-        <button onclick="switchView('settings')" style="background: rgba(0, 140, 255, 0.15); border: 1px solid rgba(0, 140, 255, 0.4); color: #00baff; font-size: 11px; font-weight: bold; padding: 6px 12px; border-radius: 8px; cursor: pointer; box-shadow: 0 0 10px rgba(0,186,255,0.2);">
-            Manage Keys <i class="fa-solid fa-arrow-right" style="font-size: 9px; margin-left: 4px;"></i>
-        </button>
+  
     </div>
 
 </div>
   </div>
+  <button onclick="switchView('settings', this)" class="...">
+    Manage Keys <i class="fa-solid fa-arrow-right"></i>
+</button>
+</div>
 <div id="voiceStudio" class="app-view" style="display: none;">
 
         <!-- 1. အပြင်ဘက်မှာ အမြဲပေါ်နေမယ့် Header နဲ့ Tab ခလုတ်များ -->
@@ -1758,38 +1760,39 @@ body{background:radial-gradient(circle at 50% -10%,rgba(32,104,255,.16),transpar
   <div class="premium-section-label"><strong>🎛️ Studio Workspace</strong><span>YOUR EXISTING TOOLS</span></div>
 </div>
 
+        <!-- SETTINGS / API KEYS VIEW -->
+<div id="settings" class="app-view" style="display: none;">
+    <div class="section" style="background: rgba(13, 27, 42, 0.85); border: 1px solid rgba(0, 186, 255, 0.4); border-radius: 16px; padding: 20px; box-shadow: 0 0 20px rgba(0, 186, 255, 0.15); margin-bottom: 20px;">
 
-        <!-- SHARED API KEY SECTION -->
-        <div class="section">
-
-            <div class="section-title">
-                <div>
-                    <h2>🔑 Gemini API Keys</h2>
-                    <div class="subtitle">Google Gemini API Key စတင် သတ်မှတ်ပါ</div>
-                </div>
-                <span id="keyStatus" class="status">Missing</span>
+        <div class="section-title" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+            <div>
+                <h2 style="font-size: 16px; color: #00baff; margin: 0; text-shadow: 0 0 8px rgba(0,186,255,0.5);">🔑 Gemini API Keys</h2>
+                <div class="subtitle" style="font-size: 11px; color: #8eb0cb; margin-top: 3px;">Google Gemini API Key စတင် သတ်မှတ်ပါ</div>
             </div>
+            <span id="keyStatus" class="status" style="background: rgba(255,77,77,0.15); color: #ff4d4d; padding: 4px 10px; border-radius: 8px; font-size: 10px; border: 1px solid rgba(255,77,77,0.3);">Missing</span>
+        </div>
 
-            <div class="input-wrap">
-                <input id="apiKey" class="key-input" type="password" placeholder="Gemini API Key ထည့်ပါ..." autocomplete="off">
-                <button class="eye" onclick="toggleKey()" type="button">👁️</button>
-            </div>
+        <div class="input-wrap" style="position: relative; margin-bottom: 15px;">
+            <input id="apiKey" class="key-input" type="password" placeholder="Gemini API Key ထည့်ပါ..." autocomplete="off" style="width: 100%; background: rgba(6, 26, 53, 0.95); border: 1px solid #008cff; border-radius: 10px; padding: 12px 40px 12px 12px; color: #fff; outline: none; box-sizing: border-box;">
+            <button class="eye" onclick="toggleKey()" type="button" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; font-size: 16px;">👁️</button>
+        </div>
 
-            <label class="checkbox-row">
-                <input id="saveKey" type="checkbox" checked>
-                App ထဲမှာ API Keys ကို မှတ်ထားမည်
-            </label>
+        <label class="checkbox-row" style="display: flex; align-items: center; gap: 8px; font-size: 12px; color: #8eb0cb; margin-bottom: 20px; cursor: pointer;">
+            <input id="saveKey" type="checkbox" checked style="accent-color: #00baff; width: 16px; height: 16px;">
+            App ထဲမှာ API Keys ကို မှတ်ထားမည်
+        </label>
 
-            <div class="buttons">
-                <button class="btn" onclick="saveKey()">💾 Save</button>
-                <button class="btn" onclick="testKey()">⚡ Test Key</button>
-                <button class="btn" onclick="changeKey()">✏️ Change</button>
-                <button class="btn btn-danger" onclick="removeKey()">🗑️ Remove</button>
-            </div>
+        <div class="buttons" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
+            <button class="btn" onclick="saveKey()" style="background: #00baff; color: #061a35; border: none; border-radius: 10px; padding: 12px; font-weight: bold; cursor: pointer; box-shadow: 0 0 10px rgba(0,186,255,0.4);">💾 Save</button>
+            <button class="btn" onclick="testKey()" style="background: rgba(0,186,255,0.15); color: #00baff; border: 1px solid #00baff; border-radius: 10px; padding: 12px; font-weight: bold; cursor: pointer;">⚡ Test Key</button>
+            <button class="btn" onclick="changeKey()" style="background: rgba(142,176,203,0.15); color: #8eb0cb; border: 1px solid #8eb0cb; border-radius: 10px; padding: 12px; font-weight: bold; cursor: pointer;">✏️ Change</button>
+            <button class="btn btn-danger" onclick="removeKey()" style="background: rgba(255,77,77,0.15); color: #ff4d4d; border: 1px solid #ff4d4d; border-radius: 10px; padding: 12px; font-weight: bold; cursor: pointer;">🗑️ Remove</button>
+        </div>
 
-            <div id="keyMessage" class="message"></div>
-        </div>   
-                 
+        <div id="keyMessage" class="message" style="margin-top: 12px; font-size: 12px; text-align: center;"></div>
+    </div>
+</div>
+
 
 <!-- CUSTOM VOICE PICKER MODAL -->
 <div id="voicePickerModal" class="voice-picker-modal">
