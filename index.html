@@ -229,6 +229,16 @@ position: relative;
     padding:0;
 }
 
+/* Neon Blue Glowing Placeholder */
+.speech-textarea::placeholder {
+    color: rgba(0, 243, 255, 0.5);
+    text-shadow: 0 0 8px rgba(0, 243, 255, 0.4);
+}
+
+.speech-textarea:focus {
+    box-shadow: 0 0 15px rgba(0, 243, 255, 0.3);
+}
+
 /* Single နဲ့ Multi နှစ်ခုလုံး ၁၀၀% ဒီဇိုင်းတူညီစေမည့် Trigger Box CSS */
 .style-trigger-box {
   width: 100%;
@@ -1366,6 +1376,41 @@ body{background:radial-gradient(circle at 50% -10%,rgba(32,104,255,.16),transpar
         </button>
     </div>
 
+</div>
+<!-- Voice Studio (Single Mode View) -->
+<div id="voiceStudio" class="view-container" style="display: none;">
+    <div class="p-4 space-y-4">
+        
+        <!-- Header / Mode Switch Indicator -->
+        <div class="flex justify-between items-center bg-slate-900/60 p-3 rounded-2xl border border-cyan-500/30 backdrop-blur-md">
+            <span class="text-cyan-400 font-semibold text-sm">🎙️ AI Voice Studio (Single Mode)</span>
+            <!-- နောက်ပိုင်း Multi Mode ကိုပြောင်းမယ့် Switcher ထည့်လို့ရမယ့်နေရာ -->
+        </div>
+
+        <!-- Voice Style Selection Card -->
+        <div class="bg-slate-900/40 border border-cyan-500/30 rounded-2xl p-4 backdrop-blur-md shadow-[0_0_15px_rgba(0,243,255,0.1)]">
+            <label class="text-xs text-cyan-300 font-medium block mb-2">Select Voice Style</label>
+            <div class="grid grid-cols-2 gap-2">
+                <button type="button" class="p-2.5 rounded-xl border border-cyan-500 bg-cyan-500/20 text-cyan-200 text-xs font-medium text-center shadow-[0_0_10px_rgba(0,243,255,0.3)]">Natural Dialogue</button>
+                <button type="button" class="p-2.5 rounded-xl border border-cyan-500/30 bg-slate-800/50 text-slate-300 text-xs font-medium text-center hover:border-cyan-500">Warm</button>
+                <button type="button" class="p-2.5 rounded-xl border border-cyan-500/30 bg-slate-800/50 text-slate-300 text-xs font-medium text-center hover:border-cyan-500">Movie Dialogue</button>
+                <button type="button" class="p-2.5 rounded-xl border border-cyan-500/30 bg-slate-800/50 text-slate-300 text-xs font-medium text-center hover:border-cyan-500">Excited</button>
+            </div>
+        </div>
+
+        <!-- Script Text Area Card -->
+        <div class="bg-slate-900/40 border border-cyan-500/30 rounded-2xl p-4 backdrop-blur-md shadow-[0_0_15px_rgba(0,243,255,0.1)]">
+            <label class="text-xs text-cyan-300 font-medium block mb-2">Script / Text Input</label>
+            <textarea id="singleScriptText" rows="5" class="w-full bg-slate-950/60 border border-cyan-500/40 rounded-xl p-3 text-white text-sm focus:outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-500/30 speech-textarea" placeholder="စာသားများ ရိုက်ထည့်ပါ..."></textarea>
+            
+            <!-- Action Buttons -->
+            <div class="flex gap-3 mt-3">
+                <button type="button" class="flex-1 py-2.5 px-4 rounded-xl border border-cyan-500/40 bg-cyan-950/30 text-cyan-300 text-xs font-semibold hover:bg-cyan-500/20 transition">Preview</button>
+                <button type="button" class="flex-1 py-2.5 px-4 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 text-slate-950 text-xs font-bold shadow-[0_0_15px_rgba(0,243,255,0.4)] hover:brightness-110 transition">Generate Audio</button>
+            </div>
+        </div>
+
+    </div>
 </div>
 
 <!-- Lock Screen Display Start -->
