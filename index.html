@@ -1377,6 +1377,7 @@ body{background:radial-gradient(circle at 50% -10%,rgba(32,104,255,.16),transpar
     </div>
 
 </div>
+
 <!-- Voice Studio (Single Mode View) -->
 <div id="voiceStudio" class="view-container" style="display: none;">
     <div class="p-4 space-y-4">
@@ -2749,7 +2750,15 @@ function writeString(view, offset, string){
         view.setUint8(offset + i, string.charCodeAt(i));
     }
 }
-
+  function switchView(viewId) {
+    const views = document.querySelectorAll('.view-container');
+    views.forEach(v => v.style.display = 'none');
+    
+    const target = document.getElementById(viewId);
+    if (target) {
+        target.style.display = 'block';
+    }
+}
 function showGenerateMessage(text, type){
     const box = document.getElementById("generateMessage");
     box.textContent = text;
