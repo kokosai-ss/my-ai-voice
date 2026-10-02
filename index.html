@@ -1269,6 +1269,24 @@ body{background:radial-gradient(circle at 50% -10%,rgba(32,104,255,.16),transpar
 .animated-wave {
     animation: wavePulse 1.5s infinite ease-in-out;
 }
+    .voice-library-grid {
+    display: grid !important;
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 8px !important;
+    justify-content: center !important;
+    align-items: center !important;
+}
+.voice-card img, 
+#premiumVoiceGrid img {
+    display: block !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+}
+
+.voice-card {
+    text-align: center !important;
+}
+
 </style>
 
 </head>
@@ -2935,11 +2953,11 @@ const SH_DEMO_TEXT = {
   Charon: 'မင်္ဂလာပါ၊ ကျွန်တော့်နာမည်ကတော့ ချာကွန်ပါ။',
   Fenrir: 'မင်္ဂလာပါ၊ ကျွန်တော့်နာမည်ကတော့ ဖန်နီယာပါ။',
   Orus: 'မင်္ဂလာပါ၊ ကျွန်တော့်နာမည်ကတော့ အိုရပ်စ်ပါ။',
-  Kore: 'မင်္ဂလာပါ၊ ကျွန်တော့်နာမည်ကတော့ ကိုးရီးပါ။',
-  Leda: 'မင်္ဂလာပါ၊ ကျွန်တော့်နာမည်ကတော့ လီဒါပါ။',
-  Aoede: 'မင်္ဂလာပါ၊ ကျွန်တော့်နာမည်ကတော့ အော်ဒီပါ။',
-  Callirrhoe: 'မင်္ဂလာပါ၊ ကျွန်တော့်နာမည်ကတော့ ကလီရိုးပါ။',
-  Despina: 'မင်္ဂလာပါ၊ ကျွန်တော့်နာမည်ကတော့ ဒက်စပီနာပါ။'
+  Kore: 'မင်္ဂလာပါ၊ ကျွန်မနာမည်ကတော့ ကိုးရီးပါ။',
+  Leda: 'မင်္ဂလာပါ၊ ကျွန်မနာမည်ကတော့ လီဒါပါ။',
+  Aoede: 'မင်္ဂလာပါ၊ ကျွန်မနာမည်ကတော့ အော်ဒီပါ။',
+  Callirrhoe: 'မင်္ဂလာပါ၊ ကျွန်မနာမည်ကတော့ ကလီရိုးပါ။',
+  Despina: 'မင်္ဂလာပါ၊ ကျွန်မနာမည်ကတော့ ဒက်စပီနာပါ။'
 };
 const SH_VOICES = [
   ['Charon','တည်ငြိမ်ပြီး ရှင်းလင်းတဲ့ အသံ','charon.jpg'],
