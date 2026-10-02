@@ -1927,11 +1927,11 @@ let audioURL = null;
 let singleAudioURL = null;
 let blockCounter = 0;
 
-/* LOCK SCREEN CONTROLS */
+    /* PURE LOCK SCREEN CONTROLS */
 function togglePasswordVisibility() {
     const input = document.getElementById('passInput');
     const eyeIcon = document.getElementById('eyeIcon');
-    if (!input) return; // 👉 ဒီလိုင်းလေးက Error တက်ပြီး Script မရပ်သွားအောင် ကာကွယ်ပေးပါတယ်
+    if (!input) return;
     
     if (input.type === 'password') {
         input.type = 'text';
@@ -1950,52 +1950,39 @@ function togglePasswordVisibility() {
 
 function checkUnlockPassword() {
     const inputField = document.getElementById('passInput');
-    if (!inputField) return;
+    if (!inputField) {
+        alert('❌ passInput ID ကို ရှာမတွေ့ပါ။');
+        return;
+    }
     
-    const input = inputField.value;
+    const password = inputField.value.trim();
 
-    if (input === '') {
+    if (password === '') {
         alert('ကျေးဇူးပြု၍ စကားဝှက် ရိုက်ထည့်ပါ!');
-    } else if (input === '1911999') {
-        // ၁။ Lock Screen ကို ဖျောက်မည်
-        const lockScreen = document.getElementById('cyberpunk-lockscreen') || document.getElementById('lockScreen');
+        return;
+    } 
+    
+    if (password === '1911999') {
+        // ၁။ Lock Screen ကို လုံးဝ ဖျောက်မည်
+        const lockScreen = document.getElementById('cyberpunk-lockscreen');
         if (lockScreen) {
-            lockScreen.style.transition = 'opacity 0.5s ease';
-            lockScreen.style.opacity = '0';
-            setTimeout(() => {
-                lockScreen.style.display = 'none';
-            }, 500);
+            lockScreen.style.display = 'none';
+        } else {
+            alert('❌ cyberpunk-lockscreen ID ကို ရှာမတွေ့ပါ။');
         }
 
-        // ၂။ ပင်မ App Container ကို ပေါ်စေရန်
-        const appContent = document.getElementById("appContent");
+        // ၂။ ပင်မ App Content ကို ပေါ်လာစေမည်
+        const appContent = document.getElementById('appContent');
         if (appContent) {
-            appContent.style.display = "block";
-        }
-
-        // ၃။ Studio View နဲ့ Single Tab ကို ဖွင့်ရန်
-        if (typeof switchView === 'function') {
-            switchView('voiceStudio');
-        }
-        if (typeof switchTab === 'function') {
-            switchTab('single');
-        }
-
-        // ၄။ API Key စစ်ရန်
-        if (typeof getStoredKey === 'function') {
-            const saved = getStoredKey();
-            if (saved) {
-                const apiKeyEl = document.getElementById("apiKey");
-                if (apiKeyEl) apiKeyEl.value = saved;
-            }
-        }
-        if (typeof updateKeyStatus === 'function') {
-            updateKeyStatus();
+            appContent.style.display = 'block';
+        } else {
+            alert('❌ appContent ID ကို ရှာမတွေ့ပါ။');
         }
     } else {
         alert('စကားဝှက် မှားယွင်းနေပါသည်။');
     }
-}        
+}
+    
 /* FORMAT & STYLE MODAL LOGICS */
 function setAudioFormat(formatValue) {
   const btnWav = document.getElementById('btnWav');
