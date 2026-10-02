@@ -2099,13 +2099,14 @@ function switchTab(tabId) {
     document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
     document.querySelectorAll('.page-content').forEach(page => page.classList.remove('active'));
     
-    if(tabId === 'singleTab') {
+       if(tabId === 'single' || tabId === 'singleTab') {
         document.querySelectorAll('.tab-btn')[0].classList.add('active');
         document.getElementById('singleTab').classList.add('active');
     } else {
         document.querySelectorAll('.tab-btn')[1].classList.add('active');
         document.getElementById('multiTab').classList.add('active');
     }
+}
 }
 /* SIDEBAR & OPTIONS */
 function openSidebar() {
