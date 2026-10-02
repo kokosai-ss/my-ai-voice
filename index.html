@@ -1931,6 +1931,8 @@ let blockCounter = 0;
 function togglePasswordVisibility() {
     const input = document.getElementById('passInput');
     const eyeIcon = document.getElementById('eyeIcon');
+    if (!input) return; // 👉 ဒီလိုင်းလေးက Error တက်ပြီး Script မရပ်သွားအောင် ကာကွယ်ပေးပါတယ်
+    
     if (input.type === 'password') {
         input.type = 'text';
         if (eyeIcon) {
@@ -1945,6 +1947,7 @@ function togglePasswordVisibility() {
         }
     }
 }
+
 function checkUnlockPassword() {
     const inputField = document.getElementById('passInput');
     if (!inputField) return;
@@ -1992,7 +1995,7 @@ function checkUnlockPassword() {
     } else {
         alert('စကားဝှက် မှားယွင်းနေပါသည်။');
     }
-}
+}        
 /* FORMAT & STYLE MODAL LOGICS */
 function setAudioFormat(formatValue) {
   const btnWav = document.getElementById('btnWav');
