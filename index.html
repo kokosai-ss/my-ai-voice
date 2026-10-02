@@ -1648,7 +1648,7 @@ body{background:radial-gradient(circle at 50% -10%,rgba(32,104,255,.16),transpar
 
       <div class="input-group">
     <i class="fa-solid fa-lock left-icon"></i>
-    <input type="password" id="passInput" placeholder="Password ရိုက်ထည့်ပါ..." onkeydown="if(event.key === 'Enter') checkUnlockPassword()">
+    <input type="password" id="passInput" placeholder="Password ရိုက်ထည့်ပါ..." onkeydown="if(event.key ==='Enter') checkUnlockPassword()">
     <!-- 👁️ မျက်လုံး Icon လေး အလုပ်လုပ်အောင် id="eyeIcon" ထည့်ထားပေးပါသည် -->
     <i class="fa-regular fa-eye right-icon" id="eyeIcon" onclick="togglePasswordVisibility()"></i>
 </div>
@@ -1966,14 +1966,6 @@ function checkUnlockPassword() {
         const appContent = document.getElementById("appContent");
         if (appContent) {
             appContent.style.display = "block";
-        }
-
-        // ၂။ Studio View နဲ့ Single Tab ကို ဖွင့်ရန်
-        if (typeof switchView === 'function') {
-            switchView('voiceStudio');
-        }
-        if (typeof switchTab === 'function') {
-            switchTab('single');
         }
 
         const saved = getStoredKey();
