@@ -1962,7 +1962,13 @@ function checkUnlockPassword() {
             }, 500);
         }
 
-        // 👉 ဒီနေရာမှာ Studio View နဲ့ Single Tab ပါ တွဲဖွင့်ပေးရန်
+        // ၁။ ပင်မ App Container ကြီးကို ပေါ်လာစေရန်
+        const appContent = document.getElementById("appContent");
+        if (appContent) {
+            appContent.style.display = "block";
+        }
+
+        // ၂။ Studio View နဲ့ Single Tab ကို ဖွင့်ရန်
         if (typeof switchView === 'function') {
             switchView('voiceStudio');
         }
@@ -1979,6 +1985,7 @@ function checkUnlockPassword() {
         alert('စကားဝှက် မှားယွင်းနေပါသည်။');
     }
 }
+
 
 /* FORMAT & STYLE MODAL LOGICS */
 function setAudioFormat(formatValue) {
