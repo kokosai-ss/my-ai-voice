@@ -1945,15 +1945,17 @@ function togglePasswordVisibility() {
         }
     }
 }
-
 function checkUnlockPassword() {
-    const input = document.getElementById('passInput').value;
+    const inputField = document.getElementById('passInput');
+    if (!inputField) return;
+    
+    const input = inputField.value;
 
     if (input === '') {
         alert('ကျေးဇူးပြု၍ စကားဝှက် ရိုက်ထည့်ပါ!');
     } else if (input === '1911999') {
-
-        const lockScreen = document.getElementById('cyberpunk-lockscreen');
+        // ၁။ Lock Screen ကို ဖျောက်မည်
+        const lockScreen = document.getElementById('cyberpunk-lockscreen') || document.getElementById('lockScreen');
         if (lockScreen) {
             lockScreen.style.transition = 'opacity 0.5s ease';
             lockScreen.style.opacity = '0';
@@ -1962,23 +1964,35 @@ function checkUnlockPassword() {
             }, 500);
         }
 
-        // ၁။ ပင်မ App Container ကြီးကို ပေါ်လာစေရန်
+        // ၂။ ပင်မ App Container ကို ပေါ်စေရန်
         const appContent = document.getElementById("appContent");
         if (appContent) {
             appContent.style.display = "block";
         }
 
-        const saved = getStoredKey();
-        if (saved) {
-            document.getElementById("apiKey").value = saved;
+        // ၃။ Studio View နဲ့ Single Tab ကို ဖွင့်ရန်
+        if (typeof switchView === 'function') {
+            switchView('voiceStudio');
         }
-        updateKeyStatus();
+        if (typeof switchTab === 'function') {
+            switchTab('single');
+        }
+
+        // ၄။ API Key စစ်ရန်
+        if (typeof getStoredKey === 'function') {
+            const saved = getStoredKey();
+            if (saved) {
+                const apiKeyEl = document.getElementById("apiKey");
+                if (apiKeyEl) apiKeyEl.value = saved;
+            }
+        }
+        if (typeof updateKeyStatus === 'function') {
+            updateKeyStatus();
+        }
     } else {
         alert('စကားဝှက် မှားယွင်းနေပါသည်။');
     }
 }
-
-
 /* FORMAT & STYLE MODAL LOGICS */
 function setAudioFormat(formatValue) {
   const btnWav = document.getElementById('btnWav');
@@ -2080,7 +2094,19 @@ function selectVoiceOption(voiceVal, displayLabel) {
     }
     closeVoicePicker();
 }
-
+/* TAB SWITCHING */
+function switchTab(tabId) {
+    document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+    document.querySelectorAll('.page-content').forEach(page => page.classList.remove('active'));
+    
+    if(tabId === 'singleTab') {
+        document.querySelectorAll('.tab-btn')[0].classList.add('active');
+        document.getElementById('singleTab').classList.add('active');
+    } else {
+        document.querySelectorAll('.tab-btn')[1].classList.add('active');
+        document.getElementById('multiTab').classList.add('active');
+    }
+}
 /* SIDEBAR & OPTIONS */
 function openSidebar() {
     document.getElementById("mySidebar").style.left = "0";
