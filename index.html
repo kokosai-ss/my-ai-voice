@@ -1276,14 +1276,19 @@ body{background:radial-gradient(circle at 50% -10%,rgba(32,104,255,.16),transpar
     justify-content: center !important;
     align-items: center !important;
 }
+
 .voice-card img, 
 #premiumVoiceGrid img {
     display: block !important;
-    margin-left: auto !important;
-    margin-right: auto !important;
+    margin: 0 auto !important;
+    object-fit: cover !important;
+    object-position: center center !important;
 }
 
 .voice-card {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
     text-align: center !important;
 }
 
