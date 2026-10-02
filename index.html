@@ -1277,6 +1277,20 @@ body{background:radial-gradient(circle at 50% -10%,rgba(32,104,255,.16),transpar
     align-items: center !important;
 }
 
+.voice-card {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    text-align: center !important;
+}
+
+/* ပုံပါတဲ့ container (သို့) wrapper ကို အလယ်ပို့ရန် */
+.voice-card > div {
+    display: flex !important;
+    justify-content: center !important;
+    width: 100% !important;
+}
+
 .voice-card img, 
 #premiumVoiceGrid img {
     display: block !important;
@@ -1285,12 +1299,6 @@ body{background:radial-gradient(circle at 50% -10%,rgba(32,104,255,.16),transpar
     object-position: center center !important;
 }
 
-.voice-card {
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: center !important;
-    text-align: center !important;
-}
 
 </style>
 
