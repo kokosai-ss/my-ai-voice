@@ -2787,9 +2787,12 @@ function writeString(view, offset, string){
 
     // ၄။ အခု နှိပ်လိုက်တဲ့ ခလုတ်ကိုပဲ အပြာရောင် (Active) ဖြစ်စေမယ်
     if (element) {
-        element.style.color = '#00baff';
-    }
-  }
+    element.style.color = '#00baff';
+}
+
+if (viewId === 'voiceGenerator') {
+    shRenderVoiceLibrary();
+}
 function showGenerateMessage(text, type){
     const box = document.getElementById("generateMessage");
     box.textContent = text;
