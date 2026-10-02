@@ -1295,7 +1295,7 @@ body{background:radial-gradient(circle at 50% -10%,rgba(32,104,255,.16),transpar
 <!-- ========================================== -->
 <!-- 1. MAIN DASHBOARD (Complete & Final) -->
 <!-- ========================================== -->
-<div id="mainDashboard" class="app-view" style="display: block; padding: 16px; font-family: 'Myanmar Sans Pro', sans-serif; color: #fff;">
+<div id="mainDashboard" class="view-container" style="display: block; padding: 16px; font-family: 'Myanmar Sans Pro', sans-serif; color: #fff;">
 
   <!-- အသံလှိုင်း Animation အတွက် CSS -->
     <style>
@@ -1404,7 +1404,7 @@ body{background:radial-gradient(circle at 50% -10%,rgba(32,104,255,.16),transpar
     </button>
 </div>
 
-<div id="voiceStudio" class="app-view” style="display: none;">
+<div id="voiceStudio" class="view-cotainer” style="display: none;">
 
         <!-- 1. အပြင်ဘက်မှာ အမြဲပေါ်နေမယ့် Header နဲ့ Tab ခလုတ်များ -->
 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; padding: 0 4px;">
@@ -1618,7 +1618,7 @@ body{background:radial-gradient(circle at 50% -10%,rgba(32,104,255,.16),transpar
   
       </div>
   <!-- Generator View -->
-<div id="generator" class="app-view">
+<div id="voiceGenerator" class="view-container">
     <div class="voice-library">
         <div class="library-head">
           <div><h3>Voice Library</h3><p>အသံမရွေးခင် အရင်နားထောင်ပါ</p></div>
@@ -2769,7 +2769,7 @@ function writeString(view, offset, string){
 }
   function switchView(viewId, element) {
     // ၁။ View အားလုံးကို ဖျောက်မယ်
-    document.querySelectorAll('.app-view').forEach(el => {
+    document.querySelectorAll('.view-container').forEach(el => {
         el.style.display = 'none';
     });
     
