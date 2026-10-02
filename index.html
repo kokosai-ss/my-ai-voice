@@ -3001,6 +3001,7 @@ async function shRefreshCacheMarks(){
   for(const [voice] of SH_VOICES){try{if(await shGetDemo(voice))shMarkCached(voice,true);}catch(e){}}
 }
 function shRenderVoiceLibrary(){
+  console.log('shRenderVoiceLibrary is running!');
   const grid=document.getElementById('premiumVoiceGrid'); if(!grid)return;
   grid.innerHTML=SH_VOICES.map(([voice,desc,img])=>`<article class="premium-voice-card" data-voice="${voice}">
     <div class="voice-avatar-wrap"><img class="premium-voice-avatar" src="${img}" alt="${voice}" onerror="this.src='Logo.png.png'"><span class="voice-cached-dot"></span></div>
