@@ -3001,16 +3001,27 @@ async function shRefreshCacheMarks(){
   for(const [voice] of SH_VOICES){try{if(await shGetDemo(voice))shMarkCached(voice,true);}catch(e){}}
 }
 function shRenderVoiceLibrary(){
-console.log('shRenderVoiceLibrary is running!');
-console.log('SH_VOICES data:', SH_VOICES);
-  const grid=document.getElementById('premiumVoiceGrid'); if(!grid)return;
-  grid.innerHTML=SH_VOICES.map(([voice,desc,img])=>`<article class="premium-voice-card" data-voice="${voice}">
-    <div class="voice-avatar-wrap"><img class="premium-voice-avatar" src="${img}" alt="${voice}" onerror="this.src='Logo.png.png'"><span class="voice-cached-dot"></span></div>
-    <div class="voice-name-row"><strong>${voice}</strong><span class="voice-mini-tag">GEMINI TTS</span></div>
-    <div class="voice-desc">${desc}</div>
-    <div class="voice-card-actions"><button class="preview" type="button" onclick="shPreviewVoice('${voice}',this)">▶ Preview</button><button type="button" onclick="shChooseVoice('${voice}')">✓ Use</button></div>
-  </article>`).join('');
-  shRefreshCacheMarks();
+    console.log('shRenderVoiceLibrary is running!');
+    console.log('SH_VOICES data:', SH_VOICES);
+    
+    const grid = document.getElementById('premiumVoiceGrid');
+    if(!grid) {
+        console.error('Error: premiumVoiceGrid ID not found in HTML!');
+        return;
+    }
+
+    const htmlOutput = SH_VOICES.map(([voice, desc, id]) => {
+        console.log('Mapping item:', voice, desc);
+        return `<article class="voice-card">
+            <div class="voice-avatar-wrap">${voice}</div>
+            <div class="voice-name-row"><strong>${voice}</strong></div>
+            <div class="voice-desc">${desc}</div>
+        </article>`;
+    }).join('');
+
+    console.log('Generated HTML output:', htmlOutput);
+    grid.innerHTML = htmlOutput;
+    shRefreshCacheMarks();
 }
 function shChooseVoice(voice){
   singleVoiceValue=voice;
