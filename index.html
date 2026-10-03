@@ -1679,7 +1679,7 @@ body{background:radial-gradient(circle at 50% -10%,rgba(32,104,255,.16),transpar
   </div>
 </div>
 <!-- Lock Screen Display End -->
-
+<div class="container" id="appContent" style="display: none;">
 <header class="app-header">
     <button class="menu-toggle-btn" onclick="openSidebar()" title="Menu">☰</button>
     <div class="app-header-title">SH AI Voice Studio</div>
@@ -2074,20 +2074,6 @@ function selectVoiceOption(voiceVal, displayLabel) {
         }
     }
     closeVoicePicker();
-}
-
-/* TAB SWITCHING */
-function switchTab(tabId) {
-    document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-    document.querySelectorAll('.page-content').forEach(page => page.classList.remove('active'));
-    
-    if(tabId === 'singleTab') {
-        document.querySelectorAll('.tab-btn')[0].classList.add('active');
-        document.getElementById('singleTab').classList.add('active');
-    } else {
-        document.querySelectorAll('.tab-btn')[1].classList.add('active');
-        document.getElementById('multiTab').classList.add('active');
-    }
 }
 
 /* SIDEBAR & OPTIONS */
@@ -3000,26 +2986,18 @@ async function shRefreshCacheMarks(){
   for(const [voice] of SH_VOICES){try{if(await shGetDemo(voice))shMarkCached(voice,true);}catch(e){}}
 }
 function shRenderVoiceLibrary(){
-    console.log('shRenderVoiceLibrary is running!');
-    console.log('SH_VOICES data:', SH_VOICES);
-    
     const grid = document.getElementById('premiumVoiceGrid');
-    if(!grid) {
-        console.error('Error: premiumVoiceGrid ID not found in HTML!');
-        return;
-    }
+    if(!grid) return;
 
-    const htmlOutput = SH_VOICES.map(([voice, desc, id]) => {
-        console.log('Mapping item:', voice, desc);
-        return `<article class="voice-card">
-            <div class="voice-avatar-wrap">${voice}</div>
-            <div class="voice-name-row"><strong>${voice}</strong></div>
-            <div class="voice-desc">${desc}</div>
+    grid.innerHTML = SH_VOICES.map(([voice, desc]) => {
+        return `<article class="voice-card premium-voice-card" data-voice="${voice}">
+            <div class="voice-avatar-wrap" onclick="shChooseVoice('${voice}')">${voice}</div>
+            <div class="voice-name-row" onclick="shChooseVoice('${voice}')"><strong>${voice}</strong></div>
+            <div class="voice-desc" onclick="shChooseVoice('${voice}')">${desc}</div>
+            <button class="btn preview" onclick="shPreviewVoice('${voice}', this)" style="margin-top:10px; width:100%; padding:8px; background:rgba(0,186,255,0.2); border:1px solid #00baff; border-radius:8px; color:#fff; cursor:pointer;">▶ Play</button>
         </article>`;
     }).join('');
-
-    console.log('Generated HTML output:', htmlOutput);
-    grid.innerHTML = htmlOutput;
+    
     shRefreshCacheMarks();
 }
 function shChooseVoice(voice){
@@ -3090,6 +3068,6 @@ window.addEventListener('DOMContentLoaded', (event) => {
         <div style="font-size: 9px;">Settings</div>
     </div>
 </div>
-
+</div>
 </body>
 </html>
