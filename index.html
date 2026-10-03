@@ -2991,17 +2991,25 @@ function shRenderVoiceLibrary(){
     const grid = document.getElementById('premiumVoiceGrid');
     if(!grid) return;
 
-    grid.innerHTML = SH_VOICES.map(([voice, desc]) => {
+    grid.innerHTML = SH_VOICES.map(([voice, desc, img]) => {
         return `<article class="voice-card premium-voice-card" data-voice="${voice}">
-            <div class="voice-avatar-wrap" onclick="shChooseVoice('${voice}')">${voice}</div>
-            <div class="voice-name-row" onclick="shChooseVoice('${voice}')"><strong>${voice}</strong></div>
+            <div class="voice-avatar-wrap" onclick="shChooseVoice('${voice}')">
+                <img src="${img}" alt="${voice}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
+            </div>
+            <div class="voice-name-row" onclick="shChooseVoice('${voice}')">
+                <strong>${voice}</strong> <span style="font-size: 10px; color: #00baff;">GEMINI TTS</span>
+            </div>
             <div class="voice-desc" onclick="shChooseVoice('${voice}')">${desc}</div>
-            <button class="btn preview" onclick="shPreviewVoice('${voice}', this)" style="margin-top:10px; width:100%; padding:8px; background:rgba(0,186,255,0.2); border:1px solid #00baff; border-radius:8px; color:#fff; cursor:pointer;">▶ Play</button>
+            <div style="display: flex; gap: 8px; margin-top: 10px;">
+                <button class="btn preview" onclick="shPreviewVoice('${voice}', this)" style="flex: 1; padding: 8px; background: rgba(0,186,255,0.2); border: 1px solid #00baff; border-radius: 8px; color: #fff; cursor: pointer; font-size: 12px;">Preview</button>
+                <button class="btn use" onclick="shChooseVoice('${voice}')" style="flex: 1; padding: 8px; background: rgba(0,255,136,0.2); border: 1px solid #00ff88; border-radius: 8px; color: #fff; cursor: pointer; font-size: 12px;">Use</button>
+            </div>
         </article>`;
     }).join('');
     
     shRefreshCacheMarks();
 }
+
 function shChooseVoice(voice){
   singleVoiceValue=voice;
   const labels={Puck:'Puck (တက်ကြွလှုပ်ရှား လူငယ်သံ)',Charon:'Charon (သတင်း/ဗဟုသုတပေး တည်ငြိမ်သံ)',Fenrir:'Fenrir (စိတ်လှုပ်ရှားဖွယ် ဇာတ်လမ်းသံ)',Orus:'Orus (ပြတ်သားခိုင်မာ ရင့်ကျက်သံ)',Kore:'Kore (ပြတ်သားခိုင်မာ လူငယ်သံ)',Leda:'Leda (နုပျိုတက်ကြွ ချိုသာသံ)',Aoede:'Aoede (ပေါ့ပါးလန်းဆန်း စကားပြောသံ)',Callirrhoe:'Callirrhoe (အေးဆေးပေါ့ပါး သဘာဝသံ)',Despina:'Despina (ချောမွေ့ငြိမ့်ညောင်း ဇာတ်လမ်းသံ)'};
