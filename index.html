@@ -1727,49 +1727,38 @@ cursor:pointer;
         <div id="keyMessage" class="message" style="margin-top: 12px; font-size: 12px; text-align: center;"></div>
     </div>
 </div>
-<!-- AI IMAGE GENERATOR VIEW -->
-<div id="aiImageGenerator" class="app-view" style="display: none; padding: 16px; padding-bottom: 90px; color: #fff;">
-    
-    <!-- Neon Header -->
-    <div style="text-align: center; margin-bottom: 20px;">
-        <h2 style="font-size: 20px; font-weight: bold; color: #fff; text-shadow: 0 0 10px rgba(0,186,255,0.8), 0 0 25px rgba(0,136,204,0.5); margin: 0 0 6px 0;">✨ AI IMAGE STUDIO ✨</h2>
-        <p style="font-size: 11px; color: #94a3b8; margin: 0;">Prompt ရိုက်ထည့်ရုံဖြင့် ပုံဖော်ပေးမည့် Free AI စနစ်</p>
+
+<div id="aiChatbot" class="app-view" style="display: none; flex-direction: column; height: 100vh; background: #0f172a; color: #fff;">
+    <!-- Header with New Chat Button -->
+    <div style="display: flex; justify-content: space-between; align-items: center; padding: 15px; border-bottom: 1px solid #1e293b;">
+        <h3 style="margin: 0; font-size: 18px; color: #38bdf8;">🤖 Gemini AI Assistant</h3>
+        <button onclick="startNewChat()" style="background: linear-gradient(135deg, #3b82f6, #8b5cf6); border: none; color: white; padding: 8px 14px; border-radius: 20px; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 5px;">
+            ✨ New Chat
+        </button>
     </div>
 
-    <!-- Card Wrapper -->
-    <div style="background: linear-gradient(135deg, rgba(13, 27, 42, 0.95), rgba(20, 40, 70, 0.9)); border: 1px solid rgba(0, 186, 204, 0.5); box-shadow: 0 0 25px rgba(0, 136, 204, 0.25); border-radius: 16px; padding: 16px;">
+  <!-- Chat Messages Container -->
+    <div id="chatMessages" style="flex: 1; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 12px;">
+        <div style="align-self: flex-start; background: #1e293b; padding: 10px 14px; border-radius: 12px; max-width: 80%; font-size: 14px;">
+            မင်္ဂလာပါ သားရီး! ဘာတွေကူညီပေးရမလဲ? စာတွေမေးလို့ရသလို ပုံတွေပါ တင်ပြီးမေးလို့ရပါတယ် ခင်ဗျာ။ 🚀
+        </div>
+    </div>
+
+    <!-- Image Preview Area (if image selected) -->
+    <div id="imagePreviewContainer" style="display: none; padding: 5px 15px; background: #1e293b; align-items: center; gap: 10px;">
+        <img id="selectedImagePreview" src="" style="width: 40px; height: 40px; object-fit: cover; border-radius: 6px;" />
+        <span style="font-size: 12px; color: #94a3b8;" id="imageFileName">Image attached</span>
+        <button onclick="removeAttachedImage()" style="background: none; border: none; color: #ef4444; cursor: pointer; font-size: 16px;">✕</button>
+    </div>
+
+    <!-- Input Area -->
+    <div style="padding: 12px; background: #090d16; display: flex; gap: 8px; align-items: center; border-top: 1px solid #1e293b;">
+        <input type="file" id="chatImageInput" accept="image/*" style="display: none;" onchange="handleChatImage(event)">
+        <button onclick="document.getElementById('chatImageInput').click()" style="background: #1e293b; border: none; color: #38bdf8; width: 40px; height: 40px; border-radius: 50%; cursor: pointer; font-size: 18px; display: flex; align-items: center; justify-content: center;">📷</button>
         
-        <!-- Prompt Input Box -->
-        <div style="margin-bottom: 14px;">
-            <label style="font-size: 11px; color: #00baff; font-weight: bold; display: block; margin-bottom: 6px;">Enter Prompt (အင်္ဂလိပ်လို ရေးပါ)</label>
-            <textarea id="aiImagePrompt" placeholder="ဥပမာ - A cute cyberpunk cat, neon lights, 4k..." style="width: 100%; background: rgba(10, 20, 35, 0.8); border: 1px solid rgba(0, 186, 255, 0.3); border-radius: 10px; padding: 12px; color: #fff; font-size: 12px; resize: none; height: 80px; outline: none; box-sizing: border-box;"></textarea>
-        </div>
-
-        <!-- Style Selector Buttons -->
-        <div style="margin-bottom: 14px;">
-            <label style="font-size: 11px; color: #00baff; font-weight: bold; display: block; margin-bottom: 8px;">Select Style Presets</label>
-            <div style="display: flex; gap: 6px; flex-wrap: wrap;">
-                <button onclick="setAiStyle(', anime style, vibrant colors')" style="background: rgba(0,186,255,0.15); border: 1px solid rgba(0,186,255,0.4); color: #fff; padding: 6px 12px; border-radius: 12px; font-size: 10px; cursor: pointer;">Anime</button>
-                <button onclick="setAiStyle(', 3d render, blender, highly detailed')" style="background: rgba(0,186,255,0.15); border: 1px solid rgba(0,186,255,0.4); color: #fff; padding: 6px 12px; border-radius: 12px; font-size: 10px; cursor: pointer;">3D Render</button>
-                <button onclick="setAiStyle(', cinematic lighting, dramatic, 8k')" style="background: rgba(0,186,255,0.15); border: 1px solid rgba(0,186,255,0.4); color: #fff; padding: 6px 12px; border-radius: 12px; font-size: 10px; cursor: pointer;">Cinematic</button>
-                <button onclick="setAiStyle(', cyberpunk aesthetic, neon glow, futuristic')" style="background: rgba(0,186,255,0.15); border: 1px solid rgba(0,186,255,0.4); color: #fff; padding: 6px 12px; border-radius: 12px; font-size: 10px; cursor: pointer;">Cyberpunk</button>
-            </div>
-        </div>
-
-        <!-- Generate Button -->
-        <button onclick="generateAIImage()" style="width: 100%; background: linear-gradient(135deg, #0088cc, #005588); color: #fff; border: none; padding: 12px; border-radius: 12px; font-weight: bold; font-size: 13px; cursor: pointer; box-shadow: 0 4px 15px rgba(0, 136, 204, 0.4); margin-bottom: 16px;">
-            <i class="fa-solid fa-wand-magic-sparkles"></i> Generate Image (Free)
-        </button>
-
-        <!-- Result Preview & Download Area -->
-        <div id="aiImageResultBox" style="display: none; text-align: center; border-top: 1px dashed rgba(0, 186, 255, 0.3); padding-top: 14px;">
-            <div style="position: relative; display: inline-block; width: 100%;">
-                <img id="aiGeneratedImg" src="" alt="AI Generated Image" style="width: 100%; border-radius: 12px; border: 1px solid rgba(0, 186, 255, 0.4); box-shadow: 0 0 20px rgba(0, 186, 255, 0.3);">
-            </div>
-            <a id="aiDownloadBtn" href="" download="ai-image.jpg" target="_blank" style="display: inline-block; margin-top: 12px; background: #10b981; color: #fff; padding: 8px 16px; border-radius: 8px; font-size: 11px; font-weight: bold; text-decoration: none; box-shadow: 0 4px 10px rgba(16, 185, 129, 0.4);">
-                <i class="fa-solid fa-download"></i> Download Image
-            </a>
-        </div>
+        <input type="text" id="chatInput" placeholder="မေးချင်တာလေး ရိုက်ထည့်ပါ..." style="flex: 1; background: #1e293b; border: 1px solid #334155; color: white; padding: 10px 14px; border-radius: 20px; outline: none; font-size: 14px;" onkeypress="if(event.key === 'Enter') sendChatMessage()">
+        
+        <button onclick="sendChatMessage()" style="background: #38bdf8; border: none; color: #0f172a; width: 40px; height: 40px; border-radius: 50%; cursor: pointer; font-weight: bold; display: flex; align-items: center; justify-content: center;">📤</button>
     </div>
 </div>
 
@@ -2351,39 +2340,106 @@ function selectStyleOption(element, displayText, promptValue) {
   
   closeStyleModal();
 }
-  // Style များကို Prompt ထဲသို့ အလိုအလျောက် ပေါင်းထည့်ပေးရန်
-function setAiStyle(styleText) {
-    const promptBox = document.getElementById('aiImagePrompt');
-    promptBox.value += styleText;
+  let chatHistory = []; // စကားပြောမှတ်တမ်းများ သိမ်းရန်
+let attachedBase64Image = null;
+
+// New Chat လုပ်ခြင်း (မှတ်တမ်းများ ရှင်းလင်းရန်)
+function startNewChat() {
+    chatHistory = [];
+    document.getElementById('chatMessages').innerHTML = `
+        <div style="align-self: flex-start; background: #1e293b; padding: 10px 14px; border-radius: 12px; max-width: 80%; font-size: 14px;">
+            စကားပြောခန်းအသစ် စလိုက်ပါပြီ သားရီး! ဘာဆက်မေးမလဲ? ✨
+        </div>
+    `;
+    removeAttachedImage();
 }
 
-// AI ပုံထုတ်ပေးသည့် လုပ်ဆောင်ချက်
-function generateAIImage() {
-    const prompt = document.getElementById('aiImagePrompt').value.trim();
-    if(!prompt) {
-        alert('ကျေးဇူးပြု၍ Prompt တစ်ခုခု ရေးထည့်ပါ သားရီး!');
+// ပုံတင်ရန် ရွေးချယ်သည့်အခါ
+function handleChatImage(event) {
+    const file = event.target.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            attachedBase64Image = e.target.result.split(',')[1]; // Base64 data
+            document.getElementById('selectedImagePreview').src = e.target.result;
+            document.getElementById('imageFileName').innerText = file.name;
+            document.getElementById('imagePreviewContainer').style.display = 'flex';
+        };
+        reader.readAsDataURL(file);
+    }
+}
+
+// ပုံဖယ်ရှားရန်
+function removeAttachedImage() {
+    attachedBase64Image = null;
+    document.getElementById('chatImageInput').value = '';
+    document.getElementById('imagePreviewContainer').style.display = 'none';
+}
+
+// မက်ဆေ့ချ် ပို့ရန်နှင့် Gemini API သို့ ချိတ်ဆက်ရန်
+async function sendChatMessage() {
+    const inputField = document.getElementById('chatInput');
+    const messageText = inputField.value.trim();
+    const chatContainer = document.getElementById('chatMessages');
+    const apiKey = localStorage.getItem('gemini_api_key'); // Setting ထဲက သိမ်းထားတဲ့ API Key ကို ယူသုံးမည်
+
+    if (!messageText && !attachedBase64Image) return;
+    if (!apiKey) {
+        alert('ကျေးဇူးပြု၍ Settings ထဲတွင် Google AI Studio API Key ထည့်သွင်းပေးပါ။');
         return;
     }
-    
-    const resultBox = document.getElementById('aiImageResultBox');
-    const imgElement = document.getElementById('aiGeneratedImg');
-    const downloadBtn = document.getElementById('aiDownloadBtn');
-    
-    // ပုံမပေါ်ခင် Loading ပုံစံပြရန်
-    resultBox.style.display = 'block';
-    imgElement.src = 'https://via.placeholder.com/512x512/0d1b2a/00baff?text=Generating+AI+Image...';
-    
-    // Pollinations.ai URL သို့ ချိတ်ဆက်ခြင်း
-    const encodedPrompt = encodeURIComponent(prompt);
-    const imageUrl = `https://image.pollinations.ai/prompt/${encodedPrompt}?width=512&height=512&nologo=true&seed=` + Math.floor(Math.random() * 100000);
-    
-    // ပုံ Load ဖြစ်လာမှ ပြသရန်
-    const tempImg = new Image();
-    tempImg.src = imageUrl;
-    tempImg.onload = function() {
-        imgElement.src = imageUrl;
-        downloadBtn.href = imageUrl;
-    };
+
+    // ၁။ User ရဲ့ မက်ဆေ့ချ်ကို UI ပေါ်တင်မည်
+    let userHtml = `<div style="align-self: flex-end; background: #3b82f6; color: white; padding: 10px 14px; border-radius: 12px; max-width: 80%; font-size: 14px;">${messageText}</div>`;
+    chatContainer.innerHTML += userHtml;
+    inputField.value = '';
+    chatContainer.scrollTop = chatContainer.scrollHeight;
+
+    // API သို့ ပို့မည့် ပုံစံဆင်ခြင်း
+    let contentParts = [{ text: messageText }];
+    if (attachedBase64Image) {
+        contentParts.push({
+            inline_data: {
+                mime_type: "image/jpeg",
+                data: attachedBase64Image
+            }
+        });
+        removeAttachedImage();
+    }
+
+    chatHistory.push({ role: "user", parts: contentParts });
+
+    // Loading ပုံစံပြရန်
+    const loadingId = 'loading-' + Date.now();
+    chatContainer.innerHTML += `<div id="${loadingId}" style="align-self: flex-start; background: #1e293b; color: #94a3b8; padding: 10px 14px; border-radius: 12px; font-size: 14px;">AI တွေးနေပါပြီ... ⏳</div>`;
+    chatContainer.scrollTop = chatContainer.scrollHeight;
+
+    try {
+        // Gemini API Call (gemini-1.5-flash model ကို သုံးမည်)
+        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ contents: chatHistory })
+        });
+
+        const data = await response.json();
+        document.getElementById(loadingId).remove();
+
+        if (data.candidates && data.candidates[0].content) {
+            const aiReply = data.candidates[0].content.parts[0].text;
+            chatHistory.push(data.candidates[0].content); // မှတ်တမ်းထဲ ဆက်ထည့်မည်
+
+            // AI အဖြေကို UI ပေါ်တင်မည်
+            chatContainer.innerHTML += `<div style="align-self: flex-start; background: #1e293b; color: #fff; padding: 10px 14px; border-radius: 12px; max-width: 80%; font-size: 14px; line-height: 1.5;">${aiReply.replace(/\n/g, '<br>')}</div>`;
+        } else {
+            chatContainer.innerHTML += `<div style="align-self: flex-start; background: #7f1d1d; color: #fca5a5; padding: 10px 14px; border-radius: 12px; font-size: 14px;">API Error: တောင်းဆိုမှု အဆင်မပြေပါ။ Key မှန်ကန်မှု ရှိမရှိ စစ်ဆေးပါ။</div>`;
+        }
+    } catch (error) {
+        document.getElementById(loadingId)?.remove();
+        chatContainer.innerHTML += `<div style="align-self: flex-start; background: #7f1d1d; color: #fca5a5; padding: 10px 14px; border-radius: 12px; font-size: 14px;">Network Error: ချိတ်ဆက်မှု အမှားအယွင်း ရှိနေပါသည်။</div>`;
+    }
+
+    chatContainer.scrollTop = chatContainer.scrollHeight;
 }
 
 /* VOICE PICKER MODAL LOGIC */
@@ -3446,12 +3502,12 @@ window.addEventListener('DOMContentLoaded', (event) => {
         <div style="font-size: 9px;">Generator</div>
     </div>
 
-  <!-- AI Image (Added) -->
-    <div class="nav-btn" onclick="switchView('aiImageGenerator', this)" style="text-align: center; cursor: pointer; color: #8eb0cb; transition: 0.3s;">
-        <i class="fa-solid fa-wand-magic-sparkles" style="font-size: 16px; margin-bottom: 3px;"></i>
-        <div style="font-size: 9px;">AI Image</div>
-    </div>
-  
+    <!-- aichat bot -->
+  <div class="nav-btn" onclick="switchView('aiChatbot', this)">
+    <span>🤖</span>
+    <small>AI Chat</small>
+</div>
+ 
     <!-- Settings / Keys -->
     <div class="nav-btn" onclick="switchView('settings', this)" style="text-align: center; cursor: pointer; color: #8eb0cb; transition: 0.3s;">
         <i class="fa-solid fa-gear" style="font-size: 16px; margin-bottom: 3px;"></i>
