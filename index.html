@@ -1377,12 +1377,11 @@ body{background:radial-gradient(circle at 50% -10%,rgba(32,104,255,.16),transpar
                 <p style="font-size: 9px; color: #8eb0cb; margin: 0;">Manage scripts</p>
             </div>
         </div>
-
-        <div style="background: rgba(13, 27, 42, 0.6); backdrop-filter: blur(10px); border: 1px solid rgba(245, 158, 11, 0.3); padding: 12px; border-radius: 14px; display: flex; align-items: center; gap: 10px; cursor: pointer;">
-            <div style="width: 32px; height: 32px; border-radius: 8px; background: rgba(245, 158, 11, 0.2); border: 1px solid rgba(245, 158, 11, 0.4); display: flex; align-items: center; justify-content: center; color: #fbbf24; flex-shrink: 0;">
-                <i class="fa-solid fa-clock-rotate-left" style="font-size: 13px;"></i>
-            </div>
-            <div style="overflow: hidden;">
+        <div onclick="switchView('historyPage', this)" style="background: rgba(13, 27, 42, 0.6); backdrop-filter: blur(10px); border: 1px solid rgba(245, 158, 11, 0.3); padding: 12px; border-radius: 14px; display: flex; align-items: center; gap: 10px; cursor: pointer;">
+    <div style="width: 32px; height: 32px; border-radius: 8px; background: rgba(245, 158, 11, 0.2); border: 1px solid rgba(245, 158, 11, 0.4); display: flex; align-items: center; justify-content: center; color: #fbbf24; flex-shrink: 0;">
+        <i class="fa-solid fa-clock-rotate-left" style="font-size: 13px;"></i>
+    </div>
+           <div style="overflow: hidden;">
                 <h4 style="font-size: 12px; font-weight: bold; color: #fff; margin: 0 0 2px 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">History</h4>
                 <p style="font-size: 9px; color: #8eb0cb; margin: 0;">View past gens</p>
             </div>
@@ -1402,6 +1401,31 @@ body{background:radial-gradient(circle at 50% -10%,rgba(32,104,255,.16),transpar
     <i class="fa-solid fa-arrow-right" style="color: #8b9bb4;"></i>
 </div>
 </div> 
+  <!-- History Page (Full Page View) -->
+<div id="historyPage" class="view-container" style="display: none; padding: 10px;">
+    
+    <!-- Back Button & Title Header -->
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+        <div style="display: flex; align-items: center; gap: 10px;">
+            <button onclick="switchView('homeTab', this)" style="background: rgba(0,210,255,0.1); border: 1px solid rgba(0,210,255,0.3); color: #00d2ff; padding: 6px 12px; border-radius: 10px; cursor: pointer;">
+                ← Back
+            </button>
+            <h3 style="color: #fff; margin: 0; font-size: 15px;">Voice History</h3>
+        </div>
+    </div>
+
+    <!-- History Neon Card Container -->
+    <div style="background: rgba(10, 15, 30, 0.75); border: 1px solid rgba(0, 210, 255, 0.3); border-radius: 16px; padding: 14px; backdrop-filter: blur(10px);">
+        <div style="font-size: 13px; color: #8eb0cb; margin-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,0.06); padding-bottom: 8px;">
+            📜 Generated Audio Logs
+        </div>
+        <!-- History Items List -->
+        <div id="fullHistoryList" style="display: flex; flex-direction: column; gap: 10px;">
+            <!-- Dynamic items will load here -->
+        </div>
+    </div>
+</div>
+
  <!-- API Key Management View -->
 <div id="apiKeyView" class="view-container" style="display: none; padding: 16px;">
     <!-- Header with Back Button -->
