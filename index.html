@@ -2992,17 +2992,17 @@ function shRenderVoiceLibrary(){
     if(!grid) return;
 
     grid.innerHTML = SH_VOICES.map(([voice, desc, img]) => {
-        return `<article class="voice-card premium-voice-card" data-voice="${voice}">
+        return `<article class="voice-card premium-voice-card" data-voice="${voice}" style="box-sizing: border-box;">
             <div class="voice-avatar-wrap" onclick="shChooseVoice('${voice}')">
                 <img src="${img}" alt="${voice}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
             </div>
             <div class="voice-name-row" onclick="shChooseVoice('${voice}')">
-                <strong>${voice}</strong> <span style="font-size: 10px; color: #00baff;">GEMINI TTS</span>
+                <strong>${voice}</strong> <span style="font-size: 9px; color: #00baff;">GEMINI TTS</span>
             </div>
             <div class="voice-desc" onclick="shChooseVoice('${voice}')">${desc}</div>
-            <div style="display: flex; gap: 8px; margin-top: 10px;">
-                <button class="btn preview" onclick="shPreviewVoice('${voice}', this)" style="flex: 1; padding: 8px; background: rgba(0,186,255,0.2); border: 1px solid #00baff; border-radius: 8px; color: #fff; cursor: pointer; font-size: 12px;">Preview</button>
-                <button class="btn use" onclick="shChooseVoice('${voice}')" style="flex: 1; padding: 8px; background: rgba(0,255,136,0.2); border: 1px solid #00ff88; border-radius: 8px; color: #fff; cursor: pointer; font-size: 12px;">Use</button>
+            <div style="display: flex; gap: 6px; margin-top: 10px; width: 100%; box-sizing: border-box;">
+                <button class="btn preview" onclick="shPreviewVoice('${voice}', this)" style="flex: 1; padding: 6px 2px; background: rgba(0,186,255,0.2); border: 1px solid #00baff; border-radius: 8px; color: #fff; cursor: pointer; font-size: 11px; text-align: center;">Preview</button>
+                <button class="btn use" onclick="shChooseVoice('${voice}')" style="flex: 1; padding: 6px 2px; background: rgba(0,255,136,0.2); border: 1px solid #00ff88; border-radius: 8px; color: #fff; cursor: pointer; font-size: 11px; text-align: center;">Use</button>
             </div>
         </article>`;
     }).join('');
