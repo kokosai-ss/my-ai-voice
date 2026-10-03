@@ -1299,90 +1299,95 @@ body{background:radial-gradient(circle at 50% -10%,rgba(32,104,255,.16),transpar
 
   <!-- အသံလှိုင်း Animation အတွက် CSS -->
     <style>
-      /* TELEGRAM PREMIUM WAVE */
+/* TELEGRAM PREMIUM WAVE */
 .tg-wave {
-    position:absolute;
-    width:76px;
-    height:76px;
-    border:2px solid rgba(0,186,255,.45);
-    border-radius:50%;
-    animation:tgWave 2.4s ease-out infinite;
-    pointer-events:none;
+    position: absolute;
+    width: 76px;
+    height: 76px;
+    border: 2px solid rgba(0,186,255,.45);
+    border-radius: 50%;
+    animation: tgWave 2.4s ease-out infinite;
+    pointer-events: none;
 }
 
 .tg-wave.wave2 {
-    animation-delay:.8s;
+    animation-delay: .8s;
 }
 
 .tg-wave.wave3 {
-    animation-delay:1.6s;
+    animation-delay: 1.6s;
 }
 
 @keyframes tgWave {
     0% {
-        transform:scale(.75);
-        opacity:.65;
+        transform: scale(.75);
+        opacity: .65;
     }
     70% {
-        transform:scale(1.45);
-        opacity:.12;
+        transform: scale(1.45);
+        opacity: .12;
     }
     100% {
-        transform:scale(1.65);
-        opacity:0;
+        transform: scale(1.65);
+        opacity: 0;
     }
 }
 
-/* FLOATING ICONS */
+/* FLOATING ICONS - Spaced across corners */
 .tg-float {
-    position:absolute;
-    width:22px;
-    height:22px;
-    border-radius:50%;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    opacity:.2;
-    animation:tgFloat 2.7s ease-in-out infinite;
-    pointer-events:none;
+    position: absolute;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    opacity: 0.85;
+    animation: tgFloat 2.7s ease-in-out infinite;
+    pointer-events: none;
+    z-index: 4;
 }
 
+/* Top-Right Corner (Bell) */
 .tg-noti {
-    top:2px;
-    right:0;
-    background:#00baff;
-    color:#fff;
-    animation-delay:0s;
+    top: -3px;
+    right: -3px;
+    background: #00baff;
+    color: #fff;
+    animation-delay: 0s;
 }
 
+/* Top-Left Corner (Message) */
 .tg-msg {
-    bottom:8px;
-    left:0;
-    background:#1677ff;
-    color:#fff;
-    animation-delay:.9s;
+    top: -3px;
+    left: -3px;
+    background: #1677ff;
+    color: #fff;
+    animation-delay: .9s;
 }
 
+/* Bottom-Right Corner (Gift) */
 .tg-gift {
-    top:25px;
-    left:-2px;
-    background:#9b59ff;
-    color:#fff;
-    animation-delay:1.8s;
+    bottom: -3px;
+    right: -3px;
+    background: #9b59ff;
+    color: #fff;
+    animation-delay: 1.8s;
 }
 
 @keyframes tgFloat {
-    0%,100% {
-        opacity:.12;
-        transform:scale(.8) translateY(3px);
+    0%, 100% {
+        opacity: .4;
+        transform: scale(.9) translateY(2px);
     }
     30% {
-        opacity:.75;
-        transform:scale(1) translateY(0);
+        opacity: 1;
+        transform: scale(1.1) translateY(0);
     }
     55% {
-        opacity:.3;
-        transform:scale(.92) translateY(-2px);
+        opacity: .7;
+        transform: scale(1) translateY(-2px);
     }
 }
     @keyframes soundWave {
@@ -1576,26 +1581,6 @@ cursor:pointer;
 <div class="tg-float tg-gift">
     <i class="fa-solid fa-gift"></i>
 </div>
-    </div>
-
-    <!-- Bell Badge -->
-    <div style="
-        position:absolute;
-        top:7px;
-        right:2px;
-        width:21px;
-        height:21px;
-        border-radius:50%;
-        background:#00baff;
-        color:#fff;
-        display:flex;
-        align-items:center;
-        justify-content:center;
-        border:2px solid #071827;
-        box-shadow:0 0 10px rgba(0,186,255,.55);
-        z-index:3;
-    ">
-        <i class="fa-solid fa-bell" style="font-size:9px;"></i>
     </div>
 
     <!-- Decorative Ring -->
