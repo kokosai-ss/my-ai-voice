@@ -1560,7 +1560,8 @@ body{background:radial-gradient(circle at 50% -10%,rgba(32,104,255,.16),transpar
         </div> <!-- /voice-card-container -->
     </div> <!-- /section -->
 </div> <!-- /singleTab အဆုံး -->
-<!-- PAGE 2: MULTI-VOICE (Neon UI - Exact Single Voice Order) -->
+
+ <!-- PAGE 2: MULTI-VOICE (Neon UI - Complete & Clean) -->
 <div id="multiTab" class="page-content" style="display: none;">
     <div class="voice-card-container" style="background: rgba(13, 27, 42, 0.75); border: 1px solid rgba(0, 210, 255, 0.3); border-radius: 20px; padding: 18px; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5); backdrop-filter: blur(12px); margin-bottom: 20px;">
         
@@ -1570,14 +1571,16 @@ body{background:radial-gradient(circle at 50% -10%,rgba(32,104,255,.16),transpar
                 <div style="width: 32px; height: 32px; background: rgba(0,210,255,0.15); border-radius: 10px; display: flex; align-items: center; justify-content: center; color: #00d2ff;">
                     <i class="fa-solid fa-users-gear"></i>
                 </div>
-                <h3 style="font-size: 15px; color: #fff; margin: 0;">Multi-Voice Studio</h3>
+                <div>
+                    <h3 style="font-size: 15px; color: #fff; margin: 0;">Multi-Voice Studio</h3>
+                </div>
             </div>
             <span style="background: rgba(0,210,255,0.15); color: #00d2ff; padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: bold; border: 1px solid rgba(0,210,255,0.3);">Multi-Mode</span>
         </div>
 
-        <!-- Global Voice Style (Charon အောက်မှာ လာမယ့် Global Style အကွက်) -->
+        <!-- 1. Global Voice Style Section -->
         <div style="margin-bottom: 16px; background: rgba(10, 15, 30, 0.4); border: 1px solid rgba(255,255,255,0.06); border-radius: 14px; padding: 12px;">
-            <label style="display: block; color: #b7d5ee; font-size: 12px; margin-bottom: 6px;">Global Voice Style</label>
+            <label style="display: block; color: #b7d5ee; font-size: 12px; margin-bottom: 6px;">Voice Style</label>
             <div class="style-trigger-box" onclick="openStyleModal()" style="background: rgba(10, 15, 30, 0.85); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 10px 12px; display: flex; justify-content: space-between; align-items: center; cursor: pointer;">
                 <span id="selectedStyleDisplay" style="font-size: 13px; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Natural Dialogue - သဘာဝကျကျ</span>
                 <span style="color: #8b9bb4; font-size: 11px;">▼</span>
@@ -1585,17 +1588,17 @@ body{background:radial-gradient(circle at 50% -10%,rgba(32,104,255,.16),transpar
             <input type="hidden" id="styleSelect" value="Speak naturally and clearly as a movie narrator.">
         </div>
 
-        <!-- Speech Blocks Container (Charon Speaker နဲ့ Text တွေ ပါဝင်မယ့် Dynamic Blocks) -->
+        <!-- 2. Speech Blocks Container -->
         <div id="speechBlocksContainer" style="display: flex; flex-direction: column; gap: 14px; margin-bottom: 16px;">
             <!-- Dynamic Speech Blocks will appear here -->
         </div>
 
-        <!-- Add Block Button (Text ပြီးမှ လာမယ့် Add Block ခလုတ်) -->
+        <!-- Add Block Button -->
         <button id="addBlockBtn" onclick="addSpeechBlock()" style="width: 100%; padding: 12px; background: rgba(0,210,255,0.1); border: 1px dashed rgba(0,210,255,0.4); border-radius: 12px; color: #00d2ff; font-weight: bold; cursor: pointer; margin-bottom: 16px; font-size: 13px; transition: 0.2s;">
             + Add Speech Block
         </button>
 
-        <!-- Voice Speed Section -->
+        <!-- 3. Voice Speed Section -->
         <div style="margin-bottom: 18px; padding: 0 4px;">
             <label style="display: flex; justify-content: space-between; margin-bottom: 6px; color: #b7d5ee; font-size: 13px;">
                 <span>⚡ Voice Speed</span>
@@ -1609,7 +1612,7 @@ body{background:radial-gradient(circle at 50% -10%,rgba(32,104,255,.16),transpar
             🎙️ Generate Multi-Voice Audio
         </button>
 
-        <!-- Result / Audio Output Section -->
+        <!-- 4. Result / Audio Output Section -->
         <div id="multiResultSection" style="display: none; background: rgba(10, 15, 30, 0.6); border: 1px solid rgba(0,210,255,0.2); border-radius: 14px; padding: 14px;">
             <div style="font-size: 12px; color: #00d2ff; margin-bottom: 8px; font-weight: bold;">✨ Result Audio</div>
             <audio id="multiAudioPlayer" controls style="width: 100%; height: 36px; margin-bottom: 10px;"></audio>
@@ -1619,7 +1622,34 @@ body{background:radial-gradient(circle at 50% -10%,rgba(32,104,255,.16),transpar
     </div>
 </div>
 
-
+<!-- Modal Popup Window (Global Voice Style အတွက်) -->
+<div id="styleModalOverlay" class="style-modal-overlay" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 1000; justify-content: center; align-items: center; padding: 20px;">
+  <div class="style-modal-content" style="background: #0d1b2a; border: 1px solid rgba(0,210,255,0.3); border-radius: 20px; width: 100%; max-width: 400px; padding: 20px;">
+    <div class="style-modal-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+      <h3 style="color: #fff; font-size: 16px; margin: 0;">🎛️ Select Global Voice Style</h3>
+      <span class="style-close-btn" onclick="closeStyleModal()" style="color: #8b9bb4; font-size: 20px; cursor: pointer;">&times;</span>
+    </div>
+    
+    <div class="style-modal-cards" style="display: flex; flex-direction: column; gap: 10px;">
+      <div class="modal-style-card" onclick="selectStyleOption(this, 'Natural Dialogue - သဘာဝကျကျ', 'Speak naturally and clearly as a movie narrator.')" style="background: rgba(10,15,30,0.8); border: 1px solid rgba(0,210,255,0.2); border-radius: 12px; padding: 12px; cursor: pointer;">
+        <h4 style="color: #fff; font-size: 14px; margin: 0 0 4px 0;">Natural Dialogue</h4>
+        <p style="color: #8b9bb4; font-size: 12px; margin: 0;">သဘာဝကျကျ စကားပြောဟန်</p>
+      </div>
+      <div class="modal-style-card" onclick="selectStyleOption(this, 'Warm - နွေးထွေးစွာ', 'Speak warmly and gently as a narrator.')" style="background: rgba(10,15,30,0.8); border: 1px solid rgba(0,210,255,0.2); border-radius: 12px; padding: 12px; cursor: pointer;">
+        <h4 style="color: #fff; font-size: 14px; margin: 0 0 4px 0;">Warm (နွေးထွေးစွာ)</h4>
+        <p style="color: #8b9bb4; font-size: 12px; margin: 0;">နွေးထွေးယုယသော စကားပြောအသံ</p>
+      </div>
+      <div class="modal-style-card" onclick="selectStyleOption(this, 'Movie Dialogue - ဇာတ်လမ်းပုံစံ', 'Speak like a dramatic movie narrator.')" style="background: rgba(10,15,30,0.8); border: 1px solid rgba(0,210,255,0.2); border-radius: 12px; padding: 12px; cursor: pointer;">
+        <h4 style="color: #fff; font-size: 14px; margin: 0 0 4px 0;">Movie Dialogue</h4>
+        <p style="color: #8b9bb4; font-size: 12px; margin: 0;">Movie Recap နှင့် ဇာတ်လမ်းပြောပြသည့် ပုံစံ</p>
+      </div>
+      <div class="modal-style-card" onclick="selectStyleOption(this, 'Excited - စိတ်လှုပ်ရှားစွာ', 'Speak with excitement and high energy.')" style="background: rgba(10,15,30,0.8); border: 1px solid rgba(0,210,255,0.2); border-radius: 12px; padding: 12px; cursor: pointer;">
+        <h4 style="color: #fff; font-size: 14px; margin: 0 0 4px 0;">Excited</h4>
+        <p style="color: #8b9bb4; font-size: 12px; margin: 0;">စိတ်လှုပ်ရှား တက်ကြွသော အသံ</p>
+      </div>
+    </div>
+  </div>
+</div>
   <!-- Generator View -->
 <div id="voiceGenerator" class="view-container">
     <div class="voice-library">
@@ -2079,13 +2109,12 @@ function addSpeechBlock(initialText = "", selectedSpeaker = "Charon") {
         "Despina": "Despina (ချောမွေ့ငြိမ့်ညောင်း ဇာတ်လမ်းသံ)"
     };
 
-    blockDiv.innerHTML = `
+        blockDiv.innerHTML = `
         <div class="block-card-header">
             <span class="block-card-title">💬 <span class="block-number-text">Speech Block (1)</span></span>
         </div>
-        <div class="block-card-body">
-            <div class="mic-avatar-circle">🎙️</div>
-            <div style="flex:1; width:100%;">
+        <div class="block-card-body" style="margin-bottom: 10px;">
+            <div style="width:100%;">
                 <label style="display:block; font-size:12px; color:#8eb0cb; margin-bottom:6px;">Speaker Voice ရွေးရန်:</label>
                 <div class="speaker-select-trigger" onclick="openVoicePicker(${blockCounter})">
                     <span class="block-speaker-label">${speakerLabelMap[selectedSpeaker] || selectedSpeaker}</span>
@@ -2103,6 +2132,7 @@ function addSpeechBlock(initialText = "", selectedSpeaker = "Charon") {
             <button class="btn-card-delete" onclick="removeSpeechBlock(${blockCounter})">Delete</button>
         </div>
     `;
+
 
     container.appendChild(blockDiv);
     reindexBlocks();
