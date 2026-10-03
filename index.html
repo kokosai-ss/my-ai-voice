@@ -1,9 +1,6 @@
 <!DOCTYPE html>
 <html lang="my">
 <head>
-  <!-- Mobile Console (Eruda) -->
-<script src="https://cdn.jsdelivr.net/npm/eruda"></script>
-<script>eruda.init();</script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>SH AI Voice Studio</title>
@@ -1405,7 +1402,7 @@ body{background:radial-gradient(circle at 50% -10%,rgba(32,104,255,.16),transpar
     <i class="fa-solid fa-arrow-right" style="color: #8b9bb4;"></i>
 </div>
 </div> 
-  <!-- API Key Management View -->
+ <!-- API Key Management View -->
 <div id="apiKeyView" class="view-container" style="display: none; padding: 16px;">
     <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 20px;">
         <button class="menu-toggle-btn" onclick="switchView('mainDashboard', this)">
@@ -1413,12 +1410,31 @@ body{background:radial-gradient(circle at 50% -10%,rgba(32,104,255,.16),transpar
         </button>
         <h2 style="font-size: 18px; color: #fff; margin: 0;">API Key Settings</h2>
     </div>
+    
     <div style="background: rgba(13, 27, 42, 0.85); border: 1px solid #1e3e62; padding: 16px; border-radius: 16px;">
         <label style="color: #8b9bb4; font-size: 13px; display: block; margin-bottom: 8px;">Gemini API Key</label>
-        <input type="password" id="apiKeyInput" placeholder="Enter your API Key..." style="width: 100%; padding: 10px; background: #0b192c; border: 1px solid #1e3e62; color: #fff; border-radius: 8px; margin-bottom: 12px;">
-        <button onclick="saveApiKey()" class="btn" style="width: 100%; padding: 10px; background: #1e3e62; color: #fff; border: none; border-radius: 8px;">Save Key</button>
+        
+        <!-- Input with Eye Icon -->
+        <div style="position: relative; margin-bottom: 12px;">
+            <input type="password" id="apiKey" class="key-input" placeholder="Enter your API Key..." style="width: 100%; padding: 10px 40px 10px 10px; background: #0b192c; border: 1px solid #1e3e62; color: #fff; border-radius: 8px; box-sizing: border-box;">
+            <button class="eye" onclick="toggleKey()" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; color: #8b9bb4; cursor: pointer; padding: 5px;">
+                <i class="fa-solid fa-eye" id="eyeIcon"></i>
+            </button>
+        </div>
+
+        <!-- Checkbox -->
+        <label class="checkbox-row" style="display: flex; align-items: center; gap: 8px; color: #8b9bb4; font-size: 12px; margin-bottom: 15px; cursor: pointer;">
+            <input id="saveKey" type="checkbox" style="accent-color: #00f2fe;"> App ထဲမှာ API Keys ကို မှတ်ထားမည်
+        </label>
+
+        <!-- Action Buttons (Save & Test) -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+            <button class="btn" onclick="saveApiKey()" style="padding: 10px; background: #1e3e62; color: #fff; border: 1px solid #00f2fe; border-radius: 8px; cursor: pointer;">Save Key</button>
+            <button class="btn" onclick="testApiKey()" style="padding: 10px; background: rgba(0, 242, 254, 0.1); color: #00f2fe; border: 1px solid #1e3e62; border-radius: 8px; cursor: pointer;">Test Key</button>
+        </div>
     </div>
 </div>
+ 
 
 <div id="voiceStudio" class="view-container" style="display: none;">
         <!-- 1. အပြင်ဘက်မှာ အမြဲပေါ်နေမယ့် Header နဲ့ Tab ခလုတ်များ -->
