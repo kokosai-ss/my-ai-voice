@@ -3391,6 +3391,446 @@ cursor:pointer;
 </div>
 
 <script>
+/* =========================================
+   SH AI TEAM CHATBOT
+   ========================================= */
+
+let shChatHistory = [];
+let shAttachedImage = null;
+let shAttachedFileText = null;
+
+/* ---------- API KEY ---------- */
+
+function shGetChatApiKey() {
+    const input = document.getElementById("apiKey");
+
+    if (input && input.value.trim()) {
+        return input.value.trim().split(",")[0].trim();
+    }
+
+    return localStorage.getItem("gemini_api_key") || "";
+}
+
+/* ---------- ATTACH MENU ---------- */
+
+function toggleAttachMenu() {
+    const menu = document.getElementById("attachMenu");
+    if (!menu) return;
+
+    menu.style.display =
+        menu.style.display === "flex" ? "none" : "flex";
+}
+
+/* ---------- IMAGE ---------- */
+
+function handleChatImage(event) {
+
+    const file = event.target.files[0];
+    if (!file) return;
+
+    if (!file.type.startsWith("image/")) {
+        alert("Image ဖိုင်ပဲ ရွေးပါ။");
+        return;
+    }
+
+    const reader = new FileReader();
+
+    reader.onload = function(e) {
+
+        shAttachedImage = {
+            mimeType: file.type,
+            data: e.target.result.split(",")[1],
+            name: file.name
+        };
+
+        const previewBox =
+            document.getElementById("imagePreviewContainer");
+
+        const preview =
+            document.getElementById("selectedImagePreview");
+
+        const name =
+            document.getElementById("imageFileName");
+
+        if (preview) {
+            preview.src = e.target.result;
+        }
+
+        if (name) {
+            name.textContent = file.name;
+        }
+
+        if (previewBox) {
+            previewBox.style.display = "flex";
+        }
+    };
+
+    reader.readAsDataURL(file);
+
+    toggleAttachMenu();
+}
+
+/* ---------- FILE ---------- */
+
+function handleChatFile(event) {
+
+    const file = event.target.files[0];
+    if (!file) return;
+
+    /*
+       Text-based files ကို AI ဆီပို့မယ်။
+       PDF/DOCX လို binary document တွေကို
+       ဒီ version မှာ မဖတ်သေးဘူး။
+    */
+
+    if (
+        file.type.startsWith("text/") ||
+        file.name.endsWith(".txt") ||
+        file.name.endsWith(".md")
+    ) {
+
+        const reader = new FileReader();
+
+        reader.onload = function(e) {
+
+            shAttachedFileText = {
+                name: file.name,
+                text: e.target.result
+            };
+
+            const previewBox =
+                document.getElementById("imagePreviewContainer");
+
+            const name =
+                document.getElementById("imageFileName");
+
+            const preview =
+                document.getElementById("selectedImagePreview");
+
+            if (preview) {
+                preview.style.display = "none";
+            }
+
+            if (name) {
+                name.textContent =
+                    "📄 " + file.name;
+            }
+
+            if (previewBox) {
+                previewBox.style.display = "flex";
+            }
+        };
+
+        reader.readAsText(file);
+
+    } else {
+
+        alert(
+            "ဒီ version မှာ TXT / MD ဖိုင်တွေကိုပဲ ဖတ်နိုင်သေးပါတယ်။"
+        );
+    }
+
+    toggleAttachMenu();
+}
+
+/* ---------- REMOVE ATTACHMENT ---------- */
+
+function removeAttachedImage() {
+
+    shAttachedImage = null;
+    shAttachedFileText = null;
+
+    const previewBox =
+        document.getElementById("imagePreviewContainer");
+
+    const imageInput =
+        document.getElementById("chatImageInput");
+
+    const fileInput =
+        document.getElementById("chatFileInput");
+
+    if (previewBox) {
+        previewBox.style.display = "none";
+    }
+
+    if (imageInput) {
+        imageInput.value = "";
+    }
+
+    if (fileInput) {
+        fileInput.value = "";
+    }
+}
+
+/* ---------- ADD MESSAGE ---------- */
+
+function shAddChatMessage(text, type = "ai") {
+
+    const container =
+        document.getElementById("chatMessages");
+
+    if (!container) return;
+
+    const bubble = document.createElement("div");
+
+    if (type === "user") {
+
+        bubble.style.cssText = `
+            align-self:flex-end;
+            background:linear-gradient(135deg,#0284c7,#2563eb);
+            color:#fff;
+            padding:10px 14px;
+            border-radius:16px 16px 4px 16px;
+            max-width:82%;
+            font-size:14px;
+            line-height:1.6;
+            box-shadow:0 5px 18px rgba(0,140,255,.25);
+            white-space:pre-wrap;
+            word-break:break-word;
+        `;
+
+    } else {
+
+        bubble.style.cssText = `
+            align-self:flex-start;
+            background:rgba(30,41,59,.88);
+            border:1px solid rgba(56,189,248,.22);
+            color:#e5f4ff;
+            padding:10px 14px;
+            border-radius:16px 16px 16px 4px;
+            max-width:82%;
+            font-size:14px;
+            line-height:1.65;
+            box-shadow:0 5px 18px rgba(0,0,0,.25);
+            white-space:pre-wrap;
+            word-break:break-word;
+        `;
+    }
+
+    bubble.textContent = text;
+
+    container.appendChild(bubble);
+
+    container.scrollTop = container.scrollHeight;
+
+    return bubble;
+}
+
+/* ---------- SEND MESSAGE ---------- */
+
+async function sendChatMessage() {
+
+    const input =
+        document.getElementById("chatInput");
+
+    if (!input) return;
+
+    const text = input.value.trim();
+
+    if (!text && !shAttachedImage && !shAttachedFileText) {
+        return;
+    }
+
+    const apiKey = shGetChatApiKey();
+
+    if (!apiKey) {
+
+        shAddChatMessage(
+            "🔑 Gemini API Key မတွေ့ပါဘူး။ Settings မှာ API Key ထည့်ပေးပါ။",
+            "ai"
+        );
+
+        return;
+    }
+
+    let displayText = text;
+
+    if (shAttachedImage) {
+        displayText +=
+            (displayText ? "\n" : "") +
+            "🖼️ " + shAttachedImage.name;
+    }
+
+    if (shAttachedFileText) {
+        displayText +=
+            (displayText ? "\n" : "") +
+            "📄 " + shAttachedFileText.name;
+    }
+
+    shAddChatMessage(displayText, "user");
+
+    input.value = "";
+
+    const loadingBubble =
+        shAddChatMessage(
+            "⏳ SH AI စဉ်းစားနေပါတယ်...",
+            "ai"
+        );
+
+    try {
+
+        const parts = [];
+
+        /* TEXT */
+
+        if (text) {
+            parts.push({
+                text: text
+            });
+        }
+
+        /* IMAGE */
+
+        if (shAttachedImage) {
+
+            parts.push({
+                inline_data: {
+                    mime_type: shAttachedImage.mimeType,
+                    data: shAttachedImage.data
+                }
+            });
+        }
+
+        /* TEXT FILE */
+
+        if (shAttachedFileText) {
+
+            parts.push({
+                text:
+                    "\n\nAttached file: " +
+                    shAttachedFileText.name +
+                    "\n\n" +
+                    shAttachedFileText.text
+            });
+        }
+
+        /* HISTORY */
+
+        shChatHistory.push({
+            role: "user",
+            parts: parts
+        });
+
+        const response =
+            await fetch(
+                "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent",
+                {
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type": "application/json",
+                        "x-goog-api-key": apiKey
+                    },
+
+                    body: JSON.stringify({
+                        systemInstruction: {
+                            parts: [{
+                                text:
+                                    "You are SH AI TEAM, the helpful AI assistant inside SH AI Studio. " +
+                                    "Answer clearly and naturally. " +
+                                    "When the user speaks Burmese, reply naturally in Burmese. " +
+                                    "Do not mention internal API details unless asked."
+                            }]
+                        },
+
+                        contents: shChatHistory,
+
+                        generationConfig: {
+                            temperature: 0.7,
+                            maxOutputTokens: 2048
+                        }
+                    })
+                }
+            );
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(
+                data?.error?.message ||
+                "Gemini API Error"
+            );
+        }
+
+        const answer =
+            data?.candidates?.[0]?.content?.parts
+                ?.map(p => p.text || "")
+                .join("") ||
+            "AI က အဖြေပြန်မပေးနိုင်သေးပါဘူး။";
+
+        if (loadingBubble) {
+            loadingBubble.textContent = answer;
+        }
+
+        shChatHistory.push({
+            role: "model",
+            parts: [{
+                text: answer
+            }]
+        });
+
+        /* Clear attachment after successful send */
+
+        removeAttachedImage();
+
+    } catch (error) {
+
+        if (loadingBubble) {
+
+            loadingBubble.textContent =
+                "❌ Error: " + error.message;
+        }
+
+        console.error(
+            "SH AI CHAT ERROR:",
+            error
+        );
+    }
+}
+
+/* ---------- NEW CHAT ---------- */
+
+function startNewChat() {
+
+    shChatHistory = [];
+
+    const container =
+        document.getElementById("chatMessages");
+
+    if (!container) return;
+
+    container.innerHTML = "";
+
+    shAddChatMessage(
+        "မင်္ဂလာပါ။ SH AI TEAM ပါ 🚀\nဘာများကူညီပေးရမလဲ?",
+        "ai"
+    );
+
+    removeAttachedImage();
+}
+
+/* ---------- ENTER KEY ---------- */
+
+document.addEventListener(
+    "keydown",
+    function(event) {
+
+        const input =
+            document.getElementById("chatInput");
+
+        if (
+            input &&
+            document.activeElement === input &&
+            event.key === "Enter" &&
+            !event.shiftKey
+        ) {
+
+            event.preventDefault();
+
+            sendChatMessage();
+        }
+    }
+);
 let activePickerTarget = null; // 'single' or block ID number
 let singleVoiceValue = "Charon";
 let currentAudioBlob = null;
