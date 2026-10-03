@@ -1378,7 +1378,7 @@ body{background:radial-gradient(circle at 50% -10%,rgba(32,104,255,.16),transpar
             </div>
         </div>
 
-        <div style="background: rgba(13, 27, 42, 0.6); backdrop-filter: blur(10px); border: 1px solid rgba(245, 158, 11, 0.3); padding: 12px; border-radius: 14px; display: flex; align-items: center; gap: 10px; cursor: pointer;">
+        <div onclick="openHistoryModal()" style="background: rgba(13, 27, 42, 0.6); backdrop-filter: blur(10px); border: 1px solid rgba(245, 158, 11, 0.3); padding: 12px; border-radius: 14px; display: flex; align-items: center; gap: 10px; cursor: pointer;">
             <div style="width: 32px; height: 32px; border-radius: 8px; background: rgba(245, 158, 11, 0.2); border: 1px solid rgba(245, 158, 11, 0.4); display: flex; align-items: center; justify-content: center; color: #fbbf24; flex-shrink: 0;">
                 <i class="fa-solid fa-clock-rotate-left" style="font-size: 13px;"></i>
             </div>
@@ -1723,12 +1723,6 @@ body{background:radial-gradient(circle at 50% -10%,rgba(32,104,255,.16),transpar
         <h2>⚙️ App Settings</h2>
         <button class="sidebar-close-btn" onclick="closeSidebar()">&times;</button>
     </div>
-
-    <div class="sidebar-item">
-        <label>📜 Audio Logs:</label>
-        <button class="btn" style="width:100%; min-height:48px;" onclick="closeSidebar(); openHistoryModal();">🕒 Voice History</button>
-    </div>
-
     <!-- Audio Output Format (Segmented Control) -->
     <div class="sidebar-item">
       <label style="color: #8b9bb4; font-size: 13px; display: block; margin-bottom: 8px;">📁 Audio Output Format:</label>
