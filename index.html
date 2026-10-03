@@ -1622,34 +1622,34 @@ body{background:radial-gradient(circle at 50% -10%,rgba(32,104,255,.16),transpar
     </div>
 </div>
 
-<!-- Modal Popup Window (Global Voice Style အတွက်) -->
-<div id="styleModalOverlay" class="style-modal-overlay" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 1000; justify-content: center; align-items: center; padding: 20px;">
-  <div class="style-modal-content" style="background: #0d1b2a; border: 1px solid rgba(0,210,255,0.3); border-radius: 20px; width: 100%; max-width: 400px; padding: 20px;">
-    <div class="style-modal-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-      <h3 style="color: #fff; font-size: 16px; margin: 0;">🎛️ Select Global Voice Style</h3>
-      <span class="style-close-btn" onclick="closeStyleModal()" style="color: #8b9bb4; font-size: 20px; cursor: pointer;">&times;</span>
+   <!-- Modal Popup Window (Global Style အတွက်) -->
+    <div id="styleModalOverlay" class="style-modal-overlay">
+      <div class="style-modal-content">
+        <div class="style-modal-header">
+          <h3>🎛️ Select Global Voice Style</h3>
+          <span class="style-close-btn" onclick="closeStyleModal()">&times;</span>
+        </div>
+        
+        <div class="style-modal-cards">
+          <div class="modal-style-card" onclick="selectStyleOption(this, 'Natural Dialogue - သဘာဝကျကျ', 'Speak naturally and clearly as a movie narrator.')">
+            <h4>Natural Dialogue</h4>
+            <p>သဘာဝကျကျ စကားပြောဟန်</p>
+          </div>
+          <div class="modal-style-card active" onclick="selectStyleOption(this, 'Warm - နွေးထွေးစွာ', 'Speak warmly and gently as a narrator.')">
+            <h4>Warm (နွေးထွေးစွာ)</h4>
+            <p>နွေးထွေးယုယသော စကားပြောအသံ</p>
+          </div>
+          <div class="modal-style-card" onclick="selectStyleOption(this, 'Movie Dialogue - ဇာတ်လမ်းပုံစံ', 'Speak like a dramatic movie narrator.')">
+            <h4>Movie Dialogue</h4>
+            <p>Movie Recap နှင့် ဇာတ်လမ်းပြောပြသည့် ပုံစံ</p>
+          </div>
+          <div class="modal-style-card" onclick="selectStyleOption(this, 'Excited -စိတ်လှုပ်ရှားစွာ', 'Speak with excitement and high energy.')">
+            <h4>Excited</h4>
+            <p>စိတ်လှုပ်ရှား တက်ကြွသော အသံ</p>
+          </div>
+        </div>
+      </div>
     </div>
-    
-    <div class="style-modal-cards" style="display: flex; flex-direction: column; gap: 10px;">
-      <div class="modal-style-card" onclick="selectStyleOption(this, 'Natural Dialogue - သဘာဝကျကျ', 'Speak naturally and clearly as a movie narrator.')" style="background: rgba(10,15,30,0.8); border: 1px solid rgba(0,210,255,0.2); border-radius: 12px; padding: 12px; cursor: pointer;">
-        <h4 style="color: #fff; font-size: 14px; margin: 0 0 4px 0;">Natural Dialogue</h4>
-        <p style="color: #8b9bb4; font-size: 12px; margin: 0;">သဘာဝကျကျ စကားပြောဟန်</p>
-      </div>
-      <div class="modal-style-card" onclick="selectStyleOption(this, 'Warm - နွေးထွေးစွာ', 'Speak warmly and gently as a narrator.')" style="background: rgba(10,15,30,0.8); border: 1px solid rgba(0,210,255,0.2); border-radius: 12px; padding: 12px; cursor: pointer;">
-        <h4 style="color: #fff; font-size: 14px; margin: 0 0 4px 0;">Warm (နွေးထွေးစွာ)</h4>
-        <p style="color: #8b9bb4; font-size: 12px; margin: 0;">နွေးထွေးယုယသော စကားပြောအသံ</p>
-      </div>
-      <div class="modal-style-card" onclick="selectStyleOption(this, 'Movie Dialogue - ဇာတ်လမ်းပုံစံ', 'Speak like a dramatic movie narrator.')" style="background: rgba(10,15,30,0.8); border: 1px solid rgba(0,210,255,0.2); border-radius: 12px; padding: 12px; cursor: pointer;">
-        <h4 style="color: #fff; font-size: 14px; margin: 0 0 4px 0;">Movie Dialogue</h4>
-        <p style="color: #8b9bb4; font-size: 12px; margin: 0;">Movie Recap နှင့် ဇာတ်လမ်းပြောပြသည့် ပုံစံ</p>
-      </div>
-      <div class="modal-style-card" onclick="selectStyleOption(this, 'Excited - စိတ်လှုပ်ရှားစွာ', 'Speak with excitement and high energy.')" style="background: rgba(10,15,30,0.8); border: 1px solid rgba(0,210,255,0.2); border-radius: 12px; padding: 12px; cursor: pointer;">
-        <h4 style="color: #fff; font-size: 14px; margin: 0 0 4px 0;">Excited</h4>
-        <p style="color: #8b9bb4; font-size: 12px; margin: 0;">စိတ်လှုပ်ရှား တက်ကြွသော အသံ</p>
-      </div>
-    </div>
-  </div>
-</div>
   <!-- Generator View -->
 <div id="voiceGenerator" class="view-container">
     <div class="voice-library">
