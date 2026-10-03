@@ -1560,7 +1560,6 @@ body{background:radial-gradient(circle at 50% -10%,rgba(32,104,255,.16),transpar
         </div> <!-- /voice-card-container -->
     </div> <!-- /section -->
 </div> <!-- /singleTab အဆုံး -->
-  
 <!-- PAGE 2: MULTI-VOICE (Neon UI) -->
 <div id="multiTab" class="page-content" style="display: none;">
     <div class="voice-card-container" style="background: rgba(13, 27, 42, 0.75); border: 1px solid rgba(0, 210, 255, 0.3); border-radius: 20px; padding: 18px; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5); backdrop-filter: blur(12px); margin-bottom: 20px;">
@@ -1573,34 +1572,32 @@ body{background:radial-gradient(circle at 50% -10%,rgba(32,104,255,.16),transpar
                 </div>
                 <div>
                     <h3 style="font-size: 15px; color: #fff; margin: 0;">Multi-Voice Studio</h3>
-                    <div style="font-size: 11px; color: #8b9bb4;">စကားပြော block တစ်ခုချင်းစီအတွက် Speaker သီးသန့်ရွေးပါ</div>
-                </div>
-            </div>
+                    
             <span style="background: rgba(0,210,255,0.15); color: #00d2ff; padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: bold; border: 1px solid rgba(0,210,255,0.3);">Multi-Mode</span>
         </div>
 
-        <!-- 1. Voice Style Section (Single လိုပဲ အပေါ်နားမှာ တစ်န်းတည်း ဖြစ်သွားအောင် ဒီမှာ အရင်တင်လိုက်မယ်) -->
-        <div style="margin-bottom: 14px;">
-            <label style="display: block; color: #b7d5ee; font-size: 13px; margin-bottom: 6px;">🎭 Global Voice Style</label>
-            <div class="style-trigger-box" onclick="openStyleModal()" style="background: rgba(10, 15, 30, 0.65); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 10px 12px; display: flex; justify-content: space-between; align-items: center; cursor: pointer;">
+        <!-- 1. Speech Blocks Container (Charon / Speaker တွေ အရင်လာမယ့်နေရာ) -->
+        <div id="speechBlocksContainer">
+            <!-- Dynamic Speech Blocks will appear here -->
+        </div>
+
+        <!-- Add Block Button -->
+        <button id="addBlockBtn" onclick="addSpeechBlock()" style="width: 100%; padding: 12px; background: rgba(0,210,255,0.1); border: 1px dashed rgba(0,210,255,0.4); border-radius: 12px; color: #00d2ff; font-weight: bold; cursor: pointer; margin-bottom: 16px; font-size: 13px; transition: 0.2s;">
+            + Add Speech Block (1)
+        </button>
+
+        <!-- 2. Global Voice Style Section (Charon ပြီးမှ လာမယ့် Global Style) -->
+        <div style="margin-bottom: 16px; background: rgba(10, 15, 30, 0.4); border: 1px solid rgba(255,255,255,0.06); border-radius: 14px; padding: 12px;">
+            <label style="display: block; color: #b7d5ee; font-size: 12px; margin-bottom: 6px;"> Voice Style</label>
+            <div class="style-trigger-box" onclick="openStyleModal()" style="background: rgba(10, 15, 30, 0.85); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 10px 12px; display: flex; justify-content: space-between; align-items: center; cursor: pointer;">
                 <span id="selectedStyleDisplay" style="font-size: 13px; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Natural Dialogue - သဘာဝကျကျ</span>
                 <span style="color: #8b9bb4; font-size: 11px;">▼</span>
             </div>
             <input type="hidden" id="styleSelect" value="Speak naturally and clearly as a movie narrator.">
         </div>
 
-        <!-- Dynamic Speech Blocks Container -->
-        <div id="speechBlocksContainer">
-            <!-- Dynamic Speech Blocks will appear here -->
-        </div>
-
-        <!-- Add Block Button -->
-        <button id="addBlockBtn" onclick="addSpeechBlock()" style="width: 100%; padding: 12px; background: rgba(0,210,255,0.1); border: 1px dashed rgba(0,210,255,0.4); border-radius: 12px; color: #00d2ff; font-weight: bold; cursor: pointer; margin-bottom: 15px; font-size: 13px; transition: 0.2s;">
-            + Add Speech Block (1)
-        </button>
-
         <!-- Voice Speed Section -->
-        <div style="margin-bottom: 18px;">
+        <div style="margin-bottom: 18px; padding: 0 4px;">
             <label style="display: flex; justify-content: space-between; margin-bottom: 6px; color: #b7d5ee; font-size: 13px;">
                 <span>⚡ Voice Speed</span>
                 <span id="speedVal" style="color: #00baff; font-weight: bold;">1.0x</span>
@@ -1609,20 +1606,20 @@ body{background:radial-gradient(circle at 50% -10%,rgba(32,104,255,.16),transpar
         </div>
 
         <!-- Generate Button -->
-        <button id="generateBtn" onclick="generateVoice()" style="width: 100%; padding: 14px; background: linear-gradient(135deg, #00c6ff, #0072ff); border: none; border-radius: 14px; color: #fff; font-weight: bold; font-size: 14px; cursor: pointer; box-shadow: 0 4px 15px rgba(0,114,255,0.4);">
-            🔊 Generate Multi-Voice Audio
+        <button onclick="generateMultiVoice()" style="width: 100%; padding: 14px; background: linear-gradient(135deg, #00baff, #0077ff); color: #fff; border: none; border-radius: 14px; font-weight: bold; font-size: 14px; cursor: pointer; box-shadow: 0 0 20px rgba(0,186,255,0.3); margin-bottom: 16px;">
+            🎙️ Generate Multi-Voice Audio
         </button>
-        
-        <div id="generateMessage" class="message" style="margin-top: 10px; font-size: 12px; text-align: center;"></div>
 
-        <!-- Result Section -->
-        <div id="result" class="result" style="margin-top: 15px; background: rgba(5, 15, 30, 0.6); border: 1px solid rgba(0,210,255,0.2); border-radius: 14px; padding: 12px; display: none;">
-            <strong style="color: #00d2ff; font-size: 12px; display: block; margin-bottom: 8px;">🎧 Generated Voice</strong>
-            <audio id="audioPlayer" controls style="width: 100%; height: 36px; margin-bottom: 8px;"></audio>
-            <a id="downloadBtn" class="download" style="display: block; text-align: center; background: rgba(0,210,255,0.15); color: #00d2ff; padding: 8px; border-radius: 10px; text-decoration: none; font-size: 12px; font-weight: bold;" onclick="triggerDownload(event)">⬇️ Download Voice</a>
+        <!-- 3. Result / Audio Output Section (အသံထွက်လာရင် ပေါ်လာမည့် Result Settings နဲ့ Player) -->
+        <div id="multiResultSection" style="display: none; background: rgba(10, 15, 30, 0.6); border: 1px solid rgba(0,210,255,0.2); border-radius: 14px; padding: 14px;">
+            <div style="font-size: 12px; color: #00d2ff; margin-bottom: 8px; font-weight: bold;">✨ Result Audio</div>
+            <audio id="multiAudioPlayer" controls style="width: 100%; height: 36px; margin-bottom: 10px;"></audio>
+            <div id="multiStatusMessage" style="font-size: 12px; color: #8b9bb4; text-align: center;"></div>
         </div>
 
     </div>
+</div>
+
 
     <!-- Modal Popup Window (Global Style အတွက်) -->
     <div id="styleModalOverlay" class="style-modal-overlay">
