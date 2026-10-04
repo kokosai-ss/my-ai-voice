@@ -1,1 +1,2036 @@
+/* =========================================
+   SH AI TEAM CHATBOT
+   ========================================= */
+
+let shChatHistory = [];
+let shAttachedImage = null;
+let shAttachedFileText = null;
+
+/* ---------- API KEY ---------- */
+
+function shGetChatApiKey() {
+    const input = document.getElementById("apiKey");
+
+    if (input && input.value.trim()) {
+        return input.value.trim().split(",")[0].trim();
+    }
+
+    return localStorage.getItem("gemini_api_key") || "";
+}
+
+/* ---------- ATTACH MENU ---------- */
+
+function toggleAttachMenu() {
+    const menu = document.getElementById("attachMenu");
+    if (!menu) return;
+
+    menu.style.display =
+        menu.style.display === "flex" ? "none" : "flex";
+}
+
+/* ---------- IMAGE ---------- */
+
+function handleChatImage(event) {
+
+    const file = event.target.files[0];
+    if (!file) return;
+
+    if (!file.type.startsWith("image/")) {
+        alert("Image ဖိုင်ပဲ ရွေးပါ။");
+        return;
+    }
+
+    const reader = new FileReader();
+
+    reader.onload = function(e) {
+
+        shAttachedImage = {
+            mimeType: file.type,
+            data: e.target.result.split(",")[1],
+            name: file.name
+        };
+
+        const previewBox =
+            document.getElementById("imagePreviewContainer");
+
+        const preview =
+            document.getElementById("selectedImagePreview");
+
+        const name =
+            document.getElementById("imageFileName");
+
+        if (preview) {
+            preview.src = e.target.result;
+        }
+
+        if (name) {
+            name.textContent = file.name;
+        }
+
+        if (previewBox) {
+            previewBox.style.display = "flex";
+        }
+    };
+
+    reader.readAsDataURL(file);
+
+    toggleAttachMenu();
+}
+
+/* ---------- FILE ---------- */
+
+function handleChatFile(event) {
+
+    const file = event.target.files[0];
+    if (!file) return;
+
+    /*
+       Text-based files ကို AI ဆီပို့မယ်။
+       PDF/DOCX လို binary document တွေကို
+       ဒီ version မှာ မဖတ်သေးဘူး။
+    */
+
+    if (
+        file.type.startsWith("text/") ||
+        file.name.endsWith(".txt") ||
+        file.name.endsWith(".md")
+    ) {
+
+        const reader = new FileReader();
+
+        reader.onload = function(e) {
+
+            shAttachedFileText = {
+                name: file.name,
+                text: e.target.result
+            };
+
+            const previewBox =
+                document.getElementById("imagePreviewContainer");
+
+            const name =
+                document.getElementById("imageFileName");
+
+            const preview =
+                document.getElementById("selectedImagePreview");
+
+            if (preview) {
+                preview.style.display = "none";
+            }
+
+            if (name) {
+                name.textContent =
+                    "📄 " + file.name;
+            }
+
+            if (previewBox) {
+                previewBox.style.display = "flex";
+            }
+        };
+
+        reader.readAsText(file);
+
+    } else {
+
+        alert(
+            "ဒီ version မှာ TXT / MD ဖိုင်တွေကိုပဲ ဖတ်နိုင်သေးပါတယ်။"
+        );
+    }
+
+    toggleAttachMenu();
+}
+
+/* ---------- REMOVE ATTACHMENT ---------- */
+
+function removeAttachedImage() {
+
+    shAttachedImage = null;
+    shAttachedFileText = null;
+
+    const previewBox =
+        document.getElementById("imagePreviewContainer");
+
+    const imageInput =
+        document.getElementById("chatImageInput");
+
+    const fileInput =
+        document.getElementById("chatFileInput");
+
+    if (previewBox) {
+        previewBox.style.display = "none";
+    }
+
+    if (imageInput) {
+        imageInput.value = "";
+    }
+
+    if (fileInput) {
+        fileInput.value = "";
+    }
+}
+
+/* ---------- ADD MESSAGE ---------- */
+
+function shAddChatMessage(text, type = "ai") {
+
+    const container =
+        document.getElementById("chatMessages");
+
+    if (!container) return;
+
+    const bubble = document.createElement("div");
+
+    if (type === "user") {
+
+        bubble.style.cssText = `
+            align-self:flex-end;
+            background:linear-gradient(135deg,#0284c7,#2563eb);
+            color:#fff;
+            padding:10px 14px;
+            border-radius:16px 16px 4px 16px;
+            max-width:82%;
+            font-size:14px;
+            line-height:1.6;
+            box-shadow:0 5px 18px rgba(0,140,255,.25);
+            white-space:pre-wrap;
+            word-break:break-word;
+        `;
+
+    } else {
+
+        bubble.style.cssText = `
+            align-self:flex-start;
+            background:rgba(30,41,59,.88);
+            border:1px solid rgba(56,189,248,.22);
+            color:#e5f4ff;
+            padding:10px 14px;
+            border-radius:16px 16px 16px 4px;
+            max-width:82%;
+            font-size:14px;
+            line-height:1.65;
+            box-shadow:0 5px 18px rgba(0,0,0,.25);
+            white-space:pre-wrap;
+            word-break:break-word;
+        `;
+    }
+
+    bubble.textContent = text;
+
+    container.appendChild(bubble);
+
+    container.scrollTop = container.scrollHeight;
+
+    return bubble;
+}
+
+/* ---------- SEND MESSAGE ---------- */
+
+async function sendChatMessage() {
+
+    const input =
+        document.getElementById("chatInput");
+
+    if (!input) return;
+
+    const text = input.value.trim();
+
+    if (!text && !shAttachedImage && !shAttachedFileText) {
+        return;
+    }
+
+    const apiKey = shGetChatApiKey();
+
+    if (!apiKey) {
+
+        shAddChatMessage(
+            "🔑 API Key မတွေ့ပါဘူး။ ကျေးဇူးပြုပြီး Settings မှာ API Key ထည့်ပေးပါ။",
+            "ai"
+        );
+
+        return;
+    }
+
+    let displayText = text;
+
+    if (shAttachedImage) {
+        displayText +=
+            (displayText ? "\n" : "") +
+            "🖼️ " + shAttachedImage.name;
+    }
+
+    if (shAttachedFileText) {
+        displayText +=
+            (displayText ? "\n" : "") +
+            "📄 " + shAttachedFileText.name;
+    }
+
+    shAddChatMessage(displayText, "user");
+
+    input.value = "";
+
+    const loadingBubble =
+        shAddChatMessage(
+            "⏳ SH AI စဉ်းစားနေပါတယ်...",
+            "ai"
+        );
+
+    try {
+
+        const parts = [];
+
+        /* TEXT */
+
+        if (text) {
+            parts.push({
+                text: text
+            });
+        }
+
+        /* IMAGE */
+
+        if (shAttachedImage) {
+
+            parts.push({
+                inline_data: {
+                    mime_type: shAttachedImage.mimeType,
+                    data: shAttachedImage.data
+                }
+            });
+        }
+
+        /* TEXT FILE */
+
+        if (shAttachedFileText) {
+
+            parts.push({
+                text:
+                    "\n\nAttached file: " +
+                    shAttachedFileText.name +
+                    "\n\n" +
+                    shAttachedFileText.text
+            });
+        }
+
+        /* HISTORY */
+
+        shChatHistory.push({
+            role: "user",
+            parts: parts
+        });
+
+        const response =
+            await fetch(
+                "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent",
+                {
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type": "application/json",
+                        "x-goog-api-key": apiKey
+                    },
+
+                    body: JSON.stringify({
+                        systemInstruction: {
+                            parts: [{
+                                text:
+                                    "You are SH AI TEAM, the helpful AI assistant inside SH AI Studio. " +
+                                    "Answer clearly and naturally. " +
+                                    "When the user speaks Burmese, reply naturally in Burmese. " +
+                                    "Do not mention internal API details unless asked."
+                            }]
+                        },
+
+                        contents: shChatHistory,
+
+                        generationConfig: {
+                            temperature: 0.7,
+                            maxOutputTokens: 2048
+                        }
+                    })
+                }
+            );
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(
+                data?.error?.message ||
+                "Gemini API Error"
+            );
+        }
+
+        const answer =
+            data?.candidates?.[0]?.content?.parts
+                ?.map(p => p.text || "")
+                .join("") ||
+            "AI က အဖြေပြန်မပေးနိုင်သေးပါဘူး။";
+
+        if (loadingBubble) {
+            loadingBubble.textContent = answer;
+        }
+
+        shChatHistory.push({
+            role: "model",
+            parts: [{
+                text: answer
+            }]
+        });
+
+        /* Clear attachment after successful send */
+
+        removeAttachedImage();
+
+    } catch (error) {
+
+        if (loadingBubble) {
+
+            loadingBubble.textContent =
+                "❌ Error: " + error.message;
+        }
+
+        console.error(
+            "SH AI CHAT ERROR:",
+            error
+        );
+    }
+}
+
+/* ---------- NEW CHAT ---------- */
+
+function startNewChat() {
+
+    shChatHistory = [];
+
+    const container =
+        document.getElementById("chatMessages");
+
+    if (!container) return;
+
+    container.innerHTML = "";
+
+    shAddChatMessage(
+        "မင်္ဂလာပါ။ SH AI TEAM ပါ 🚀\nဘာများကူညီပေးရမလဲ?",
+        "ai"
+    );
+
+    removeAttachedImage();
+}
+
+/* ---------- ENTER KEY ---------- */
+
+document.addEventListener(
+    "keydown",
+    function(event) {
+
+        const input =
+            document.getElementById("chatInput");
+
+        if (
+            input &&
+            document.activeElement === input &&
+            event.key === "Enter" &&
+            !event.shiftKey
+        ) {
+
+            event.preventDefault();
+
+            sendChatMessage();
+        }
+    }
+);
+let activePickerTarget = null; // 'single' or block ID number
+let singleVoiceValue = "Charon";
+let currentAudioBlob = null;
+
+const MY_PASSWORD = "1911999";
+const API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-tts-preview:generateContent";
+let audioURL = null;
+let singleAudioURL = null;
+let blockCounter = 0;
+
+/* LOCK SCREEN CONTROLS */
+function togglePasswordVisibility() {
+    const input = document.getElementById('passInput');
+    const eyeIcon = document.getElementById('eyeIcon');
+    if (input.type === 'password') {
+        input.type = 'text';
+        if (eyeIcon) {
+            eyeIcon.classList.remove('fa-eye');
+            eyeIcon.classList.add('fa-eye-slash');
+        }
+    } else {
+        input.type = 'password';
+        if (eyeIcon) {
+            eyeIcon.classList.remove('fa-eye-slash');
+            eyeIcon.classList.add('fa-eye');
+        }
+    }
+}
+
+function checkUnlockPassword() {
+    const input = document.getElementById('passInput').value;
+
+    if (input === '') {
+        alert('ကျေးဇူးပြု၍ စကားဝှက် ရိုက်ထည့်ပါ!');
+    } else if (input === '1911999') {
+
+        const lockScreen = document.getElementById('cyberpunk-lockscreen');
+        if (lockScreen) {
+            lockScreen.style.transition = 'opacity 0.5s ease';
+            lockScreen.style.opacity = '0';
+            setTimeout(() => {
+                lockScreen.style.display = 'none';
+            }, 500);
+        }
+
+        const appContent = document.getElementById("appContent");
+        if (appContent) {
+            appContent.style.display = "block";
+        }
+
+        const saved = getStoredKey();
+        if (saved) {
+            document.getElementById("apiKey").value = saved;
+        }
+        updateKeyStatus();
+    } else {
+        alert('စကားဝှက် မှားယွင်းနေပါသည်။');
+    }
+}
+/* =========================================
+   SH IMAGE SEARCH — UNSPLASH FREE MODE
+   ========================================= */
+
+async function searchAssets() {
+
+    const input = document.getElementById('assetSearchInput');
+    const grid = document.getElementById('assetGrid');
+
+    const query = input.value.trim();
+
+    if (!query) {
+        input.focus();
+        return;
+    }
+
+    /* Loading */
+
+    grid.innerHTML = `
+        <div class="sh-empty-state">
+
+            <div class="sh-empty-icon">
+                <i class="fa-solid fa-spinner fa-spin"></i>
+            </div>
+
+            <div class="sh-empty-title">
+                ရှာဖွေနေပါတယ်...
+            </div>
+
+            <div class="sh-empty-text">
+                ${escapeHtml(query)} ပုံများကို ရှာနေပါတယ်
+            </div>
+
+        </div>
+    `;
+
+    /*
+       IMPORTANT:
+       ဒီနေရာမှာ မင်းရဲ့ Unsplash API Key အသစ်ထည့်
+    */
+
+    const accessKey = 'cLALLiJz6pnN-U2M5LNepEwmYEEPu1Ld1pJ';
+
+    const url =
+        `https://api.unsplash.com/search/photos` +
+        `?query=${encodeURIComponent(query)}` +
+        `&per_page=20` +
+        `&client_id=${encodeURIComponent(accessKey)}`;
+
+    try {
+
+        const response = await fetch(url);
+
+        if (!response.ok) {
+            throw new Error(
+                `Unsplash API Error: ${response.status}`
+            );
+        }
+
+        const data = await response.json();
+
+        if (!data.results || data.results.length === 0) {
+
+            grid.innerHTML = `
+                <div class="sh-empty-state">
+
+                    <div class="sh-empty-icon">
+                        <i class="fa-regular fa-face-frown"></i>
+                    </div>
+
+                    <div class="sh-empty-title">
+                        ပုံမတွေ့ပါ
+                    </div>
+
+                    <div class="sh-empty-text">
+                        အခြားစာလုံးနဲ့ ပြန်ရှာကြည့်ပါ
+                    </div>
+
+                </div>
+            `;
+
+            return;
+        }
+
+        grid.innerHTML = '';
+
+        data.results.forEach(photo => {
+
+            const card = document.createElement('div');
+
+            card.className = 'sh-asset-card';
+
+            const image = document.createElement('img');
+
+            image.src = photo.urls.small;
+
+            image.alt =
+                photo.alt_description ||
+                query;
+
+            image.loading = 'lazy';
+
+            /*
+               Main grid မှာ user name မပြဘူး
+            */
+
+            const overlay =
+                document.createElement('div');
+
+            overlay.className =
+                'sh-image-overlay';
+
+            /*
+               Unsplash download tracking
+            */
+
+            const download =
+                document.createElement('a');
+
+            download.className =
+                'sh-image-download';
+
+            download.href =
+                photo.links.download_location;
+
+            download.target = '_blank';
+
+            download.rel =
+                'noopener noreferrer';
+
+            download.innerHTML =
+                '<i class="fa-solid fa-download"></i>';
+
+            download.title =
+                'Download';
+
+            /*
+               Download ကိုနှိပ်တဲ့အခါ
+               Unsplash download endpoint ကို trigger
+            */
+
+            download.addEventListener(
+                'click',
+                async function(e) {
+
+                    e.preventDefault();
+
+                    try {
+                        await fetch(
+                            photo.links.download_location
+                        );
+                    } catch (err) {
+                        console.warn(
+                            'Download tracking failed',
+                            err
+                        );
+                    }
+
+                    /*
+                       Full image ကိုဖွင့်
+                    */
+
+                    window.open(
+                        photo.urls.full,
+                        '_blank',
+                        'noopener'
+                    );
+                }
+            );
+
+            overlay.appendChild(download);
+
+            card.appendChild(image);
+            card.appendChild(overlay);
+
+            /*
+               ပုံနှိပ်ရင် Preview
+            */
+
+            image.addEventListener(
+                'click',
+                function() {
+                    openImagePreview(photo);
+                }
+            );
+
+            grid.appendChild(card);
+        });
+
+    } catch (error) {
+
+        console.error(error);
+
+        grid.innerHTML = `
+            <div class="sh-empty-state">
+
+                <div
+                    class="sh-empty-icon"
+                    style="color:#fb7185;"
+                >
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+                </div>
+
+                <div class="sh-empty-title">
+                    ရှာဖွေရာမှာ အမှားဖြစ်နေပါတယ်
+                </div>
+
+                <div class="sh-empty-text">
+                    API Key နဲ့ Internet connection ကို
+                    ပြန်စစ်ကြည့်ပါ
+                </div>
+
+            </div>
+        `;
+    }
+}
+
+
+/* =========================================
+   IMAGE PREVIEW
+   ========================================= */
+
+function openImagePreview(photo) {
+
+    let modal =
+        document.getElementById(
+            'shImagePreviewModal'
+        );
+
+    if (!modal) {
+
+        modal =
+            document.createElement('div');
+
+        modal.id =
+            'shImagePreviewModal';
+
+        modal.innerHTML = `
+
+            <div class="sh-preview-backdrop">
+
+                <div class="sh-preview-box">
+
+                    <button
+                        class="sh-preview-close"
+                        onclick="closeImagePreview()"
+                    >
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+
+                    <img
+                        id="shPreviewImage"
+                        src=""
+                        alt=""
+                    >
+
+                    <div
+                        class="sh-preview-info"
+                        id="shPreviewInfo"
+                    ></div>
+
+                </div>
+
+            </div>
+        `;
+
+        document.body.appendChild(modal);
+
+        const style =
+            document.createElement('style');
+
+        style.textContent = `
+
+            #shImagePreviewModal {
+                position: fixed;
+                inset: 0;
+                z-index: 99999;
+            }
+
+            .sh-preview-backdrop {
+                position: absolute;
+                inset: 0;
+
+                display: flex;
+                align-items: center;
+                justify-content: center;
+
+                padding: 20px;
+
+                background:
+                    rgba(1,8,16,0.88);
+
+                backdrop-filter: blur(16px);
+                -webkit-backdrop-filter: blur(16px);
+            }
+
+            .sh-preview-box {
+                position: relative;
+
+                width: min(100%, 420px);
+
+                padding: 8px;
+
+                border-radius: 20px;
+
+                background:
+                    rgba(10,25,42,0.78);
+
+                border:
+                    1px solid
+                    rgba(34,211,238,0.25);
+
+                box-shadow:
+                    0 0 40px
+                    rgba(34,211,238,0.10);
+            }
+
+            .sh-preview-box img {
+                width: 100%;
+                max-height: 70vh;
+
+                display: block;
+
+                object-fit: contain;
+
+                border-radius: 15px;
+            }
+
+            .sh-preview-close {
+                position: absolute;
+
+                top: 15px;
+                right: 15px;
+
+                z-index: 2;
+
+                width: 34px;
+                height: 34px;
+
+                border-radius: 10px;
+
+                border:
+                    1px solid
+                    rgba(255,255,255,0.12);
+
+                background:
+                    rgba(0,0,0,0.55);
+
+                color: #fff;
+
+                cursor: pointer;
+            }
+
+            .sh-preview-info {
+                padding: 8px 5px 3px;
+
+                color: #6f8da3;
+                font-size: 8px;
+                text-align: center;
+            }
+        `;
+
+        document.head.appendChild(style);
+    }
+
+    const previewImage =
+        document.getElementById(
+            'shPreviewImage'
+        );
+
+    const info =
+        document.getElementById(
+            'shPreviewInfo'
+        );
+
+    previewImage.src =
+        photo.urls.regular;
+
+    /*
+       Main card မှာမပြပေမယ့်
+       Preview ထဲမှာ attribution ထား
+    */
+
+    info.innerHTML =
+        `Photo by ${escapeHtml(photo.user.name)} · Unsplash`;
+
+    modal.style.display = 'block';
+}
+
+
+function closeImagePreview() {
+
+    const modal =
+        document.getElementById(
+            'shImagePreviewModal'
+        );
+
+    if (modal) {
+        modal.style.display = 'none';
+    }
+}
+
+
+/* =========================================
+   HTML SAFETY
+   ========================================= */
+
+function escapeHtml(value) {
+
+    const div =
+        document.createElement('div');
+
+    div.textContent =
+        value || '';
+
+    return div.innerHTML;
+}
+
+
+/* =========================================
+   ENTER KEY SEARCH
+   ========================================= */
+
+document.addEventListener(
+    'keydown',
+    function(e) {
+
+        if (
+            e.key === 'Enter' &&
+            document.activeElement &&
+            document.activeElement.id ===
+                'assetSearchInput'
+        ) {
+
+            searchAssets();
+        }
+    }
+);
+  
+/* FORMAT & STYLE MODAL LOGICS */
+function setAudioFormat(formatValue) {
+  const btnWav = document.getElementById('btnWav');
+  const btnMp3 = document.getElementById('btnMp3');
+  const select = document.getElementById('formatSelect');
+
+  if (formatValue === 'wav') {
+    btnWav.style.background = '#0088ff';
+    btnWav.style.color = '#ffffff';
+    btnMp3.style.background = 'transparent';
+    btnMp3.style.color = '#8b9bb4';
+  } else {
+    btnMp3.style.background = '#0088ff';
+    btnMp3.style.color = '#ffffff';
+    btnWav.style.background = 'transparent';
+    btnWav.style.color = '#8b9bb4';
+  }
+
+  if (select) {
+    select.value = formatValue;
+    select.dispatchEvent(new Event('change'));
+  }
+}
+
+function openSingleStyleModal() {
+  document.getElementById('singleStyleModalOverlay').style.display = 'flex';
+}
+
+function closeSingleStyleModal() {
+  document.getElementById('singleStyleModalOverlay').style.display = 'none';
+}
+
+function selectSingleStyleOption(element, displayText, promptValue) {
+  document.getElementById('singleSelectedStyleDisplay').innerText = displayText;
+  document.getElementById('singleStyleSelect').value = promptValue;
+  
+  const modalCards = element.parentElement.querySelectorAll('.modal-style-card');
+  modalCards.forEach(card => card.classList.remove('active'));
+  element.classList.add('active');
+  
+  closeSingleStyleModal();
+}
+
+function openStyleModal() {
+  document.getElementById('styleModalOverlay').style.display = 'flex';
+}
+
+function closeStyleModal() {
+  document.getElementById('styleModalOverlay').style.display = 'none';
+}
+
+function selectStyleOption(element, displayText, promptValue) {
+  document.getElementById('selectedStyleDisplay').innerText = displayText;
+  document.getElementById('styleSelect').value = promptValue;
+  
+  document.querySelectorAll('#styleModalOverlay .modal-style-card').forEach(card => card.classList.remove('active'));
+  element.classList.add('active');
+  
+  closeStyleModal();
+}
+/* VOICE PICKER MODAL LOGIC */
+function openVoicePicker(target) {
+    activePickerTarget = target;
+    const modal = document.getElementById("voicePickerModal");
+    modal.style.display = "flex";
+
+    let currentVal = "";
+    if (target === 'single') {
+        currentVal = singleVoiceValue;
+    } else {
+        const block = document.getElementById(`speechBlock_${target}`);
+        if(block) currentVal = block.getAttribute("data-speaker");
+    }
+
+    document.querySelectorAll(".voice-card-option").forEach(card => {
+        if(card.getAttribute("data-voice") === currentVal) {
+            card.classList.add("selected");
+        } else {
+            card.classList.remove("selected");
+        }
+    });
+}
+
+function closeVoicePicker() {
+    document.getElementById("voicePickerModal").style.display = "none";
+}
+
+function selectVoiceOption(voiceVal, displayLabel) {
+    if (activePickerTarget === 'single') {
+        singleVoiceValue = voiceVal;
+        document.getElementById("singleSelectedSpeakerText").textContent = displayLabel;
+    } else {
+        const block = document.getElementById(`speechBlock_${activePickerTarget}`);
+        if(block) {
+            block.setAttribute("data-speaker", voiceVal);
+            block.querySelector(".block-speaker-label").textContent = displayLabel;
+        }
+    }
+    closeVoicePicker();
+}
+
+/* SIDEBAR & OPTIONS */
+function openSidebar() {
+    document.getElementById("mySidebar").style.left = "0";
+    document.getElementById("overlay").style.display = "block";
+}
+
+function closeSidebar() {
+    document.getElementById("mySidebar").style.left = "-310px";
+    document.getElementById("overlay").style.display = "none";
+}
+
+function openHistoryModal() {
+    document.getElementById("historyModal").style.display = "flex";
+    renderHistory();
+}
+
+function closeHistoryModal() {
+    document.getElementById("historyModal").style.display = "none";
+}
+
+function toggleTempSlider() {
+    const isChecked = document.getElementById("tempToggle").checked;
+    document.getElementById("tempSliderWrap").style.display = isChecked ? "block" : "none";
+}
+
+function addSpeechBlock(initialText = "", selectedSpeaker = "Charon") {
+    blockCounter++;
+    const container = document.getElementById("speechBlocksContainer");
+
+    const blockDiv = document.createElement("div");
+    blockDiv.className = "speech-block-card";
+    blockDiv.id = `speechBlock_${blockCounter}`;
+    blockDiv.setAttribute("data-speaker", selectedSpeaker);
+
+    const speakerLabelMap = {
+        "Puck": "Puck (တက်ကြွလှုပ်ရှား လူငယ်သံ)",
+        "Charon": "Charon (သတင်း/ဗဟုသုတပေး တည်ငြိမ်သံ)",
+        "Fenrir": "Fenrir (စိတ်လှုပ်ရှားဖွယ် ဇာတ်လမ်းသံ)",
+        "Orus": "Orus (ပြတ်သားခိုင်မာ ရင့်ကျက်သံ)",
+        "Kore": "Kore (ပြတ်သားခိုင်မာ လူငယ်သံ)",
+        "Leda": "Leda (နုပျိုတက်ကြွ ချိုသာသံ)",
+        "Aoede": "Aoede (ပေါ့ပါးလန်းဆန်း စကားပြောသံ)",
+        "Callirrhoe": "Callirrhoe (အေးဆေးပေါ့ပါး သဘာဝသံ)",
+        "Despina": "Despina (ချောမွေ့ငြိမ့်ညောင်း ဇာတ်လမ်းသံ)"
+    };
+
+    blockDiv.innerHTML = `
+        <div class="block-card-header">
+            <span class="block-card-title">💬 <span class="block-number-text">Speech Block (1)</span></span>
+        </div>
+        <div class="block-card-body">
+            <div class="mic-avatar-circle">🎙️</div>
+            <div style="flex:1; width:100%;">
+                <label style="display:block; font-size:12px; color:#8eb0cb; margin-bottom:6px;">Speaker Voice ရွေးရန်:</label>
+                <div class="speaker-select-trigger" onclick="openVoicePicker(${blockCounter})">
+                    <span class="block-speaker-label">${speakerLabelMap[selectedSpeaker] || selectedSpeaker}</span>
+                    <span>▼</span>
+                </div>
+            </div>
+        </div>
+        <textarea class="block-textarea block-text-input" placeholder="ဒီ block အတွက် ပြောရမည့် စာသား ရိုက်ထည့်ပါ...">${initialText}</textarea>
+        
+        <div class="block-card-footer">
+            <div class="card-controls-left">
+                <button class="btn-card-ctrl" onclick="moveBlockUp(${blockCounter})">↑ Move Up</button>
+                <button class="btn-card-ctrl" onclick="moveBlockDown(${blockCounter})">↓ Move Down</button>
+            </div>
+            <button class="btn-card-delete" onclick="removeSpeechBlock(${blockCounter})">Delete</button>
+        </div>
+    `;
+
+    container.appendChild(blockDiv);
+    reindexBlocks();
+}
+
+function removeSpeechBlock(id) {
+    const block = document.getElementById(`speechBlock_${id}`);
+    if (block) {
+        block.remove();
+        reindexBlocks();
+    }
+}
+
+function moveBlockUp(id) {
+    const block = document.getElementById(`speechBlock_${id}`);
+    if (block && block.previousElementSibling) {
+        block.parentNode.insertBefore(block, block.previousElementSibling);
+        reindexBlocks();
+    }
+}
+
+function moveBlockDown(id) {
+    const block = document.getElementById(`speechBlock_${id}`);
+    if (block && block.nextElementSibling) {
+        block.parentNode.insertBefore(block.nextElementSibling, block);
+        reindexBlocks();
+    }
+}
+
+function reindexBlocks() {
+    const blocks = document.querySelectorAll(".speech-block-card");
+    blocks.forEach((el, index) => {
+        const numText = el.querySelector(".block-number-text");
+        if(numText) numText.textContent = `Speech Block (${index + 1})`;
+    });
+
+    const addBtn = document.getElementById("addBlockBtn");
+    if(addBtn) {
+        addBtn.textContent = `+ Add Speech Block (${blocks.length + 1})`;
+    }
+}
+
+// Initialize default block
+window.addEventListener("DOMContentLoaded", () => {
+    addSpeechBlock();
+});
+
+function updateSpeed(val){
+    document.getElementById("speedVal").textContent = val + "x";
+    const player = document.getElementById("audioPlayer");
+    if(player){
+        player.playbackRate = parseFloat(val);
+    }
+}
+
+function updateSingleSpeed(val){
+    document.getElementById("singleSpeedVal").textContent = val + "x";
+    const player = document.getElementById("singleAudioPlayer");
+    if(player){
+        player.playbackRate = parseFloat(val);
+    }
+}
+
+function getStoredKey(){
+    return localStorage.getItem("gemini_api_key") || "";
+}
+
+function updateKeyStatus(){
+    const key = document.getElementById("apiKey").value.trim();
+    const status = document.getElementById("keyStatus");
+
+    if(key){
+        status.textContent = "Ready";
+        status.classList.add("ok");
+    }else{
+        status.textContent = "Missing";
+        status.classList.remove("ok");
+    }
+}
+
+function saveKey(){
+    const key = document.getElementById("apiKey").value.trim();
+    if(!key){
+        showKeyMessage("API Key မထည့်ရသေးပါ။", "error");
+        return;
+    }
+
+    if(document.getElementById("saveKey").checked){
+        localStorage.setItem("gemini_api_key", key);
+    }
+
+    updateKeyStatus();
+    showKeyMessage("✅ API Key ကို သိမ်းပြီးပါပြီ။", "success");
+}
+
+function changeKey(){
+    const input = document.getElementById("apiKey");
+    input.focus();
+    input.select();
+}
+
+function removeKey(){
+    localStorage.removeItem("gemini_api_key");
+    document.getElementById("apiKey").value = "";
+    updateKeyStatus();
+    showKeyMessage("API Key ကို ဖျက်ပြီးပါပြီ။", "success");
+}
+
+function toggleKey(){
+    const input = document.getElementById("apiKey");
+    input.type = input.type === "password" ? "text" : "password";
+}
+
+function showKeyMessage(text,type){
+    const box = document.getElementById("keyMessage");
+    box.textContent = text;
+    box.className = "message " + type;
+}
+
+async function testKey(){
+    const rawKeys = document.getElementById("apiKey").value.trim();
+    if(!rawKeys){
+        showKeyMessage("အရင်ဆုံး API Key ထည့်ပါ။", "error");
+        return;
+    }
+
+    const keysList = rawKeys.split(",").map(k => k.trim()).filter(k => k.length > 0);
+    showKeyMessage("🔄 API Key ကို စစ်ဆေးနေပါတယ်...", "info");
+
+    try{
+        const response = await fetch("https://generativelanguage.googleapis.com/v1beta/models", {
+            method:"GET",
+            headers: { "x-goog-api-key": keysList[0] }
+        });
+
+        const data = await response.json().catch(()=>({}));
+        if(!response.ok){
+            throw new Error(data?.error?.message || `HTTP ${response.status}`);
+        }
+
+        if(document.getElementById("saveKey").checked){
+            localStorage.setItem("gemini_api_key", rawKeys);
+        }
+
+        updateKeyStatus();
+        showKeyMessage("✅ API Key အလုပ်လုပ်ပါတယ်။", "success");
+
+    }catch(error){
+        showKeyMessage("❌ API Key Error: " + error.message, "error");
+    }
+}
+async function testApiKey() {
+    const apiKey = document.getElementById('apiKey').value.trim();
+    if (!apiKey) {
+        alert('ကျေးဇူးပြု၍ API Key အရင်ထည့်ပါ။');
+        return;
+    }
+    
+    alert('စစ်ဆေးနေပါပြီ... ခဏစောင့်ပါ။');
+    
+    try {
+        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ contents: [{ parts: [{ text: "hi" }] }] })
+        });
+        
+        if (response.ok) {
+            alert('✅ API Key အလုပ်လုပ်ပါသည် (Valid Key)');
+        } else {
+            alert('❌ API Key မမှန်ပါ သို့မဟုတ် သက်တမ်းကုန်နေပါပြီ။');
+        }
+    } catch (error) {
+        alert('⚠️ ချိတ်ဆက်မှု အမှားအယွင်းရှိပါသည်: ' + error.message);
+    }
+}
+
+function cleanScriptText(rawText) {
+    if (!rawText) return "";
+    return rawText
+        .replace(/[\r\n]+/g, ' ')
+        .replace(/\s+/g, ' ')
+        .replace(/([၊။])\1+/g, '$1')
+        .trim();
+}
+
+async function trimSilenceFromPCM(pcmUint8Array, sampleRate = 24000) {
+    const samplesCount = pcmUint8Array.length / 2;
+    if (samplesCount === 0) return pcmUint8Array;
+
+    const float32Array = new Float32Array(samplesCount);
+    const dataView = new DataView(pcmUint8Array.buffer, pcmUint8Array.byteOffset, pcmUint8Array.byteLength);
+
+    for (let i = 0; i < samplesCount; i++) {
+        const int16 = dataView.getInt16(i * 2, true);
+        float32Array[i] = int16 < 0 ? int16 / 32768 : int16 / 32767;
+    }
+
+    let start = 0;
+    let end = float32Array.length;
+    const threshold = 0.015;
+
+    for (let i = 0; i < float32Array.length; i++) {
+        if (Math.abs(float32Array[i]) > threshold) {
+            start = Math.max(0, i - 240);
+            break;
+        }
+    }
+
+    for (let i = float32Array.length - 1; i >= 0; i--) {
+        if (Math.abs(float32Array[i]) > threshold) {
+            end = Math.min(float32Array.length, i + 240);
+            break;
+        }
+    }
+
+    if (start >= end) return pcmUint8Array;
+
+    const trimmedSamples = float32Array.subarray(start, end);
+    const trimmedPCM = new Uint8Array(trimmedSamples.length * 2);
+    const trimmedView = new DataView(trimmedPCM.buffer);
+
+    for (let i = 0; i < trimmedSamples.length; i++) {
+        const s = Math.max(-1, Math.min(1, trimmedSamples[i]));
+        const val = s < 0 ? s * 32768 : s * 32767;
+        trimmedView.setInt16(i * 2, val, true);
+    }
+
+    return trimmedPCM;
+}
+function switchTab(tabName) {
+    const singleTab = document.getElementById('singleTab');
+    const multiTab = document.getElementById('multiTab');
+    const singleBtn = document.getElementById('singleTabBtn');
+    const multiBtn = document.getElementById('multiTabBtn');
+
+    if (tabName === 'single') {
+        singleTab.style.display = 'block';
+        multiTab.style.display = 'none';
+        
+        singleBtn.style.background = 'rgba(0,210,255,0.2)';
+        singleBtn.style.borderColor = '#00d2ff';
+        singleBtn.style.color = '#fff';
+
+        multiBtn.style.background = 'rgba(15,23,42,0.8)';
+        multiBtn.style.borderColor = 'rgba(255,255,255,0.1)';
+        multiBtn.style.color = '#8eb0cb';
+    } else {
+        singleTab.style.display = 'none';
+        multiTab.style.display = 'block';
+
+        multiBtn.style.background = 'rgba(0,210,255,0.2)';
+        multiBtn.style.borderColor = '#00d2ff';
+        multiBtn.style.color = '#fff';
+
+        singleBtn.style.background = 'rgba(15,23,42,0.8)';
+        singleBtn.style.borderColor = 'rgba(255,255,255,0.1)';
+        singleBtn.style.color = '#8eb0cb';
+    }
+}
+
+/* MAIN VOICE GENERATION LOGIC (MULTI-VOICE) */
+async function generateVoice(){
+    const rawKeys = document.getElementById("apiKey").value.trim();
+    const style = document.getElementById("styleSelect").value;
+    const speed = document.getElementById("speedSlider").value;
+    const format = document.getElementById("formatSelect").value;
+
+    const blockElements = document.querySelectorAll(".speech-block-card");
+    if (blockElements.length === 0) {
+        showGenerateMessage("📝 Speech Block အနည်းဆုံး တစ်ခု ထည့်ပါ။", "error");
+        return;
+    }
+
+    let blocksData = [];
+    let fullCombinedText = "";
+    let primaryVoice = "";
+
+    const isCleanerActive = document.getElementById("cleanerToggle").checked;
+
+    blockElements.forEach((el) => {
+        let textVal = el.querySelector(".block-text-input").value.trim();
+        const speakerVal = el.getAttribute("data-speaker") || "Charon";
+
+        if (isCleanerActive) {
+            textVal = cleanScriptText(textVal);
+            el.querySelector(".block-text-input").value = textVal;
+        }
+
+        if (textVal) {
+            if (!primaryVoice) primaryVoice = speakerVal;
+            blocksData.push({ text: textVal, speaker: speakerVal });
+            fullCombinedText += `[${speakerVal}]: ${textVal}\n`;
+        }
+    });
+
+    if (blocksData.length === 0) {
+        showGenerateMessage("📝 စကားပြော စာသားများ ရိုက်ထည့်ပါ...", "error");
+        return;
+    }
+
+    const btn = document.getElementById("generateBtn");
+
+    if(!rawKeys){
+        showGenerateMessage("🔑 အရင်ဆုံး Gemini API Key ထည့်ပါ။", "error");
+        return;
+    }
+
+    const keysList = rawKeys.split(",").map(k => k.trim()).filter(k => k.length > 0);
+
+    btn.disabled = true;
+    btn.innerHTML = '<span class="loading"></span>Generating Multi-Voice Audio...';
+
+    document.getElementById("generateMessage").className = "message";
+    document.getElementById("result").style.display = "none";
+
+    let speechContentPrompt = blocksData.map(b => `<speaker name="${b.speaker}">${b.text}</speaker>`).join("\n");
+
+    const prompt = `${style}
+
+Clear, natural Burmese conversational tone with friendly, engaging, casual narration.
+
+<speak xml:lang="my-MM">
+${speechContentPrompt}
+</speak>`;
+
+    const useTemp = document.getElementById("tempToggle").checked;
+    const customTemp = useTemp ? parseFloat(document.getElementById("tempSlider").value) : 0.6;
+
+    const body = {
+        contents:[{ parts:[{ text:prompt }] }],
+        generationConfig:{
+            responseModalities:["AUDIO"],
+            temperature: customTemp,
+            speechConfig:{
+                voiceConfig:{
+                    prebuiltVoiceConfig:{ voiceName: primaryVoice || "Charon" }
+                }
+            }
+        }
+    };
+
+    let success = false;
+    let lastError = "";
+
+    for(let i=0; i<keysList.length; i++){
+        const currentKey = keysList[i];
+        try{
+            showGenerateMessage(`🔄 API Key ${i+1}/${keysList.length} ဖြင့် စမ်းနေပါတယ်...`, "info");
+
+            const response = await fetch(API_URL, {
+                method:"POST",
+                headers:{
+                    "Content-Type": "application/json",
+                    "x-goog-api-key": currentKey
+                },
+                body: JSON.stringify(body)
+            });
+
+            const data = await response.json().catch(()=>({}));
+            if(!response.ok){
+                const apiError = data?.error;
+                let errorText = apiError?.message || `HTTP ${response.status}`;
+                if(apiError?.status) errorText += ` (${apiError.status})`;
+                throw new Error(errorText);
+            }
+
+            const base64 = data?.candidates?.[0]?.content?.parts?.find(p => p.inlineData)?.inlineData?.data;
+            if(!base64){
+                throw new Error("Gemini က Audio Data မပြန်လာပါ။ Response ကို စစ်ပါ။");
+            }
+
+            let pcm = base64ToUint8Array(base64);
+
+            if (document.getElementById("trimmerToggle").checked) {
+                showGenerateMessage("✂️ အသံနားချိန် Silence များကို ညှပ်ထုတ်နေပါသည်...", "info");
+                pcm = await trimSilenceFromPCM(pcm, 24000);
+            }
+
+            const wav = pcmToWav(pcm, 24000, 1, 16);
+            const blob = new Blob([wav], { type:"audio/wav" });
+            currentAudioBlob = blob;
+
+            if(audioURL) URL.revokeObjectURL(audioURL);
+            audioURL = URL.createObjectURL(blob);
+
+            const player = document.getElementById("audioPlayer");
+            player.src = audioURL;
+            player.playbackRate = parseFloat(speed);
+
+            const download = document.getElementById("downloadBtn");
+            download.style.display = "block";
+
+            document.getElementById("result").style.display = "block";
+
+            await saveHistoryDB({
+                id: Date.now(),
+                text: fullCombinedText,
+                voice: `Multi (${blocksData.length} speakers)`,
+                style: style,
+                speed: speed,
+                format: format,
+                audioBlob: blob,
+                date: new Date().toLocaleString()
+            });
+
+            showGenerateMessage("✅ အသံဖန်တီးပြီးပါပြီ။", "success");
+            success = true;
+            break;
+
+        }catch(error){
+            lastError = error.message || "Unknown Error";
+        }
+    }
+
+    if(!success){
+        showGenerateMessage("❌ Generate မအောင်မြင်ပါ။\n\nအကြောင်းရင်း:\n" + lastError, "error");
+    }
+
+    btn.disabled = false;
+    btn.innerHTML = "🔊 Generate Multi-Voice Audio";
+}
+
+/* SINGLE-VOICE GENERATION LOGIC */
+async function generateSingleVoice(){
+    const rawKeys = document.getElementById("apiKey").value.trim();
+    const voice = singleVoiceValue;
+    let textVal = document.getElementById("singleTextInput").value.trim();
+    const style = document.getElementById("singleStyleSelect").value;
+    const speed = document.getElementById("singleSpeedSlider").value;
+    const format = document.getElementById("formatSelect").value;
+
+    const isCleanerActive = document.getElementById("cleanerToggle").checked;
+    if (isCleanerActive) {
+        textVal = cleanScriptText(textVal);
+        document.getElementById("singleTextInput").value = textVal;
+    }
+
+    if (!textVal) {
+        showSingleGenerateMessage("📝 ဖတ်ရမည့် စာသား ရိုက်ထည့်ပါ...", "error");
+        return;
+    }
+
+    if(!rawKeys){
+        showSingleGenerateMessage("🔑 အရင်ဆုံး Gemini API Key ထည့်ပါ။", "error");
+        return;
+    }
+
+    const btn = document.getElementById("singleGenerateBtn");
+    const keysList = rawKeys.split(",").map(k => k.trim()).filter(k => k.length > 0);
+
+    btn.disabled = true;
+    btn.innerHTML = '<span class="loading"></span>Generating Single-Voice Audio...';
+
+    document.getElementById("singleGenerateMessage").className = "message";
+    document.getElementById("singleResult").style.display = "none";
+
+    const prompt = `${style}
+
+Clear, natural Burmese conversational tone with friendly, engaging, casual narration.
+
+<speak xml:lang="my-MM">
+<speaker name="${voice}">${textVal}</speaker>
+</speak>`;
+
+    const useTemp = document.getElementById("tempToggle").checked;
+    const customTemp = useTemp ? parseFloat(document.getElementById("tempSlider").value) : 0.6;
+
+    const body = {
+        contents:[{ parts:[{ text:prompt }] }],
+        generationConfig:{
+            responseModalities:["AUDIO"],
+            temperature: customTemp,
+            speechConfig:{
+                voiceConfig:{
+                    prebuiltVoiceConfig:{ voiceName: voice }
+                }
+            }
+        }
+    };
+
+    let success = false;
+    let lastError = "";
+
+    for(let i=0; i<keysList.length; i++){
+        const currentKey = keysList[i];
+        try{
+            showSingleGenerateMessage(`🔄 API Key ${i+1}/${keysList.length} ဖြင့် စမ်းနေပါတယ်...`, "info");
+
+            const response = await fetch(API_URL, {
+                method:"POST",
+                headers:{
+                    "Content-Type": "application/json",
+                    "x-goog-api-key": currentKey
+                },
+                body: JSON.stringify(body)
+            });
+
+            const data = await response.json().catch(()=>({}));
+            if(!response.ok){
+                const apiError = data?.error;
+                let errorText = apiError?.message || `HTTP ${response.status}`;
+                if(apiError?.status) errorText += ` (${apiError.status})`;
+                throw new Error(errorText);
+            }
+
+            const base64 = data?.candidates?.[0]?.content?.parts?.find(p => p.inlineData)?.inlineData?.data;
+            if(!base64){
+                throw new Error("Gemini က Audio Data မပြန်လာပါ။ Response ကို စစ်ပါ။");
+            }
+
+            let pcm = base64ToUint8Array(base64);
+
+            if (document.getElementById("trimmerToggle").checked) {
+                showSingleGenerateMessage("✂️ အသံနားချိန် Silence များကို ညှပ်ထုတ်နေပါသည်...", "info");
+                pcm = await trimSilenceFromPCM(pcm, 24000);
+            }
+
+            const wav = pcmToWav(pcm, 24000, 1, 16);
+            const blob = new Blob([wav], { type:"audio/wav" });
+
+            if(singleAudioURL) URL.revokeObjectURL(singleAudioURL);
+            singleAudioURL = URL.createObjectURL(blob);
+
+            const player = document.getElementById("singleAudioPlayer");
+            player.src = singleAudioURL;
+            player.playbackRate = parseFloat(speed);
+
+            const download = document.getElementById("singleDownloadBtn");
+            download.onclick = (e) => {
+                e.preventDefault();
+                try {
+                    const reader = new FileReader();
+                    reader.onloadend = function () {
+                        const downloadLink = document.createElement("a");
+                        downloadLink.href = reader.result;
+                        downloadLink.download = `sh_single_audio_${Date.now()}.${format}`;
+                        document.body.appendChild(downloadLink);
+                        downloadLink.click();
+                        document.body.removeChild(downloadLink);
+                    };
+                    reader.readAsDataURL(blob);
+                } catch (err) {
+                    window.open(singleAudioURL, "_blank");
+                }
+            };
+
+            document.getElementById("singleResult").style.display = "block";
+
+            await saveHistoryDB({
+                id: Date.now(),
+                text: textVal,
+                voice: voice,
+                style: style,
+                speed: speed,
+                format: format,
+                audioBlob: blob,
+                date: new Date().toLocaleString()
+            });
+
+            showSingleGenerateMessage("✅ အသံဖန်တီးပြီးပါပြီ။", "success");
+            success = true;
+            break;
+
+        }catch(error){
+            lastError = error.message || "Unknown Error";
+        }
+    }
+
+    if(!success){
+        showSingleGenerateMessage("❌ Generate မအောင်မြင်ပါ။\n\nအကြောင်းရင်း:\n" + lastError, "error");
+    }
+
+    btn.disabled = false;
+    btn.innerHTML = "🔊 Generate Single-Voice Audio";
+}
+
+// Download Button Click Handler
+function triggerDownload(e) {
+    if (e) e.preventDefault();
+    if (!currentAudioBlob) return;
+
+    const format = document.getElementById("formatSelect").value || "wav";
+    const reader = new FileReader();
+    reader.onloadend = function() {
+        const base64Data = reader.result;
+        const a = document.createElement('a');
+        a.href = base64Data;
+        a.download = `sh_multi_audio_${Date.now()}.${format}`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+    };
+    reader.readAsDataURL(currentAudioBlob);
+}
+
+/* HELPER FUNCTIONS */
+function base64ToUint8Array(base64){
+    const binary = atob(base64);
+    const bytes = new Uint8Array(binary.length);
+    for(let i=0; i<binary.length; i++){
+        bytes[i] = binary.charCodeAt(i);
+    }
+    return bytes;
+}
+
+function pcmToWav(pcmData, sampleRate, channels, bitDepth){
+    const bytesPerSample = bitDepth / 8;
+    const blockAlign = channels * bytesPerSample;
+    const buffer = new ArrayBuffer(44 + pcmData.length);
+    const view = new DataView(buffer);
+
+    writeString(view, 0, "RIFF");
+    view.setUint32(4, 36 + pcmData.length, true);
+    writeString(view, 8, "WAVE");
+    writeString(view, 12, "fmt ");
+    view.setUint32(16, 16, true);
+    view.setUint16(20, 1, true);
+    view.setUint16(22, channels, true);
+    view.setUint32(24, sampleRate, true);
+    view.setUint32(28, sampleRate * blockAlign, true);
+    view.setUint16(32, blockAlign, true);
+    view.setUint16(34, bitDepth, true);
+    writeString(view, 36, "data");
+    view.setUint32(40, pcmData.length, true);
+
+    new Uint8Array(buffer, 44).set(pcmData);
+    return buffer;
+}
+
+function writeString(view, offset, string){
+    for(let i=0; i<string.length; i++){
+        view.setUint8(offset + i, string.charCodeAt(i));
+    }
+}
+  function switchView(viewId, element) {
+    // ၁။ View အားလုံးကို ဖျောက်မယ်
+    document.querySelectorAll('.view-container').forEach(el => {
+        el.style.display = 'none';
+    });
+    
+    // ၂။ ရွေးလိုက်တဲ့ View ကို ဖော်မယ်
+    const targetView = document.getElementById(viewId);
+    if (targetView) {
+        targetView.style.display = 'block';
+    }
+
+    // ၃။ Navigation ခလုတ်တွေ အားလုံးကို မူလအရောင် (မီးခိုးပြာရောင်) ပြန်ပြောင်းမယ်
+    document.querySelectorAll('.nav-btn').forEach(btn => {
+        btn.style.color = '#8eb0cb';
+    });
+
+    // ၄။ အခု နှိပ်လိုက်တဲ့ ခလုတ်ကိုပဲ အပြာရောင် (Active) ဖြစ်စေမယ်
+    if (element) {
+    element.style.color = '#00baff';
+}
+
+    if (viewId === 'voiceGenerator' || viewId === 'generator') {
+    shRenderVoiceLibrary();
+}
+  }
+function showGenerateMessage(text, type){
+    const box = document.getElementById("generateMessage");
+    box.textContent = text;
+    box.className = "message " + type;
+}
+
+function showSingleGenerateMessage(text, type){
+    const box = document.getElementById("singleGenerateMessage");
+    box.textContent = text;
+    box.className = "message " + type;
+}
+
+/* INDEXEDDB STORAGE */
+const DB_NAME = "VoiceStudioDB";
+const DB_VERSION = 1;
+const STORE_NAME = "audio_history";
+
+function openDB() {
+    return new Promise((resolve, reject) => {
+        const request = indexedDB.open(DB_NAME, DB_VERSION);
+        request.onupgradeneeded = (e) => {
+            const db = e.target.result;
+            if (!db.objectStoreNames.contains(STORE_NAME)) {
+                db.createObjectStore(STORE_NAME, { keyPath: "id" });
+            }
+        };
+        request.onsuccess = (e) => resolve(e.target.result);
+        request.onerror = (e) => reject(e.target.error);
+    });
+}
+
+async function saveHistoryDB(item) {
+    try {
+        const db = await openDB();
+        const tx = db.transaction(STORE_NAME, "readwrite");
+        const store = tx.objectStore(STORE_NAME);
+        await new Promise((resolve, reject) => {
+            const req = store.put(item);
+            req.onsuccess = resolve;
+            req.onerror = reject;
+        });
+    } catch (err) {
+        console.error("IndexedDB Save Error:", err);
+    }
+}
+
+async function getHistoryDB() {
+    try {
+        const db = await openDB();
+        const tx = db.transaction(STORE_NAME, "readonly");
+        const store = tx.objectStore(STORE_NAME);
+        return new Promise((resolve, reject) => {
+            const req = store.getAll();
+            req.onsuccess = () => resolve(req.result.sort((a,b) => b.id - a.id));
+            req.onerror = reject;
+        });
+    } catch (err) {
+        console.error("IndexedDB Get Error:", err);
+        return [];
+    }
+}
+
+async function deleteHistoryItem(id) {
+    try {
+        const db = await openDB();
+        const tx = db.transaction(STORE_NAME, "readwrite");
+        const store = tx.objectStore(STORE_NAME);
+        await new Promise((resolve, reject) => {
+            const req = store.delete(id);
+            req.onsuccess = resolve;
+            req.onerror = reject;
+        });
+        renderHistory();
+    } catch (err) {
+        console.error("IndexedDB Delete Error:", err);
+    }
+}
+
+async function clearHistory() {
+    const history = await getHistoryDB();
+    if(history.length === 0) return;
+    if(!confirm("History အားလုံးကို ဖျက်မှာ သေချာပါသလား?")) return;
+
+    try {
+        const db = await openDB();
+        const tx = db.transaction(STORE_NAME, "readwrite");
+        const store = tx.objectStore(STORE_NAME);
+        await new Promise((resolve, reject) => {
+            const req = store.clear();
+            req.onsuccess = resolve;
+            req.onerror = reject;
+        });
+        renderHistory();
+    } catch (err) {
+        console.error("IndexedDB Clear Error:", err);
+    }
+}
+
+async function renderHistory() {
+    const list = document.getElementById("modalHistoryList");
+    if (!list) return;
+
+    const history = await getHistoryDB();
+
+    if (history.length === 0) {
+        list.innerHTML = `<div class="empty-history">📭 History မရှိသေးပါ</div>`;
+        return;
+    }
+
+    list.innerHTML = history.map(item => {
+        let audioSrc = "";
+        if(item.audioBlob) {
+            audioSrc = URL.createObjectURL(item.audioBlob);
+        }
+
+        return `
+            <div class="history-item">
+                <div class="history-top">
+                    <div class="history-title">🎙️ Voice #${item.id}</div>
+                    <div class="history-date">${escapeHTML(item.date)}</div>
+                </div>
+
+                <div class="history-text">${escapeHTML(item.text)}</div>
+
+                <div class="history-info">
+                    🎙️ ${escapeHTML(item.voice || "Multi-Voice")} &nbsp;|&nbsp;
+                    ⚡ ${escapeHTML(item.speed)}x &nbsp;|&nbsp;
+                    📁 ${escapeHTML((item.format || "wav").toUpperCase())}
+                </div>
+
+                ${audioSrc ? `<audio controls src="${audioSrc}" style="width:100%; margin-top:8px;"></audio>` : ''}
+
+                <div class="history-buttons">
+                    ${audioSrc ? `<a class="history-btn" style="text-align:center; text-decoration:none;" href="${audioSrc}" download="sh_audio_${item.id}.${item.format || 'wav'}">⬇️ Save</a>` : ''}
+
+                    <button class="history-btn history-delete" style="grid-column: span 2;" onclick="deleteHistoryItem(${item.id})">
+                        🗑️ Delete
+                    </button>
+                </div>
+            </div>
+        `;
+    }).join("");
+}
+
+function escapeHTML(value){
+    return String(value)
+        .replace(/&/g,"&amp;")
+        .replace(/</g,"&lt;")
+        .replace(/>/g,"&gt;")
+        .replace(/"/g,"&quot;")
+        .replace(/'/g,"&#039;");
+}
+
+/* ================= SH PREMIUM VOICE DEMO CACHE ================= */
+const SH_DEMO_DB = 'SHVoiceDemoDB';
+const SH_DEMO_VERSION = 1;
+const SH_DEMO_STORE = 'voice_demos';
+const SH_DEMO_TEXT = {
+  Puck: 'မင်္ဂလာပါ၊ ကျွန်တော့်နာမည်ကတော့ ပတ်ခ်ပါ။',
+  Charon: 'မင်္ဂလာပါ၊ ကျွန်တော့်နာမည်ကတော့ ချာကွန်ပါ။',
+  Fenrir: 'မင်္ဂလာပါ၊ ကျွန်တော့်နာမည်ကတော့ ဖန်နီယာပါ။',
+  Orus: 'မင်္ဂလာပါ၊ ကျွန်တော့်နာမည်ကတော့ အိုရပ်စ်ပါ။',
+  Kore: 'မင်္ဂလာပါ၊ ကျွန်မနာမည်ကတော့ ကိုးရီးပါ။',
+  Leda: 'မင်္ဂလာပါ၊ ကျွန်မနာမည်ကတော့ လီဒါပါ။',
+  Aoede: 'မင်္ဂလာပါ၊ ကျွန်မနာမည်ကတော့ အော်ဒီပါ။',
+  Callirrhoe: 'မင်္ဂလာပါ၊ ကျွန်မနာမည်ကတော့ ကလီရိုးပါ။',
+  Despina: 'မင်္ဂလာပါ၊ ကျွန်မနာမည်ကတော့ ဒက်စပီနာပါ။'
+};
+const SH_VOICES = [
+  ['Charon','တည်ငြိမ်ပြီး ရှင်းလင်းတဲ့ အသံ','charon.jpg'],
+  ['Puck','တက်ကြွလှုပ်ရှား လူငယ်သံ','puck.jpg'],
+  ['Fenrir','စိတ်လှုပ်ရှားဖွယ် ဇာတ်လမ်းသံ','fenrir.jpg'],
+  ['Orus','ပြတ်သားခိုင်မာ ရင့်ကျက်သံ','orus.jpg'],
+  ['Kore','ပြတ်သားခိုင်မာ လူငယ်သံ','kore.jpg'],
+  ['Leda','နုပျိုတက်ကြွ ချိုသာသံ','leda.jpg'],
+  ['Aoede','ပေါ့ပါးလန်းဆန်း စကားပြောသံ','aoede.jpg'],
+  ['Callirrhoe','အေးဆေးပေါ့ပါး သဘာဝသံ','callirrhoe.jpg'],
+  ['Despina','ချောမွေ့ငြိမ့်ညောင်း ဇာတ်လမ်းသံ','despina.jpg']
+];
+function shOpenDemoDB(){
+  return new Promise((resolve,reject)=>{
+    const r=indexedDB.open(SH_DEMO_DB,SH_DEMO_VERSION);
+    r.onupgradeneeded=e=>{const db=e.target.result;if(!db.objectStoreNames.contains(SH_DEMO_STORE))db.createObjectStore(SH_DEMO_STORE,{keyPath:'voice'});};
+    r.onsuccess=()=>resolve(r.result); r.onerror=()=>reject(r.error);
+  });
+}
+async function shGetDemo(voice){
+  const db=await shOpenDemoDB();
+  return new Promise((resolve,reject)=>{const tx=db.transaction(SH_DEMO_STORE,'readonly');const r=tx.objectStore(SH_DEMO_STORE).get(voice);r.onsuccess=()=>resolve(r.result||null);r.onerror=()=>reject(r.error);});
+}
+async function shSaveDemo(voice,blob){
+  const db=await shOpenDemoDB();
+  return new Promise((resolve,reject)=>{const tx=db.transaction(SH_DEMO_STORE,'readwrite');tx.objectStore(SH_DEMO_STORE).put({voice,blob,createdAt:Date.now()});tx.oncomplete=()=>resolve();tx.onerror=()=>reject(tx.error);});
+}
+function shMarkCached(voice,cached=true){
+  const card=document.querySelector(`.premium-voice-card[data-voice="${voice}"]`);
+  if(card)card.classList.toggle('cached',cached);
+  const btn=card?.querySelector('.preview');
+  if(btn && cached)btn.textContent='▶ Play';
+}
+async function shRefreshCacheMarks(){
+  for(const [voice] of SH_VOICES){try{if(await shGetDemo(voice))shMarkCached(voice,true);}catch(e){}}
+}
+function shRenderVoiceLibrary(){
+    const grid = document.getElementById('premiumVoiceGrid');
+    if(!grid) return;
+
+    grid.innerHTML = SH_VOICES.map(([voice, desc, img]) => {
+        return `<article class="voice-card premium-voice-card" data-voice="${voice}" style="box-sizing: border-box;">
+            <div class="voice-avatar-wrap" onclick="shChooseVoice('${voice}')">
+                <img src="${img}" alt="${voice}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
+            </div>
+            <div class="voice-name-row" onclick="shChooseVoice('${voice}')">
+                <strong>${voice}</strong> <span style="font-size: 9px; color: #00baff;">GEMINI TTS</span>
+            </div>
+            <div class="voice-desc" onclick="shChooseVoice('${voice}')">${desc}</div>
+            <div style="display: flex; gap: 6px; margin-top: 10px; width: 100%; box-sizing: border-box;">
+                <button class="btn preview" onclick="shPreviewVoice('${voice}', this)" style="flex: 1; padding: 6px 2px; background: rgba(0,186,255,0.2); border: 1px solid #00baff; border-radius: 8px; color: #fff; cursor: pointer; font-size: 11px; text-align: center;">Preview</button>
+                <button class="btn use" onclick="shChooseVoice('${voice}')" style="flex: 1; padding: 6px 2px; background: rgba(0,255,136,0.2); border: 1px solid #00ff88; border-radius: 8px; color: #fff; cursor: pointer; font-size: 11px; text-align: center;">Use</button>
+            </div>
+        </article>`;
+    }).join('');
+    
+    shRefreshCacheMarks();
+}
+
+function shChooseVoice(voice){
+  singleVoiceValue=voice;
+  const labels={Puck:'Puck (တက်ကြွလှုပ်ရှား လူငယ်သံ)',Charon:'Charon (သတင်း/ဗဟုသုတပေး တည်ငြိမ်သံ)',Fenrir:'Fenrir (စိတ်လှုပ်ရှားဖွယ် ဇာတ်လမ်းသံ)',Orus:'Orus (ပြတ်သားခိုင်မာ ရင့်ကျက်သံ)',Kore:'Kore (ပြတ်သားခိုင်မာ လူငယ်သံ)',Leda:'Leda (နုပျိုတက်ကြွ ချိုသာသံ)',Aoede:'Aoede (ပေါ့ပါးလန်းဆန်း စကားပြောသံ)',Callirrhoe:'Callirrhoe (အေးဆေးပေါ့ပါး သဘာဝသံ)',Despina:'Despina (ချောမွေ့ငြိမ့်ညောင်း ဇာတ်လမ်းသံ)'};
+  const el=document.getElementById('singleSelectedSpeakerText');if(el)el.textContent=labels[voice]||voice;
+  switchTab('singleTab');
+  document.getElementById('singleTab')?.scrollIntoView({behavior:'smooth',block:'start'});
+}
+async function shPreviewVoice(voice,button){
+  try{
+    const cached=await shGetDemo(voice);
+    if(cached?.blob){shMarkCached(voice,true);const u=URL.createObjectURL(cached.blob);const a=new Audio(u);a.onended=()=>URL.revokeObjectURL(u);await a.play();return;}
+    const raw=(document.getElementById('apiKey')?.value||'').trim();
+    if(!raw){alert('အရင်ဆုံး Gemini API Key ထည့်ပြီး Save လုပ်ပါ။');return;}
+    const keys=raw.split(',').map(k=>k.trim()).filter(Boolean);
+    button.disabled=true;button.textContent='⏳ Creating...';
+    const prompt=`Clear, natural Burmese voice demo. Say exactly this sentence naturally: ${SH_DEMO_TEXT[voice]||`မင်္ဂလာပါ၊ ကျွန်တော့်နာမည်ကတော့ ${voice} ပါ။`}`;
+    const body={contents:[{parts:[{text:prompt}]}],generationConfig:{responseModalities:['AUDIO'],temperature:0.6,speechConfig:{voiceConfig:{prebuiltVoiceConfig:{voiceName:voice}}}}};
+    let blob=null,last='';
+    for(const key of keys){
+      try{
+        const res=await fetch(API_URL,{method:'POST',headers:{'Content-Type':'application/json','x-goog-api-key':key},body:JSON.stringify(body)});
+        const data=await res.json().catch(()=>({}));
+        if(!res.ok)throw new Error(data?.error?.message||`HTTP ${res.status}`);
+        const b64=data?.candidates?.[0]?.content?.parts?.find(p=>p.inlineData)?.inlineData?.data;
+        if(!b64)throw new Error('Audio Data မပြန်လာပါ။');
+        const wav=pcmToWav(base64ToUint8Array(b64),24000,1,16);
+        blob=new Blob([wav],{type:'audio/wav'});break;
+      }catch(e){last=e.message||'Unknown error';}
+    }
+    if(!blob)throw new Error(last||'Preview မအောင်မြင်ပါ။');
+    await shSaveDemo(voice,blob);shMarkCached(voice,true);
+    const u=URL.createObjectURL(blob);const a=new Audio(u);a.onended=()=>URL.revokeObjectURL(u);await a.play();
+  }catch(e){alert('Preview မအောင်မြင်ပါ။\n\n'+(e.message||e));}
+  finally{button.disabled=false;button.textContent='▶ Play';}
+}
+window.addEventListener('DOMContentLoaded',()=>{shRenderVoiceLibrary();});
+window.addEventListener('DOMContentLoaded', (event) => {
+    switchView('mainDashboard');
+});
 
