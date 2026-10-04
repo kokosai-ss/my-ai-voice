@@ -551,10 +551,12 @@ async function searchAssets() {
         const response = await fetch(url);
 
         if (!response.ok) {
-            throw new Error(
-                `Unsplash API Error: ${response.status}`
-            );
-        }
+    const errorText = await response.text();
+
+    throw new Error(
+        `Unsplash API Error: ${response.status} - ${errorText}`
+    );
+}
 
         const data = await response.json();
 
@@ -688,7 +690,8 @@ async function searchAssets() {
 
     } catch (error) {
 
-        console.error(error);
+        console.error('UNSPLASH ERROR:', error);
+alert(error.message);
 
         grid.innerHTML = `
             <div class="sh-empty-state">
