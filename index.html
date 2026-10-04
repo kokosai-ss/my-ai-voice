@@ -2966,7 +2966,62 @@ cursor:pointer;
     filter:blur(8px);
 "></div>
 
-</a>  
+</a>
+<!-- SH IMAGE SEARCH — FREE MODE -->
+<div id="shImageSearch" class="sh-image-search">
+
+    <div class="sh-image-header">
+        <div>
+            <div class="sh-image-title">
+                <i class="fa-solid fa-images"></i>
+                Image Search
+            </div>
+            <div class="sh-image-subtitle">
+                Search beautiful images instantly
+            </div>
+        </div>
+
+        <div class="sh-free-badge">
+            <span></span>
+            FREE
+        </div>
+    </div>
+
+    <div class="sh-search-glass">
+        <i class="fa-solid fa-magnifying-glass"></i>
+
+        <input
+            type="text"
+            id="assetSearchInput"
+            placeholder="Search images..."
+            autocomplete="off"
+        >
+
+        <button onclick="searchAssets()" class="sh-search-btn">
+            <i class="fa-solid fa-arrow-right"></i>
+        </button>
+    </div>
+
+    <div id="assetGrid" class="sh-asset-grid">
+
+        <div class="sh-empty-state">
+            <div class="sh-empty-icon">
+                <i class="fa-regular fa-image"></i>
+            </div>
+
+            <div class="sh-empty-title">
+                Search for an image
+            </div>
+
+            <div class="sh-empty-text">
+                Type something above to find images
+            </div>
+        </div>
+
+    </div>
+
+</div>
+    
     <!-- Quick Access Grid (Top 2 Neon Glass Cards) -->
     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 15px;">
         <div onclick="switchView('voiceStudio')" style="background: rgba(13, 27, 42, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(0, 140, 255, 0.35); box-shadow: 0 4px 20px rgba(0, 140, 255, 0.15); padding: 16px; border-radius: 16px; cursor: pointer;">
@@ -3517,59 +3572,31 @@ cursor:pointer;
 
   <!-- Asset View -->
 <div id="assetView" class="view-container" style="display: none;">
-<!-- SH IMAGE SEARCH — FREE MODE -->
-<div id="shImageSearch" class="sh-image-search">
-
-    <div class="sh-image-header">
-        <div>
-            <div class="sh-image-title">
-                <i class="fa-solid fa-images"></i>
-                Image Search
+    <div class="sh-image-search">
+        <div class="sh-image-header">
+            <div>
+                <div class="sh-image-title">
+                    <i class="fa-solid fa-image"></i> Asset Hub Image Search
+                </div>
+                <div class="sh-image-subtitle">Unsplash API မှ ပုံများကို ရှာဖွေပါ</div>
             </div>
-            <div class="sh-image-subtitle">
-                Search beautiful images instantly
+            <div class="sh-free-badge"><span></span> FREE</div>
+        </div>
+        
+        <div class="sh-search-glass">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="text" id="assetSearchInput" placeholder="ဥပမာ - shwedagon pagoda, nature...">
+            <button class="sh-search-btn" onclick="searchAssets()"><i class="fa-solid fa-arrow-right"></i></button>
+        </div>
+        
+        <div class="sh-asset-grid" id="assetGrid">
+            <div class="sh-empty-state">
+                <div class="sh-empty-icon"><i class="fa-solid fa-mountain-sun"></i></div>
+                <div class="sh-empty-title">ပုံများ ရှာဖွေရန် အဆင်သင့်ဖြစ်နေပါပြီ</div>
+                <div class="sh-empty-text">အထက်ပါ ရှာဖွေရေးဘောက်စ်တွင် လိုချင်သည့် စာသားကို ရိုက်ထည့်ပါ</div>
             </div>
         </div>
-
-        <div class="sh-free-badge">
-            <span></span>
-            FREE
-        </div>
     </div>
-
-    <div class="sh-search-glass">
-        <i class="fa-solid fa-magnifying-glass"></i>
-
-        <input
-            type="text"
-            id="assetSearchInput"
-            placeholder="Search images..."
-            autocomplete="off"
-        >
-
-        <button onclick="searchAssets()" class="sh-search-btn">
-            <i class="fa-solid fa-arrow-right"></i>
-        </button>
-    </div>
-
-    <div id="assetGrid" class="sh-asset-grid">
-
-        <div class="sh-empty-state">
-            <div class="sh-empty-icon">
-                <i class="fa-regular fa-image"></i>
-            </div>
-
-            <div class="sh-empty-title">
-                Search for an image
-            </div>
-
-            <div class="sh-empty-text">
-                Type something above to find images
-            </div>
-        </div>
-
-    </div>
-
 </div>
 
   <!-- Generator View -->
@@ -5870,7 +5897,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
     </div>
 
     <!-- Asset Hub Nav -->
-   <div class="nav-btn" onclick="switchView('assetView', this)" style="text-align: center; cursor: pointer; color: #8eb0cb; transition: 0.3s;">
+   <div class="nav-btn" onclick="switchView('assetHub', this)" style="text-align: center; cursor: pointer; color: #8eb0cb; transition: 0.3s;">
       <i class="fa-solid fa-images" style="font-size: 16px; margin-bottom: 3px;"></i>
       <div style="font-size: 9px;">Assets</div>
     </div>
