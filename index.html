@@ -954,6 +954,395 @@
     }
 
 }
+   /* =========================================
+   SH IMAGE SEARCH — NEON GLASS
+   ========================================= */
+
+.sh-image-search {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 16px;
+    border-radius: 22px;
+
+    background:
+        radial-gradient(
+            circle at 20% 0%,
+            rgba(34,211,238,0.10),
+            transparent 35%
+        ),
+        linear-gradient(
+            145deg,
+            rgba(10,25,42,0.92),
+            rgba(5,15,28,0.96)
+        );
+
+    border: 1px solid rgba(34,211,238,0.18);
+
+    box-shadow:
+        0 20px 50px rgba(0,0,0,0.35),
+        inset 0 1px 0 rgba(255,255,255,0.04);
+
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+
+    overflow: hidden;
+}
+
+/* HEADER */
+
+.sh-image-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 15px;
+}
+
+.sh-image-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    color: #e8fbff;
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: 0.2px;
+}
+
+.sh-image-title i {
+    color: #22d3ee;
+    font-size: 17px;
+
+    filter:
+        drop-shadow(0 0 6px rgba(34,211,238,0.65));
+}
+
+.sh-image-subtitle {
+    margin-top: 4px;
+    color: #7895ad;
+    font-size: 10px;
+}
+
+/* FREE BADGE */
+
+.sh-free-badge {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+
+    padding: 5px 9px;
+    border-radius: 20px;
+
+    color: #67e8f9;
+    font-size: 9px;
+    font-weight: 800;
+
+    background: rgba(34,211,238,0.08);
+    border: 1px solid rgba(34,211,238,0.22);
+
+    box-shadow:
+        0 0 12px rgba(34,211,238,0.08);
+}
+
+.sh-free-badge span {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+
+    background: #22d3ee;
+
+    box-shadow:
+        0 0 7px #22d3ee;
+}
+
+/* SEARCH BAR */
+
+.sh-search-glass {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+
+    height: 48px;
+    padding: 0 7px 0 14px;
+
+    box-sizing: border-box;
+
+    border-radius: 15px;
+
+    background: rgba(255,255,255,0.035);
+
+    border: 1px solid rgba(34,211,238,0.18);
+
+    box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.035),
+        0 8px 25px rgba(0,0,0,0.18);
+
+    transition: 0.25s ease;
+}
+
+.sh-search-glass:focus-within {
+    border-color: rgba(34,211,238,0.48);
+
+    box-shadow:
+        0 0 0 3px rgba(34,211,238,0.06),
+        0 0 22px rgba(34,211,238,0.08);
+}
+
+.sh-search-glass > i {
+    color: #608198;
+    font-size: 13px;
+}
+
+.sh-search-glass input {
+    flex: 1;
+    min-width: 0;
+
+    height: 100%;
+
+    border: none;
+    outline: none;
+
+    background: transparent;
+
+    color: #e8faff;
+    font-size: 12px;
+}
+
+.sh-search-glass input::placeholder {
+    color: #557188;
+}
+
+/* SEARCH BUTTON */
+
+.sh-search-btn {
+    width: 36px;
+    height: 36px;
+
+    border: 1px solid rgba(34,211,238,0.25);
+    border-radius: 11px;
+
+    background: rgba(34,211,238,0.10);
+
+    color: #67e8f9;
+
+    cursor: pointer;
+
+    transition: 0.2s ease;
+}
+
+.sh-search-btn:active {
+    transform: scale(0.92);
+}
+
+.sh-search-btn:hover {
+    background: rgba(34,211,238,0.18);
+
+    box-shadow:
+        0 0 15px rgba(34,211,238,0.15);
+}
+
+/* IMAGE GRID */
+
+.sh-asset-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+
+    gap: 10px;
+
+    margin-top: 14px;
+}
+
+/* IMAGE CARD */
+
+.sh-asset-card {
+    position: relative;
+
+    height: 165px;
+
+    overflow: hidden;
+
+    border-radius: 15px;
+
+    background: #081522;
+
+    border: 1px solid rgba(34,211,238,0.13);
+
+    box-shadow:
+        0 8px 22px rgba(0,0,0,0.28);
+
+    cursor: pointer;
+
+    transition:
+        transform 0.22s ease,
+        border-color 0.22s ease,
+        box-shadow 0.22s ease;
+}
+
+.sh-asset-card:hover {
+    transform: translateY(-2px);
+
+    border-color:
+        rgba(34,211,238,0.42);
+
+    box-shadow:
+        0 10px 28px rgba(0,0,0,0.4),
+        0 0 18px rgba(34,211,238,0.07);
+}
+
+.sh-asset-card img {
+    width: 100%;
+    height: 100%;
+
+    display: block;
+
+    object-fit: cover;
+
+    transition:
+        transform 0.35s ease;
+}
+
+.sh-asset-card:hover img {
+    transform: scale(1.04);
+}
+
+/* IMAGE BOTTOM GLASS */
+
+.sh-image-overlay {
+    position: absolute;
+
+    left: 0;
+    right: 0;
+    bottom: 0;
+
+    padding: 28px 8px 8px;
+
+    background:
+        linear-gradient(
+            to top,
+            rgba(2,8,15,0.92),
+            rgba(2,8,15,0.28),
+            transparent
+        );
+
+    display: flex;
+    justify-content: flex-end;
+}
+
+/* DOWNLOAD BUTTON */
+
+.sh-image-download {
+    width: 31px;
+    height: 31px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 9px;
+
+    color: #67e8f9;
+
+    background: rgba(6,182,212,0.13);
+
+    border: 1px solid rgba(34,211,238,0.25);
+
+    backdrop-filter: blur(8px);
+
+    text-decoration: none;
+
+    box-shadow:
+        0 4px 12px rgba(0,0,0,0.25);
+
+    transition: 0.2s ease;
+}
+
+.sh-image-download:hover {
+    background: rgba(34,211,238,0.22);
+
+    box-shadow:
+        0 0 14px rgba(34,211,238,0.18);
+}
+
+.sh-image-download:active {
+    transform: scale(0.9);
+}
+
+/* EMPTY */
+
+.sh-empty-state {
+    grid-column: 1 / -1;
+
+    min-height: 190px;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    text-align: center;
+
+    border-radius: 17px;
+
+    border: 1px dashed rgba(34,211,238,0.16);
+
+    background:
+        rgba(255,255,255,0.018);
+}
+
+.sh-empty-icon {
+    width: 48px;
+    height: 48px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    margin-bottom: 10px;
+
+    border-radius: 15px;
+
+    color: #22d3ee;
+    font-size: 19px;
+
+    background: rgba(34,211,238,0.06);
+
+    border: 1px solid rgba(34,211,238,0.12);
+
+    box-shadow:
+        0 0 20px rgba(34,211,238,0.06);
+}
+
+.sh-empty-title {
+    color: #a9c4d7;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.sh-empty-text {
+    margin-top: 4px;
+
+    color: #536f84;
+    font-size: 9px;
+}
+
+/* MOBILE */
+
+@media (max-width: 380px) {
+
+    .sh-image-search {
+        padding: 13px;
+    }
+
+    .sh-asset-grid {
+        gap: 8px;
+    }
+
+    .sh-asset-card {
+        height: 145px;
+    }
+} 
 
 #cyberpunk-lockscreen {
   position: fixed;
@@ -2578,7 +2967,60 @@ cursor:pointer;
 "></div>
 
 </a>
+<!-- SH IMAGE SEARCH — FREE MODE -->
+<div id="shImageSearch" class="sh-image-search">
 
+    <div class="sh-image-header">
+        <div>
+            <div class="sh-image-title">
+                <i class="fa-solid fa-images"></i>
+                Image Search
+            </div>
+            <div class="sh-image-subtitle">
+                Search beautiful images instantly
+            </div>
+        </div>
+
+        <div class="sh-free-badge">
+            <span></span>
+            FREE
+        </div>
+    </div>
+
+    <div class="sh-search-glass">
+        <i class="fa-solid fa-magnifying-glass"></i>
+
+        <input
+            type="text"
+            id="assetSearchInput"
+            placeholder="Search images..."
+            autocomplete="off"
+        >
+
+        <button onclick="searchAssets()" class="sh-search-btn">
+            <i class="fa-solid fa-arrow-right"></i>
+        </button>
+    </div>
+
+    <div id="assetGrid" class="sh-asset-grid">
+
+        <div class="sh-empty-state">
+            <div class="sh-empty-icon">
+                <i class="fa-regular fa-image"></i>
+            </div>
+
+            <div class="sh-empty-title">
+                Search for an image
+            </div>
+
+            <div class="sh-empty-text">
+                Type something above to find images
+            </div>
+        </div>
+
+    </div>
+
+</div>
     
     <!-- Quick Access Grid (Top 2 Neon Glass Cards) -->
     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 15px;">
@@ -3127,6 +3569,36 @@ cursor:pointer;
   
       </div>
   </div> 
+
+  <!-- Asset View -->
+<div id="assetView" class="view-container" style="display: none;">
+    <div class="sh-image-search">
+        <div class="sh-image-header">
+            <div>
+                <div class="sh-image-title">
+                    <i class="fa-solid fa-image"></i> Asset Hub Image Search
+                </div>
+                <div class="sh-image-subtitle">Unsplash API မှ ပုံများကို ရှာဖွေပါ</div>
+            </div>
+            <div class="sh-free-badge"><span></span> FREE</div>
+        </div>
+        
+        <div class="sh-search-glass">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="text" id="assetSearchInput" placeholder="ဥပမာ - shwedagon pagoda, nature...">
+            <button class="sh-search-btn" onclick="searchAssets()"><i class="fa-solid fa-arrow-right"></i></button>
+        </div>
+        
+        <div class="sh-asset-grid" id="assetGrid">
+            <div class="sh-empty-state">
+                <div class="sh-empty-icon"><i class="fa-solid fa-mountain-sun"></i></div>
+                <div class="sh-empty-title">ပုံများ ရှာဖွေရန် အဆင်သင့်ဖြစ်နေပါပြီ</div>
+                <div class="sh-empty-text">အထက်ပါ ရှာဖွေရေးဘောက်စ်တွင် လိုချင်သည့် စာသားကို ရိုက်ထည့်ပါ</div>
+            </div>
+        </div>
+    </div>
+</div>
+
   <!-- Generator View -->
 <div id="voiceGenerator" class="view-container">
     <div class="voice-library">
@@ -3871,7 +4343,445 @@ function checkUnlockPassword() {
         alert('စကားဝှက် မှားယွင်းနေပါသည်။');
     }
 }
+/* =========================================
+   SH IMAGE SEARCH — UNSPLASH FREE MODE
+   ========================================= */
 
+async function searchAssets() {
+
+    const input = document.getElementById('assetSearchInput');
+    const grid = document.getElementById('assetGrid');
+
+    const query = input.value.trim();
+
+    if (!query) {
+        input.focus();
+        return;
+    }
+
+    /* Loading */
+
+    grid.innerHTML = `
+        <div class="sh-empty-state">
+
+            <div class="sh-empty-icon">
+                <i class="fa-solid fa-spinner fa-spin"></i>
+            </div>
+
+            <div class="sh-empty-title">
+                ရှာဖွေနေပါတယ်...
+            </div>
+
+            <div class="sh-empty-text">
+                ${escapeHtml(query)} ပုံများကို ရှာနေပါတယ်
+            </div>
+
+        </div>
+    `;
+
+    /*
+       IMPORTANT:
+       ဒီနေရာမှာ မင်းရဲ့ Unsplash API Key အသစ်ထည့်
+    */
+
+    const accessKey = 'cLALLiJz6pnN-U2M5LNepEwmYEEPu1Ld1pJ';
+
+    const url =
+        `https://api.unsplash.com/search/photos` +
+        `?query=${encodeURIComponent(query)}` +
+        `&per_page=20` +
+        `&client_id=${encodeURIComponent(accessKey)}`;
+
+    try {
+
+        const response = await fetch(url);
+
+        if (!response.ok) {
+            throw new Error(
+                `Unsplash API Error: ${response.status}`
+            );
+        }
+
+        const data = await response.json();
+
+        if (!data.results || data.results.length === 0) {
+
+            grid.innerHTML = `
+                <div class="sh-empty-state">
+
+                    <div class="sh-empty-icon">
+                        <i class="fa-regular fa-face-frown"></i>
+                    </div>
+
+                    <div class="sh-empty-title">
+                        ပုံမတွေ့ပါ
+                    </div>
+
+                    <div class="sh-empty-text">
+                        အခြားစာလုံးနဲ့ ပြန်ရှာကြည့်ပါ
+                    </div>
+
+                </div>
+            `;
+
+            return;
+        }
+
+        grid.innerHTML = '';
+
+        data.results.forEach(photo => {
+
+            const card = document.createElement('div');
+
+            card.className = 'sh-asset-card';
+
+            const image = document.createElement('img');
+
+            image.src = photo.urls.small;
+
+            image.alt =
+                photo.alt_description ||
+                query;
+
+            image.loading = 'lazy';
+
+            /*
+               Main grid မှာ user name မပြဘူး
+            */
+
+            const overlay =
+                document.createElement('div');
+
+            overlay.className =
+                'sh-image-overlay';
+
+            /*
+               Unsplash download tracking
+            */
+
+            const download =
+                document.createElement('a');
+
+            download.className =
+                'sh-image-download';
+
+            download.href =
+                photo.links.download_location;
+
+            download.target = '_blank';
+
+            download.rel =
+                'noopener noreferrer';
+
+            download.innerHTML =
+                '<i class="fa-solid fa-download"></i>';
+
+            download.title =
+                'Download';
+
+            /*
+               Download ကိုနှိပ်တဲ့အခါ
+               Unsplash download endpoint ကို trigger
+            */
+
+            download.addEventListener(
+                'click',
+                async function(e) {
+
+                    e.preventDefault();
+
+                    try {
+                        await fetch(
+                            photo.links.download_location
+                        );
+                    } catch (err) {
+                        console.warn(
+                            'Download tracking failed',
+                            err
+                        );
+                    }
+
+                    /*
+                       Full image ကိုဖွင့်
+                    */
+
+                    window.open(
+                        photo.urls.full,
+                        '_blank',
+                        'noopener'
+                    );
+                }
+            );
+
+            overlay.appendChild(download);
+
+            card.appendChild(image);
+            card.appendChild(overlay);
+
+            /*
+               ပုံနှိပ်ရင် Preview
+            */
+
+            image.addEventListener(
+                'click',
+                function() {
+                    openImagePreview(photo);
+                }
+            );
+
+            grid.appendChild(card);
+        });
+
+    } catch (error) {
+
+        console.error(error);
+
+        grid.innerHTML = `
+            <div class="sh-empty-state">
+
+                <div
+                    class="sh-empty-icon"
+                    style="color:#fb7185;"
+                >
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+                </div>
+
+                <div class="sh-empty-title">
+                    ရှာဖွေရာမှာ အမှားဖြစ်နေပါတယ်
+                </div>
+
+                <div class="sh-empty-text">
+                    API Key နဲ့ Internet connection ကို
+                    ပြန်စစ်ကြည့်ပါ
+                </div>
+
+            </div>
+        `;
+    }
+}
+
+
+/* =========================================
+   IMAGE PREVIEW
+   ========================================= */
+
+function openImagePreview(photo) {
+
+    let modal =
+        document.getElementById(
+            'shImagePreviewModal'
+        );
+
+    if (!modal) {
+
+        modal =
+            document.createElement('div');
+
+        modal.id =
+            'shImagePreviewModal';
+
+        modal.innerHTML = `
+
+            <div class="sh-preview-backdrop">
+
+                <div class="sh-preview-box">
+
+                    <button
+                        class="sh-preview-close"
+                        onclick="closeImagePreview()"
+                    >
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+
+                    <img
+                        id="shPreviewImage"
+                        src=""
+                        alt=""
+                    >
+
+                    <div
+                        class="sh-preview-info"
+                        id="shPreviewInfo"
+                    ></div>
+
+                </div>
+
+            </div>
+        `;
+
+        document.body.appendChild(modal);
+
+        const style =
+            document.createElement('style');
+
+        style.textContent = `
+
+            #shImagePreviewModal {
+                position: fixed;
+                inset: 0;
+                z-index: 99999;
+            }
+
+            .sh-preview-backdrop {
+                position: absolute;
+                inset: 0;
+
+                display: flex;
+                align-items: center;
+                justify-content: center;
+
+                padding: 20px;
+
+                background:
+                    rgba(1,8,16,0.88);
+
+                backdrop-filter: blur(16px);
+                -webkit-backdrop-filter: blur(16px);
+            }
+
+            .sh-preview-box {
+                position: relative;
+
+                width: min(100%, 420px);
+
+                padding: 8px;
+
+                border-radius: 20px;
+
+                background:
+                    rgba(10,25,42,0.78);
+
+                border:
+                    1px solid
+                    rgba(34,211,238,0.25);
+
+                box-shadow:
+                    0 0 40px
+                    rgba(34,211,238,0.10);
+            }
+
+            .sh-preview-box img {
+                width: 100%;
+                max-height: 70vh;
+
+                display: block;
+
+                object-fit: contain;
+
+                border-radius: 15px;
+            }
+
+            .sh-preview-close {
+                position: absolute;
+
+                top: 15px;
+                right: 15px;
+
+                z-index: 2;
+
+                width: 34px;
+                height: 34px;
+
+                border-radius: 10px;
+
+                border:
+                    1px solid
+                    rgba(255,255,255,0.12);
+
+                background:
+                    rgba(0,0,0,0.55);
+
+                color: #fff;
+
+                cursor: pointer;
+            }
+
+            .sh-preview-info {
+                padding: 8px 5px 3px;
+
+                color: #6f8da3;
+                font-size: 8px;
+                text-align: center;
+            }
+        `;
+
+        document.head.appendChild(style);
+    }
+
+    const previewImage =
+        document.getElementById(
+            'shPreviewImage'
+        );
+
+    const info =
+        document.getElementById(
+            'shPreviewInfo'
+        );
+
+    previewImage.src =
+        photo.urls.regular;
+
+    /*
+       Main card မှာမပြပေမယ့်
+       Preview ထဲမှာ attribution ထား
+    */
+
+    info.innerHTML =
+        `Photo by ${escapeHtml(photo.user.name)} · Unsplash`;
+
+    modal.style.display = 'block';
+}
+
+
+function closeImagePreview() {
+
+    const modal =
+        document.getElementById(
+            'shImagePreviewModal'
+        );
+
+    if (modal) {
+        modal.style.display = 'none';
+    }
+}
+
+
+/* =========================================
+   HTML SAFETY
+   ========================================= */
+
+function escapeHtml(value) {
+
+    const div =
+        document.createElement('div');
+
+    div.textContent =
+        value || '';
+
+    return div.innerHTML;
+}
+
+
+/* =========================================
+   ENTER KEY SEARCH
+   ========================================= */
+
+document.addEventListener(
+    'keydown',
+    function(e) {
+
+        if (
+            e.key === 'Enter' &&
+            document.activeElement &&
+            document.activeElement.id ===
+                'assetSearchInput'
+        ) {
+
+            searchAssets();
+        }
+    }
+);
+  
 /* FORMAT & STYLE MODAL LOGICS */
 function setAudioFormat(formatValue) {
   const btnWav = document.getElementById('btnWav');
