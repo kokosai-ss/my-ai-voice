@@ -2027,8 +2027,17 @@ async function shPreviewVoice(voice,button){
   }catch(e){alert('Preview မအောင်မြင်ပါ။\n\n'+(e.message||e));}
   finally{button.disabled=false;button.textContent='▶ Play';}
 }
-window.addEventListener('DOMContentLoaded',()=>{shRenderVoiceLibrary();});
-window.addEventListener('DOMContentLoaded', (event) => {
+window.addEventListener('DOMContentLoaded', () => {
+    shRenderVoiceLibrary();
     switchView('mainDashboard');
+    
+    // Browser / App ထဲမှာ သိမ်းထားခဲ့တဲ့ Chat တွေရှိရင် ပြန်ဖော်ပြပေးရန်
+    const savedChats = localStorage.getItem('shSavedChats');
+    if (savedChats) {
+        const chatContainer = document.getElementById('chatMessages');
+        if (chatContainer) {
+            chatContainer.innerHTML = savedChats;
+        }
+    }
 });
 
