@@ -4,7 +4,31 @@
 
 let shChatHistory = [];
 let shAttachedImage = null;
+let chatSessions = JSON.parse(localStorage.getItem('shAllChatSessions')) || [];
+let currentChatId = null;
 let shAttachedFileText = null;
+
+function startNewChat() {
+    currentChatId = 'chat_' + Date.now();
+    
+    const newSession = {
+        id: currentChatId,
+        title: "Chat အသစ် " + new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
+        messagesHTML: '' 
+    };
+    
+    chatSessions.unshift(newSession);
+    saveAndRenderSessions();
+    
+    document.getElementById('chatMessages').innerHTML = `
+        <div class="sh-message-row ai">
+            <div class="sh-message-avatar">SH</div>
+            <div class="sh-message-content">
+                <div class="sh-ai-bubble">မင်္ဂလာပါ 👋 ဘာများကူညီပေးရမလဲ 🚀</div>
+            </div>
+        </div>
+    `;
+}
 
 /* ---------- API KEY ---------- */
 
@@ -1766,6 +1790,64 @@ function writeString(view, offset, string){
     shRenderVoiceLibrary();
 }
   }
+// 1. New Chat ခလုတ်နှိပ်သည့်အခါ
+function startNewChat() {
+    currentChatId = 'chat_' + Date.now();
+    
+    const newSession = {
+        id: currentChatId,
+        title: "Chat အသစ် " + new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
+        messagesHTML: '' 
+    };
+    
+    chatSessions.unshift(newSession); // ထိပ်ဆုံးကနေ အသစ်ထည့်ရန်
+    saveAndRenderSessions();
+    
+    // Screen ပေါ်က Chat တွေကို ရှင်းထုတ်ပြီး Welcome message ပြန်ပြရန်
+    document.getElementById('chatMessages').innerHTML = `
+        <div class="sh-message-row ai">
+            <div class="sh-message-avatar">SH</div>
+            <div class="sh-message-content">
+                <div class="sh-ai-bubble">မင်္ဂလာပါ 👋 ဘာများကူညီပေးရမလဲ 🚀</div>
+            </div>
+        </div>
+    `;
+}
+
+// 2. Sidebar ထဲမှာ Chat စာရင်းများ ဖော်ပြခြင်းနှင့် သိမ်းဆည်းခြင်း
+function saveAndRenderSessions() {
+    localStorage.setItem('shAllChatSessions', JSON.stringify(chatSessions));
+    const listContainer = document.getElementById('chatHistoryList');
+    if (!listContainer) return;
+    
+    listContainer.innerHTML = '';
+    
+    chatSessions.forEach(session => {
+        const item = document.createElement('div');
+        item.textContent = session.title;
+        item.style.cssText = `
+            padding: 10px; background: ${session.id === currentChatId ? '#222' : 'transparent'};
+            color: ${session.id === currentChatId ? '#4da6ff' : '#b8c9d8'};
+            border-radius: 6px; cursor: pointer; font-size: 13px;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        `;
+        // Chat တစ်ခုကို နှိပ်လိုက်ရင် အဲ့ဒီဘက်ကို ပြောင်းပေးရန်
+        item.onclick = () => switchChat(session.id);
+        listContainer.appendChild(item);
+    });
+}
+
+// 3. Chat ဟောင်းတစ်ခုကို ရွေးချယ်ပြသရန် (Switch Chat)
+function switchChat(chatId) {
+    currentChatId = chatId;
+    const session = chatSessions.find(s => s.id === chatId);
+    
+    if (session) {
+        document.getElementById('chatMessages').innerHTML = session.messagesHTML || '<div class="sh-ai-bubble">မင်္ဂလာပါ 👋</div>';
+        saveAndRenderSessions(); // Active အရောင်ပြောင်းရန်
+    }
+}
+
 function showGenerateMessage(text, type){
     const box = document.getElementById("generateMessage");
     box.textContent = text;
@@ -2031,13 +2113,13 @@ window.addEventListener('DOMContentLoaded', () => {
     shRenderVoiceLibrary();
     switchView('mainDashboard');
     
-    // Browser / App ထဲမှာ သိမ်းထားခဲ့တဲ့ Chat တွေရှိရင် ပြန်ဖော်ပြပေးရန်
-    const savedChats = localStorage.getItem('shSavedChats');
-    if (savedChats) {
-        const chatContainer = document.getElementById('chatMessages');
-        if (chatContainer) {
-            chatContainer.innerHTML = savedChats;
-        }
+        // Chat Sessions များ ရှိမရှိ စစ်ဆေးပြီး Loading လုပ်ရန်
+    if (chatSessions.length > 0) {
+        switchChat(chatSessions[0].id);
+    } else {
+        startNewChat();
     }
+    saveAndRenderSessions();
+
 });
 
