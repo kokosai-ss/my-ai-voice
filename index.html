@@ -2589,8 +2589,7 @@ cursor:pointer;
             <h3 style="font-size: 13px; font-weight: bold; color: #fff; margin-bottom: 4px;">AI Voice Studio</h3>
             <p style="font-size: 9px; color: #8eb0cb; margin: 0;">Create amazing voices</p>
         </div>
-
-        <div onclick="switchView('voiceGenerator')" style="background: rgba(13, 27, 42, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(6, 182, 212, 0.35); box-shadow: 0 4px 20px rgba(6, 182, 212, 0.15); padding: 16px; border-radius: 16px; cursor: pointer;">
+       <div onclick="switchView('voiceGenerator', this)" style="background: rgba(13, 27, 42, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(6, 182, 212, 0.35); box-shadow: 0 4px 20px rgba(6, 182, 212, 0.15); padding: 16px; border-radius: 16px; cursor: pointer;">
             <div style="width: 36px; height: 36px; border-radius: 10px; background: rgba(6, 182, 212, 0.25); border: 1px solid rgba(6, 182, 212, 0.5); display: flex; align-items: center; justify-content: center; color: #22d3ee; margin-bottom: 10px; box-shadow: 0 0 10px rgba(34,211,238,0.3);">
                 <i class="fa-solid fa-bolt"></i>
             </div>
@@ -4987,10 +4986,10 @@ window.addEventListener('DOMContentLoaded', (event) => {
         <div style="font-size: 9px;">Studio</div>
     </div>
 
-    <!-- Generator -->
-    <div class="nav-btn" onclick="switchView('voiceGenerator', this)" style="text-align: center; cursor: pointer; color: #8eb0cb; transition: 0.3s;">
-        <i class="fa-solid fa-bolt" style="font-size: 16px; margin-bottom: 3px;"></i>
-        <div style="font-size: 9px;">Generator</div>
+    <!-- Asset Hub Nav -->
+   <div class="nav-btn" onclick="switchView('assetHub', this)" style="text-align: center; cursor: pointer; color: #8eb0cb; transition: 0.3s;">
+      <i class="fa-solid fa-images" style="font-size: 16px; margin-bottom: 3px;"></i>
+      <div style="font-size: 9px;">Assets</div>
     </div>
 
         <!-- AI Chatbot -->
