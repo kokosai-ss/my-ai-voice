@@ -4369,12 +4369,10 @@ async function searchAssets() {
         const response = await fetch(url);
 
         if (!response.ok) {
-    const errorText = await response.text();
-
-    throw new Error(
-        `Unsplash API Error: ${response.status} - ${errorText}`
-    );
-}
+            throw new Error(
+                `Unsplash API Error: ${response.status}`
+            );
+        }
 
         const data = await response.json();
 
@@ -4506,8 +4504,9 @@ async function searchAssets() {
             grid.appendChild(card);
         });
 
-    console.error('UNSPLASH ERROR:', error);
-alert(error.message);
+    } catch (error) {
+
+        console.error(error);
 
         grid.innerHTML = `
             <div class="sh-empty-state">
