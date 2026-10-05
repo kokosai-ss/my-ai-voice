@@ -1419,12 +1419,17 @@ async function handleProAssetFiles(event) {
             }
             catch (singleError) {
 
-                console.error(
-                    'Single image upload failed:',
-                    singleError
-                );
+    console.error(
+        'Single image upload failed:',
+        singleError
+    );
 
-            }
+    alert(
+        'Upload Error:\n\n' +
+        (singleError.message || singleError)
+    );
+
+}
         }
 
 
