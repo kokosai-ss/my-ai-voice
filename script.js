@@ -2031,73 +2031,118 @@ async function shDownloadDemo(voice, button){
     }
 }
 const SH_LOCAL_VOICE_FILES = {
-  Puck: 'voices/Puck.wav',
-  Charon: 'voices/Charon.wav',
-  Fenrir: 'voices/Fenrir.mp3',
-  Orus: 'voices/Orus.wav',
-  Kore: 'voices/Kore.wav',
-  Leda: 'voices/Leda.wav',
-  Aoede: 'voices/Aoede.wav',
-  Callirrhoe: 'voices/Callirrhoe.wav',
-  Despina: 'voices/Despina.wav'
+    Puck: 'Puck.wav',
+    Charon: 'Charon.wav',
+    Fenrir: 'Fenrir.mp3',
+    Orus: 'Orus.wav',
+    Kore: 'Kore.wav',
+    Leda: 'Leda.wav',
+    Aoede: 'Aoede.wav',
+    Callirrhoe: 'Callirrhoe.wav',
+    Despina: 'Despina.wav'
 };
 
 let shVoiceAudio = null;
 let shPlayingButton = null;
 
 function shPreviewVoice(voice, button){
-  try{
-    const src = SH_LOCAL_VOICE_FILES[voice];
+    try{
+        const src = SH_LOCAL_VOICE_FILES[voice];
 
-    if(!src){
-      alert('ဒီအသံဖိုင် မတွေ့ပါ။');
-      return;
+        if(!src){
+            alert('ဒီအသံဖိုင် မတွေ့ပါ။');
+            return;
+        }
+
+        // အရင်ဖွင့်နေတဲ့အသံရှိရင် ရပ်
+        if(shVoiceAudio){
+            shVoiceAudio.pause();
+            shVoiceAudio.currentTime = 0;
+
+            if(shPlayingButton){
+                shPlayingButton.textContent = '▶ Play';
+            }
+        }
+
+        // Local audio file ကို တိုက်ရိုက်ဖွင့်
+        shVoiceAudio = new Audio('./' + src);
+        shPlayingButton = button;
+
+        button.textContent = '⏸ Stop';
+
+        shVoiceAudio.onended = () => {
+            button.textContent = '▶ Play';
+            shVoiceAudio = null;
+            shPlayingButton = null;
+        };
+
+        shVoiceAudio.onerror = () => {
+            button.textContent = '▶ Play';
+            shVoiceAudio = null;
+            shPlayingButton = null;
+
+            alert(
+                'အသံဖိုင် ဖွင့်မရပါ။\n\n' +
+                'File name ကို စစ်ပေးပါ။\n' +
+                'ဥပမာ - Charon.wav'
+            );
+        };
+
+        shVoiceAudio.play().catch(() => {
+            button.textContent = '▶ Play';
+        });
+
+    }catch(e){
+        button.textContent = '▶ Play';
+
+        alert(
+            'အသံဖိုင် ဖွင့်မရပါ။\n\n' +
+            (e.message || e)
+        );
     }
-
-    // အရင်အသံရှိရင် ရပ်
-    if(shVoiceAudio){
-      shVoiceAudio.pause();
-      shVoiceAudio.currentTime = 0;
-
-      if(shPlayingButton){
-        shPlayingButton.textContent = '▶ Play';
-      }
-    }
-
-    // Local file ကိုပဲ ဖွင့်မယ်
-    shVoiceAudio = new Audio(src);
-    shPlayingButton = button;
-
-    button.textContent = '⏸ Stop';
-
-    shVoiceAudio.onended = () => {
-      button.textContent = '▶ Play';
-      shVoiceAudio = null;
-      shPlayingButton = null;
-    };
-
-    shVoiceAudio.onerror = () => {
-      button.textContent = '▶ Play';
-      shVoiceAudio = null;
-      shPlayingButton = null;
-
-      alert(
-        'အသံဖိုင် ဖွင့်မရပါ။\n\n' +
-        'File location နဲ့ file name ကို စစ်ပေးပါ။'
-      );
-    };
-
-    shVoiceAudio.play().catch(() => {
-      button.textContent = '▶ Play';
-    });
-
-  }catch(e){
-    button.textContent = '▶ Play';
-    alert('အသံဖိုင် ဖွင့်မရပါ။\n\n' + (e.message || e));
-  }
 }
+
+function shRenderVoiceLibrary(){
+    const grid = document.getElementById('premiumVoiceGrid');
+    if(!grid) return;
+
+    grid.innerHTML = SH_VOICES.map(([voice, desc, img]) => {
+        return `<article class="voice-card premium-voice-card" data-voice="${voice}" style="box-sizing: border-box;">
+
+            <div class="voice-avatar-wrap" onclick="shChooseVoice('${voice}')">
+                <img src="${img}" alt="${voice}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
+            </div>
+
+            <div class="voice-name-row" onclick="shChooseVoice('${voice}')">
+                <strong>${voice}</strong>
+                <span style="font-size: 9px; color: #00baff;">GEMINI TTS</span>
+            </div>
+
+            <div class="voice-desc" onclick="shChooseVoice('${voice}')">${desc}</div>
+
+            <div style="display:flex; gap:5px; margin-top:10px; width:100%; box-sizing:border-box;">
+
+                <button
+                    class="btn preview"
+                    onclick="shPreviewVoice('${voice}', this)"
+                    style="flex:1; padding:7px 2px; background:rgba(0,186,255,0.2); border:1px solid #00baff; border-radius:8px; color:#fff; cursor:pointer; font-size:11px; text-align:center;">
+                    ▶ Play
+                </button>
+
+                <button
+                    class="btn use"
+                    onclick="shChooseVoice('${voice}')"
+                    style="flex:1; padding:7px 2px; background:rgba(0,255,136,0.2); border:1px solid #00ff88; border-radius:8px; color:#fff; cursor:pointer; font-size:11px; text-align:center;">
+                    Use
+                </button>
+
+            </div>
+
+        </article>`;
+    }).join('');
+}
+
 window.addEventListener('DOMContentLoaded', () => {
     shRenderVoiceLibrary();
     switchView('mainDashboard');
 });
-
