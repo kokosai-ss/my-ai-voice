@@ -933,335 +933,541 @@ document.addEventListener(
         }
     }
 );
-
-  /* =========================================================
-   SH PRO ASSET LIBRARY
-   LOCAL IMAGE STORAGE — INDEXEDDB
-   ========================================================= */
-
-const SH_PRO_DB_NAME = 'SH_Pro_Asset_Library';
-const SH_PRO_DB_VERSION = 1;
-const SH_PRO_STORE = 'assets';
-
-let shProDB = null;
-
-
 /* =========================================================
-   OPEN DATABASE
+   SH PRO ASSET HUB — SUPABASE CLOUD
+   Public Search / Preview / Download
+   Admin Upload / Delete
+   Auto Image Compression
    ========================================================= */
 
-function openSHProDB() {
 
-    return new Promise((resolve, reject) => {
+/* ---------------------------------------------------------
+   1. SUPABASE CONFIG
+   --------------------------------------------------------- */
 
-        if (shProDB) {
-            resolve(shProDB);
-            return;
-        }
+const SH_SUPABASE_URL =
+    'https://ctnczlsurnrzipcuhoe.supabase.co';
 
-        const request = indexedDB.open(
-            SH_PRO_DB_NAME,
-            SH_PRO_DB_VERSION
-        );
+const SH_SUPABASE_ANON_KEY =
+    'sb_publishable_RGccvi4KIz9F5q657aKilA_-Fbsm55n';
 
-        request.onupgradeneeded = function(event) {
 
-            const db = event.target.result;
+/* IMPORTANT:
+   Do NOT put service_role / secret key here.
+*/
 
-            if (!db.objectStoreNames.contains(SH_PRO_STORE)) {
+const shSupabase =
+    window.supabase.createClient(
+        SH_SUPABASE_URL,
+        SH_SUPABASE_ANON_KEY
+    );
 
-                const store = db.createObjectStore(
-                    SH_PRO_STORE,
-                    {
-                        keyPath: 'id',
-                        autoIncrement: true
-                    }
-                );
 
-                store.createIndex(
-                    'category',
-                    'category',
-                    { unique: false }
-                );
+/* ---------------------------------------------------------
+   2. SETTINGS
+   --------------------------------------------------------- */
 
-                store.createIndex(
-                    'tags',
-                    'tags',
-                    { unique: false }
-                );
+const SH_PRO_BUCKET = 'Assets';
+const SH_PRO_TABLE  = 'Images';
 
-                store.createIndex(
-                    'createdAt',
-                    'createdAt',
-                    { unique: false }
-                );
-            }
-        };
+const SH_MAX_IMAGE_SIZE = 1920;
+const SH_WEBP_QUALITY = 0.88;
 
-        request.onsuccess = function(event) {
 
-            shProDB = event.target.result;
+/* ---------------------------------------------------------
+   3. BASIC HELPERS
+   --------------------------------------------------------- */
 
-            resolve(shProDB);
-        };
+function shShowProMessage(message) {
 
-        request.onerror = function() {
+    console.log('[SH Pro]', message);
 
-            reject(
-                request.error ||
-                new Error('IndexedDB ဖွင့်မရပါ')
-            );
-        };
+    if (typeof showToast === 'function') {
+        showToast(message);
+        return;
+    }
 
-    });
+    alert(message);
 }
 
 
-/* =========================================================
-   OPEN GALLERY
-   ========================================================= */
+function shSafeText(value) {
+
+    return String(value ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+}
+
+
+/* ---------------------------------------------------------
+   4. OPEN FILE PICKER
+   --------------------------------------------------------- */
 
 function openProAssetPicker() {
 
     const input =
-        document.getElementById(
-            'proAssetFileInput'
-        );
+        document.getElementById('proAssetFileInput');
 
     if (!input) {
-
         console.error(
-            'proAssetFileInput မတွေ့ပါ'
+            'proAssetFileInput not found'
         );
-
         return;
     }
 
     input.value = '';
-
     input.click();
 }
 
 
-/* =========================================================
-   HANDLE SELECTED IMAGES
-   ========================================================= */
+/* ---------------------------------------------------------
+   5. IMAGE COMPRESSION
+   --------------------------------------------------------- */
 
-async function handleProAssetFiles(event) {
+async function shCompressImage(file) {
 
-    const files =
-        Array.from(
-            event.target.files || []
-        );
+    return new Promise((resolve, reject) => {
 
-    if (!files.length) {
-        return;
-    }
+        const reader = new FileReader();
 
+        reader.onload = function () {
 
-    try {
+            const img = new Image();
 
-        const db =
-            await openSHProDB();
+            img.onload = function () {
 
-        const category =
-            prompt(
-                'ဒီပုံတွေကို ဘယ် Category ထဲထည့်မလဲ?\n\nဥပမာ — ရွှေတိဂုံ / ပုဂံ / ဘုရား / အိမ်'
-            );
+                let width = img.naturalWidth;
+                let height = img.naturalHeight;
 
+                /*
+                 * Keep original size if already small.
+                 * Otherwise scale down to max 1920.
+                 */
 
-        if (category === null) {
-            return;
-        }
+                const maxSize =
+                    SH_MAX_IMAGE_SIZE;
 
+                if (
+                    width > maxSize ||
+                    height > maxSize
+                ) {
 
-        const cleanCategory =
-            category.trim() ||
-            'အထွေထွေ';
+                    const ratio =
+                        Math.min(
+                            maxSize / width,
+                            maxSize / height
+                        );
 
+                    width =
+                        Math.round(width * ratio);
 
-        /* -----------------------------------------
-           SAVE ALL SELECTED IMAGES
-           ----------------------------------------- */
-
-        for (const file of files) {
-
-            if (!file.type.startsWith('image/')) {
-                continue;
-            }
+                    height =
+                        Math.round(height * ratio);
+                }
 
 
-            const asset = {
+                const canvas =
+                    document.createElement('canvas');
 
-                name:
-                    file.name ||
-                    'image',
+                canvas.width = width;
+                canvas.height = height;
 
-                category:
-                    cleanCategory,
 
-                tags:
-                    [cleanCategory],
+                const ctx =
+                    canvas.getContext('2d');
 
-                type:
-                    file.type,
+                if (!ctx) {
+                    reject(
+                        new Error(
+                            'Canvas is not supported'
+                        )
+                    );
+                    return;
+                }
 
-                size:
-                    file.size,
 
-                blob:
-                    file,
+                /*
+                 * White background prevents transparent
+                 * images becoming black when converted to JPEG.
+                 */
 
-                createdAt:
-                    Date.now(),
+                ctx.fillStyle = '#ffffff';
 
-                updatedAt:
-                    Date.now()
+                ctx.fillRect(
+                    0,
+                    0,
+                    width,
+                    height
+                );
+
+
+                ctx.drawImage(
+                    img,
+                    0,
+                    0,
+                    width,
+                    height
+                );
+
+
+                /*
+                 * Prefer WebP.
+                 */
+
+                canvas.toBlob(
+                    function (blob) {
+
+                        if (!blob) {
+                            reject(
+                                new Error(
+                                    'Image compression failed'
+                                )
+                            );
+                            return;
+                        }
+
+
+                        const compressedName =
+                            (
+                                file.name
+                                    .replace(
+                                        /\.[^/.]+$/,
+                                        ''
+                                    )
+                            ) +
+                            '_' +
+                            Date.now() +
+                            '.webp';
+
+
+                        const compressedFile =
+                            new File(
+                                [blob],
+                                compressedName,
+                                {
+                                    type: 'image/webp'
+                                }
+                            );
+
+
+                        resolve(
+                            compressedFile
+                        );
+
+                    },
+                    'image/webp',
+                    SH_WEBP_QUALITY
+                );
 
             };
 
 
-            await saveSHProAsset(
-                db,
-                asset
+            img.onerror = function () {
+
+                reject(
+                    new Error(
+                        'Image could not be loaded'
+                    )
+                );
+
+            };
+
+
+            img.src = reader.result;
+        };
+
+
+        reader.onerror = function () {
+
+            reject(
+                new Error(
+                    'Image could not be read'
+                )
             );
+
+        };
+
+
+        reader.readAsDataURL(file);
+    });
+}
+
+
+/* ---------------------------------------------------------
+   6. CREATE UNIQUE FILE PATH
+   --------------------------------------------------------- */
+
+function shCreateStoragePath(file) {
+
+    const randomPart =
+        Math.random()
+            .toString(36)
+            .substring(2, 10);
+
+    return (
+        'assets/' +
+        Date.now() +
+        '_' +
+        randomPart +
+        '.webp'
+    );
+}
+
+
+/* ---------------------------------------------------------
+   7. UPLOAD FILES
+   --------------------------------------------------------- */
+
+async function handleProAssetFiles(event) {
+
+    const input = event.target;
+
+    if (!input || !input.files) {
+        return;
+    }
+
+
+    const files =
+        Array.from(input.files)
+            .filter(file =>
+                file.type.startsWith('image/')
+            );
+
+
+    if (!files.length) {
+        shShowProMessage(
+            'ပုံဖိုင် မတွေ့ပါ။'
+        );
+        return;
+    }
+
+
+    /*
+     * Temporary category input.
+     *
+     * Later we can replace this with the
+     * Neon Glass custom category popup.
+     */
+
+    const category =
+        prompt(
+            'ဒီပုံတွေအတွက် Category ထည့်ပါ။\nဥပမာ - ရွှေတိဂုံ'
+        );
+
+
+    if (!category || !category.trim()) {
+
+        shShowProMessage(
+            'Category မထည့်ရသေးပါ။'
+        );
+
+        return;
+    }
+
+
+    const cleanCategory =
+        category.trim();
+
+
+    let successCount = 0;
+
+
+    try {
+
+        for (
+            let i = 0;
+            i < files.length;
+            i++
+        ) {
+
+            const originalFile =
+                files[i];
+
+
+            try {
+
+                /*
+                 * 1. Compress
+                 */
+
+                const compressedFile =
+                    await shCompressImage(
+                        originalFile
+                    );
+
+
+                /*
+                 * 2. Storage path
+                 */
+
+                const storagePath =
+                    shCreateStoragePath(
+                        compressedFile
+                    );
+
+
+                /*
+                 * 3. Upload to Storage
+                 */
+
+                const {
+                    data: storageData,
+                    error: storageError
+                } =
+                    await shSupabase
+                        .storage
+                        .from(SH_PRO_BUCKET)
+                        .upload(
+                            storagePath,
+                            compressedFile,
+                            {
+                                cacheControl:
+                                    '31536000',
+
+                                contentType:
+                                    'image/webp',
+
+                                upsert: false
+                            }
+                        );
+
+
+                if (storageError) {
+
+                    console.error(
+                        'Storage upload error:',
+                        storageError
+                    );
+
+                    throw storageError;
+                }
+
+
+                /*
+                 * 4. Public URL
+                 */
+
+                const {
+                    data: publicData
+                } =
+                    shSupabase
+                        .storage
+                        .from(SH_PRO_BUCKET)
+                        .getPublicUrl(
+                            storagePath
+                        );
+
+
+                const imageUrl =
+                    publicData.publicUrl;
+
+
+                /*
+                 * 5. Save metadata
+                 *    into Images table
+                 */
+
+                const {
+                    data: dbData,
+                    error: dbError
+                } =
+                    await shSupabase
+                        .from(SH_PRO_TABLE)
+                        .insert([
+                            {
+                                title:
+                                    originalFile.name,
+
+                                image_url:
+                                    imageUrl,
+
+                                category:
+                                    cleanCategory
+                            }
+                        ])
+                        .select();
+
+
+                /*
+                 * If DB fails, remove uploaded file
+                 * so we don't leave orphan files.
+                 */
+
+                if (dbError) {
+
+                    await shSupabase
+                        .storage
+                        .from(SH_PRO_BUCKET)
+                        .remove([
+                            storagePath
+                        ]);
+
+                    throw dbError;
+                }
+
+
+                successCount++;
+
+                console.log(
+                    'Uploaded:',
+                    originalFile.name
+                );
+
+            }
+            catch (singleError) {
+
+                console.error(
+                    'Single image upload failed:',
+                    singleError
+                );
+
+            }
         }
 
 
-        /* -----------------------------------------
-           REFRESH LIBRARY
-           ----------------------------------------- */
+        if (successCount > 0) {
 
-        await loadSHProAssets();
+            shShowProMessage(
+                `${successCount} ပုံ Upload အောင်မြင်ပါတယ်။ 🎉`
+            );
 
+            await loadSHProAssets();
 
-        alert(
-            `ပုံ ${files.length} ပုံ ထည့်ပြီးပါပြီ။`
-        );
+        }
+        else {
 
+            shShowProMessage(
+                'ပုံတင်မရပါ။ Supabase Permission / Policy ကို စစ်ပါ။'
+            );
 
-    } catch (error) {
+        }
+
+    }
+    catch (error) {
 
         console.error(
-            'PRO ASSET SAVE ERROR:',
+            'Pro upload error:',
             error
         );
 
-        alert(
-            'ပုံသိမ်းရာမှာ အမှားဖြစ်နေပါတယ်။'
+        shShowProMessage(
+            'Upload လုပ်ရာမှာ အမှားတစ်ခု ဖြစ်သွားပါတယ်။'
         );
+
+    }
+    finally {
+
+        input.value = '';
     }
 }
 
 
-/* =========================================================
-   SAVE ONE ASSET
-   ========================================================= */
-
-function saveSHProAsset(
-    db,
-    asset
-) {
-
-    return new Promise(
-        (resolve, reject) => {
-
-            const transaction =
-                db.transaction(
-                    SH_PRO_STORE,
-                    'readwrite'
-                );
-
-            const store =
-                transaction.objectStore(
-                    SH_PRO_STORE
-                );
-
-            const request =
-                store.add(asset);
-
-
-            request.onsuccess =
-                function() {
-
-                    resolve(
-                        request.result
-                    );
-                };
-
-
-            request.onerror =
-                function() {
-
-                    reject(
-                        request.error
-                    );
-                };
-
-        }
-    );
-}
-
-
-/* =========================================================
-   GET ALL ASSETS
-   ========================================================= */
-
-function getAllSHProAssets() {
-
-    return new Promise(
-        async (resolve, reject) => {
-
-            try {
-
-                const db =
-                    await openSHProDB();
-
-                const transaction =
-                    db.transaction(
-                        SH_PRO_STORE,
-                        'readonly'
-                    );
-
-                const store =
-                    transaction.objectStore(
-                        SH_PRO_STORE
-                    );
-
-                const request =
-                    store.getAll();
-
-
-                request.onsuccess =
-                    function() {
-
-                        resolve(
-                            request.result || []
-                        );
-                    };
-
-
-                request.onerror =
-                    function() {
-
-                        reject(
-                            request.error
-                        );
-                    };
-
-            } catch (error) {
-
-                reject(error);
-            }
-
-        }
-    );
-}
-
-
-/* =========================================================
-   LOAD PRO ASSETS
-   ========================================================= */
+/* ---------------------------------------------------------
+   8. LOAD PUBLIC ASSETS
+   --------------------------------------------------------- */
 
 async function loadSHProAssets(
     searchTerm = ''
@@ -1272,348 +1478,842 @@ async function loadSHProAssets(
             'proAssetGrid'
         );
 
+
     if (!grid) {
         return;
     }
 
 
+    /*
+     * Loading state
+     */
+
+    grid.innerHTML = `
+        <div class="sh-pro-empty-state">
+            <div class="sh-pro-empty-icon">
+                ⏳
+            </div>
+
+            <div class="sh-pro-empty-title">
+                ပုံတွေရှာနေပါတယ်
+            </div>
+
+            <div class="sh-pro-empty-text">
+                ခဏစောင့်ပါ...
+            </div>
+        </div>
+    `;
+
+
     try {
 
-        const assets =
-            await getAllSHProAssets();
+        let query =
+            shSupabase
+                .from(SH_PRO_TABLE)
+                .select(
+                    'id,title,image_url,category'
+                )
+                .order(
+                    'id',
+                    {
+                        ascending: false
+                    }
+                );
 
 
-        const term =
-            searchTerm
-                .trim()
-                .toLowerCase();
+        /*
+         * Search by category/title.
+         */
+
+        if (
+            searchTerm &&
+            searchTerm.trim()
+        ) {
+
+            const keyword =
+                searchTerm.trim();
 
 
-        const filtered =
-            term
-                ? assets.filter(asset => {
-
-                    const category =
-                        String(
-                            asset.category || ''
-                        ).toLowerCase();
-
-                    const name =
-                        String(
-                            asset.name || ''
-                        ).toLowerCase();
-
-                    const tags =
-                        Array.isArray(asset.tags)
-                            ? asset.tags.join(' ').toLowerCase()
-                            : String(
-                                asset.tags || ''
-                            ).toLowerCase();
+            query =
+                query.or(
+                    `title.ilike.%${keyword}%,category.ilike.%${keyword}%`
+                );
+        }
 
 
-                    return (
-                        category.includes(term) ||
-                        name.includes(term) ||
-                        tags.includes(term)
-                    );
-
-                })
-                : assets;
+        const {
+            data,
+            error
+        } = await query;
 
 
-        if (!filtered.length) {
+        if (error) {
+
+            console.error(
+                'Load assets error:',
+                error
+            );
 
             grid.innerHTML = `
-
                 <div class="sh-pro-empty-state">
-
                     <div class="sh-pro-empty-icon">
-                        💎
+                        ⚠️
                     </div>
 
                     <div class="sh-pro-empty-title">
-                        ပုံမတွေ့ပါ
+                        ပုံတွေယူလို့မရပါ
                     </div>
 
                     <div class="sh-pro-empty-text">
-                        ပုံတွေထည့်ပြီး ရှာဖွေကြည့်ပါ
+                        ${shSafeText(error.message)}
                     </div>
-
-                    <button
-                        class="sh-pro-empty-btn"
-                        onclick="openProAssetPicker()"
-                    >
-                        <i class="fa-solid fa-plus"></i>
-                        ပုံထည့်မယ်
-                    </button>
-
                 </div>
-
             `;
 
             return;
         }
 
 
-        /*
-           အခုစမ်းသပ်တဲ့အဆင့်မှာ
-           အများကြီးရှိရင်တောင် Browser ကို
-           တစ်ခါတည်း မပြည့်စေဖို့
-           ပထမ 30 ပုံပဲပြမယ်။
-        */
-
-        const visibleAssets =
-            filtered.slice(0, 30);
+        const assets =
+            Array.isArray(data)
+                ? data
+                : [];
 
 
-        grid.innerHTML = '';
+        renderSHProAssets(
+            assets
+        );
 
-
-        for (
-            const asset of visibleAssets
-        ) {
-
-            const card =
-                document.createElement('div');
-
-            card.className =
-                'sh-pro-asset-card';
-
-
-            const image =
-                document.createElement('img');
-
-            image.loading =
-                'lazy';
-
-
-            image.alt =
-                asset.name ||
-                asset.category ||
-                'Asset';
-
-
-            /*
-               Blob URL
-            */
-
-            const imageUrl =
-                URL.createObjectURL(
-                    asset.blob
-                );
-
-
-            image.src =
-                imageUrl;
-
-
-            /*
-               INFO
-            */
-
-            const info =
-                document.createElement('div');
-
-            info.className =
-                'sh-pro-asset-info';
-
-
-            const category =
-                document.createElement('div');
-
-            category.className =
-                'sh-pro-asset-category';
-
-            category.textContent =
-                asset.category ||
-                'အထွေထွေ';
-
-
-            info.appendChild(
-                category
-            );
-
-
-            /*
-               DELETE BUTTON
-            */
-
-            const deleteBtn =
-                document.createElement('button');
-
-            deleteBtn.className =
-                'sh-pro-delete-btn';
-
-            deleteBtn.innerHTML =
-                '<i class="fa-solid fa-trash"></i>';
-
-            deleteBtn.title =
-                'Delete';
-
-
-            deleteBtn.onclick =
-                async function(event) {
-
-                    event.stopPropagation();
-
-                    const ok =
-                        confirm(
-                            'ဒီပုံကို ဖျက်မလား?'
-                        );
-
-                    if (!ok) {
-                        return;
-                    }
-
-                    await deleteSHProAsset(
-                        asset.id
-                    );
-
-                    URL.revokeObjectURL(
-                        imageUrl
-                    );
-
-                    await loadSHProAssets(
-                        document
-                            .getElementById(
-                                'proAssetSearchInput'
-                            )
-                            ?.value || ''
-                    );
-                };
-
-
-            card.appendChild(
-                image
-            );
-
-            card.appendChild(
-                info
-            );
-
-            card.appendChild(
-                deleteBtn
-            );
-
-
-            grid.appendChild(
-                card
-            );
-        }
-
-
-        /*
-           More count
-        */
-
-        if (
-            filtered.length > 30
-        ) {
-
-            const more =
-                document.createElement('div');
-
-            more.className =
-                'sh-pro-more-count';
-
-            more.textContent =
-                `စုစုပေါင်း ${filtered.length} ပုံထဲမှ ပထမ 30 ပုံကို ပြထားပါတယ်`;
-
-            grid.appendChild(
-                more
-            );
-        }
-
-
-    } catch (error) {
+    }
+    catch (error) {
 
         console.error(
-            'LOAD PRO ASSETS ERROR:',
+            'Public asset load error:',
             error
         );
 
         grid.innerHTML = `
-
             <div class="sh-pro-empty-state">
-
                 <div class="sh-pro-empty-icon">
                     ⚠️
                 </div>
 
                 <div class="sh-pro-empty-title">
-                    Asset Library ဖွင့်မရပါ
+                    Connection Error
                 </div>
 
+                <div class="sh-pro-empty-text">
+                    Internet connection ကို စစ်ပါ။
+                </div>
             </div>
-
         `;
     }
 }
 
 
-/* =========================================================
-   DELETE ASSET
-   ========================================================= */
+/* ---------------------------------------------------------
+   9. RENDER ASSET CARDS
+   --------------------------------------------------------- */
 
-function deleteSHProAsset(
+function renderSHProAssets(
+    assets
+) {
+
+    const grid =
+        document.getElementById(
+            'proAssetGrid'
+        );
+
+
+    if (!grid) {
+        return;
+    }
+
+
+    if (!assets.length) {
+
+        grid.innerHTML = `
+            <div class="sh-pro-empty-state">
+                <div class="sh-pro-empty-icon">
+                    🔍
+                </div>
+
+                <div class="sh-pro-empty-title">
+                    ပုံမတွေ့ပါ
+                </div>
+
+                <div class="sh-pro-empty-text">
+                    ရှာဖွေတဲ့ Category နဲ့ ကိုက်ညီတဲ့ပုံ မရှိသေးပါ။
+                </div>
+            </div>
+        `;
+
+        return;
+    }
+
+
+    /*
+     * Limit display to 60.
+     */
+
+    const visibleAssets =
+        assets.slice(0, 60);
+
+
+    grid.innerHTML =
+        visibleAssets
+            .map(asset =>
+                createSHProAssetCard(
+                    asset
+                )
+            )
+            .join('');
+}
+
+
+/* ---------------------------------------------------------
+   10. CREATE CARD
+   --------------------------------------------------------- */
+
+function createSHProAssetCard(
+    asset
+) {
+
+    const id =
+        Number(asset.id);
+
+
+    const imageUrl =
+        shSafeText(
+            asset.image_url
+        );
+
+
+    const category =
+        shSafeText(
+            asset.category ||
+            'Uncategorized'
+        );
+
+
+    const title =
+        shSafeText(
+            asset.title ||
+            'SH Asset'
+        );
+
+
+    return `
+        <div
+            class="sh-pro-asset-card"
+            data-asset-id="${id}"
+        >
+
+            <div
+                class="sh-pro-image-wrap"
+                onclick="openSHProImagePreview(${id})"
+            >
+
+                <img
+                    src="${imageUrl}"
+                    alt="${title}"
+                    loading="lazy"
+                    onerror="this.style.opacity='0.25'"
+                >
+
+                <div class="sh-pro-image-overlay">
+                    <i class="fa-solid fa-expand"></i>
+                </div>
+
+            </div>
+
+
+            <div class="sh-pro-asset-info">
+
+                <div
+                    class="sh-pro-asset-category"
+                >
+                    ${category}
+                </div>
+
+
+                <div
+                    class="sh-pro-asset-name"
+                >
+                    ${title}
+                </div>
+
+
+                <div
+                    class="sh-pro-card-actions"
+                >
+
+                    <button
+                        class="sh-pro-download"
+                        onclick="event.stopPropagation(); downloadSHProAsset(${id})"
+                    >
+                        <i class="fa-solid fa-download"></i>
+                        Download
+                    </button>
+
+
+                    <!--
+                        DELETE BUTTON
+                        Will be protected by Admin/RLS later.
+                    -->
+
+                    <button
+                        class="sh-pro-delete"
+                        onclick="event.stopPropagation(); deleteSHProAsset(${id})"
+                        title="Delete"
+                    >
+                        <i class="fa-solid fa-trash"></i>
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+    `;
+}
+
+
+/* ---------------------------------------------------------
+   11. KEEP CURRENT ASSETS IN MEMORY
+   --------------------------------------------------------- */
+
+let SH_PRO_ASSET_CACHE = [];
+
+
+/*
+ * Override render so preview/download can find asset.
+ */
+
+const shOriginalRenderSHProAssets =
+    renderSHProAssets;
+
+
+/* ---------------------------------------------------------
+   12. REDEFINE LOAD WITH CACHE
+   --------------------------------------------------------- */
+
+async function loadSHProAssetsWithCache(
+    searchTerm = ''
+) {
+
+    try {
+
+        let query =
+            shSupabase
+                .from(SH_PRO_TABLE)
+                .select(
+                    'id,title,image_url,category'
+                )
+                .order(
+                    'id',
+                    {
+                        ascending: false
+                    }
+                );
+
+
+        if (
+            searchTerm &&
+            searchTerm.trim()
+        ) {
+
+            const keyword =
+                searchTerm.trim();
+
+
+            query =
+                query.or(
+                    `title.ilike.%${keyword}%,category.ilike.%${keyword}%`
+                );
+        }
+
+
+        const {
+            data,
+            error
+        } = await query;
+
+
+        if (error) {
+            throw error;
+        }
+
+
+        SH_PRO_ASSET_CACHE =
+            Array.isArray(data)
+                ? data
+                : [];
+
+
+        renderSHProAssets(
+            SH_PRO_ASSET_CACHE
+        );
+
+    }
+    catch (error) {
+
+        console.error(
+            error
+        );
+
+        const grid =
+            document.getElementById(
+                'proAssetGrid'
+            );
+
+        if (grid) {
+
+            grid.innerHTML = `
+                <div class="sh-pro-empty-state">
+                    <div class="sh-pro-empty-icon">
+                        ⚠️
+                    </div>
+
+                    <div class="sh-pro-empty-title">
+                        မရပါ
+                    </div>
+
+                    <div class="sh-pro-empty-text">
+                        ${shSafeText(error.message)}
+                    </div>
+                </div>
+            `;
+        }
+    }
+}
+
+
+/* ---------------------------------------------------------
+   13. GET ONE ASSET
+   --------------------------------------------------------- */
+
+function getSHProAssetById(
     id
 ) {
 
-    return new Promise(
-        async (resolve, reject) => {
-
-            try {
-
-                const db =
-                    await openSHProDB();
-
-
-                const transaction =
-                    db.transaction(
-                        SH_PRO_STORE,
-                        'readwrite'
-                    );
-
-
-                const store =
-                    transaction.objectStore(
-                        SH_PRO_STORE
-                    );
-
-
-                const request =
-                    store.delete(id);
-
-
-                request.onsuccess =
-                    function() {
-
-                        resolve();
-                    };
-
-
-                request.onerror =
-                    function() {
-
-                        reject(
-                            request.error
-                        );
-                    };
-
-
-            } catch (error) {
-
-                reject(error);
-            }
-
-        }
+    return SH_PRO_ASSET_CACHE.find(
+        asset =>
+            Number(asset.id) ===
+            Number(id)
     );
 }
 
 
-/* =========================================================
-   CATEGORY FILTER
-   ========================================================= */
+/* ---------------------------------------------------------
+   14. PREVIEW
+   --------------------------------------------------------- */
+
+function openSHProImagePreview(
+    id
+) {
+
+    const asset =
+        getSHProAssetById(id);
+
+
+    if (!asset) {
+
+        shShowProMessage(
+            'ပုံကို ရှာမတွေ့ပါ။'
+        );
+
+        return;
+    }
+
+
+    const oldPreview =
+        document.getElementById(
+            'shProImagePreview'
+        );
+
+
+    if (oldPreview) {
+        oldPreview.remove();
+    }
+
+
+    const preview =
+        document.createElement('div');
+
+    preview.id =
+        'shProImagePreview';
+
+
+    preview.innerHTML = `
+
+        <div
+            class="sh-pro-preview-backdrop"
+            onclick="closeSHProImagePreview(event)"
+        >
+
+            <div
+                class="sh-pro-preview-box"
+                onclick="event.stopPropagation()"
+            >
+
+                <button
+                    class="sh-pro-preview-close"
+                    onclick="closeSHProImagePreview()"
+                >
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+
+
+                <img
+                    class="sh-pro-preview-image"
+                    src="${shSafeText(asset.image_url)}"
+                    alt="${shSafeText(asset.title || 'SH Asset')}"
+                >
+
+
+                <div class="sh-pro-preview-info">
+
+                    <div class="sh-pro-preview-category">
+                        ${shSafeText(asset.category || '')}
+                    </div>
+
+                    <div class="sh-pro-preview-title">
+                        ${shSafeText(asset.title || 'SH Asset')}
+                    </div>
+
+                </div>
+
+
+                <button
+                    class="sh-pro-preview-download"
+                    onclick="downloadSHProAsset(${Number(asset.id)})"
+                >
+                    <i class="fa-solid fa-download"></i>
+                    Download
+                </button>
+
+            </div>
+
+        </div>
+    `;
+
+
+    document.body.appendChild(
+        preview
+    );
+}
+
+
+/* ---------------------------------------------------------
+   15. CLOSE PREVIEW
+   --------------------------------------------------------- */
+
+function closeSHProImagePreview(
+    event
+) {
+
+    if (
+        event &&
+        event.target &&
+        event.target.classList &&
+        !event.target.classList.contains(
+            'sh-pro-preview-backdrop'
+        )
+    ) {
+        return;
+    }
+
+
+    const preview =
+        document.getElementById(
+            'shProImagePreview'
+        );
+
+
+    if (preview) {
+        preview.remove();
+    }
+}
+
+
+/* ---------------------------------------------------------
+   16. DOWNLOAD
+   --------------------------------------------------------- */
+
+async function downloadSHProAsset(
+    id
+) {
+
+    const asset =
+        getSHProAssetById(id);
+
+
+    if (!asset) {
+
+        shShowProMessage(
+            'Download လုပ်မယ့်ပုံ မတွေ့ပါ။'
+        );
+
+        return;
+    }
+
+
+    try {
+
+        /*
+         * Fetch image as Blob.
+         * This makes Android / CapCut handling
+         * more reliable than simply opening the URL.
+         */
+
+        const response =
+            await fetch(
+                asset.image_url
+            );
+
+
+        if (!response.ok) {
+            throw new Error(
+                'Image download failed'
+            );
+        }
+
+
+        const blob =
+            await response.blob();
+
+
+        const blobUrl =
+            URL.createObjectURL(
+                blob
+            );
+
+
+        const link =
+            document.createElement('a');
+
+
+        link.href =
+            blobUrl;
+
+
+        link.download =
+            (
+                String(
+                    asset.title ||
+                    'SH_Asset'
+                )
+                .replace(
+                    /\.[^/.]+$/,
+                    ''
+                )
+            ) +
+            '.webp';
+
+
+        document.body.appendChild(
+            link
+        );
+
+
+        link.click();
+
+
+        link.remove();
+
+
+        setTimeout(() => {
+
+            URL.revokeObjectURL(
+                blobUrl
+            );
+
+        }, 1500);
+
+
+    }
+    catch (error) {
+
+        console.error(
+            'Download error:',
+            error
+        );
+
+
+        /*
+         * Fallback:
+         * open public URL.
+         */
+
+        window.open(
+            asset.image_url,
+            '_blank'
+        );
+    }
+}
+
+
+/* ---------------------------------------------------------
+   17. DELETE
+   ---------------------------------------------------------
+   IMPORTANT:
+   This function is NOT secure by itself.
+   Supabase RLS MUST protect DELETE.
+   Later we will restrict this to Admin only.
+   --------------------------------------------------------- */
+
+async function deleteSHProAsset(
+    id
+) {
+
+    const asset =
+        getSHProAssetById(id);
+
+
+    if (!asset) {
+        return;
+    }
+
+
+    const confirmed =
+        confirm(
+            'ဒီပုံကို ဖျက်မှာ သေချာလား?'
+        );
+
+
+    if (!confirmed) {
+        return;
+    }
+
+
+    try {
+
+        /*
+         * First delete DB record.
+         */
+
+        const {
+            error: dbError
+        } =
+            await shSupabase
+                .from(SH_PRO_TABLE)
+                .delete()
+                .eq(
+                    'id',
+                    id
+                );
+
+
+        if (dbError) {
+            throw dbError;
+        }
+
+
+        /*
+         * Then remove Storage file.
+         */
+
+        const storagePath =
+            shGetStoragePathFromPublicUrl(
+                asset.image_url
+            );
+
+
+        if (storagePath) {
+
+            const {
+                error: storageError
+            } =
+                await shSupabase
+                    .storage
+                    .from(SH_PRO_BUCKET)
+                    .remove([
+                        storagePath
+                    ]);
+
+
+            if (storageError) {
+
+                console.warn(
+                    'Storage delete warning:',
+                    storageError
+                );
+            }
+        }
+
+
+        shShowProMessage(
+            'ပုံဖျက်ပြီးပါပြီ။'
+        );
+
+
+        await loadSHProAssets();
+
+
+    }
+    catch (error) {
+
+        console.error(
+            'Delete error:',
+            error
+        );
+
+
+        shShowProMessage(
+            'Delete မလုပ်နိုင်ပါ။ Admin Permission / RLS ကို စစ်ပါ။'
+        );
+    }
+}
+
+
+/* ---------------------------------------------------------
+   18. GET STORAGE PATH
+   --------------------------------------------------------- */
+
+function shGetStoragePathFromPublicUrl(
+    publicUrl
+) {
+
+    try {
+
+        const marker =
+            `/storage/v1/object/public/${SH_PRO_BUCKET}/`;
+
+
+        const index =
+            publicUrl.indexOf(
+                marker
+            );
+
+
+        if (index === -1) {
+            return null;
+        }
+
+
+        return decodeURIComponent(
+            publicUrl.substring(
+                index +
+                marker.length
+            )
+        );
+
+    }
+    catch (error) {
+
+        console.error(
+            error
+        );
+
+        return null;
+    }
+}
+
+
+/* ---------------------------------------------------------
+   19. CATEGORY FILTER
+   --------------------------------------------------------- */
 
 async function filterProAssets(
     category
@@ -1624,8 +2324,8 @@ async function filterProAssets(
             'proAssetSearchInput'
         );
 
-    if (input) {
 
+    if (input) {
         input.value =
             category;
     }
@@ -1637,32 +2337,73 @@ async function filterProAssets(
 }
 
 
-/* =========================================================
-   PRO SEARCH
-   ========================================================= */
+/* ---------------------------------------------------------
+   20. SEARCH INPUT
+   --------------------------------------------------------- */
 
-document.addEventListener(
-    'input',
-    function(event) {
+(function initSHProSearch() {
 
-        if (
-            event.target &&
-            event.target.id ===
-                'proAssetSearchInput'
-        ) {
+    const input =
+        document.getElementById(
+            'proAssetSearchInput'
+        );
 
-            loadSHProAssets(
-                event.target.value
-            );
-        }
 
+    if (!input) {
+        return;
     }
-);
 
 
-/* =========================================================
-   FREE / PRO SWITCH
-   ========================================================= */
+    let timer = null;
+
+
+    input.addEventListener(
+        'input',
+        function () {
+
+            clearTimeout(
+                timer
+            );
+
+
+            timer =
+                setTimeout(
+                    () => {
+
+                        loadSHProAssets(
+                            input.value
+                        );
+
+                    },
+                    300
+                );
+        }
+    );
+
+
+    input.addEventListener(
+        'keydown',
+        function (event) {
+
+            if (
+                event.key === 'Enter'
+            ) {
+
+                event.preventDefault();
+
+                loadSHProAssets(
+                    input.value
+                );
+            }
+        }
+    );
+
+})();
+
+
+/* ---------------------------------------------------------
+   21. FREE / PRO SWITCH
+   --------------------------------------------------------- */
 
 function switchAssetMode(
     mode
@@ -1673,15 +2414,18 @@ function switchAssetMode(
             'assetFreeArea'
         );
 
+
     const proArea =
         document.getElementById(
             'assetProArea'
         );
 
+
     const freeTab =
         document.getElementById(
             'assetFreeTab'
         );
+
 
     const proTab =
         document.getElementById(
@@ -1689,81 +2433,147 @@ function switchAssetMode(
         );
 
 
-    if (
-        !freeArea ||
-        !proArea
-    ) {
-        return;
-    }
+    if (mode === 'pro') {
+
+        if (freeArea) {
+            freeArea.style.display =
+                'none';
+        }
 
 
-    if (
-        mode === 'pro'
-    ) {
-
-        freeArea.style.display =
-            'none';
-
-        proArea.style.display =
-            'block';
+        if (proArea) {
+            proArea.style.display =
+                'block';
+        }
 
 
-        freeTab?.classList.remove(
-            'active'
-        );
+        if (freeTab) {
+            freeTab.classList.remove(
+                'active'
+            );
+        }
 
-        proTab?.classList.add(
-            'active'
-        );
+
+        if (proTab) {
+            proTab.classList.add(
+                'active'
+            );
+        }
 
 
         /*
-           Load local assets
-        */
+         * Load Cloud Assets.
+         */
 
         loadSHProAssets();
+    }
+
+    else {
+
+        if (freeArea) {
+            freeArea.style.display =
+                'block';
+        }
 
 
-    } else {
-
-        freeArea.style.display =
-            'block';
-
-        proArea.style.display =
-            'none';
+        if (proArea) {
+            proArea.style.display =
+                'none';
+        }
 
 
-        proTab?.classList.remove(
-            'active'
-        );
+        if (freeTab) {
+            freeTab.classList.add(
+                'active'
+            );
+        }
 
-        freeTab?.classList.add(
-            'active'
-        );
+
+        if (proTab) {
+            proTab.classList.remove(
+                'active'
+            );
+        }
     }
 }
 
 
-/* =========================================================
-   INITIALIZE PRO DATABASE
-   ========================================================= */
+/* ---------------------------------------------------------
+   22. TEST SUPABASE
+   --------------------------------------------------------- */
 
-openSHProDB()
-    .then(() => {
+async function testSHSupabaseConnection() {
+
+    try {
+
+        const {
+            data,
+            error
+        } =
+            await shSupabase
+                .from(SH_PRO_TABLE)
+                .select(
+                    'id'
+                )
+                .limit(1);
+
+
+        if (error) {
+
+            console.error(
+                'Supabase connection error:',
+                error
+            );
+
+            shShowProMessage(
+                'Supabase ချိတ်မရပါ။\n' +
+                error.message
+            );
+
+            return false;
+        }
+
 
         console.log(
-            'SH Pro Asset Library Ready'
+            'SH Supabase connection OK',
+            data
         );
 
-    })
-    .catch(error => {
+
+        return true;
+
+    }
+    catch (error) {
 
         console.error(
-            'SH Pro DB ERROR:',
             error
         );
 
-    });
+        return false;
+    }
+}
+
+
+/* ---------------------------------------------------------
+   23. INITIAL START
+   --------------------------------------------------------- */
+
+document.addEventListener(
+    'DOMContentLoaded',
+    function () {
+
+        console.log(
+            'SH Pro Asset Cloud loaded'
+        );
+
+        /*
+         * We don't automatically load until
+         * the user opens PRO.
+         */
+
+    }
+);
+  
 /* FORMAT & STYLE MODAL LOGICS */
 function setAudioFormat(formatValue) {
   const btnWav = document.getElementById('btnWav');
