@@ -2089,6 +2089,554 @@ touch-action:pan-y;
         height: 145px;
     }
 } 
+/* =========================================================
+   SH ASSET HUB — FREE / PRO MODE SWITCH
+   ========================================================= */
+
+.sh-asset-mode-switch {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+
+    margin: 0 0 14px;
+    padding: 4px;
+
+    border-radius: 14px;
+
+    background: rgba(255,255,255,0.025);
+    border: 1px solid rgba(34,211,238,0.12);
+
+    box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.025);
+}
+
+.sh-asset-mode {
+    height: 38px;
+
+    border: 1px solid transparent;
+    border-radius: 10px;
+
+    background: transparent;
+
+    color: #607d94;
+
+    font-size: 11px;
+    font-weight: 700;
+
+    cursor: pointer;
+
+    transition:
+        0.22s ease;
+}
+
+.sh-asset-mode.active {
+    color: #67e8f9;
+
+    background: rgba(34,211,238,0.10);
+
+    border-color:
+        rgba(34,211,238,0.22);
+
+    box-shadow:
+        0 0 15px rgba(34,211,238,0.07),
+        inset 0 1px 0 rgba(255,255,255,0.035);
+}
+
+.sh-asset-mode:active {
+    transform: scale(0.97);
+}
+
+
+/* =========================================================
+   FREE / PRO AREA
+   ========================================================= */
+
+#assetFreeArea,
+#assetProArea {
+    width: 100%;
+}
+
+#assetProArea {
+    display: none;
+}
+
+
+/* =========================================================
+   PRO HEADER
+   ========================================================= */
+
+.sh-pro-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 10px;
+    margin-bottom: 14px;
+}
+
+.sh-pro-title {
+    color: #e8fbff;
+
+    font-size: 14px;
+    font-weight: 700;
+
+    letter-spacing: 0.15px;
+}
+
+.sh-pro-subtitle {
+    margin-top: 4px;
+
+    color: #7895ad;
+
+    font-size: 9px;
+}
+
+
+/* =========================================================
+   PRO ADD BUTTON
+   ========================================================= */
+
+.sh-pro-add-btn {
+    flex-shrink: 0;
+
+    height: 36px;
+
+    padding: 0 11px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    gap: 6px;
+
+    border-radius: 11px;
+
+    border: 1px solid rgba(34,211,238,0.25);
+
+    background:
+        rgba(34,211,238,0.09);
+
+    color: #67e8f9;
+
+    font-size: 10px;
+    font-weight: 700;
+
+    cursor: pointer;
+
+    transition: 0.2s ease;
+}
+
+.sh-pro-add-btn i {
+    font-size: 11px;
+}
+
+.sh-pro-add-btn:hover {
+    background:
+        rgba(34,211,238,0.17);
+
+    box-shadow:
+        0 0 16px rgba(34,211,238,0.10);
+}
+
+.sh-pro-add-btn:active {
+    transform: scale(0.94);
+}
+
+
+/* =========================================================
+   PRO SEARCH
+   ========================================================= */
+
+.sh-pro-search {
+    display: flex;
+    align-items: center;
+
+    gap: 9px;
+
+    height: 45px;
+
+    padding: 0 13px;
+
+    box-sizing: border-box;
+
+    border-radius: 14px;
+
+    background:
+        rgba(255,255,255,0.035);
+
+    border:
+        1px solid rgba(34,211,238,0.15);
+
+    box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.025),
+        0 7px 20px rgba(0,0,0,0.15);
+
+    transition: 0.25s ease;
+}
+
+.sh-pro-search:focus-within {
+    border-color:
+        rgba(34,211,238,0.42);
+
+    box-shadow:
+        0 0 0 3px rgba(34,211,238,0.05),
+        0 0 18px rgba(34,211,238,0.07);
+}
+
+.sh-pro-search i {
+    color: #608198;
+
+    font-size: 12px;
+}
+
+.sh-pro-search input {
+    flex: 1;
+
+    min-width: 0;
+
+    height: 100%;
+
+    border: none;
+    outline: none;
+
+    background: transparent;
+
+    color: #e8faff;
+
+    font-size: 11px;
+}
+
+.sh-pro-search input::placeholder {
+    color: #557188;
+}
+
+
+/* =========================================================
+   PRO CATEGORY BUTTONS
+   ========================================================= */
+
+.sh-pro-categories {
+    display: flex;
+
+    gap: 7px;
+
+    margin-top: 11px;
+
+    padding-bottom: 3px;
+
+    overflow-x: auto;
+
+    scrollbar-width: none;
+}
+
+.sh-pro-categories::-webkit-scrollbar {
+    display: none;
+}
+
+.sh-category-btn {
+    flex-shrink: 0;
+
+    height: 31px;
+
+    padding: 0 11px;
+
+    border-radius: 10px;
+
+    border:
+        1px solid rgba(34,211,238,0.12);
+
+    background:
+        rgba(255,255,255,0.025);
+
+    color: #668197;
+
+    font-size: 9px;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition: 0.2s ease;
+}
+
+.sh-category-btn:hover,
+.sh-category-btn:active {
+    color: #67e8f9;
+
+    border-color:
+        rgba(34,211,238,0.30);
+
+    background:
+        rgba(34,211,238,0.08);
+}
+
+
+/* =========================================================
+   PRO IMAGE GRID
+   ========================================================= */
+
+#proAssetGrid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+
+    gap: 10px;
+
+    margin-top: 13px;
+}
+
+
+/* =========================================================
+   PRO IMAGE CARD
+   ========================================================= */
+
+.sh-pro-asset-card {
+    position: relative;
+
+    height: 155px;
+
+    overflow: hidden;
+
+    border-radius: 15px;
+
+    background: #081522;
+
+    border:
+        1px solid rgba(34,211,238,0.13);
+
+    box-shadow:
+        0 8px 22px rgba(0,0,0,0.28);
+
+    transition:
+        transform 0.22s ease,
+        border-color 0.22s ease,
+        box-shadow 0.22s ease;
+}
+
+.sh-pro-asset-card:hover {
+    transform: translateY(-2px);
+
+    border-color:
+        rgba(34,211,238,0.38);
+
+    box-shadow:
+        0 10px 28px rgba(0,0,0,0.40),
+        0 0 17px rgba(34,211,238,0.07);
+}
+
+.sh-pro-asset-card img {
+    width: 100%;
+    height: 100%;
+
+    display: block;
+
+    object-fit: cover;
+
+    transition:
+        transform 0.35s ease;
+}
+
+.sh-pro-asset-card:hover img {
+    transform: scale(1.04);
+}
+
+
+/* =========================================================
+   PRO IMAGE INFO
+   ========================================================= */
+
+.sh-pro-asset-info {
+    position: absolute;
+
+    left: 0;
+    right: 0;
+    bottom: 0;
+
+    padding: 25px 8px 8px;
+
+    background:
+        linear-gradient(
+            to top,
+            rgba(2,8,15,0.94),
+            rgba(2,8,15,0.35),
+            transparent
+        );
+}
+
+.sh-pro-asset-category {
+    color: #8feefa;
+
+    font-size: 8px;
+    font-weight: 700;
+
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+
+/* =========================================================
+   PRO DELETE BUTTON
+   ========================================================= */
+
+.sh-pro-delete {
+    position: absolute;
+
+    top: 7px;
+    right: 7px;
+
+    width: 28px;
+    height: 28px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 9px;
+
+    border:
+        1px solid rgba(255,255,255,0.12);
+
+    background:
+        rgba(3,11,22,0.68);
+
+    color: #a5b7c5;
+
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+
+    cursor: pointer;
+
+    transition: 0.2s ease;
+
+    z-index: 3;
+}
+
+.sh-pro-delete:hover {
+    color: #ff7b8a;
+
+    border-color:
+        rgba(255,100,120,0.30);
+
+    background:
+        rgba(255,70,90,0.10);
+
+    box-shadow:
+        0 0 12px rgba(255,70,90,0.10);
+}
+
+.sh-pro-delete:active {
+    transform: scale(0.88);
+}
+
+
+/* =========================================================
+   PRO EMPTY STATE
+   ========================================================= */
+
+.sh-pro-empty {
+    grid-column: 1 / -1;
+
+    min-height: 190px;
+
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+    justify-content: center;
+
+    text-align: center;
+
+    border-radius: 17px;
+
+    border:
+        1px dashed rgba(34,211,238,0.16);
+
+    background:
+        rgba(255,255,255,0.018);
+}
+
+.sh-pro-empty-icon {
+    width: 48px;
+    height: 48px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    margin-bottom: 10px;
+
+    border-radius: 15px;
+
+    color: #22d3ee;
+
+    font-size: 18px;
+
+    background:
+        rgba(34,211,238,0.06);
+
+    border:
+        1px solid rgba(34,211,238,0.12);
+
+    box-shadow:
+        0 0 20px rgba(34,211,238,0.06);
+}
+
+.sh-pro-empty-title {
+    color: #a9c4d7;
+
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.sh-pro-empty-text {
+    margin-top: 4px;
+
+    color: #536f84;
+
+    font-size: 9px;
+}
+
+
+/* =========================================================
+   PRO RESULT COUNT
+   ========================================================= */
+
+.sh-pro-result-count {
+    margin-top: 9px;
+
+    color: #536f84;
+
+    font-size: 8px;
+
+    text-align: center;
+}
+
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 380px) {
+
+    .sh-pro-asset-card {
+        height: 140px;
+    }
+
+    #proAssetGrid {
+        gap: 8px;
+    }
+
+    .sh-pro-add-btn {
+        padding: 0 9px;
+    }
+
+    .sh-pro-title {
+        font-size: 13px;
+    }
+}
 
 #cyberpunk-lockscreen {
   position: fixed;
