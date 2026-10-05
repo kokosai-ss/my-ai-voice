@@ -1992,14 +1992,7 @@ function shRenderVoiceLibrary(){
                     class="btn preview"
                     onclick="shPreviewVoice('${voice}', this)"
                     style="flex:1; padding:7px 2px; background:rgba(0,186,255,0.2); border:1px solid #00baff; border-radius:8px; color:#fff; cursor:pointer; font-size:11px; text-align:center;">
-                    Preview
-                </button>
-
-                <button
-                    class="btn download-demo"
-                    onclick="shDownloadDemo('${voice}', this)"
-                    style="flex:1; padding:7px 2px; background:rgba(255,193,7,0.18); border:1px solid #ffc107; border-radius:8px; color:#fff; cursor:pointer; font-size:11px; text-align:center;">
-                    ⬇ Download
+                    ▶ Play
                 </button>
 
                 <button
@@ -2012,16 +2005,6 @@ function shRenderVoiceLibrary(){
             </div>
         </article>`;
     }).join('');
-
-    shRefreshCacheMarks();
-}
-
-function shChooseVoice(voice){
-  singleVoiceValue=voice;
-  const labels={Puck:'Puck (တက်ကြွလှုပ်ရှား လူငယ်သံ)',Charon:'Charon (သတင်း/ဗဟုသုတပေး တည်ငြိမ်သံ)',Fenrir:'Fenrir (စိတ်လှုပ်ရှားဖွယ် ဇာတ်လမ်းသံ)',Orus:'Orus (ပြတ်သားခိုင်မာ ရင့်ကျက်သံ)',Kore:'Kore (ပြတ်သားခိုင်မာ လူငယ်သံ)',Leda:'Leda (နုပျိုတက်ကြွ ချိုသာသံ)',Aoede:'Aoede (ပေါ့ပါးလန်းဆန်း စကားပြောသံ)',Callirrhoe:'Callirrhoe (အေးဆေးပေါ့ပါး သဘာဝသံ)',Despina:'Despina (ချောမွေ့ငြိမ့်ညောင်း ဇာတ်လမ်းသံ)'};
-  const el=document.getElementById('singleSelectedSpeakerText');if(el)el.textContent=labels[voice]||voice;
-  switchTab('singleTab');
-  document.getElementById('singleTab')?.scrollIntoView({behavior:'smooth',block:'start'});
 }
 async function shDownloadDemo(voice, button){
     try{
@@ -2047,33 +2030,71 @@ async function shDownloadDemo(voice, button){
         alert('Download မအောင်မြင်ပါ။\n\n' + (e.message || e));
     }
 }
-async function shPreviewVoice(voice,button){
+const SH_LOCAL_VOICE_FILES = {
+  Puck: 'voices/Puck.wav',
+  Charon: 'voices/Charon.wav',
+  Fenrir: 'voices/Fenrir.mp3',
+  Orus: 'voices/Orus.wav',
+  Kore: 'voices/Kore.wav',
+  Leda: 'voices/Leda.wav',
+  Aoede: 'voices/Aoede.wav',
+  Callirrhoe: 'voices/Callirrhoe.wav',
+  Despina: 'voices/Despina.wav'
+};
+
+let shVoiceAudio = null;
+let shPlayingButton = null;
+
+function shPreviewVoice(voice, button){
   try{
-    const cached=await shGetDemo(voice);
-    if(cached?.blob){shMarkCached(voice,true);const u=URL.createObjectURL(cached.blob);const a=new Audio(u);a.onended=()=>URL.revokeObjectURL(u);await a.play();return;}
-    const raw=(document.getElementById('apiKey')?.value||'').trim();
-    if(!raw){alert('အရင်ဆုံး Gemini API Key ထည့်ပြီး Save လုပ်ပါ။');return;}
-    const keys=raw.split(',').map(k=>k.trim()).filter(Boolean);
-    button.disabled=true;button.textContent='⏳ Creating...';
-    const prompt=`Clear, natural Burmese voice demo. Say exactly this sentence naturally: ${SH_DEMO_TEXT[voice]||`မင်္ဂလာပါ၊ ကျွန်တော့်နာမည်ကတော့ ${voice} ပါ။`}`;
-    const body={contents:[{parts:[{text:prompt}]}],generationConfig:{responseModalities:['AUDIO'],temperature:0.6,speechConfig:{voiceConfig:{prebuiltVoiceConfig:{voiceName:voice}}}}};
-    let blob=null,last='';
-    for(const key of keys){
-      try{
-        const res=await fetch(API_URL,{method:'POST',headers:{'Content-Type':'application/json','x-goog-api-key':key},body:JSON.stringify(body)});
-        const data=await res.json().catch(()=>({}));
-        if(!res.ok)throw new Error(data?.error?.message||`HTTP ${res.status}`);
-        const b64=data?.candidates?.[0]?.content?.parts?.find(p=>p.inlineData)?.inlineData?.data;
-        if(!b64)throw new Error('Audio Data မပြန်လာပါ။');
-        const wav=pcmToWav(base64ToUint8Array(b64),24000,1,16);
-        blob=new Blob([wav],{type:'audio/wav'});break;
-      }catch(e){last=e.message||'Unknown error';}
+    const src = SH_LOCAL_VOICE_FILES[voice];
+
+    if(!src){
+      alert('ဒီအသံဖိုင် မတွေ့ပါ။');
+      return;
     }
-    if(!blob)throw new Error(last||'Preview မအောင်မြင်ပါ။');
-    await shSaveDemo(voice,blob);shMarkCached(voice,true);
-    const u=URL.createObjectURL(blob);const a=new Audio(u);a.onended=()=>URL.revokeObjectURL(u);await a.play();
-  }catch(e){alert('Preview မအောင်မြင်ပါ။\n\n'+(e.message||e));}
-  finally{button.disabled=false;button.textContent='▶ Play';}
+
+    // အရင်အသံရှိရင် ရပ်
+    if(shVoiceAudio){
+      shVoiceAudio.pause();
+      shVoiceAudio.currentTime = 0;
+
+      if(shPlayingButton){
+        shPlayingButton.textContent = '▶ Play';
+      }
+    }
+
+    // Local file ကိုပဲ ဖွင့်မယ်
+    shVoiceAudio = new Audio(src);
+    shPlayingButton = button;
+
+    button.textContent = '⏸ Stop';
+
+    shVoiceAudio.onended = () => {
+      button.textContent = '▶ Play';
+      shVoiceAudio = null;
+      shPlayingButton = null;
+    };
+
+    shVoiceAudio.onerror = () => {
+      button.textContent = '▶ Play';
+      shVoiceAudio = null;
+      shPlayingButton = null;
+
+      alert(
+        'အသံဖိုင် ဖွင့်မရပါ။\n\n' +
+        'File location နဲ့ file name ကို စစ်ပေးပါ။'
+      );
+    };
+
+    shVoiceAudio.play().catch(() => {
+      button.textContent = '▶ Play';
+    });
+
+  }catch(e){
+    button.textContent = '▶ Play';
+    alert('အသံဖိုင် ဖွင့်မရပါ။\n\n' + (e.message || e));
+  }
 }
 window.addEventListener('DOMContentLoaded', () => {
     shRenderVoiceLibrary();
