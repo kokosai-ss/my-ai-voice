@@ -933,7 +933,837 @@ document.addEventListener(
         }
     }
 );
-  
+
+  /* =========================================================
+   SH PRO ASSET LIBRARY
+   LOCAL IMAGE STORAGE — INDEXEDDB
+   ========================================================= */
+
+const SH_PRO_DB_NAME = 'SH_Pro_Asset_Library';
+const SH_PRO_DB_VERSION = 1;
+const SH_PRO_STORE = 'assets';
+
+let shProDB = null;
+
+
+/* =========================================================
+   OPEN DATABASE
+   ========================================================= */
+
+function openSHProDB() {
+
+    return new Promise((resolve, reject) => {
+
+        if (shProDB) {
+            resolve(shProDB);
+            return;
+        }
+
+        const request = indexedDB.open(
+            SH_PRO_DB_NAME,
+            SH_PRO_DB_VERSION
+        );
+
+        request.onupgradeneeded = function(event) {
+
+            const db = event.target.result;
+
+            if (!db.objectStoreNames.contains(SH_PRO_STORE)) {
+
+                const store = db.createObjectStore(
+                    SH_PRO_STORE,
+                    {
+                        keyPath: 'id',
+                        autoIncrement: true
+                    }
+                );
+
+                store.createIndex(
+                    'category',
+                    'category',
+                    { unique: false }
+                );
+
+                store.createIndex(
+                    'tags',
+                    'tags',
+                    { unique: false }
+                );
+
+                store.createIndex(
+                    'createdAt',
+                    'createdAt',
+                    { unique: false }
+                );
+            }
+        };
+
+        request.onsuccess = function(event) {
+
+            shProDB = event.target.result;
+
+            resolve(shProDB);
+        };
+
+        request.onerror = function() {
+
+            reject(
+                request.error ||
+                new Error('IndexedDB ဖွင့်မရပါ')
+            );
+        };
+
+    });
+}
+
+
+/* =========================================================
+   OPEN GALLERY
+   ========================================================= */
+
+function openProAssetPicker() {
+
+    const input =
+        document.getElementById(
+            'proAssetFileInput'
+        );
+
+    if (!input) {
+
+        console.error(
+            'proAssetFileInput မတွေ့ပါ'
+        );
+
+        return;
+    }
+
+    input.value = '';
+
+    input.click();
+}
+
+
+/* =========================================================
+   HANDLE SELECTED IMAGES
+   ========================================================= */
+
+async function handleProAssetFiles(event) {
+
+    const files =
+        Array.from(
+            event.target.files || []
+        );
+
+    if (!files.length) {
+        return;
+    }
+
+
+    try {
+
+        const db =
+            await openSHProDB();
+
+        const category =
+            prompt(
+                'ဒီပုံတွေကို ဘယ် Category ထဲထည့်မလဲ?\n\nဥပမာ — ရွှေတိဂုံ / ပုဂံ / ဘုရား / အိမ်'
+            );
+
+
+        if (category === null) {
+            return;
+        }
+
+
+        const cleanCategory =
+            category.trim() ||
+            'အထွေထွေ';
+
+
+        /* -----------------------------------------
+           SAVE ALL SELECTED IMAGES
+           ----------------------------------------- */
+
+        for (const file of files) {
+
+            if (!file.type.startsWith('image/')) {
+                continue;
+            }
+
+
+            const asset = {
+
+                name:
+                    file.name ||
+                    'image',
+
+                category:
+                    cleanCategory,
+
+                tags:
+                    [cleanCategory],
+
+                type:
+                    file.type,
+
+                size:
+                    file.size,
+
+                blob:
+                    file,
+
+                createdAt:
+                    Date.now(),
+
+                updatedAt:
+                    Date.now()
+
+            };
+
+
+            await saveSHProAsset(
+                db,
+                asset
+            );
+        }
+
+
+        /* -----------------------------------------
+           REFRESH LIBRARY
+           ----------------------------------------- */
+
+        await loadSHProAssets();
+
+
+        alert(
+            `ပုံ ${files.length} ပုံ ထည့်ပြီးပါပြီ။`
+        );
+
+
+    } catch (error) {
+
+        console.error(
+            'PRO ASSET SAVE ERROR:',
+            error
+        );
+
+        alert(
+            'ပုံသိမ်းရာမှာ အမှားဖြစ်နေပါတယ်။'
+        );
+    }
+}
+
+
+/* =========================================================
+   SAVE ONE ASSET
+   ========================================================= */
+
+function saveSHProAsset(
+    db,
+    asset
+) {
+
+    return new Promise(
+        (resolve, reject) => {
+
+            const transaction =
+                db.transaction(
+                    SH_PRO_STORE,
+                    'readwrite'
+                );
+
+            const store =
+                transaction.objectStore(
+                    SH_PRO_STORE
+                );
+
+            const request =
+                store.add(asset);
+
+
+            request.onsuccess =
+                function() {
+
+                    resolve(
+                        request.result
+                    );
+                };
+
+
+            request.onerror =
+                function() {
+
+                    reject(
+                        request.error
+                    );
+                };
+
+        }
+    );
+}
+
+
+/* =========================================================
+   GET ALL ASSETS
+   ========================================================= */
+
+function getAllSHProAssets() {
+
+    return new Promise(
+        async (resolve, reject) => {
+
+            try {
+
+                const db =
+                    await openSHProDB();
+
+                const transaction =
+                    db.transaction(
+                        SH_PRO_STORE,
+                        'readonly'
+                    );
+
+                const store =
+                    transaction.objectStore(
+                        SH_PRO_STORE
+                    );
+
+                const request =
+                    store.getAll();
+
+
+                request.onsuccess =
+                    function() {
+
+                        resolve(
+                            request.result || []
+                        );
+                    };
+
+
+                request.onerror =
+                    function() {
+
+                        reject(
+                            request.error
+                        );
+                    };
+
+            } catch (error) {
+
+                reject(error);
+            }
+
+        }
+    );
+}
+
+
+/* =========================================================
+   LOAD PRO ASSETS
+   ========================================================= */
+
+async function loadSHProAssets(
+    searchTerm = ''
+) {
+
+    const grid =
+        document.getElementById(
+            'proAssetGrid'
+        );
+
+    if (!grid) {
+        return;
+    }
+
+
+    try {
+
+        const assets =
+            await getAllSHProAssets();
+
+
+        const term =
+            searchTerm
+                .trim()
+                .toLowerCase();
+
+
+        const filtered =
+            term
+                ? assets.filter(asset => {
+
+                    const category =
+                        String(
+                            asset.category || ''
+                        ).toLowerCase();
+
+                    const name =
+                        String(
+                            asset.name || ''
+                        ).toLowerCase();
+
+                    const tags =
+                        Array.isArray(asset.tags)
+                            ? asset.tags.join(' ').toLowerCase()
+                            : String(
+                                asset.tags || ''
+                            ).toLowerCase();
+
+
+                    return (
+                        category.includes(term) ||
+                        name.includes(term) ||
+                        tags.includes(term)
+                    );
+
+                })
+                : assets;
+
+
+        if (!filtered.length) {
+
+            grid.innerHTML = `
+
+                <div class="sh-pro-empty-state">
+
+                    <div class="sh-pro-empty-icon">
+                        💎
+                    </div>
+
+                    <div class="sh-pro-empty-title">
+                        ပုံမတွေ့ပါ
+                    </div>
+
+                    <div class="sh-pro-empty-text">
+                        ပုံတွေထည့်ပြီး ရှာဖွေကြည့်ပါ
+                    </div>
+
+                    <button
+                        class="sh-pro-empty-btn"
+                        onclick="openProAssetPicker()"
+                    >
+                        <i class="fa-solid fa-plus"></i>
+                        ပုံထည့်မယ်
+                    </button>
+
+                </div>
+
+            `;
+
+            return;
+        }
+
+
+        /*
+           အခုစမ်းသပ်တဲ့အဆင့်မှာ
+           အများကြီးရှိရင်တောင် Browser ကို
+           တစ်ခါတည်း မပြည့်စေဖို့
+           ပထမ 30 ပုံပဲပြမယ်။
+        */
+
+        const visibleAssets =
+            filtered.slice(0, 30);
+
+
+        grid.innerHTML = '';
+
+
+        for (
+            const asset of visibleAssets
+        ) {
+
+            const card =
+                document.createElement('div');
+
+            card.className =
+                'sh-pro-asset-card';
+
+
+            const image =
+                document.createElement('img');
+
+            image.loading =
+                'lazy';
+
+
+            image.alt =
+                asset.name ||
+                asset.category ||
+                'Asset';
+
+
+            /*
+               Blob URL
+            */
+
+            const imageUrl =
+                URL.createObjectURL(
+                    asset.blob
+                );
+
+
+            image.src =
+                imageUrl;
+
+
+            /*
+               INFO
+            */
+
+            const info =
+                document.createElement('div');
+
+            info.className =
+                'sh-pro-asset-info';
+
+
+            const category =
+                document.createElement('div');
+
+            category.className =
+                'sh-pro-asset-category';
+
+            category.textContent =
+                asset.category ||
+                'အထွေထွေ';
+
+
+            info.appendChild(
+                category
+            );
+
+
+            /*
+               DELETE BUTTON
+            */
+
+            const deleteBtn =
+                document.createElement('button');
+
+            deleteBtn.className =
+                'sh-pro-delete-btn';
+
+            deleteBtn.innerHTML =
+                '<i class="fa-solid fa-trash"></i>';
+
+            deleteBtn.title =
+                'Delete';
+
+
+            deleteBtn.onclick =
+                async function(event) {
+
+                    event.stopPropagation();
+
+                    const ok =
+                        confirm(
+                            'ဒီပုံကို ဖျက်မလား?'
+                        );
+
+                    if (!ok) {
+                        return;
+                    }
+
+                    await deleteSHProAsset(
+                        asset.id
+                    );
+
+                    URL.revokeObjectURL(
+                        imageUrl
+                    );
+
+                    await loadSHProAssets(
+                        document
+                            .getElementById(
+                                'proAssetSearchInput'
+                            )
+                            ?.value || ''
+                    );
+                };
+
+
+            card.appendChild(
+                image
+            );
+
+            card.appendChild(
+                info
+            );
+
+            card.appendChild(
+                deleteBtn
+            );
+
+
+            grid.appendChild(
+                card
+            );
+        }
+
+
+        /*
+           More count
+        */
+
+        if (
+            filtered.length > 30
+        ) {
+
+            const more =
+                document.createElement('div');
+
+            more.className =
+                'sh-pro-more-count';
+
+            more.textContent =
+                `စုစုပေါင်း ${filtered.length} ပုံထဲမှ ပထမ 30 ပုံကို ပြထားပါတယ်`;
+
+            grid.appendChild(
+                more
+            );
+        }
+
+
+    } catch (error) {
+
+        console.error(
+            'LOAD PRO ASSETS ERROR:',
+            error
+        );
+
+        grid.innerHTML = `
+
+            <div class="sh-pro-empty-state">
+
+                <div class="sh-pro-empty-icon">
+                    ⚠️
+                </div>
+
+                <div class="sh-pro-empty-title">
+                    Asset Library ဖွင့်မရပါ
+                </div>
+
+            </div>
+
+        `;
+    }
+}
+
+
+/* =========================================================
+   DELETE ASSET
+   ========================================================= */
+
+function deleteSHProAsset(
+    id
+) {
+
+    return new Promise(
+        async (resolve, reject) => {
+
+            try {
+
+                const db =
+                    await openSHProDB();
+
+
+                const transaction =
+                    db.transaction(
+                        SH_PRO_STORE,
+                        'readwrite'
+                    );
+
+
+                const store =
+                    transaction.objectStore(
+                        SH_PRO_STORE
+                    );
+
+
+                const request =
+                    store.delete(id);
+
+
+                request.onsuccess =
+                    function() {
+
+                        resolve();
+                    };
+
+
+                request.onerror =
+                    function() {
+
+                        reject(
+                            request.error
+                        );
+                    };
+
+
+            } catch (error) {
+
+                reject(error);
+            }
+
+        }
+    );
+}
+
+
+/* =========================================================
+   CATEGORY FILTER
+   ========================================================= */
+
+async function filterProAssets(
+    category
+) {
+
+    const input =
+        document.getElementById(
+            'proAssetSearchInput'
+        );
+
+    if (input) {
+
+        input.value =
+            category;
+    }
+
+
+    await loadSHProAssets(
+        category
+    );
+}
+
+
+/* =========================================================
+   PRO SEARCH
+   ========================================================= */
+
+document.addEventListener(
+    'input',
+    function(event) {
+
+        if (
+            event.target &&
+            event.target.id ===
+                'proAssetSearchInput'
+        ) {
+
+            loadSHProAssets(
+                event.target.value
+            );
+        }
+
+    }
+);
+
+
+/* =========================================================
+   FREE / PRO SWITCH
+   ========================================================= */
+
+function switchAssetMode(
+    mode
+) {
+
+    const freeArea =
+        document.getElementById(
+            'assetFreeArea'
+        );
+
+    const proArea =
+        document.getElementById(
+            'assetProArea'
+        );
+
+    const freeTab =
+        document.getElementById(
+            'assetFreeTab'
+        );
+
+    const proTab =
+        document.getElementById(
+            'assetProTab'
+        );
+
+
+    if (
+        !freeArea ||
+        !proArea
+    ) {
+        return;
+    }
+
+
+    if (
+        mode === 'pro'
+    ) {
+
+        freeArea.style.display =
+            'none';
+
+        proArea.style.display =
+            'block';
+
+
+        freeTab?.classList.remove(
+            'active'
+        );
+
+        proTab?.classList.add(
+            'active'
+        );
+
+
+        /*
+           Load local assets
+        */
+
+        loadSHProAssets();
+
+
+    } else {
+
+        freeArea.style.display =
+            'block';
+
+        proArea.style.display =
+            'none';
+
+
+        proTab?.classList.remove(
+            'active'
+        );
+
+        freeTab?.classList.add(
+            'active'
+        );
+    }
+}
+
+
+/* =========================================================
+   INITIALIZE PRO DATABASE
+   ========================================================= */
+
+openSHProDB()
+    .then(() => {
+
+        console.log(
+            'SH Pro Asset Library Ready'
+        );
+
+    })
+    .catch(error => {
+
+        console.error(
+            'SH Pro DB ERROR:',
+            error
+        );
+
+    });
 /* FORMAT & STYLE MODAL LOGICS */
 function setAudioFormat(formatValue) {
   const btnWav = document.getElementById('btnWav');
