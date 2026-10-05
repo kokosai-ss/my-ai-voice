@@ -1978,17 +1978,41 @@ function shRenderVoiceLibrary(){
             <div class="voice-avatar-wrap" onclick="shChooseVoice('${voice}')">
                 <img src="${img}" alt="${voice}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
             </div>
+
             <div class="voice-name-row" onclick="shChooseVoice('${voice}')">
-                <strong>${voice}</strong> <span style="font-size: 9px; color: #00baff;">GEMINI TTS</span>
+                <strong>${voice}</strong>
+                <span style="font-size: 9px; color: #00baff;">GEMINI TTS</span>
             </div>
+
             <div class="voice-desc" onclick="shChooseVoice('${voice}')">${desc}</div>
-            <div style="display: flex; gap: 6px; margin-top: 10px; width: 100%; box-sizing: border-box;">
-                <button class="btn preview" onclick="shPreviewVoice('${voice}', this)" style="flex: 1; padding: 6px 2px; background: rgba(0,186,255,0.2); border: 1px solid #00baff; border-radius: 8px; color: #fff; cursor: pointer; font-size: 11px; text-align: center;">Preview</button>
-                <button class="btn use" onclick="shChooseVoice('${voice}')" style="flex: 1; padding: 6px 2px; background: rgba(0,255,136,0.2); border: 1px solid #00ff88; border-radius: 8px; color: #fff; cursor: pointer; font-size: 11px; text-align: center;">Use</button>
+
+            <div style="display:flex; gap:5px; margin-top:10px; width:100%; box-sizing:border-box;">
+
+                <button
+                    class="btn preview"
+                    onclick="shPreviewVoice('${voice}', this)"
+                    style="flex:1; padding:7px 2px; background:rgba(0,186,255,0.2); border:1px solid #00baff; border-radius:8px; color:#fff; cursor:pointer; font-size:11px; text-align:center;">
+                    Preview
+                </button>
+
+                <button
+                    class="btn download-demo"
+                    onclick="shDownloadDemo('${voice}', this)"
+                    style="flex:1; padding:7px 2px; background:rgba(255,193,7,0.18); border:1px solid #ffc107; border-radius:8px; color:#fff; cursor:pointer; font-size:11px; text-align:center;">
+                    ⬇ Download
+                </button>
+
+                <button
+                    class="btn use"
+                    onclick="shChooseVoice('${voice}')"
+                    style="flex:1; padding:7px 2px; background:rgba(0,255,136,0.2); border:1px solid #00ff88; border-radius:8px; color:#fff; cursor:pointer; font-size:11px; text-align:center;">
+                    Use
+                </button>
+
             </div>
         </article>`;
     }).join('');
-    
+
     shRefreshCacheMarks();
 }
 
@@ -1998,6 +2022,30 @@ function shChooseVoice(voice){
   const el=document.getElementById('singleSelectedSpeakerText');if(el)el.textContent=labels[voice]||voice;
   switchTab('singleTab');
   document.getElementById('singleTab')?.scrollIntoView({behavior:'smooth',block:'start'});
+}
+async function shDownloadDemo(voice, button){
+    try{
+        const cached = await shGetDemo(voice);
+
+        if(!cached?.blob){
+            alert('အရင်ဆုံး Preview ကိုနှိပ်ပြီး အသံဖန်တီးပေးပါ။');
+            return;
+        }
+
+        const url = URL.createObjectURL(cached.blob);
+
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `SH-${voice}-Preview.wav`;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+
+        setTimeout(() => URL.revokeObjectURL(url), 1000);
+
+    }catch(e){
+        alert('Download မအောင်မြင်ပါ။\n\n' + (e.message || e));
+    }
 }
 async function shPreviewVoice(voice,button){
   try{
