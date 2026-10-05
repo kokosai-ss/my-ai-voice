@@ -2027,7 +2027,8 @@ async function shPreviewVoice(voice,button){
   }catch(e){alert('Preview မအောင်မြင်ပါ။\n\n'+(e.message||e));}
   finally{button.disabled=false;button.textContent='▶ Play';}
 }
-window.addEventListener('DOMContentLoaded',()=>{shRenderVoiceLibrary();});
-window.addEventListener('DOMContentLoaded', (event) => {
+window.addEventListener('DOMContentLoaded', () => {
+    shRenderVoiceLibrary();
     switchView('mainDashboard');
 });
+
