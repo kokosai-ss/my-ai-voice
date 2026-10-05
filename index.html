@@ -1113,62 +1113,268 @@ cursor:pointer;
       </div>
   </div> 
 
-  <!-- Asset View -->
+<!-- =========================================================
+     SH ASSET HUB
+     FREE / PRO
+     ========================================================= -->
 <div id="assetView" class="view-container" style="display: none;">
-<div id="shImageSearch" class="sh-image-search">
 
-    <div class="sh-image-header">
-        <div>
-            <div class="sh-image-title">
-                <i class="fa-solid fa-images"></i>
-                Image Search
+    <div id="shImageSearch" class="sh-image-search">
+
+        <!-- HEADER -->
+        <div class="sh-image-header">
+
+            <div>
+                <div class="sh-image-title">
+                    <i class="fa-solid fa-images"></i>
+                    SH Asset Hub
+                </div>
+
+                <div class="sh-image-subtitle">
+                    ဗီဒီယိုနှင့် ဇာတ်ညွှန်းများအတွက် ပုံများရှာဖွေပါ
+                </div>
             </div>
-            <div class="sh-image-subtitle">
-                Search beautiful images instantly
-            </div>
+
         </div>
 
-        <div class="sh-free-badge">
-            <span></span>
-            FREE
+
+        <!-- FREE / PRO SWITCH -->
+        <div class="sh-asset-mode-switch">
+
+            <button
+                id="assetFreeTab"
+                class="sh-asset-mode active"
+                onclick="switchAssetMode('free')"
+            >
+                🆓 FREE
+            </button>
+
+            <button
+                id="assetProTab"
+                class="sh-asset-mode"
+                onclick="switchAssetMode('pro')"
+            >
+                💎 PRO
+            </button>
+
         </div>
-    </div>
 
-    <div class="sh-search-glass">
-        <i class="fa-solid fa-magnifying-glass"></i>
 
-        <input
-            type="text"
-            id="assetSearchInput"
-            placeholder="Search images..."
-            autocomplete="off"
+        <!-- =====================================================
+             FREE ASSET AREA
+             ===================================================== -->
+        <div id="assetFreeArea">
+
+            <div class="sh-search-glass">
+
+                <i class="fa-solid fa-magnifying-glass"></i>
+
+                <input
+                    type="text"
+                    id="assetSearchInput"
+                    placeholder="Search images..."
+                    autocomplete="off"
+                >
+
+                <button
+                    onclick="searchAssets()"
+                    class="sh-search-btn"
+                >
+                    <i class="fa-solid fa-arrow-right"></i>
+                </button>
+
+            </div>
+
+
+            <div id="assetGrid" class="sh-asset-grid">
+
+                <div class="sh-empty-state">
+
+                    <div class="sh-empty-icon">
+                        <i class="fa-regular fa-image"></i>
+                    </div>
+
+                    <div class="sh-empty-title">
+                        Search for an image
+                    </div>
+
+                    <div class="sh-empty-text">
+                        Type something above to find images
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- =====================================================
+             PRO ASSET AREA
+             ===================================================== -->
+        <div
+            id="assetProArea"
+            style="display: none;"
         >
 
-        <button onclick="searchAssets()" class="sh-search-btn">
-            <i class="fa-solid fa-arrow-right"></i>
-        </button>
-    </div>
+            <div class="sh-pro-header">
 
-    <div id="assetGrid" class="sh-asset-grid">
+                <div>
+                    <div class="sh-pro-title">
+                        💎 SH Pro Asset Library
+                    </div>
 
-        <div class="sh-empty-state">
-            <div class="sh-empty-icon">
-                <i class="fa-regular fa-image"></i>
+                    <div class="sh-pro-subtitle">
+                        ကိုယ့်ပုံတွေကို သိမ်းပြီး အလွယ်တကူရှာဖွေပါ
+                    </div>
+                </div>
+
             </div>
 
-            <div class="sh-empty-title">
-                Search for an image
+
+            <!-- ADD + SEARCH -->
+            <div class="sh-pro-tools">
+
+                <button
+                    class="sh-pro-add-btn"
+                    onclick="openProAssetPicker()"
+                >
+                    <i class="fa-solid fa-plus"></i>
+                    ပုံထည့်မယ်
+                </button>
+
+
+                <div class="sh-pro-search">
+
+                    <i class="fa-solid fa-magnifying-glass"></i>
+
+                    <input
+                        type="text"
+                        id="proAssetSearchInput"
+                        placeholder="ပုံရှာရန်..."
+                        autocomplete="off"
+                    >
+
+                </div>
+
             </div>
 
-            <div class="sh-empty-text">
-                Type something above to find images
+
+            <!-- CATEGORY -->
+            <div class="sh-pro-category-title">
+                Categories
             </div>
+
+
+            <div class="sh-pro-categories">
+
+                <button
+                    class="sh-category-btn"
+                    onclick="filterProAssets('ရွှေတိဂုံ')"
+                >
+                    🏯 ရွှေတိဂုံ
+                </button>
+
+                <button
+                    class="sh-category-btn"
+                    onclick="filterProAssets('ပုဂံ')"
+                >
+                    🏯 ပုဂံ
+                </button>
+
+                <button
+                    class="sh-category-btn"
+                    onclick="filterProAssets('ဘုရား')"
+                >
+                    🛕 ဘုရား
+                </button>
+
+                <button
+                    class="sh-category-btn"
+                    onclick="filterProAssets('အိမ်')"
+                >
+                    🏠 အိမ်
+                </button>
+
+                <button
+                    class="sh-category-btn"
+                    onclick="filterProAssets('ဆေးရုံ')"
+                >
+                    🏥 ဆေးရုံ
+                </button>
+
+                <button
+                    class="sh-category-btn"
+                    onclick="filterProAssets('ကား')"
+                >
+                    🚗 ကား
+                </button>
+
+                <button
+                    class="sh-category-btn"
+                    onclick="filterProAssets('ရဲ')"
+                >
+                    👮 ရဲ
+                </button>
+
+                <button
+                    class="sh-category-btn"
+                    onclick="filterProAssets('ည')"
+                >
+                    🌃 ညမြင်ကွင်း
+                </button>
+
+            </div>
+
+
+            <!-- PRO ASSET GRID -->
+            <div
+                id="proAssetGrid"
+                class="sh-pro-asset-grid"
+            >
+
+                <div class="sh-pro-empty-state">
+
+                    <div class="sh-pro-empty-icon">
+                        💎
+                    </div>
+
+                    <div class="sh-pro-empty-title">
+                        Your Asset Library is Empty
+                    </div>
+
+                    <div class="sh-pro-empty-text">
+                        ပုံတွေကို စတင်ထည့်သွင်းလိုက်ပါ
+                    </div>
+
+                    <button
+                        class="sh-pro-empty-btn"
+                        onclick="openProAssetPicker()"
+                    >
+                        <i class="fa-solid fa-plus"></i>
+                        ပုံထည့်မယ်
+                    </button>
+
+                </div>
+
+            </div>
+
+
+            <!-- HIDDEN FILE INPUT -->
+            <input
+                type="file"
+                id="proAssetFileInput"
+                accept="image/*"
+                multiple
+                style="display: none;"
+                onchange="handleProAssetFiles(event)"
+            >
+
         </div>
 
     </div>
 
 </div>
-  </div>  
   <!-- Generator View -->
 <div id="voiceGenerator" class="view-container">
     <div class="voice-library">
