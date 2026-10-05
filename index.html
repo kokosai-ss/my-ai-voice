@@ -336,138 +336,434 @@ cursor:pointer;
         <div id="keyMessage" class="message" style="margin-top: 12px; font-size: 12px; text-align: center;"></div>
     </div>
 </div>
+
 <!-- =========================================================
      SH AI TEAM — PREMIUM AI CHAT
-     ========================================================= -->
-
-<div id="aiChatbot"
+     HTML ONLY
+     ========================================================= --><div id="aiChatbot"
      class="view-container sh-ai-chat"
-     style="display:none;">
+     style="display:none;"><div class="sh-chat-shell">
 
-    <div class="sh-chat-shell">
+    <!-- =================================================
+         HEADER
+         ================================================= -->
 
-        <!-- ================= HEADER ================= -->
-        <div class="sh-chat-header">
+    <div class="sh-chat-header">
 
-            <div class="sh-chat-header-left">
+        <div class="sh-chat-header-left">
 
-                <!-- AI Avatar -->
-                <div class="sh-ai-avatar">
-                    <div class="sh-ai-avatar-ring"></div>
-                    <span>SH</span>
-                    <div class="sh-online-dot"></div>
+            <div class="sh-ai-avatar">
+                <div class="sh-ai-avatar-ring"></div>
+                <span>SH</span>
+                <div class="sh-online-dot"></div>
+            </div>
+
+            <div class="sh-ai-title-box">
+
+                <div class="sh-ai-title">
+                    SH AI
+                    <span class="sh-ai-pro-badge">PRO</span>
                 </div>
 
-                <div class="sh-ai-title-box">
-                    <div class="sh-ai-title">
-                        SH AI TEAM
-                    </div>
-
-                    <div class="sh-ai-status">
-                        <span class="sh-status-dot"></span>
-                        AI Assistant • Online
-                    </div>
+                <div class="sh-ai-status">
+                    <span class="sh-status-dot"></span>
+                    AI Assistant • Online
                 </div>
 
             </div>
 
-            <!-- New Chat -->
+        </div>
+
+
+        <!-- Header Actions -->
+
+        <div class="sh-chat-header-actions">
+
             <button
                 onclick="startNewChat()"
-                class="sh-new-chat-btn">
+                class="sh-header-action-btn sh-new-chat-btn"
+                title="New Chat">
 
                 <i class="fa-solid fa-plus"></i>
                 <span>New Chat</span>
 
             </button>
 
-        </div>
-
-
-        <!-- ================= AI INFO BAR ================= -->
-        <div class="sh-ai-info-bar">
-    <div class="sh-ai-info-icon">
-        <img src="Logo.png.png" alt="Logo" style="width: 35px; height: 35px; border-radius: 50%; object-fit: cover;">
-    </div>
-
-    <div class="sh-ai-info-text">
-        <div>SH AI Assistant</div>
-        <span>
-            မေးချင်တာတွေ မေးနိုင်ပါတယ်
-        </span>
-    </div>
-
-    <div class="sh-ai-pulse">
-        <span></span>
-        <span></span>
-        <span></span>
-    </div>
-</div>
-
-        <!-- ================= CHAT MESSAGES ================= -->
-        <div id="chatMessages"
-             class="sh-chat-messages">
-
-            <!-- Welcome Message -->
-            <div class="sh-message-row ai">
-
-                <div class="sh-message-avatar">
-                    SH
-                </div>
-
-                <div class="sh-message-content">
-
-                    <div class="sh-message-name">
-                        SH AI
-                        <span>AI Assistant</span>
-                    </div>
-
-                    <div class="sh-ai-bubble">
-                        မင်္ဂလာပါ 👋<br>
-                        ဘာများကူညီပေးရမလဲ။ 🚀
-                    </div>
-
-                    <div class="sh-message-time">
-                        Just now
-                    </div>
-
-                </div>
-
-            </div>
-
-        </div>
-
-
-        <!-- ================= IMAGE PREVIEW ================= -->
-        <div id="imagePreviewContainer"
-             class="sh-image-preview">
-
-            <div class="sh-preview-image-box">
-
-                <img
-                    id="selectedImagePreview"
-                    src=""
-                    alt="Selected image">
-
-            </div>
-
-            <div class="sh-preview-info">
-
-                <div class="sh-preview-title">
-                    Image attached
-                </div>
-
-                <div
-                    id="imageFileName"
-                    class="sh-preview-name">
-                    Image attached
-                </div>
-
-            </div>
 
             <button
-                onclick="removeAttachedImage()"
-                class="sh-remove-image">
+                onclick="toggleShAISettings()"
+                class="sh-header-icon-btn"
+                title="AI Settings">
+
+                <i class="fa-solid fa-sliders"></i>
+
+            </button>
+
+
+            <button
+                onclick="toggleShAIMenu()"
+                class="sh-header-icon-btn"
+                title="More">
+
+                <i class="fa-solid fa-ellipsis-vertical"></i>
+
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <!-- =================================================
+         AI INFO BAR
+         ================================================= -->
+
+    <div class="sh-ai-info-bar">
+
+        <div class="sh-ai-info-icon">
+
+            <img
+                src="Logo.png.png"
+                alt="SH AI"
+                style="width:35px;height:35px;border-radius:50%;object-fit:cover;">
+
+        </div>
+
+
+        <div class="sh-ai-info-text">
+
+            <div class="sh-ai-info-title">
+                SH AI Assistant
+            </div>
+
+            <span>
+                မေးချင်တာတွေ မေးနိုင်ပါတယ်
+            </span>
+
+        </div>
+
+
+        <div class="sh-ai-info-right">
+
+            <span class="sh-ai-mode">
+                <i class="fa-solid fa-bolt"></i>
+                Smart Mode
+            </span>
+
+            <div class="sh-ai-pulse">
+
+                <span></span>
+                <span></span>
+                <span></span>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =================================================
+         QUICK ACTIONS
+         ================================================= -->
+
+    <div class="sh-ai-quick-actions">
+
+        <button onclick="shAIQuickAction('recap')">
+
+            <i class="fa-solid fa-film"></i>
+            <span>Recap</span>
+
+        </button>
+
+
+        <button onclick="shAIQuickAction('rewrite')">
+
+            <i class="fa-solid fa-pen"></i>
+            <span>Rewrite</span>
+
+        </button>
+
+
+        <button onclick="shAIQuickAction('hook')">
+
+            <i class="fa-solid fa-fire"></i>
+            <span>Hook</span>
+
+        </button>
+
+
+        <button onclick="shAIQuickAction('clean')">
+
+            <i class="fa-solid fa-wand-magic-sparkles"></i>
+            <span>Clean</span>
+
+        </button>
+
+    </div>
+
+
+    <!-- =================================================
+         CHAT MESSAGES
+         ================================================= -->
+
+    <div id="chatMessages"
+         class="sh-chat-messages">
+
+
+        <!-- Welcome Message -->
+
+        <div class="sh-message-row ai">
+
+            <div class="sh-message-avatar">
+                SH
+            </div>
+
+
+            <div class="sh-message-content">
+
+                <div class="sh-message-name">
+
+                    SH AI
+
+                    <span>
+                        AI Assistant
+                    </span>
+
+                </div>
+
+
+                <div class="sh-ai-bubble">
+
+                    မင်္ဂလာပါ 👋<br>
+
+                    ကျွန်တော်က SH AI ပါ။<br>
+
+                    ဘာများကူညီပေးရမလဲ။ 🚀
+
+                </div>
+
+
+                <div class="sh-message-time">
+                    Just now
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =================================================
+         IMAGE PREVIEW
+         ================================================= -->
+
+    <div id="imagePreviewContainer"
+         class="sh-image-preview"
+         style="display:none;">
+
+        <div class="sh-preview-image-box">
+
+            <img
+                id="selectedImagePreview"
+                src=""
+                alt="Selected image">
+
+        </div>
+
+
+        <div class="sh-preview-info">
+
+            <div class="sh-preview-title">
+                Image attached
+            </div>
+
+            <div
+                id="imageFileName"
+                class="sh-preview-name">
+
+                Image attached
+
+            </div>
+
+        </div>
+
+
+        <button
+            onclick="removeAttachedImage()"
+            class="sh-remove-image"
+            title="Remove image">
+
+            <i class="fa-solid fa-xmark"></i>
+
+        </button>
+
+    </div>
+
+
+    <!-- =================================================
+         INPUT AREA
+         ================================================= -->
+
+    <div class="sh-chat-input-area">
+
+
+        <!-- Attachment Menu -->
+
+        <div id="attachMenu"
+             class="sh-attach-menu">
+
+            <div class="sh-attach-title">
+                ATTACH
+            </div>
+
+
+            <!-- Photos -->
+
+            <button
+                onclick="document.getElementById('chatImageInput').click(); toggleAttachMenu();"
+                class="sh-attach-item">
+
+                <span class="sh-attach-icon image">
+
+                    <i class="fa-solid fa-image"></i>
+
+                </span>
+
+
+                <span>
+
+                    <strong>
+                        Photos
+                    </strong>
+
+                    <small>
+                        Gallery / Images
+                    </small>
+
+                </span>
+
+            </button>
+
+
+            <!-- Files -->
+
+            <button
+                onclick="document.getElementById('chatFileInput').click(); toggleAttachMenu();"
+                class="sh-attach-item">
+
+                <span class="sh-attach-icon file">
+
+                    <i class="fa-solid fa-file"></i>
+
+                </span>
+
+
+                <span>
+
+                    <strong>
+                        Files
+                    </strong>
+
+                    <small>
+                        Documents / Files
+                    </small>
+
+                </span>
+
+            </button>
+
+        </div>
+
+
+        <!-- Hidden Image Input -->
+
+        <input
+            type="file"
+            id="chatImageInput"
+            accept="image/*"
+            style="display:none;"
+            onchange="handleChatImage(event)">
+
+
+        <!-- Hidden File Input -->
+
+        <input
+            type="file"
+            id="chatFileInput"
+            style="display:none;"
+            onchange="handleChatFile(event)">
+
+
+        <!-- Plus Button -->
+
+        <button
+            onclick="toggleAttachMenu()"
+            class="sh-chat-plus"
+            title="Attach">
+
+            <i class="fa-solid fa-plus"></i>
+
+        </button>
+
+
+        <!-- Text Input -->
+
+        <div class="sh-input-wrapper">
+
+            <input
+                type="text"
+                id="chatInput"
+                placeholder="မေးချင်တာလေး ရိုက်ထည့်ပါ..."
+                autocomplete="off"
+                onkeypress="if(event.key === 'Enter') sendChatMessage()">
+
+            <div class="sh-input-glow"></div>
+
+        </div>
+
+
+        <!-- Send Button -->
+
+        <button
+            onclick="sendChatMessage()"
+            class="sh-send-btn"
+            title="Send">
+
+            <i class="fa-solid fa-paper-plane"></i>
+
+        </button>
+
+    </div>
+
+
+    <!-- =================================================
+         SETTINGS PANEL
+         ================================================= -->
+
+    <div id="shAISettingsPanel"
+         class="sh-ai-settings-panel"
+         style="display:none;">
+
+        <div class="sh-ai-settings-header">
+
+            <div>
+
+                <strong>
+                    SH AI Settings
+                </strong>
+
+                <span>
+                    AI Assistant Controls
+                </span>
+
+            </div>
+
+
+            <button
+                onclick="toggleShAISettings()"
+                class="sh-settings-close-btn">
 
                 <i class="fa-solid fa-xmark"></i>
 
@@ -476,102 +772,132 @@ cursor:pointer;
         </div>
 
 
-        <!-- ================= INPUT AREA ================= -->
-        <div class="sh-chat-input-area">
+        <!-- Smart Mode -->
 
-            <!-- Attachment Menu -->
-            <div id="attachMenu"
-                 class="sh-attach-menu">
+        <div class="sh-ai-setting-item">
 
-                <div class="sh-attach-title">
-                    ATTACH
-                </div>
+            <div>
 
-                <button
-                    onclick="document.getElementById('chatImageInput').click(); toggleAttachMenu();"
-                    class="sh-attach-item">
+                <strong>
+                    Smart Mode
+                </strong>
 
-                    <span class="sh-attach-icon image">
-                        <i class="fa-solid fa-image"></i>
-                    </span>
-
-                    <span>
-                        <strong>Photos</strong>
-                        <small>Gallery / Images</small>
-                    </span>
-
-                </button>
-
-
-                <button
-                    onclick="document.getElementById('chatFileInput').click(); toggleAttachMenu();"
-                    class="sh-attach-item">
-
-                    <span class="sh-attach-icon file">
-                        <i class="fa-solid fa-file"></i>
-                    </span>
-
-                    <span>
-                        <strong>Files</strong>
-                        <small>Documents / Files</small>
-                    </span>
-
-                </button>
+                <span>
+                    AI ကို အလိုအလျောက်သင့်တော်အောင် အသုံးပြုမယ်
+                </span>
 
             </div>
-          <!-- Hidden Inputs -->
-            <input
-                type="file"
-                id="chatImageInput"
-                accept="image/*"
-                style="display:none;"
-                onchange="handleChatImage(event)">
-
-            <input
-                type="file"
-                id="chatFileInput"
-                style="display:none;"
-                onchange="handleChatFile(event)">
 
 
-            <!-- Plus Button -->
-            <button
-                onclick="toggleAttachMenu()"
-                class="sh-chat-plus">
-
-                <i class="fa-solid fa-plus"></i>
-
-            </button>
-
-
-            <!-- Input Wrapper -->
-            <div class="sh-input-wrapper">
+            <label class="sh-ai-switch">
 
                 <input
-                    type="text"
-                    id="chatInput"
-                    placeholder="မေးချင်တာလေး ရိုက်ထည့်ပါ..."
-                    autocomplete="off"
-                    onkeypress="if(event.key === 'Enter') sendChatMessage()">
+                    type="checkbox"
+                    checked>
 
-                <div class="sh-input-glow"></div>
+                <span></span>
+
+            </label>
+
+        </div>
+
+
+        <!-- Recap Style -->
+
+        <div class="sh-ai-setting-item">
+
+            <div>
+
+                <strong>
+                    Recap Style
+                </strong>
+
+                <span>
+                    Movie Recap အတွက် သင့်တော်တဲ့ Style
+                </span>
 
             </div>
 
 
-            <!-- Send Button -->
-            <button
-                onclick="sendChatMessage()"
-                class="sh-send-btn">
+            <i class="fa-solid fa-chevron-right"></i>
 
-                <i class="fa-solid fa-paper-plane"></i>
+        </div>
 
-            </button>
+
+        <!-- Chat History -->
+
+        <div class="sh-ai-setting-item">
+
+            <div>
+
+                <strong>
+                    Chat History
+                </strong>
+
+                <span>
+                    Conversation တွေကို သိမ်းထားမယ်
+                </span>
+
+            </div>
+
+
+            <label class="sh-ai-switch">
+
+                <input
+                    type="checkbox"
+                    checked>
+
+                <span></span>
+
+            </label>
 
         </div>
 
     </div>
+
+
+    <!-- =================================================
+         MORE MENU
+         ================================================= -->
+
+    <div id="shAIMoreMenu"
+         class="sh-ai-more-menu"
+         style="display:none;">
+
+        <button onclick="startNewChat()">
+
+            <i class="fa-solid fa-plus"></i>
+
+            New Chat
+
+        </button>
+
+
+        <button onclick="toggleShAISettings()">
+
+            <i class="fa-solid fa-sliders"></i>
+
+            AI Settings
+
+        </button>
+
+
+        <button>
+
+            <i class="fa-solid fa-clock-rotate-left"></i>
+
+            Chat History
+
+        </button>
+
+    </div>
+
+
 </div>
+
+</div><!-- =========================================================
+     END SH AI TEAM
+     ========================================================= -->       
 
 <div id="voiceStudio" class="view-container" style="display: none;">
         <!-- 1. အပြင်ဘက်မှာ အမြဲပေါ်နေမယ့် Header နဲ့ Tab ခလုတ်များ -->
