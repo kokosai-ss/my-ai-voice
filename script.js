@@ -1453,16 +1453,22 @@ async function handleProAssetFiles(event) {
     }
     catch (error) {
 
-        console.error(
-            'Pro upload error:',
-            error
-        );
+    console.error(
+        'Pro upload error:',
+        error
+    );
 
-        shShowProMessage(
-            'Upload လုပ်ရာမှာ အမှားတစ်ခု ဖြစ်သွားပါတယ်။'
-        );
+    alert(
+        'UPLOAD ERROR:\n\n' +
+        (error?.message || error)
+    );
 
-    }
+    shShowProMessage(
+        'Upload Error: ' +
+        (error?.message || 'Unknown error')
+    );
+
+}
     finally {
 
         input.value = '';
