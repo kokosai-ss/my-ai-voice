@@ -1,424 +1,1134 @@
-/* =========================================
-   SH AI TEAM CHATBOT
-   ========================================= */
+/* =========================================================
+   SH AI CHAT — COMPLETE JAVASCRIPT
+   ========================================================= */
+
+
+/* =========================================================
+   GLOBAL STATE
+   ========================================================= */
 
 let shChatHistory = [];
+
 let shAttachedImage = null;
 let shAttachedFileText = null;
 
-/* ---------- API KEY ---------- */
+let shCurrentChatKeyIndex = 0;
 
-function shGetChatApiKey() {
+
+/* =========================================================
+   API KEY SYSTEM
+   Supports:
+   key1,key2,key3,key4
+   ========================================================= */
+
+function shGetAllChatApiKeys() {
+
     const input = document.getElementById("apiKey");
 
+    let raw = "";
+
     if (input && input.value.trim()) {
-        return input.value.trim().split(",")[0].trim();
+        raw = input.value.trim();
+    } else {
+        raw = localStorage.getItem("gemini_api_key") || "";
     }
 
-    return localStorage.getItem("gemini_api_key") || "";
+    if (!raw) {
+        return [];
+    }
+
+    return raw
+        .split(",")
+        .map(key => key.trim())
+        .filter(Boolean);
 }
 
-/* ---------- ATTACH MENU ---------- */
+
+function shGetChatApiKey() {
+
+    const keys = shGetAllChatApiKeys();
+
+    if (!keys.length) {
+        return "";
+    }
+
+    if (shCurrentChatKeyIndex >= keys.length) {
+        shCurrentChatKeyIndex = 0;
+    }
+
+    return keys[shCurrentChatKeyIndex];
+}
+
+
+function shMoveToNextChatKey() {
+
+    const keys = shGetAllChatApiKeys();
+
+    if (keys.length <= 1) {
+        return false;
+    }
+
+    if (shCurrentChatKeyIndex < keys.length - 1) {
+
+        shCurrentChatKeyIndex++;
+
+        return true;
+    }
+
+    return false;
+}
+
+
+function shResetChatKeyRotation() {
+
+    shCurrentChatKeyIndex = 0;
+}
+
+
+/* =========================================================
+   ATTACH MENU
+   ========================================================= */
 
 function toggleAttachMenu() {
+
     const menu = document.getElementById("attachMenu");
+
     if (!menu) return;
 
-    menu.style.display =
-        menu.style.display === "flex" ? "none" : "flex";
+    const current =
+        window.getComputedStyle(menu).display;
+
+    if (current === "none") {
+
+        menu.style.setProperty(
+            "display",
+            "block",
+            "important"
+        );
+
+    } else {
+
+        menu.style.setProperty(
+            "display",
+            "none",
+            "important"
+        );
+    }
 }
 
-/* ---------- IMAGE ---------- */
+
+function shCloseAttachMenu() {
+
+    const menu = document.getElementById("attachMenu");
+
+    if (!menu) return;
+
+    menu.style.setProperty(
+        "display",
+        "none",
+        "important"
+    );
+}
+
+
+/* =========================================================
+   IMAGE ATTACH
+   ========================================================= */
 
 function handleChatImage(event) {
 
-    const file = event.target.files[0];
+    const file =
+        event?.target?.files?.[0];
+
     if (!file) return;
 
+
     if (!file.type.startsWith("image/")) {
+
         alert("Image ဖိုင်ပဲ ရွေးပါ။");
+
         return;
     }
 
+
     const reader = new FileReader();
+
 
     reader.onload = function(e) {
 
+        const result = e.target.result;
+
+        if (!result) return;
+
+
         shAttachedImage = {
+
             mimeType: file.type,
-            data: e.target.result.split(",")[1],
+
+            data:
+                result
+                .split(",")[1],
+
             name: file.name
         };
 
+
+        shAttachedFileText = null;
+
+
         const previewBox =
-            document.getElementById("imagePreviewContainer");
+            document.getElementById(
+                "imagePreviewContainer"
+            );
 
         const preview =
-            document.getElementById("selectedImagePreview");
+            document.getElementById(
+                "selectedImagePreview"
+            );
 
         const name =
-            document.getElementById("imageFileName");
+            document.getElementById(
+                "imageFileName"
+            );
+
 
         if (preview) {
-            preview.src = e.target.result;
+
+            preview.style.display = "block";
+
+            preview.src = result;
         }
+
 
         if (name) {
-            name.textContent = file.name;
+
+            name.textContent =
+                file.name;
         }
 
+
         if (previewBox) {
-            previewBox.style.display = "flex";
+
+            previewBox.style.display =
+                "flex";
         }
     };
 
+
     reader.readAsDataURL(file);
 
-    toggleAttachMenu();
+    shCloseAttachMenu();
 }
 
-/* ---------- FILE ---------- */
+
+/* =========================================================
+   FILE ATTACH
+   TXT / MD
+   ========================================================= */
 
 function handleChatFile(event) {
 
-    const file = event.target.files[0];
+    const file =
+        event?.target?.files?.[0];
+
     if (!file) return;
 
-    /*
-       Text-based files ကို AI ဆီပို့မယ်။
-       PDF/DOCX လို binary document တွေကို
-       ဒီ version မှာ မဖတ်သေးဘူး။
-    */
 
-    if (
+    const isTextFile =
         file.type.startsWith("text/") ||
-        file.name.endsWith(".txt") ||
-        file.name.endsWith(".md")
-    ) {
+        file.name.toLowerCase().endsWith(".txt") ||
+        file.name.toLowerCase().endsWith(".md");
 
-        const reader = new FileReader();
 
-        reader.onload = function(e) {
-
-            shAttachedFileText = {
-                name: file.name,
-                text: e.target.result
-            };
-
-            const previewBox =
-                document.getElementById("imagePreviewContainer");
-
-            const name =
-                document.getElementById("imageFileName");
-
-            const preview =
-                document.getElementById("selectedImagePreview");
-
-            if (preview) {
-                preview.style.display = "none";
-            }
-
-            if (name) {
-                name.textContent =
-                    "📄 " + file.name;
-            }
-
-            if (previewBox) {
-                previewBox.style.display = "flex";
-            }
-        };
-
-        reader.readAsText(file);
-
-    } else {
+    if (!isTextFile) {
 
         alert(
             "ဒီ version မှာ TXT / MD ဖိုင်တွေကိုပဲ ဖတ်နိုင်သေးပါတယ်။"
         );
+
+        if (event.target) {
+            event.target.value = "";
+        }
+
+        shCloseAttachMenu();
+
+        return;
     }
 
-    toggleAttachMenu();
+
+    const reader =
+        new FileReader();
+
+
+    reader.onload = function(e) {
+
+        shAttachedFileText = {
+
+            name: file.name,
+
+            text: e.target.result || ""
+        };
+
+
+        shAttachedImage = null;
+
+
+        const previewBox =
+            document.getElementById(
+                "imagePreviewContainer"
+            );
+
+        const name =
+            document.getElementById(
+                "imageFileName"
+            );
+
+        const preview =
+            document.getElementById(
+                "selectedImagePreview"
+            );
+
+
+        if (preview) {
+
+            preview.style.display =
+                "none";
+
+            preview.removeAttribute(
+                "src"
+            );
+        }
+
+
+        if (name) {
+
+            name.textContent =
+                "📄 " + file.name;
+        }
+
+
+        if (previewBox) {
+
+            previewBox.style.display =
+                "flex";
+        }
+    };
+
+
+    reader.readAsText(file);
+
+    shCloseAttachMenu();
 }
 
-/* ---------- REMOVE ATTACHMENT ---------- */
+
+/* =========================================================
+   REMOVE ATTACHMENT
+   ========================================================= */
 
 function removeAttachedImage() {
 
     shAttachedImage = null;
+
     shAttachedFileText = null;
 
+
     const previewBox =
-        document.getElementById("imagePreviewContainer");
+        document.getElementById(
+            "imagePreviewContainer"
+        );
 
     const imageInput =
-        document.getElementById("chatImageInput");
+        document.getElementById(
+            "chatImageInput"
+        );
 
     const fileInput =
-        document.getElementById("chatFileInput");
+        document.getElementById(
+            "chatFileInput"
+        );
+
+    const preview =
+        document.getElementById(
+            "selectedImagePreview"
+        );
+
 
     if (previewBox) {
-        previewBox.style.display = "none";
+
+        previewBox.style.display =
+            "none";
     }
 
+
+    if (preview) {
+
+        preview.removeAttribute(
+            "src"
+        );
+
+        preview.style.display =
+            "";
+    }
+
+
     if (imageInput) {
+
         imageInput.value = "";
     }
 
+
     if (fileInput) {
+
         fileInput.value = "";
     }
 }
 
-/* ---------- ADD MESSAGE ---------- */
 
-function shAddChatMessage(text, type = "ai") {
+/* =========================================================
+   ADD AI MESSAGE
+   ========================================================= */
+
+function shAddChatMessage(
+    text,
+    type = "ai"
+) {
 
     const container =
-        document.getElementById("chatMessages");
+        document.getElementById(
+            "chatMessages"
+        );
 
-    if (!container) return;
+    if (!container) {
+        return null;
+    }
 
-    const bubble = document.createElement("div");
+
+    /* ================= USER ================= */
 
     if (type === "user") {
 
-        bubble.style.cssText = `
-            align-self:flex-end;
-            background:linear-gradient(135deg,#0284c7,#2563eb);
-            color:#fff;
-            padding:10px 14px;
-            border-radius:16px 16px 4px 16px;
-            max-width:82%;
-            font-size:14px;
-            line-height:1.6;
-            box-shadow:0 5px 18px rgba(0,140,255,.25);
-            white-space:pre-wrap;
-            word-break:break-word;
-        `;
+        const row =
+            document.createElement("div");
 
-    } else {
+        row.className =
+            "sh-message-row user";
 
-        bubble.style.cssText = `
-            align-self:flex-start;
-            background:rgba(30,41,59,.88);
-            border:1px solid rgba(56,189,248,.22);
-            color:#e5f4ff;
-            padding:10px 14px;
-            border-radius:16px 16px 16px 4px;
-            max-width:82%;
-            font-size:14px;
-            line-height:1.65;
-            box-shadow:0 5px 18px rgba(0,0,0,.25);
-            white-space:pre-wrap;
-            word-break:break-word;
-        `;
+
+        const content =
+            document.createElement("div");
+
+        content.className =
+            "sh-message-content";
+
+
+        const bubble =
+            document.createElement("div");
+
+        bubble.className =
+            "sh-user-bubble";
+
+
+        bubble.textContent =
+            text;
+
+
+        content.appendChild(
+            bubble
+        );
+
+        row.appendChild(
+            content
+        );
+
+        container.appendChild(
+            row
+        );
+
+
+        shScrollChatToBottom();
+
+
+        return bubble;
     }
 
-    bubble.textContent = text;
 
-    container.appendChild(bubble);
+    /* ================= AI ================= */
 
-    container.scrollTop = container.scrollHeight;
+    const row =
+        document.createElement("div");
+
+    row.className =
+        "sh-message-row ai";
+
+
+    const avatar =
+        document.createElement("div");
+
+    avatar.className =
+        "sh-message-avatar";
+
+    avatar.textContent =
+        "SH";
+
+
+    const content =
+        document.createElement("div");
+
+    content.className =
+        "sh-message-content";
+
+
+    const name =
+        document.createElement("div");
+
+    name.className =
+        "sh-message-name";
+
+    name.innerHTML =
+        'SH AI <span>AI Assistant</span>';
+
+
+    const bubble =
+        document.createElement("div");
+
+    bubble.className =
+        "sh-ai-bubble";
+
+    bubble.textContent =
+        text;
+
+
+    const time =
+        document.createElement("div");
+
+    time.className =
+        "sh-message-time";
+
+    time.textContent =
+        "Just now";
+
+
+    content.appendChild(
+        name
+    );
+
+    content.appendChild(
+        bubble
+    );
+
+    content.appendChild(
+        time
+    );
+
+
+    row.appendChild(
+        avatar
+    );
+
+    row.appendChild(
+        content
+    );
+
+
+    container.appendChild(
+        row
+    );
+
+
+    shScrollChatToBottom();
+
 
     return bubble;
 }
 
-/* ---------- SEND MESSAGE ---------- */
+
+/* =========================================================
+   SCROLL CHAT
+   ========================================================= */
+
+function shScrollChatToBottom() {
+
+    const container =
+        document.getElementById(
+            "chatMessages"
+        );
+
+    if (!container) return;
+
+
+    requestAnimationFrame(() => {
+
+        container.scrollTo({
+
+            top:
+                container.scrollHeight,
+
+            behavior:
+                "smooth"
+        });
+
+    });
+}
+
+
+/* =========================================================
+   LOADING MESSAGE
+   ========================================================= */
+
+function shAddLoadingMessage() {
+
+    return shAddChatMessage(
+        "⏳ SH AI စဉ်းစားနေပါတယ်...",
+        "ai"
+    );
+}
+
+
+/* =========================================================
+   SEND CHAT MESSAGE
+   ========================================================= */
 
 async function sendChatMessage() {
 
     const input =
-        document.getElementById("chatInput");
+        document.getElementById(
+            "chatInput"
+        );
 
     if (!input) return;
 
-    const text = input.value.trim();
 
-    if (!text && !shAttachedImage && !shAttachedFileText) {
+    const text =
+        input.value.trim();
+
+
+    if (
+        !text &&
+        !shAttachedImage &&
+        !shAttachedFileText
+    ) {
+
         return;
     }
 
-    const apiKey = shGetChatApiKey();
 
-    if (!apiKey) {
+    const keys =
+        shGetAllChatApiKeys();
+
+
+    if (!keys.length) {
 
         shAddChatMessage(
-            "🔑 API Key မတွေ့ပါဘူး။ ကျေးဇူးပြုပြီး Settings မှာ API Key ထည့်ပေးပါ။",
+            "🔑 API Key မတွေ့ပါဘူး။ Settings မှာ Gemini API Key ထည့်ပေးပါ။",
             "ai"
         );
 
         return;
     }
 
-    let displayText = text;
+
+    let displayText =
+        text;
+
 
     if (shAttachedImage) {
+
         displayText +=
             (displayText ? "\n" : "") +
-            "🖼️ " + shAttachedImage.name;
+            "🖼️ " +
+            shAttachedImage.name;
     }
+
 
     if (shAttachedFileText) {
+
         displayText +=
             (displayText ? "\n" : "") +
-            "📄 " + shAttachedFileText.name;
+            "📄 " +
+            shAttachedFileText.name;
     }
 
-    shAddChatMessage(displayText, "user");
+
+    /* USER MESSAGE */
+
+    shAddChatMessage(
+        displayText,
+        "user"
+    );
+
 
     input.value = "";
 
+
+    /* LOADING */
+
     const loadingBubble =
-        shAddChatMessage(
-            "⏳ SH AI စဉ်းစားနေပါတယ်...",
-            "ai"
-        );
+        shAddLoadingMessage();
 
-    try {
 
-        const parts = [];
+    /* BUILD PARTS */
 
-        /* TEXT */
+    const parts = [];
 
-        if (text) {
-            parts.push({
-                text: text
-            });
-        }
 
-        /* IMAGE */
+    if (text) {
 
-        if (shAttachedImage) {
+        parts.push({
 
-            parts.push({
-                inline_data: {
-                    mime_type: shAttachedImage.mimeType,
-                    data: shAttachedImage.data
-                }
-            });
-        }
-
-        /* TEXT FILE */
-
-        if (shAttachedFileText) {
-
-            parts.push({
-                text:
-                    "\n\nAttached file: " +
-                    shAttachedFileText.name +
-                    "\n\n" +
-                    shAttachedFileText.text
-            });
-        }
-
-        /* HISTORY */
-
-        shChatHistory.push({
-            role: "user",
-            parts: parts
+            text: text
         });
+    }
 
-        const response =
-            await fetch(
-                "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent",
-                {
-                    method: "POST",
 
-                    headers: {
-                        "Content-Type": "application/json",
-                        "x-goog-api-key": apiKey
-                    },
+    if (shAttachedImage) {
 
-                    body: JSON.stringify({
-                        systemInstruction: {
-                            parts: [{
-                                text:
-                                    "You are SH AI TEAM, the helpful AI assistant inside SH AI Studio. " +
-                                    "Answer clearly and naturally. " +
-                                    "When the user speaks Burmese, reply naturally in Burmese. " +
-                                    "Do not mention internal API details unless asked."
-                            }]
+        parts.push({
+
+            inline_data: {
+
+                mime_type:
+                    shAttachedImage.mimeType,
+
+                data:
+                    shAttachedImage.data
+            }
+        });
+    }
+
+
+    if (shAttachedFileText) {
+
+        parts.push({
+
+            text:
+                "\n\nAttached file: " +
+                shAttachedFileText.name +
+                "\n\n" +
+                shAttachedFileText.text
+        });
+    }
+
+
+    /* SAVE USER HISTORY */
+
+    shChatHistory.push({
+
+        role: "user",
+
+        parts: parts
+    });
+
+
+    let success =
+        false;
+
+    let lastError =
+        null;
+
+
+    /*
+       Try current key.
+       If quota / invalid / unavailable,
+       automatically move to next key.
+    */
+
+    while (
+        shCurrentChatKeyIndex <
+        keys.length
+    ) {
+
+        const apiKey =
+            shGetChatApiKey();
+
+
+        if (!apiKey) {
+
+            break;
+        }
+
+
+        try {
+
+            const response =
+                await fetch(
+                    "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent",
+                    {
+
+                        method:
+                            "POST",
+
+                        headers: {
+
+                            "Content-Type":
+                                "application/json",
+
+                            "x-goog-api-key":
+                                apiKey
                         },
 
-                        contents: shChatHistory,
+                        body:
+                            JSON.stringify({
 
-                        generationConfig: {
-                            temperature: 0.7,
-                            maxOutputTokens: 2048
-                        }
-                    })
-                }
+                                systemInstruction: {
+
+                                    parts: [{
+
+                                        text:
+                                            "You are SH AI TEAM, the helpful AI assistant inside SH AI Studio. " +
+                                            "Answer clearly and naturally. " +
+                                            "When the user speaks Burmese, reply naturally in Burmese. " +
+                                            "Do not mention internal API details unless asked."
+                                    }]
+                                },
+
+
+                                contents:
+                                    shChatHistory,
+
+
+                                generationConfig: {
+
+                                    temperature:
+                                        0.7,
+
+                                    maxOutputTokens:
+                                        2048
+                                }
+
+                            })
+                    }
+                );
+
+
+            const data =
+                await response.json();
+
+
+            if (!response.ok) {
+
+                throw new Error(
+                    data?.error?.message ||
+                    "Gemini API Error"
+                );
+            }
+
+
+            const answer =
+                data
+                    ?.candidates?.[0]
+                    ?.content?.parts
+                    ?.map(
+                        p => p.text || ""
+                    )
+                    .join("") ||
+                "AI က အဖြေပြန်မပေးနိုင်သေးပါဘူး။";
+
+
+            /* UPDATE LOADING */
+
+            if (loadingBubble) {
+
+                loadingBubble.textContent =
+                    answer;
+            }
+
+
+            /* SAVE MODEL */
+
+            shChatHistory.push({
+
+                role: "model",
+
+                parts: [{
+
+                    text:
+                        answer
+                }]
+            });
+
+
+            success =
+                true;
+
+
+            /*
+               Successful key stays active.
+            */
+
+            break;
+
+
+        } catch (error) {
+
+            lastError =
+                error;
+
+
+            console.warn(
+                "SH AI KEY ERROR:",
+                shCurrentChatKeyIndex + 1,
+                error
             );
 
-        const data = await response.json();
 
-        if (!response.ok) {
-            throw new Error(
-                data?.error?.message ||
-                "Gemini API Error"
-            );
+            /*
+               Try next key.
+            */
+
+            if (!shMoveToNextChatKey()) {
+
+                break;
+            }
         }
+    }
 
-        const answer =
-            data?.candidates?.[0]?.content?.parts
-                ?.map(p => p.text || "")
-                .join("") ||
-            "AI က အဖြေပြန်မပေးနိုင်သေးပါဘူး။";
 
-        if (loadingBubble) {
-            loadingBubble.textContent = answer;
-        }
+    /* ================= ERROR ================= */
 
-        shChatHistory.push({
-            role: "model",
-            parts: [{
-                text: answer
-            }]
-        });
-
-        /* Clear attachment after successful send */
-
-        removeAttachedImage();
-
-    } catch (error) {
+    if (!success) {
 
         if (loadingBubble) {
 
             loadingBubble.textContent =
-                "❌ Error: " + error.message;
+                "❌ API Key တွေအားလုံး အလုပ်မလုပ်သေးပါဘူး။\n\n" +
+                (
+                    lastError?.message ||
+                    "Gemini API Error"
+                );
         }
-
-        console.error(
-            "SH AI CHAT ERROR:",
-            error
-        );
     }
+
+
+    /* ================= CLEAR ATTACHMENT ================= */
+
+    if (success) {
+
+        removeAttachedImage();
+    }
+
+
+    shScrollChatToBottom();
 }
 
-/* ---------- NEW CHAT ---------- */
+
+/* =========================================================
+   NEW CHAT
+   ========================================================= */
 
 function startNewChat() {
 
     shChatHistory = [];
 
+    shResetChatKeyRotation();
+
+    removeAttachedImage();
+
+
     const container =
-        document.getElementById("chatMessages");
+        document.getElementById(
+            "chatMessages"
+        );
 
     if (!container) return;
 
+
     container.innerHTML = "";
 
-    removeAttachedImage();
+
+    shAddWelcomeMessage();
 }
 
-/* ---------- ENTER KEY ---------- */
+
+/* =========================================================
+   WELCOME MESSAGE
+   ========================================================= */
+
+function shAddWelcomeMessage() {
+
+    const container =
+        document.getElementById(
+            "chatMessages"
+        );
+
+    if (!container) return;
+
+
+    const row =
+        document.createElement("div");
+
+    row.className =
+        "sh-message-row ai";
+
+
+    const avatar =
+        document.createElement("div");
+
+    avatar.className =
+        "sh-message-avatar";
+
+    avatar.textContent =
+        "SH";
+
+
+    const content =
+        document.createElement("div");
+
+    content.className =
+        "sh-message-content";
+
+
+    const name =
+        document.createElement("div");
+
+    name.className =
+        "sh-message-name";
+
+    name.innerHTML =
+        'SH AI <span>AI Assistant</span>';
+
+
+    const bubble =
+        document.createElement("div");
+
+    bubble.className =
+        "sh-ai-bubble";
+
+    bubble.innerHTML =
+        "မင်္ဂလာပါ 👋<br>" +
+        "ကျွန်တော် SH AI ပါ။<br>" +
+        "ဘာများကူညီပေးရမလဲ။ 🚀";
+
+
+    const time =
+        document.createElement("div");
+
+    time.className =
+        "sh-message-time";
+
+    time.textContent =
+        "Just now";
+
+
+    content.appendChild(
+        name
+    );
+
+    content.appendChild(
+        bubble
+    );
+
+    content.appendChild(
+        time
+    );
+
+
+    row.appendChild(
+        avatar
+    );
+
+    row.appendChild(
+        content
+    );
+
+
+    container.appendChild(
+        row
+    );
+}
+
+
+/* =========================================================
+   QUICK ACTION
+   ========================================================= */
+
+function shQuickPrompt(prompt) {
+
+    const input =
+        document.getElementById(
+            "chatInput"
+        );
+
+    if (!input) return;
+
+
+    input.value =
+        prompt;
+
+
+    input.focus();
+}
+
+
+/* =========================================================
+   CLEAR CHAT
+   ========================================================= */
+
+function shClearChat() {
+
+    const container =
+        document.getElementById(
+            "chatMessages"
+        );
+
+    if (!container) return;
+
+
+    shChatHistory = [];
+
+
+    container.innerHTML = "";
+
+
+    shAddWelcomeMessage();
+}
+
+
+/* =========================================================
+   CLOSE MENUS WHEN CLICKING OUTSIDE
+   ========================================================= */
+
+document.addEventListener(
+    "click",
+    function(event) {
+
+        const attachMenu =
+            document.getElementById(
+                "attachMenu"
+            );
+
+        const plus =
+            document.querySelector(
+                ".sh-chat-plus"
+            );
+
+
+        if (
+            attachMenu &&
+            plus &&
+            !attachMenu.contains(event.target) &&
+            !plus.contains(event.target)
+        ) {
+
+            shCloseAttachMenu();
+        }
+
+    }
+);
+
+
+/* =========================================================
+   ENTER KEY
+   ========================================================= */
 
 document.addEventListener(
     "keydown",
     function(event) {
 
         const input =
-            document.getElementById("chatInput");
+            document.getElementById(
+                "chatInput"
+            );
+
 
         if (
             input &&
@@ -431,6 +1141,38 @@ document.addEventListener(
 
             sendChatMessage();
         }
+
+    }
+);
+
+
+/* =========================================================
+   INITIALIZE
+   ========================================================= */
+
+document.addEventListener(
+    "DOMContentLoaded",
+    function() {
+
+        /*
+           Make sure welcome message exists
+           only when chat area is empty.
+        */
+
+        const container =
+            document.getElementById(
+                "chatMessages"
+            );
+
+
+        if (
+            container &&
+            container.children.length === 0
+        ) {
+
+            shAddWelcomeMessage();
+        }
+
     }
 );
 let activePickerTarget = null; // 'single' or block ID number
