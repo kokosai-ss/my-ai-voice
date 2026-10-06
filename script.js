@@ -1708,7 +1708,7 @@ const shSupabase =
    2. SETTINGS
    --------------------------------------------------------- */
 
-const SH_PRO_BUCKET = 'Assets';
+const SH_PRO_BUCKET = 'ASSETS';
 const SH_PRO_TABLE  = 'Images';
 
 const SH_MAX_IMAGE_SIZE = 1920;
