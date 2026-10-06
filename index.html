@@ -341,9 +341,12 @@ cursor:pointer;
 <!-- =========================================================
      SH AI TEAM — PREMIUM AI CHAT
      HTML ONLY
-     ========================================================= --><div id="aiChatbot"
-     class="view-container sh-ai-chat"
-     style="display:none;"><div class="sh-chat-shell">
+     ========================================================= --
+                
+class="view-container sh-ai-chat"
+style="display:none;">
+
+<div class="sh-chat-shell">
 
     <!-- =================================================
          HEADER
@@ -380,33 +383,30 @@ cursor:pointer;
 
         <div class="sh-chat-header-actions">
 
+            <!-- New Chat -->
+
             <button
                 onclick="startNewChat()"
                 class="sh-header-action-btn sh-new-chat-btn"
                 title="New Chat">
 
                 <i class="fa-solid fa-plus"></i>
-                <span>New Chat</span>
+
+                <span>
+                    New Chat
+                </span>
 
             </button>
 
+
+            <!-- Chat Settings -->
 
             <button
                 onclick="toggleShAISettings()"
-                class="sh-header-icon-btn"
-                title="AI Settings">
+                class="sh-header-icon-btn sh-chat-settings-btn"
+                title="Chat Settings">
 
                 <i class="fa-solid fa-sliders"></i>
-
-            </button>
-
-
-            <button
-                onclick="toggleShAIMenu()"
-                class="sh-header-icon-btn"
-                title="More">
-
-                <i class="fa-solid fa-ellipsis-vertical"></i>
 
             </button>
 
@@ -426,7 +426,12 @@ cursor:pointer;
             <img
                 src="Logo.png.png"
                 alt="SH AI"
-                style="width:35px;height:35px;border-radius:50%;object-fit:cover;">
+                style="
+                    width:35px;
+                    height:35px;
+                    border-radius:50%;
+                    object-fit:cover;
+                ">
 
         </div>
 
@@ -447,9 +452,13 @@ cursor:pointer;
         <div class="sh-ai-info-right">
 
             <span class="sh-ai-mode">
+
                 <i class="fa-solid fa-bolt"></i>
+
                 Smart Mode
+
             </span>
+
 
             <div class="sh-ai-pulse">
 
@@ -473,7 +482,10 @@ cursor:pointer;
         <button onclick="shAIQuickAction('recap')">
 
             <i class="fa-solid fa-film"></i>
-            <span>Recap</span>
+
+            <span>
+                Recap
+            </span>
 
         </button>
 
@@ -481,7 +493,10 @@ cursor:pointer;
         <button onclick="shAIQuickAction('rewrite')">
 
             <i class="fa-solid fa-pen"></i>
-            <span>Rewrite</span>
+
+            <span>
+                Rewrite
+            </span>
 
         </button>
 
@@ -489,7 +504,10 @@ cursor:pointer;
         <button onclick="shAIQuickAction('hook')">
 
             <i class="fa-solid fa-fire"></i>
-            <span>Hook</span>
+
+            <span>
+                Hook
+            </span>
 
         </button>
 
@@ -497,7 +515,10 @@ cursor:pointer;
         <button onclick="shAIQuickAction('clean')">
 
             <i class="fa-solid fa-wand-magic-sparkles"></i>
-            <span>Clean</span>
+
+            <span>
+                Clean
+            </span>
 
         </button>
 
@@ -508,8 +529,9 @@ cursor:pointer;
          CHAT MESSAGES
          ================================================= -->
 
-    <div id="chatMessages"
-         class="sh-chat-messages">
+    <div
+        id="chatMessages"
+        class="sh-chat-messages">
 
 
         <!-- Welcome Message -->
@@ -560,9 +582,10 @@ cursor:pointer;
          IMAGE PREVIEW
          ================================================= -->
 
-    <div id="imagePreviewContainer"
-         class="sh-image-preview"
-         style="display:none;">
+    <div
+        id="imagePreviewContainer"
+        class="sh-image-preview"
+        style="display:none;">
 
         <div class="sh-preview-image-box">
 
@@ -612,8 +635,9 @@ cursor:pointer;
 
         <!-- Attachment Menu -->
 
-        <div id="attachMenu"
-             class="sh-attach-menu">
+        <div
+            id="attachMenu"
+            class="sh-attach-menu">
 
             <div class="sh-attach-title">
                 ATTACH
@@ -623,7 +647,13 @@ cursor:pointer;
             <!-- Photos -->
 
             <button
-                onclick="document.getElementById('chatImageInput').click(); toggleAttachMenu();"
+                onclick="
+                    document
+                    .getElementById('chatImageInput')
+                    .click();
+
+                    toggleAttachMenu();
+                "
                 class="sh-attach-item">
 
                 <span class="sh-attach-icon image">
@@ -651,7 +681,13 @@ cursor:pointer;
             <!-- Files -->
 
             <button
-                onclick="document.getElementById('chatFileInput').click(); toggleAttachMenu();"
+                onclick="
+                    document
+                    .getElementById('chatFileInput')
+                    .click();
+
+                    toggleAttachMenu();
+                "
                 class="sh-attach-item">
 
                 <span class="sh-attach-icon file">
@@ -718,7 +754,10 @@ cursor:pointer;
                 id="chatInput"
                 placeholder="မေးချင်တာလေး ရိုက်ထည့်ပါ..."
                 autocomplete="off"
-                onkeypress="if(event.key === 'Enter') sendChatMessage()">
+                onkeypress="
+                    if(event.key === 'Enter')
+                    sendChatMessage()
+                ">
 
             <div class="sh-input-glow"></div>
 
@@ -740,23 +779,27 @@ cursor:pointer;
 
 
     <!-- =================================================
-         SETTINGS PANEL
+         CHAT SETTINGS PANEL
          ================================================= -->
 
-    <div id="shAISettingsPanel"
-         class="sh-ai-settings-panel"
-         style="display:none;">
+    <div
+        id="shAISettingsPanel"
+        class="sh-ai-settings-panel"
+        style="display:none;">
+
+
+        <!-- Settings Header -->
 
         <div class="sh-ai-settings-header">
 
             <div>
 
                 <strong>
-                    SH AI Settings
+                    ⚙️ Chat Settings
                 </strong>
 
                 <span>
-                    AI Assistant Controls
+                    SH AI Conversation Controls
                 </span>
 
             </div>
@@ -773,7 +816,182 @@ cursor:pointer;
         </div>
 
 
-        <!-- Smart Mode -->
+        <!-- =================================================
+             NEW CHAT
+             ================================================= -->
+
+        <button
+            class="sh-chat-setting-action sh-new-chat-setting"
+            onclick="
+                startNewChat();
+                toggleShAISettings();
+            ">
+
+            <span class="sh-chat-setting-icon">
+
+                <i class="fa-solid fa-plus"></i>
+
+            </span>
+
+
+            <span class="sh-chat-setting-text">
+
+                <strong>
+                    New Chat
+                </strong>
+
+                <small>
+                    Conversation အသစ်စမယ်
+                </small>
+
+            </span>
+
+
+            <i class="fa-solid fa-chevron-right"></i>
+
+        </button>
+
+
+        <!-- =================================================
+             CHAT HISTORY
+             ================================================= -->
+
+        <button
+            class="sh-chat-setting-action"
+            onclick="shOpenChatHistory()">
+
+            <span class="sh-chat-setting-icon history">
+
+                <i class="fa-solid fa-clock-rotate-left"></i>
+
+            </span>
+
+
+            <span class="sh-chat-setting-text">
+
+                <strong>
+                    Chat History
+                </strong>
+
+                <small>
+                    အရင် Chat တွေ ပြန်ကြည့်မယ်
+                </small>
+
+            </span>
+
+
+            <i class="fa-solid fa-chevron-right"></i>
+
+        </button>
+
+
+        <!-- =================================================
+             SEARCH CHAT
+             ================================================= -->
+
+        <button
+            class="sh-chat-setting-action"
+            onclick="shSearchChatHistory()">
+
+            <span class="sh-chat-setting-icon search">
+
+                <i class="fa-solid fa-magnifying-glass"></i>
+
+            </span>
+
+
+            <span class="sh-chat-setting-text">
+
+                <strong>
+                    Search Chat
+                </strong>
+
+                <small>
+                    Chat အဟောင်းတွေ ရှာမယ်
+                </small>
+
+            </span>
+
+
+            <i class="fa-solid fa-chevron-right"></i>
+
+        </button>
+
+
+        <!-- =================================================
+             RENAME CHAT
+             ================================================= -->
+
+        <button
+            class="sh-chat-setting-action"
+            onclick="shRenameCurrentChat()">
+
+            <span class="sh-chat-setting-icon rename">
+
+                <i class="fa-solid fa-pen"></i>
+
+            </span>
+
+
+            <span class="sh-chat-setting-text">
+
+                <strong>
+                    Rename Chat
+                </strong>
+
+                <small>
+                    လက်ရှိ Chat နာမည်ပြောင်းမယ်
+                </small>
+
+            </span>
+
+
+            <i class="fa-solid fa-chevron-right"></i>
+
+        </button>
+
+
+        <!-- =================================================
+             DELETE CHAT
+             ================================================= -->
+
+        <button
+            class="sh-chat-setting-action danger"
+            onclick="shDeleteCurrentChat()">
+
+            <span class="sh-chat-setting-icon delete">
+
+                <i class="fa-solid fa-trash"></i>
+
+            </span>
+
+
+            <span class="sh-chat-setting-text">
+
+                <strong>
+                    Delete Chat
+                </strong>
+
+                <small>
+                    လက်ရှိ Chat ကိုဖျက်မယ်
+                </small>
+
+            </span>
+
+
+            <i class="fa-solid fa-chevron-right"></i>
+
+        </button>
+
+
+        <!-- DIVIDER -->
+
+        <div class="sh-chat-setting-divider"></div>
+
+
+        <!-- =================================================
+             SMART MODE
+             ================================================= -->
 
         <div class="sh-ai-setting-item">
 
@@ -793,6 +1011,7 @@ cursor:pointer;
             <label class="sh-ai-switch">
 
                 <input
+                    id="shSmartMode"
                     type="checkbox"
                     checked>
 
@@ -803,36 +1022,49 @@ cursor:pointer;
         </div>
 
 
-        <!-- Recap Style -->
+        <!-- =================================================
+             RECAP STYLE
+             ================================================= -->
 
-        <div class="sh-ai-setting-item">
+        <button
+            class="sh-chat-setting-action compact"
+            onclick="shOpenRecapStyle()">
 
-            <div>
+            <span class="sh-chat-setting-icon recap">
+
+                <i class="fa-solid fa-film"></i>
+
+            </span>
+
+
+            <span class="sh-chat-setting-text">
 
                 <strong>
                     Recap Style
                 </strong>
 
-                <span>
+                <small>
                     Movie Recap အတွက် သင့်တော်တဲ့ Style
-                </span>
+                </small>
 
-            </div>
+            </span>
 
 
             <i class="fa-solid fa-chevron-right"></i>
 
-        </div>
+        </button>
 
 
-        <!-- Chat History -->
+        <!-- =================================================
+             SAVE CHAT HISTORY
+             ================================================= -->
 
         <div class="sh-ai-setting-item">
 
             <div>
 
                 <strong>
-                    Chat History
+                    Save Chat History
                 </strong>
 
                 <span>
@@ -845,6 +1077,7 @@ cursor:pointer;
             <label class="sh-ai-switch">
 
                 <input
+                    id="shSaveChatHistory"
                     type="checkbox"
                     checked>
 
@@ -856,49 +1089,8 @@ cursor:pointer;
 
     </div>
 
-
-    <!-- =================================================
-         MORE MENU
-         ================================================= -->
-
-    <div id="shAIMoreMenu"
-         class="sh-ai-more-menu"
-         style="display:none;">
-
-        <button onclick="startNewChat()">
-
-            <i class="fa-solid fa-plus"></i>
-
-            New Chat
-
-        </button>
-
-
-        <button onclick="toggleShAISettings()">
-
-            <i class="fa-solid fa-sliders"></i>
-
-            AI Settings
-
-        </button>
-
-
-        <button>
-
-            <i class="fa-solid fa-clock-rotate-left"></i>
-
-            Chat History
-
-        </button>
-
-    </div>
-
-
 </div>
-
-</div><!-- =========================================================
-     END SH AI TEAM
-     ========================================================= -->       
+   
 
 <div id="voiceStudio" class="view-container" style="display: none;">
         <!-- 1. အပြင်ဘက်မှာ အမြဲပေါ်နေမယ့် Header နဲ့ Tab ခလုတ်များ -->
