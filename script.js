@@ -82,62 +82,6 @@ function shMoveToNextChatKey() {
 function shResetChatKeyRotation() {
 
     shCurrentChatKeyIndex = 0;
-
-}
-
-
-/* =========================================================
-   CHAT SETTINGS
-   ========================================================= */
-
-function toggleShAISettings() {
-
-    const panel =
-        document.getElementById("shAISettingsPanel");
-
-    if (!panel) {
-        return;
-    }
-
-    const current =
-        window.getComputedStyle(panel).display;
-
-    if (current === "none") {
-
-        panel.style.setProperty(
-            "display",
-            "block",
-            "important"
-        );
-
-    } else {
-
-        panel.style.setProperty(
-            "display",
-            "none",
-            "important"
-        );
-
-    }
-
-}
-
-
-function shCloseAISettings() {
-
-    const panel =
-        document.getElementById("shAISettingsPanel");
-
-    if (!panel) {
-        return;
-    }
-
-    panel.style.setProperty(
-        "display",
-        "none",
-        "important"
-    );
-
 }
 
 
@@ -147,12 +91,9 @@ function shCloseAISettings() {
 
 function toggleAttachMenu() {
 
-    const menu =
-        document.getElementById("attachMenu");
+    const menu = document.getElementById("attachMenu");
 
-    if (!menu) {
-        return;
-    }
+    if (!menu) return;
 
     const current =
         window.getComputedStyle(menu).display;
@@ -172,27 +113,21 @@ function toggleAttachMenu() {
             "none",
             "important"
         );
-
     }
-
 }
 
 
 function shCloseAttachMenu() {
 
-    const menu =
-        document.getElementById("attachMenu");
+    const menu = document.getElementById("attachMenu");
 
-    if (!menu) {
-        return;
-    }
+    if (!menu) return;
 
     menu.style.setProperty(
         "display",
         "none",
         "important"
     );
-
 }
 
 
@@ -205,9 +140,8 @@ function handleChatImage(event) {
     const file =
         event?.target?.files?.[0];
 
-    if (!file) {
-        return;
-    }
+    if (!file) return;
+
 
     if (!file.type.startsWith("image/")) {
 
@@ -216,29 +150,28 @@ function handleChatImage(event) {
         return;
     }
 
-    const reader =
-        new FileReader();
+
+    const reader = new FileReader();
+
 
     reader.onload = function(e) {
 
-        const result =
-            e.target.result;
+        const result = e.target.result;
 
-        if (!result) {
-            return;
-        }
+        if (!result) return;
+
 
         shAttachedImage = {
 
-            mimeType:
-                file.type,
+            mimeType: file.type,
 
             data:
-                result.split(",")[1],
+                result
+                .split(",")[1],
 
-            name:
-                file.name
+            name: file.name
         };
+
 
         shAttachedFileText = null;
 
@@ -261,12 +194,9 @@ function handleChatImage(event) {
 
         if (preview) {
 
-            preview.style.display =
-                "block";
+            preview.style.display = "block";
 
-            preview.src =
-                result;
-
+            preview.src = result;
         }
 
 
@@ -274,7 +204,6 @@ function handleChatImage(event) {
 
             name.textContent =
                 file.name;
-
         }
 
 
@@ -282,16 +211,13 @@ function handleChatImage(event) {
 
             previewBox.style.display =
                 "flex";
-
         }
-
     };
 
 
     reader.readAsDataURL(file);
 
     shCloseAttachMenu();
-
 }
 
 
@@ -305,9 +231,7 @@ function handleChatFile(event) {
     const file =
         event?.target?.files?.[0];
 
-    if (!file) {
-        return;
-    }
+    if (!file) return;
 
 
     const isTextFile =
@@ -340,12 +264,9 @@ function handleChatFile(event) {
 
         shAttachedFileText = {
 
-            name:
-                file.name,
+            name: file.name,
 
-            text:
-                e.target.result || ""
-
+            text: e.target.result || ""
         };
 
 
@@ -376,7 +297,6 @@ function handleChatFile(event) {
             preview.removeAttribute(
                 "src"
             );
-
         }
 
 
@@ -384,7 +304,6 @@ function handleChatFile(event) {
 
             name.textContent =
                 "📄 " + file.name;
-
         }
 
 
@@ -392,16 +311,13 @@ function handleChatFile(event) {
 
             previewBox.style.display =
                 "flex";
-
         }
-
     };
 
 
     reader.readAsText(file);
 
     shCloseAttachMenu();
-
 }
 
 
@@ -441,7 +357,6 @@ function removeAttachedImage() {
 
         previewBox.style.display =
             "none";
-
     }
 
 
@@ -453,30 +368,24 @@ function removeAttachedImage() {
 
         preview.style.display =
             "";
-
     }
 
 
     if (imageInput) {
 
-        imageInput.value =
-            "";
-
+        imageInput.value = "";
     }
 
 
     if (fileInput) {
 
-        fileInput.value =
-            "";
-
+        fileInput.value = "";
     }
-
 }
 
 
 /* =========================================================
-   ADD CHAT MESSAGE
+   ADD AI MESSAGE
    ========================================================= */
 
 function shAddChatMessage(
@@ -540,7 +449,6 @@ function shAddChatMessage(
 
 
         return bubble;
-
     }
 
 
@@ -631,7 +539,6 @@ function shAddChatMessage(
 
 
     return bubble;
-
 }
 
 
@@ -646,9 +553,7 @@ function shScrollChatToBottom() {
             "chatMessages"
         );
 
-    if (!container) {
-        return;
-    }
+    if (!container) return;
 
 
     requestAnimationFrame(() => {
@@ -660,11 +565,9 @@ function shScrollChatToBottom() {
 
             behavior:
                 "smooth"
-
         });
 
     });
-
 }
 
 
@@ -678,7 +581,6 @@ function shAddLoadingMessage() {
         "⏳ SH AI စဉ်းစားနေပါတယ်...",
         "ai"
     );
-
 }
 
 
@@ -693,9 +595,7 @@ async function sendChatMessage() {
             "chatInput"
         );
 
-    if (!input) {
-        return;
-    }
+    if (!input) return;
 
 
     const text =
@@ -707,6 +607,7 @@ async function sendChatMessage() {
         !shAttachedImage &&
         !shAttachedFileText
     ) {
+
         return;
     }
 
@@ -736,7 +637,6 @@ async function sendChatMessage() {
             (displayText ? "\n" : "") +
             "🖼️ " +
             shAttachedImage.name;
-
     }
 
 
@@ -746,7 +646,6 @@ async function sendChatMessage() {
             (displayText ? "\n" : "") +
             "📄 " +
             shAttachedFileText.name;
-
     }
 
 
@@ -776,11 +675,8 @@ async function sendChatMessage() {
 
         parts.push({
 
-            text:
-                text
-
+            text: text
         });
-
     }
 
 
@@ -795,11 +691,8 @@ async function sendChatMessage() {
 
                 data:
                     shAttachedImage.data
-
             }
-
         });
-
     }
 
 
@@ -812,9 +705,7 @@ async function sendChatMessage() {
                 shAttachedFileText.name +
                 "\n\n" +
                 shAttachedFileText.text
-
         });
-
     }
 
 
@@ -822,12 +713,9 @@ async function sendChatMessage() {
 
     shChatHistory.push({
 
-        role:
-            "user",
+        role: "user",
 
-        parts:
-            parts
-
+        parts: parts
     });
 
 
@@ -838,9 +726,11 @@ async function sendChatMessage() {
         null;
 
 
-    /* =====================================================
-       TRY API KEYS
-       ===================================================== */
+    /*
+       Try current key.
+       If quota / invalid / unavailable,
+       automatically move to next key.
+    */
 
     while (
         shCurrentChatKeyIndex <
@@ -852,6 +742,7 @@ async function sendChatMessage() {
 
 
         if (!apiKey) {
+
             break;
         }
 
@@ -860,9 +751,7 @@ async function sendChatMessage() {
 
             const response =
                 await fetch(
-
                     "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent",
-
                     {
 
                         method:
@@ -875,7 +764,6 @@ async function sendChatMessage() {
 
                             "x-goog-api-key":
                                 apiKey
-
                         },
 
                         body:
@@ -890,9 +778,7 @@ async function sendChatMessage() {
                                             "Answer clearly and naturally. " +
                                             "When the user speaks Burmese, reply naturally in Burmese. " +
                                             "Do not mention internal API details unless asked."
-
                                     }]
-
                                 },
 
 
@@ -907,13 +793,10 @@ async function sendChatMessage() {
 
                                     maxOutputTokens:
                                         2048
-
                                 }
 
                             })
-
                     }
-
                 );
 
 
@@ -924,12 +807,9 @@ async function sendChatMessage() {
             if (!response.ok) {
 
                 throw new Error(
-
                     data?.error?.message ||
                     "Gemini API Error"
-
                 );
-
             }
 
 
@@ -941,7 +821,6 @@ async function sendChatMessage() {
                         p => p.text || ""
                     )
                     .join("") ||
-
                 "AI က အဖြေပြန်မပေးနိုင်သေးပါဘူး။";
 
 
@@ -951,7 +830,6 @@ async function sendChatMessage() {
 
                 loadingBubble.textContent =
                     answer;
-
             }
 
 
@@ -959,22 +837,23 @@ async function sendChatMessage() {
 
             shChatHistory.push({
 
-                role:
-                    "model",
+                role: "model",
 
                 parts: [{
 
                     text:
                         answer
-
                 }]
-
             });
 
 
             success =
                 true;
 
+
+            /*
+               Successful key stays active.
+            */
 
             break;
 
@@ -992,18 +871,19 @@ async function sendChatMessage() {
             );
 
 
+            /*
+               Try next key.
+            */
+
             if (!shMoveToNextChatKey()) {
 
                 break;
-
             }
-
         }
-
     }
 
 
-    /* ERROR */
+    /* ================= ERROR ================= */
 
     if (!success) {
 
@@ -1015,23 +895,19 @@ async function sendChatMessage() {
                     lastError?.message ||
                     "Gemini API Error"
                 );
-
         }
-
     }
 
 
-    /* CLEAR ATTACHMENT */
+    /* ================= CLEAR ATTACHMENT ================= */
 
     if (success) {
 
         removeAttachedImage();
-
     }
 
 
     shScrollChatToBottom();
-
 }
 
 
@@ -1053,17 +929,13 @@ function startNewChat() {
             "chatMessages"
         );
 
-    if (!container) {
-        return;
-    }
+    if (!container) return;
 
 
-    container.innerHTML =
-        "";
+    container.innerHTML = "";
 
 
     shAddWelcomeMessage();
-
 }
 
 
@@ -1078,9 +950,7 @@ function shAddWelcomeMessage() {
             "chatMessages"
         );
 
-    if (!container) {
-        return;
-    }
+    if (!container) return;
 
 
     const row =
@@ -1164,12 +1034,11 @@ function shAddWelcomeMessage() {
     container.appendChild(
         row
     );
-
 }
 
 
 /* =========================================================
-   QUICK PROMPT
+   QUICK ACTION
    ========================================================= */
 
 function shQuickPrompt(prompt) {
@@ -1179,9 +1048,7 @@ function shQuickPrompt(prompt) {
             "chatInput"
         );
 
-    if (!input) {
-        return;
-    }
+    if (!input) return;
 
 
     input.value =
@@ -1189,44 +1056,6 @@ function shQuickPrompt(prompt) {
 
 
     input.focus();
-
-}
-
-
-/* =========================================================
-   QUICK ACTION
-   ========================================================= */
-
-function shAIQuickAction(action) {
-
-    const prompts = {
-
-        recap:
-            "ဒီ Movie Scene ကို Movie Recap Script အဖြစ် ပြန်ရေးပေးပါ။ Hook ကောင်းကောင်းနဲ့ သဘာဝကျတဲ့ မြန်မာစကားပြောပုံစံနဲ့ရေးပေးပါ။",
-
-        rewrite:
-            "ဒီစာကို အဓိပ္ပါယ်မပြောင်းဘဲ သဘာဝကျပြီး နားထောင်လို့ကောင်းအောင် ပြန်ရေးပေးပါ။",
-
-        hook:
-            "ဒီဇာတ်လမ်းအတွက် TikTok Movie Recap အစပိုင်း Hook အားကောင်းကောင်း ၃ ခုရေးပေးပါ။",
-
-        clean:
-            "ဒီစာထဲက မလိုအပ်တဲ့ စကားလုံးတွေ ဖယ်ပြီး ရှင်းရှင်းလင်းလင်းနဲ့ သဘာဝကျအောင် ပြင်ပေးပါ။"
-
-    };
-
-
-    const prompt =
-        prompts[action];
-
-
-    if (!prompt) {
-        return;
-    }
-
-
-    shQuickPrompt(prompt);
-
 }
 
 
@@ -1241,170 +1070,21 @@ function shClearChat() {
             "chatMessages"
         );
 
-    if (!container) {
-        return;
-    }
+    if (!container) return;
 
 
     shChatHistory = [];
 
 
-    container.innerHTML =
-        "";
+    container.innerHTML = "";
 
 
     shAddWelcomeMessage();
-
 }
 
 
 /* =========================================================
-   SETTINGS ACTIONS
-   ========================================================= */
-
-
-/* Chat History
-   Real persistent history will be added
-   in the next phase.
-*/
-
-function shOpenChatHistory() {
-
-    shCloseAISettings();
-
-    alert(
-        "📚 Chat History\n\nHistory system ကို နောက်တစ်ဆင့်မှာ ထည့်ပေးမယ်။"
-    );
-
-}
-
-
-/* Search Chat */
-
-function shSearchChatHistory() {
-
-    shCloseAISettings();
-
-    alert(
-        "🔍 Search Chat\n\nChat History system ထည့်ပြီးတဲ့အခါ Chat အဟောင်းတွေကို ဒီနေရာကနေ ရှာနိုင်မယ်။"
-    );
-
-}
-
-
-/* Rename */
-
-function shRenameCurrentChat() {
-
-    const name =
-        prompt(
-            "လက်ရှိ Chat နာမည်ထည့်ပါ။",
-            "New Chat"
-        );
-
-
-    if (
-        name === null ||
-        !name.trim()
-    ) {
-        return;
-    }
-
-
-    localStorage.setItem(
-        "sh_current_chat_name",
-        name.trim()
-    );
-
-
-    shCloseAISettings();
-
-}
-
-
-/* Delete */
-
-function shDeleteCurrentChat() {
-
-    const ok =
-        confirm(
-            "လက်ရှိ Chat ကို ဖျက်မှာ သေချာပါသလား?"
-        );
-
-
-    if (!ok) {
-        return;
-    }
-
-
-    startNewChat();
-
-    shCloseAISettings();
-
-}
-
-
-/* Recap Style */
-
-function shOpenRecapStyle() {
-
-    shCloseAISettings();
-
-
-    const style =
-        prompt(
-
-            "Recap Style ရွေးပါ။\n\n" +
-            "1 = 50/50 Narration + Dialogue\n" +
-            "2 = Narration Heavy\n" +
-            "3 = Dialogue Heavy",
-
-            "1"
-
-        );
-
-
-    if (style === null) {
-        return;
-    }
-
-
-    let selected =
-        "50/50 Narration + Dialogue";
-
-
-    if (style.trim() === "2") {
-
-        selected =
-            "Narration Heavy";
-
-    }
-
-
-    if (style.trim() === "3") {
-
-        selected =
-            "Dialogue Heavy";
-
-    }
-
-
-    localStorage.setItem(
-        "sh_recap_style",
-        selected
-    );
-
-
-    shAddChatMessage(
-        "🎬 Recap Style: " + selected,
-        "ai"
-    );
-
-}
-
-
-/* =========================================================
-   CLICK OUTSIDE
+   CLOSE MENUS WHEN CLICKING OUTSIDE
    ========================================================= */
 
 document.addEventListener(
@@ -1425,43 +1105,11 @@ document.addEventListener(
         if (
             attachMenu &&
             plus &&
-            !attachMenu.contains(
-                event.target
-            ) &&
-            !plus.contains(
-                event.target
-            )
+            !attachMenu.contains(event.target) &&
+            !plus.contains(event.target)
         ) {
 
             shCloseAttachMenu();
-
-        }
-
-
-        const settingsPanel =
-            document.getElementById(
-                "shAISettingsPanel"
-            );
-
-        const settingsButton =
-            document.querySelector(
-                ".sh-chat-settings-btn"
-            );
-
-
-        if (
-            settingsPanel &&
-            settingsButton &&
-            !settingsPanel.contains(
-                event.target
-            ) &&
-            !settingsButton.contains(
-                event.target
-            )
-        ) {
-
-            shCloseAISettings();
-
         }
 
     }
@@ -1492,7 +1140,6 @@ document.addEventListener(
             event.preventDefault();
 
             sendChatMessage();
-
         }
 
     }
@@ -1507,6 +1154,11 @@ document.addEventListener(
     "DOMContentLoaded",
     function() {
 
+        /*
+           Make sure welcome message exists
+           only when chat area is empty.
+        */
+
         const container =
             document.getElementById(
                 "chatMessages"
@@ -1519,12 +1171,10 @@ document.addEventListener(
         ) {
 
             shAddWelcomeMessage();
-
         }
 
     }
 );
-   
 let activePickerTarget = null; // 'single' or block ID number
 let singleVoiceValue = "Charon";
 let currentAudioBlob = null;
