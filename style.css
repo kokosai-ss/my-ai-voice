@@ -1962,6 +1962,52 @@
 
     touch-action:pan-y;
 }
+
+/* =========================================================
+   SH AI — KEEP CHAT ABOVE BOTTOM NAV
+   ========================================================= */
+
+#aiChatbot.sh-ai-chat {
+    position: relative !important;
+    height: calc(100dvh - 70px) !important;
+    max-height: calc(100dvh - 70px) !important;
+    overflow: hidden !important;
+}
+
+#aiChatbot.sh-ai-chat .sh-chat-shell {
+    position: relative !important;
+    width: 100% !important;
+    height: 100% !important;
+    max-height: 100% !important;
+    display: flex !important;
+    flex-direction: column !important;
+    overflow: hidden !important;
+}
+
+/* Chat messages take the middle space */
+#aiChatbot.sh-ai-chat .sh-chat-messages {
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
+    overflow-y: auto !important;
+}
+
+/* Input stays at the bottom of SH AI page */
+#aiChatbot.sh-ai-chat .sh-chat-input-area {
+    position: relative !important;
+    bottom: auto !important;
+    left: auto !important;
+    right: auto !important;
+    flex: 0 0 auto !important;
+    width: 100% !important;
+    margin-top: auto !important;
+}
+
+/* Never let SH AI cover the bottom navigation */
+#aiChatbot.sh-ai-chat {
+    margin-bottom: 0 !important;
+    padding-bottom: 0 !important;
+    z-index: 1 !important;
+}
    /* =========================================
    SH IMAGE SEARCH — NEON GLASS
    ========================================= */
