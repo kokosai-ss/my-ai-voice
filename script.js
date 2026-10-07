@@ -1686,12 +1686,10 @@ document.addEventListener(
    1. SUPABASE CONFIG
    --------------------------------------------------------- */
 
-const SH_SUPABASE_URL =
-    'https://ctnczlsurnrzipcuhoe.supabase.co';
-
+const SH_SUPABASE_URL ='https://yrlixhgqeltneczvkuko.supabase.co';
+    
 const SH_SUPABASE_ANON_KEY =
-    'sb_publishable_RGccvi4KIz9F5q657aKilA_-Fbsm55n';
-
+    'sb_publishable_Sqq0AYUqABRVBMHOqFp6QA_QqNi9xJo';
 
 /* IMPORTANT:
    Do NOT put service_role / secret key here.
