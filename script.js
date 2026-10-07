@@ -3005,38 +3005,7 @@
 
 .sh-pro-empty-btn:active {
     transform: scale(0.94);
-}
-/* Pro Area နှင့် Search Container အားလုံး မျက်နှာပြင်အပြည့် ယူစေရန် */
-#assetView,
-#shImageSearch,
-#assetProArea {
-    width: 100% !important;
-    max-width: 100% !important;
-    box-sizing: border-box !important;
-}
 
-/* Pro Tools နဲ့ Categories တွေလည်း အပြည့်ပေါ်စေရန် */
-.sh-pro-tools,
-.sh-pro-categories,
-.sh-pro-asset-grid,
-#proAssetGrid {
-    width: 100% !important;
-    box-sizing: border-box !important;
-}
-
-/* Pro Categories ခလုတ်များကို ဘေးချင်းယှဉ် လှပစွာ စီရန် */
-.sh-pro-categories {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-}
-
-/* Pro Grid အကွက်များကို Free လိုမျိုး 2 Column အပြည့်ပေါ်စေရန် */
-#proAssetGrid {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 12px;
-    margin-top: 13px;
 }
 
 #cyberpunk-lockscreen {
