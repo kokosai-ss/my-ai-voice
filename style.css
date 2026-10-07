@@ -3039,6 +3039,26 @@
     margin-top: 13px;
 }
 
+/* View Container နှင့် Main Search Box ကို အကြွင်းမဲ့ မျက်နှာပြင်အပြည့် ချဲ့ရန် */
+.view-container,
+#assetView,
+#shImageSearch {
+    width: 100% !important;
+    max-width: 100% !important;
+    flex: 1 !important;
+    margin: 0 !important;
+    padding: 12px !important;
+    box-sizing: border-box !important;
+    display: block !important;
+}
+
+#assetProArea,
+#assetFreeArea {
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+}
+
 #cyberpunk-lockscreen {
   position: fixed;
   top: 0; left: 0;
