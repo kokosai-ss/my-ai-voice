@@ -2652,14 +2652,10 @@ async function loadSHProAssetsWithCache(
    13. GET ONE ASSET
    --------------------------------------------------------- */
 
-function getSHProAssetById(
-    id
-) {
-
+function getSHProAssetById(id) {
     return SH_PRO_ASSET_CACHE.find(
-        asset =>
-            Number(asset.id) ===
-            Number(id)
+        asset => 
+            String(asset.id) === String(id)
     );
 }
 
