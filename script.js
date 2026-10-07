@@ -1701,6 +1701,16 @@ const shSupabase =
         SH_SUPABASE_ANON_KEY
     );
 
+try {
+    if (typeof window.supabase === 'undefined') {
+        alert("Error: Supabase CDN script မရောက်သေးပါ (သို့) load လို့မရပါ!");
+    } else {
+        alert("Supabase Object Loaded Successfully!");
+    }
+} catch (e) {
+    alert("Init Error: " + e.message);
+}
+
 /* ---------------------------------------------------------
    2. SETTINGS
    --------------------------------------------------------- */
