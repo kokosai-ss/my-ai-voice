@@ -2462,10 +2462,7 @@
 #assetFreeArea,
 #assetProArea {
     width: 100%;
-}
-
-#assetProArea {
-    display: none;
+    box-sizing: border-box; /* ဒီလိုင်းလေးပါ ထပ်ထည့်ပေးပါ */
 }
 
 
