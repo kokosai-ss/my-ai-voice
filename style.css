@@ -2458,11 +2458,21 @@
 /* =========================================================
    FREE / PRO AREA
    ========================================================= */
-
 #assetFreeArea,
 #assetProArea {
-    width: 100%;
-    box-sizing: border-box; /* ဒီလိုင်းလေးပါ ထပ်ထည့်ပေးပါ */
+    width: 100% !important;
+    box-sizing: border-box !important;
+}
+
+/* Pro Asset Grid ကို Free လိုမျိုး 2 Column အပြည့်ပေါ်စေရန် */
+#proAssetGrid,
+#freeAssetGrid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+    margin-top: 13px;
+    width: 100% !important;
+    box-sizing: border-box !important;
 }
 
 
