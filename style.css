@@ -2458,30 +2458,16 @@
 /* =========================================================
    FREE / PRO AREA
    ========================================================= */
-/* Pro Area ကြီးတစ်ခုလုံး မျက်နှာပြင်အပြည့်ယူစေရန် */
+
+#assetFreeArea,
 #assetProArea {
-    width: 100% !important;
-    box-sizing: border-box !important;
-}
-
-/* Free ဘက်က .sh-asset-grid လိုမျိုး Pro Grid ကိုပါ အပြည့်ချဲ့ရန် */
-.sh-pro-asset-grid,
-#proAssetGrid {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 12px;
-    width: 100% !important;
-    box-sizing: border-box !important;
-    margin-top: 13px;
-}
-
-/* ပုံမရှိသေးချိန်ပြမည့် Empty State ကို မျက်နှာပြင်အပြည့် ယူစေရန် */
-.sh-pro-asset-grid .sh-pro-empty-state {
-    grid-column: span 2;
     width: 100%;
-    text-align: center;
-    box-sizing: border-box;
 }
+
+#assetProArea {
+    display: none;
+}
+
 
 /* =========================================================
    PRO HEADER
@@ -3006,59 +2992,6 @@
 .sh-pro-empty-btn:active {
     transform: scale(0.94);
 }
-/* Pro Area နှင့် Search Container အားလုံး မျက်နှာပြင်အပြည့် ယူစေရန် */
-#assetView,
-#shImageSearch,
-#assetProArea {
-    width: 100% !important;
-    max-width: 100% !important;
-    box-sizing: border-box !important;
-}
-
-/* Pro Tools နဲ့ Categories တွေလည်း အပြည့်ပေါ်စေရန် */
-.sh-pro-tools,
-.sh-pro-categories,
-.sh-pro-asset-grid,
-#proAssetGrid {
-    width: 100% !important;
-    box-sizing: border-box !important;
-}
-
-/* Pro Categories ခလုတ်များကို ဘေးချင်းယှဉ် လှပစွာ စီရန် */
-.sh-pro-categories {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-}
-
-/* Pro Grid အကွက်များကို Free လိုမျိုး 2 Column အပြည့်ပေါ်စေရန် */
-#proAssetGrid {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 12px;
-    margin-top: 13px;
-}
-
-/* View Container နှင့် Main Search Box ကို အကြွင်းမဲ့ မျက်နှာပြင်အပြည့် ချဲ့ရန် */
-.view-container,
-#assetView,
-#shImageSearch {
-    width: 100% !important;
-    max-width: 100% !important;
-    flex: 1 !important;
-    margin: 0 !important;
-    padding: 12px !important;
-    box-sizing: border-box !important;
-    display: block !important;
-}
-
-#assetProArea,
-#assetFreeArea {
-    width: 100% !important;
-    max-width: 100% !important;
-    box-sizing: border-box !important;
-}
-
 #cyberpunk-lockscreen {
   position: fixed;
   top: 0; left: 0;
@@ -4432,4 +4365,3 @@ body{background:radial-gradient(circle at 50% -10%,rgba(32,104,255,.16),transpar
         0% { transform: scaleY(0.3); opacity: 0.3; }
         100% { transform: scaleY(1.2); opacity: 1; box-shadow: 0 0 10px #00d2ff; }
     }
-
