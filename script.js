@@ -1,87 +1,1183 @@
-/* =========================================================
-   SH AI CHAT — COMPLETE JAVASCRIPT
-   ========================================================= */
-
 
 /* =========================================================
-   GLOBAL STATE
+   SH AI CHAT — PREMIUM NEON GLASS UI
+   COMPLETE CSS
    ========================================================= */
 
-let shChatHistory = [];
+#aiChatbot.sh-ai-chat {
+    width:100%;
+    height:100%;
+    min-height:0;
 
-let shAttachedImage = null;
-let shAttachedFileText = null;
+    background:#030b16;
+    color:#fff;
 
-let shCurrentChatKeyIndex = 0;
+    overflow:hidden;
 
+    box-sizing:border-box;
+}
 
-/* =========================================================
-   API KEY SYSTEM
-   Supports:
-   key1,key2,key3,key4
-   ========================================================= */
-
-function shGetAllChatApiKeys() {
-
-    const input = document.getElementById("apiKey");
-
-    let raw = "";
-
-    if (input && input.value.trim()) {
-        raw = input.value.trim();
-    } else {
-        raw = localStorage.getItem("gemini_api_key") || "";
-    }
-
-    if (!raw) {
-        return [];
-    }
-
-    return raw
-        .split(",")
-        .map(key => key.trim())
-        .filter(Boolean);
+#aiChatbot.sh-ai-chat *,
+#aiChatbot.sh-ai-chat *::before,
+#aiChatbot.sh-ai-chat *::after {
+    box-sizing:border-box;
 }
 
 
-function shGetChatApiKey() {
+/* =========================================================
+   MAIN SHELL
+   ========================================================= */
 
-    const keys = shGetAllChatApiKeys();
+.sh-chat-shell {
+    width:100%;
+    height:100%;
+    min-height:0;
 
-    if (!keys.length) {
-        return "";
-    }
+    display:flex;
+    flex-direction:column;
 
-    if (shCurrentChatKeyIndex >= keys.length) {
-        shCurrentChatKeyIndex = 0;
-    }
+    position:relative;
 
-    return keys[shCurrentChatKeyIndex];
+    overflow:hidden;
+
+    background:
+        radial-gradient(
+            circle at 50% 0%,
+            rgba(0,186,255,.10),
+            transparent 32%
+        ),
+        radial-gradient(
+            circle at 100% 35%,
+            rgba(0,120,255,.045),
+            transparent 35%
+        ),
+        linear-gradient(
+            180deg,
+            #061625 0%,
+            #030b16 55%,
+            #020812 100%
+        );
 }
 
 
-function shMoveToNextChatKey() {
+/* =========================================================
+   HEADER
+   ========================================================= */
 
-    const keys = shGetAllChatApiKeys();
+.sh-chat-header {
+    flex:0 0 auto;
 
-    if (keys.length <= 1) {
-        return false;
-    }
+    min-height:72px;
 
-    if (shCurrentChatKeyIndex < keys.length - 1) {
+    padding:10px 14px;
 
-        shCurrentChatKeyIndex++;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
 
-        return true;
-    }
+    gap:10px;
 
-    return false;
+    background:
+        linear-gradient(
+            135deg,
+            rgba(7,28,47,.98),
+            rgba(3,15,28,.98)
+        );
+
+    border-bottom:1px solid rgba(0,186,255,.20);
+
+    box-shadow:
+        0 7px 25px rgba(0,0,0,.28);
+
+    position:relative;
+
+    z-index:50;
+}
+
+.sh-chat-header::after {
+    content:"";
+
+    position:absolute;
+
+    left:0;
+    right:0;
+    bottom:0;
+
+    height:1px;
+
+    background:
+        linear-gradient(
+            90deg,
+            transparent,
+            rgba(0,200,255,.8),
+            transparent
+        );
+
+    opacity:.7;
 }
 
 
-function shResetChatKeyRotation() {
+/* =========================================================
+   HEADER LEFT
+   ========================================================= */
 
-    shCurrentChatKeyIndex = 0;
+.sh-chat-header-left {
+    display:flex;
+    align-items:center;
+
+    gap:11px;
+
+    min-width:0;
+}
+
+
+/* =========================================================
+   AI AVATAR
+   ========================================================= */
+
+.sh-ai-avatar {
+    width:46px;
+    height:46px;
+
+    flex:0 0 46px;
+
+    border-radius:15px;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    position:relative;
+
+    background:
+        radial-gradient(
+            circle at 40% 35%,
+            rgba(0,211,255,.25),
+            rgba(3,24,41,.98) 70%
+        );
+
+    border:1px solid rgba(0,200,255,.48);
+
+    color:#00c8ff;
+
+    font-size:13px;
+    font-weight:900;
+
+    letter-spacing:.6px;
+
+    box-shadow:
+        0 0 18px rgba(0,186,255,.16),
+        inset 0 0 18px rgba(0,186,255,.08);
+}
+
+.sh-ai-avatar-ring {
+    position:absolute;
+
+    inset:-5px;
+
+    border-radius:18px;
+
+    border:1px solid rgba(0,200,255,.16);
+
+    animation:shAvatarPulse 2.6s ease-in-out infinite;
+}
+
+@keyframes shAvatarPulse {
+
+    0%,100% {
+        transform:scale(.96);
+        opacity:.35;
+    }
+
+    50% {
+        transform:scale(1.08);
+        opacity:.9;
+    }
+
+}
+
+.sh-online-dot {
+    position:absolute;
+
+    width:9px;
+    height:9px;
+
+    right:-3px;
+    bottom:-3px;
+
+    border-radius:50%;
+
+    background:#00ff9d;
+
+    border:2px solid #061625;
+
+    box-shadow:
+        0 0 10px rgba(0,255,157,.85);
+}
+
+
+/* =========================================================
+   TITLE
+   ========================================================= */
+
+.sh-ai-title-box {
+    min-width:0;
+}
+
+.sh-ai-title {
+    display:flex;
+    align-items:center;
+
+    gap:6px;
+
+    color:#f5fcff;
+
+    font-size:17px;
+    font-weight:850;
+
+    letter-spacing:.15px;
+
+    white-space:nowrap;
+}
+
+.sh-ai-pro-badge {
+    display:inline-flex;
+    align-items:center;
+
+    padding:2px 6px;
+
+    border-radius:5px;
+
+    color:#07131e;
+
+    background:
+        linear-gradient(
+            135deg,
+            #00e5ff,
+            #00aeea
+        );
+
+    font-size:7px;
+    font-weight:1000;
+
+    letter-spacing:.7px;
+
+    box-shadow:
+        0 0 9px rgba(0,200,255,.25);
+}
+
+.sh-ai-status {
+    margin-top:3px;
+
+    color:#7693a8;
+
+    font-size:9px;
+
+    white-space:nowrap;
+}
+
+.sh-status-dot {
+    display:inline-block;
+
+    width:6px;
+    height:6px;
+
+    margin-right:5px;
+
+    border-radius:50%;
+
+    background:#00e5ff;
+
+    box-shadow:
+        0 0 8px rgba(0,229,255,.85);
+}
+
+
+/* =========================================================
+   HEADER ACTIONS
+   ========================================================= */
+
+.sh-chat-header-actions {
+    display:flex;
+    align-items:center;
+
+    gap:6px;
+
+    flex-shrink:0;
+}
+
+.sh-header-action-btn,
+.sh-header-icon-btn {
+    border:1px solid rgba(0,186,255,.28);
+
+    color:#8ee6ff;
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(0,186,255,.13),
+            rgba(0,91,150,.08)
+        );
+
+    cursor:pointer;
+
+    transition:.18s ease;
+
+    -webkit-tap-highlight-color:transparent;
+}
+
+.sh-header-action-btn:active,
+.sh-header-icon-btn:active {
+    transform:scale(.94);
+}
+
+
+/* =========================================================
+   NEW CHAT BUTTON
+   ========================================================= */
+
+.sh-new-chat-btn {
+    min-height:38px;
+
+    padding:8px 12px;
+
+    border-radius:13px;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    gap:6px;
+
+    color:#b9f3ff;
+
+    font-size:10px;
+    font-weight:800;
+
+    box-shadow:
+        0 0 14px rgba(0,186,255,.08);
+}
+
+.sh-new-chat-btn i {
+    font-size:10px;
+
+    color:#00d9ff;
+
+    filter:
+        drop-shadow(
+            0 0 5px rgba(0,217,255,.7)
+        );
+}
+
+
+/* =========================================================
+   CHAT SETTINGS BUTTON
+   ========================================================= */
+
+.sh-chat-settings-btn {
+    width:38px;
+    height:38px;
+
+    border-radius:12px;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    color:#00d9ff;
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(0,200,255,.17),
+            rgba(4,38,61,.92)
+        );
+
+    border:1px solid rgba(0,210,255,.34);
+
+    box-shadow:
+        0 0 15px rgba(0,186,255,.10),
+        inset 0 0 12px rgba(0,186,255,.05);
+}
+
+.sh-chat-settings-btn i {
+    font-size:13px;
+
+    filter:
+        drop-shadow(
+            0 0 5px rgba(0,217,255,.65)
+        );
+
+    transition:.25s ease;
+}
+
+.sh-chat-settings-btn:hover i {
+    transform:rotate(45deg);
+}
+
+.sh-chat-settings-btn:active {
+    transform:scale(.92);
+}
+
+
+/* =========================================================
+   INFO BAR
+   ========================================================= */
+
+.sh-ai-info-bar {
+    flex:0 0 auto;
+
+    margin:10px 12px 5px;
+
+    min-height:61px;
+
+    padding:9px 11px;
+
+    border-radius:17px;
+
+    display:flex;
+    align-items:center;
+
+    gap:10px;
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(0,186,255,.085),
+            rgba(8,30,49,.82)
+        );
+
+    border:1px solid rgba(0,186,255,.16);
+
+    box-shadow:
+        0 7px 20px rgba(0,0,0,.12),
+        inset 0 0 18px rgba(0,186,255,.025);
+}
+
+.sh-ai-info-icon {
+    width:36px;
+    height:36px;
+
+    flex:0 0 36px;
+
+    border-radius:11px;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    overflow:hidden;
+
+    background:rgba(0,186,255,.08);
+
+    border:1px solid rgba(0,186,255,.18);
+
+    box-shadow:
+        0 0 10px rgba(0,186,255,.08);
+}
+
+.sh-ai-info-icon img {
+    width:100%;
+    height:100%;
+
+    object-fit:cover;
+}
+
+.sh-ai-info-text {
+    flex:1;
+
+    min-width:0;
+
+    color:#dff8ff;
+
+    font-size:11px;
+    font-weight:800;
+}
+
+.sh-ai-info-title {
+    color:#dff8ff;
+
+    font-size:11px;
+    font-weight:850;
+}
+
+.sh-ai-info-text span {
+    display:block;
+
+    margin-top:3px;
+
+    color:#66879d;
+
+    font-size:8px;
+    font-weight:500;
+
+    white-space:nowrap;
+
+    overflow:hidden;
+
+    text-overflow:ellipsis;
+}
+
+.sh-ai-info-right {
+    display:flex;
+    align-items:center;
+
+    gap:8px;
+
+    flex-shrink:0;
+}
+
+.sh-ai-mode {
+    display:flex;
+    align-items:center;
+
+    gap:4px;
+
+    color:#d8f8ff;
+
+    font-size:9px;
+    font-weight:750;
+
+    white-space:nowrap;
+}
+
+.sh-ai-mode i {
+    color:#00d9ff;
+
+    font-size:12px;
+
+    filter:
+        drop-shadow(
+            0 0 5px rgba(0,210,255,.7)
+        );
+}
+
+.sh-ai-pulse {
+    display:flex;
+    align-items:center;
+
+    gap:3px;
+}
+
+.sh-ai-pulse span {
+    width:4px;
+    height:4px;
+
+    border-radius:50%;
+
+    background:#00c8ff;
+
+    animation:shDotPulse 1.5s infinite;
+}
+
+.sh-ai-pulse span:nth-child(2) {
+    animation-delay:.2s;
+}
+
+.sh-ai-pulse span:nth-child(3) {
+    animation-delay:.4s;
+}
+
+@keyframes shDotPulse {
+
+    0%,100% {
+        opacity:.25;
+        transform:scale(.7);
+    }
+
+    50% {
+        opacity:1;
+        transform:scale(1.25);
+    }
+
+}
+
+
+/* =========================================================
+   QUICK ACTIONS
+   ========================================================= */
+
+.sh-ai-quick-actions {
+    flex:0 0 auto;
+
+    display:flex;
+
+    gap:7px;
+
+    padding:4px 12px 9px;
+
+    overflow-x:auto;
+
+    scrollbar-width:none;
+}
+
+.sh-ai-quick-actions::-webkit-scrollbar {
+    display:none;
+}
+
+.sh-ai-quick-actions button {
+    flex:0 0 auto;
+
+    min-height:32px;
+
+    padding:7px 11px;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    gap:5px;
+
+    border-radius:10px;
+
+    border:1px solid rgba(0,186,255,.20);
+
+    color:#8fdff4;
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(0,186,255,.095),
+            rgba(7,30,47,.78)
+        );
+
+    font-size:9px;
+    font-weight:750;
+
+    cursor:pointer;
+
+    box-shadow:
+        0 4px 12px rgba(0,0,0,.12);
+
+    transition:.18s ease;
+
+    -webkit-tap-highlight-color:transparent;
+}
+
+.sh-ai-quick-actions button i {
+    color:#00c8ff;
+
+    font-size:10px;
+}
+
+.sh-ai-quick-actions button:active {
+    transform:scale(.94);
+
+    background:
+        rgba(0,186,255,.18);
+}
+
+.sh-ai-quick-actions button:hover {
+    border-color:rgba(0,200,255,.55);
+
+    box-shadow:
+        0 0 13px rgba(0,186,255,.09);
+}
+
+
+/* =========================================================
+   CHAT MESSAGES
+   ========================================================= */
+
+.sh-chat-messages {
+    flex:1 1 auto;
+
+    min-height:0;
+
+    width:100%;
+
+    overflow-y:auto;
+    overflow-x:hidden;
+
+    padding:8px 13px 16px;
+
+    display:flex;
+    flex-direction:column;
+
+    gap:15px;
+
+    scroll-behavior:smooth;
+
+    overscroll-behavior:contain;
+
+    -webkit-overflow-scrolling:touch;
+}
+
+.sh-chat-messages::-webkit-scrollbar {
+    width:3px;
+}
+
+.sh-chat-messages::-webkit-scrollbar-track {
+    background:transparent;
+}
+
+.sh-chat-messages::-webkit-scrollbar-thumb {
+    background:rgba(0,186,255,.28);
+
+    border-radius:10px;
+}
+
+
+/* =========================================================
+   MESSAGE ROW
+   ========================================================= */
+
+.sh-message-row {
+    width:100%;
+
+    display:flex;
+
+    gap:8px;
+
+    align-items:flex-start;
+}
+
+.sh-message-row.user {
+    justify-content:flex-end;
+}
+
+.sh-message-row.user .sh-message-avatar {
+    display:none;
+}
+
+.sh-message-row.user .sh-message-content {
+    align-items:flex-end;
+}
+
+.sh-message-row.user .sh-message-name {
+    display:none;
+}
+
+
+/* =========================================================
+   MESSAGE AVATAR
+   ========================================================= */
+
+.sh-message-avatar {
+    width:29px;
+    height:29px;
+
+    flex:0 0 29px;
+
+    border-radius:10px;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    font-size:8px;
+    font-weight:900;
+
+    color:#00c8ff;
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(0,186,255,.17),
+            rgba(4,25,43,.95)
+        );
+
+    border:1px solid rgba(0,186,255,.30);
+
+    box-shadow:
+        0 0 10px rgba(0,186,255,.10);
+}
+
+
+/* =========================================================
+   MESSAGE CONTENT
+   ========================================================= */
+
+.sh-message-content {
+    max-width:84%;
+
+    min-width:0;
+
+    display:flex;
+
+    flex-direction:column;
+
+    align-items:flex-start;
+}
+
+.sh-message-name {
+    margin:0 0 4px 2px;
+
+    color:#00c8ff;
+
+    font-size:8px;
+    font-weight:850;
+
+    letter-spacing:.35px;
+}
+
+.sh-message-name span {
+    margin-left:4px;
+
+    color:#526f85;
+
+    font-weight:500;
+}
+
+
+/* =========================================================
+   AI BUBBLE
+   ========================================================= */
+
+.sh-ai-bubble {
+    padding:10px 13px;
+
+    border-radius:7px 16px 16px 16px;
+
+    color:#d9eaf3;
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(15,43,65,.94),
+            rgba(8,27,44,.91)
+        );
+
+    border:1px solid rgba(0,186,255,.18);
+
+    box-shadow:
+        0 6px 20px rgba(0,0,0,.20),
+        inset 0 0 16px rgba(0,186,255,.025);
+
+    font-size:12px;
+
+    line-height:1.65;
+
+    word-break:break-word;
+}
+
+
+/* =========================================================
+   USER BUBBLE
+   ========================================================= */
+
+.sh-user-bubble {
+    padding:10px 13px;
+
+    border-radius:16px 7px 16px 16px;
+
+    color:#fff;
+
+    background:
+        linear-gradient(
+            135deg,
+            #087fb2,
+            #075b8a
+        );
+
+    border:1px solid rgba(0,210,255,.35);
+
+    box-shadow:
+        0 6px 20px rgba(0,120,180,.18);
+
+    font-size:12px;
+
+    line-height:1.6;
+
+    word-break:break-word;
+}
+
+.sh-message-time {
+    margin:4px 4px 0;
+
+    color:#3e5c70;
+
+    font-size:7px;
+}
+
+
+/* =========================================================
+   IMAGE PREVIEW
+   ========================================================= */
+
+.sh-image-preview {
+    flex:0 0 auto;
+
+    align-items:center;
+
+    gap:9px;
+
+    margin:0 11px 7px;
+
+    padding:7px 8px;
+
+    border-radius:13px;
+
+    background:
+        rgba(7,28,45,.96);
+
+    border:1px solid rgba(0,186,255,.18);
+
+    box-shadow:
+        0 5px 18px rgba(0,0,0,.22);
+
+    position:relative;
+
+    z-index:30;
+}
+
+.sh-preview-image-box {
+    width:42px;
+    height:42px;
+
+    flex:0 0 42px;
+
+    overflow:hidden;
+
+    border-radius:9px;
+
+    border:1px solid rgba(0,186,255,.35);
+}
+
+.sh-preview-image-box img {
+    width:100%;
+    height:100%;
+
+    object-fit:cover;
+
+    display:block;
+}
+
+.sh-preview-info {
+    flex:1;
+
+    min-width:0;
+}
+
+.sh-preview-title {
+    color:#ccecf8;
+
+    font-size:10px;
+    font-weight:700;
+}
+
+.sh-preview-name {
+    margin-top:2px;
+
+    color:#55758b;
+
+    font-size:8px;
+
+    overflow:hidden;
+
+    text-overflow:ellipsis;
+
+    white-space:nowrap;
+}
+
+.sh-remove-image {
+    width:28px;
+    height:28px;
+
+    flex:0 0 28px;
+
+    border-radius:50%;
+
+    border:1px solid rgba(255,80,100,.22);
+
+    background:rgba(255,70,90,.07);
+
+    color:#ff7184;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    cursor:pointer;
+}
+
+
+/* =========================================================
+   INPUT AREA
+   ========================================================= */
+
+.sh-chat-input-area {
+    flex:0 0 auto;
+
+    width:100%;
+
+    position:relative;
+
+    display:flex;
+    align-items:center;
+
+    gap:7px;
+
+    padding:9px 11px 11px;
+
+    background:
+        linear-gradient(
+            180deg,
+            rgba(4,17,29,.82),
+            rgba(3,12,22,.99)
+        );
+
+    border-top:1px solid rgba(0,186,255,.18);
+
+    box-shadow:
+        0 -8px 25px rgba(0,0,0,.28);
+
+    z-index:40;
+}
+
+
+/* =========================================================
+   PLUS
+   ========================================================= */
+
+.sh-chat-plus {
+    width:40px;
+    height:40px;
+
+    flex:0 0 40px;
+
+    border-radius:50%;
+
+    border:1px solid rgba(0,186,255,.30);
+
+    background:
+        rgba(7,31,49,.97);
+
+    color:#00c8ff;
+
+    font-size:16px;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    cursor:pointer;
+
+    box-shadow:
+        0 0 12px rgba(0,186,255,.09);
+
+    transition:.18s ease;
+}
+
+.sh-chat-plus:active {
+    transform:scale(.92);
+
+    background:rgba(0,186,255,.15);
+}
+
+
+/* =========================================================
+   INPUT WRAPPER
+   ========================================================= */
+
+.sh-input-wrapper {
+    flex:1 1 auto;
+
+    min-width:0;
+
+    position:relative;
+}
+
+.sh-input-wrapper input {
+    width:100%;
+    height:41px;
+
+    box-sizing:border-box;
+
+    padding:0 14px;
+
+    border-radius:22px;
+
+    outline:none;
+
+    color:#eafaff;
+
+    background:
+        rgba(8,29,46,.96);
+
+    border:1px solid rgba(0,186,255,.22);
+
+    font-size:11px;
+
+    box-shadow:
+        inset 0 2px 7px rgba(0,0,0,.25);
+
+    transition:.18s ease;
+}
+
+.sh-input-wrapper input::placeholder {
+    color:#557286;
+}
+
+.sh-input-wrapper input:focus {
+    border-color:rgba(0,210,255,.60);
+
+    box-shadow:
+        0 0 14px rgba(0,186,255,.09),
+        inset 0 2px 7px rgba(0,0,0,.25);
+}
+
+.sh-input-glow {
+    position:absolute;
+
+    inset:0;
+
+    border-radius:22px;
+
+    pointer-events:none;
+
+    opacity:0;
+
+    box-shadow:
+        0 0 14px rgba(0,186,255,.16);
+
+    transition:.18s ease;
+}
+
+.sh-input-wrapper:focus-within .sh-input-glow {
+    opacity:1;
+}
+
+
+/* =========================================================
+   SEND
+   ========================================================= */
+
+.sh-send-btn {
+    width:41px;
+    height:41px;
+
+    flex:0 0 41px;
+
+    border-radius:50%;
+
+    border:1px solid rgba(255,255,255,.08);
+
+    background:
+        linear-gradient(
+            135deg,
+            #00c8ff,
+            #087fba
+        );
+
+    color:#fff;
+
+    font-size:13px;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    cursor:pointer;
+
+    box-shadow:
+        0 0 17px rgba(0,186,255,.30);
+
+    transition:.18s ease;
+}
+
+.sh-send-btn:active {
+    transform:scale(.91);
 }
 
 
@@ -89,4451 +1185,3230 @@ function shResetChatKeyRotation() {
    ATTACH MENU
    ========================================================= */
 
-function toggleAttachMenu() {
+.sh-attach-menu {
+    display:none;
 
-    const menu = document.getElementById("attachMenu");
+    position:absolute;
 
-    if (!menu) return;
+    left:11px;
 
-    const current =
-        window.getComputedStyle(menu).display;
+    bottom:100%;
 
-    if (current === "none") {
+    margin-bottom:8px;
 
-        menu.style.setProperty(
-            "display",
-            "block",
-            "important"
-        );
+    width:195px;
 
-    } else {
+    padding:8px;
 
-        menu.style.setProperty(
-            "display",
-            "none",
-            "important"
-        );
-    }
+    border-radius:16px;
+
+    background:
+        rgba(5,23,38,.98);
+
+    border:1px solid rgba(0,186,255,.25);
+
+    box-shadow:
+        0 14px 38px rgba(0,0,0,.52),
+        0 0 20px rgba(0,186,255,.07);
+
+    backdrop-filter:blur(18px);
+
+    -webkit-backdrop-filter:blur(18px);
+
+    z-index:100;
 }
 
+.sh-attach-title {
+    padding:5px 8px 7px;
 
-function shCloseAttachMenu() {
+    color:#3f718b;
 
-    const menu = document.getElementById("attachMenu");
+    font-size:8px;
+    font-weight:900;
 
-    if (!menu) return;
-
-    menu.style.setProperty(
-        "display",
-        "none",
-        "important"
-    );
+    letter-spacing:1.2px;
 }
 
+.sh-attach-item {
+    width:100%;
 
-/* =========================================================
-   IMAGE ATTACH
-   ========================================================= */
+    display:flex;
+    align-items:center;
 
-function handleChatImage(event) {
+    gap:9px;
 
-    const file =
-        event?.target?.files?.[0];
+    padding:8px;
 
-    if (!file) return;
+    border:none;
 
+    border-radius:10px;
 
-    if (!file.type.startsWith("image/")) {
+    background:transparent;
 
-        alert("Image ဖိုင်ပဲ ရွေးပါ။");
+    color:#fff;
 
-        return;
-    }
+    text-align:left;
 
+    cursor:pointer;
+}
 
-    const reader = new FileReader();
+.sh-attach-item:active {
+    background:rgba(0,186,255,.10);
+}
 
+.sh-attach-item strong {
+    display:block;
 
-    reader.onload = function(e) {
+    font-size:10px;
+}
 
-        const result = e.target.result;
+.sh-attach-item small {
+    display:block;
 
-        if (!result) return;
+    margin-top:2px;
 
+    color:#58778a;
 
-        shAttachedImage = {
+    font-size:8px;
+}
 
-            mimeType: file.type,
+.sh-attach-icon {
+    width:31px;
+    height:31px;
 
-            data:
-                result
-                .split(",")[1],
+    flex:0 0 31px;
 
-            name: file.name
-        };
+    border-radius:9px;
 
+    display:flex;
+    align-items:center;
+    justify-content:center;
 
-        shAttachedFileText = null;
+    font-size:11px;
+}
 
+.sh-attach-icon.image {
+    color:#00c8ff;
 
-        const previewBox =
-            document.getElementById(
-                "imagePreviewContainer"
-            );
+    background:
+        rgba(0,186,255,.10);
+}
 
-        const preview =
-            document.getElementById(
-                "selectedImagePreview"
-            );
+.sh-attach-icon.file {
+    color:#a98cff;
 
-        const name =
-            document.getElementById(
-                "imageFileName"
-            );
-
-
-        if (preview) {
-
-            preview.style.display = "block";
-
-            preview.src = result;
-        }
-
-
-        if (name) {
-
-            name.textContent =
-                file.name;
-        }
-
-
-        if (previewBox) {
-
-            previewBox.style.display =
-                "flex";
-        }
-    };
-
-
-    reader.readAsDataURL(file);
-
-    shCloseAttachMenu();
+    background:
+        rgba(139,92,246,.10);
 }
 
 
 /* =========================================================
-   FILE ATTACH
-   TXT / MD
+   CHAT SETTINGS PANEL
    ========================================================= */
 
-function handleChatFile(event) {
+.sh-ai-settings-panel {
+    position:absolute;
 
-    const file =
-        event?.target?.files?.[0];
+    top:7px;
+    right:7px;
+    bottom:7px;
 
-    if (!file) return;
+    width:min(330px, calc(100% - 14px));
 
+    padding:14px;
 
-    const isTextFile =
-        file.type.startsWith("text/") ||
-        file.name.toLowerCase().endsWith(".txt") ||
-        file.name.toLowerCase().endsWith(".md");
+    border-radius:20px;
 
-
-    if (!isTextFile) {
-
-        alert(
-            "ဒီ version မှာ TXT / MD ဖိုင်တွေကိုပဲ ဖတ်နိုင်သေးပါတယ်။"
+    background:
+        linear-gradient(
+            145deg,
+            rgba(7,28,47,.985),
+            rgba(3,15,28,.99)
         );
 
-        if (event.target) {
-            event.target.value = "";
-        }
+    border:1px solid rgba(0,200,255,.28);
 
-        shCloseAttachMenu();
+    box-shadow:
+        -10px 0 35px rgba(0,0,0,.42),
+        0 0 25px rgba(0,186,255,.08);
 
-        return;
+    backdrop-filter:blur(22px);
+
+    -webkit-backdrop-filter:blur(22px);
+
+    z-index:200;
+
+    overflow-y:auto;
+
+    scrollbar-width:thin;
+
+    scrollbar-color:
+        rgba(0,186,255,.35)
+        transparent;
+
+    animation:shSettingsIn .20s ease-out;
+}
+
+@keyframes shSettingsIn {
+
+    from {
+        opacity:0;
+        transform:translateX(15px) scale(.98);
     }
 
+    to {
+        opacity:1;
+        transform:translateX(0) scale(1);
+    }
 
-    const reader =
-        new FileReader();
+}
 
+.sh-ai-settings-panel::-webkit-scrollbar {
+    width:3px;
+}
 
-    reader.onload = function(e) {
+.sh-ai-settings-panel::-webkit-scrollbar-track {
+    background:transparent;
+}
 
-        shAttachedFileText = {
+.sh-ai-settings-panel::-webkit-scrollbar-thumb {
+    background:
+        rgba(0,186,255,.35);
 
-            name: file.name,
-
-            text: e.target.result || ""
-        };
-
-
-        shAttachedImage = null;
-
-
-        const previewBox =
-            document.getElementById(
-                "imagePreviewContainer"
-            );
-
-        const name =
-            document.getElementById(
-                "imageFileName"
-            );
-
-        const preview =
-            document.getElementById(
-                "selectedImagePreview"
-            );
-
-
-        if (preview) {
-
-            preview.style.display =
-                "none";
-
-            preview.removeAttribute(
-                "src"
-            );
-        }
-
-
-        if (name) {
-
-            name.textContent =
-                "📄 " + file.name;
-        }
-
-
-        if (previewBox) {
-
-            previewBox.style.display =
-                "flex";
-        }
-    };
-
-
-    reader.readAsText(file);
-
-    shCloseAttachMenu();
+    border-radius:10px;
 }
 
 
 /* =========================================================
-   REMOVE ATTACHMENT
+   SETTINGS HEADER
    ========================================================= */
 
-function removeAttachedImage() {
+.sh-ai-settings-header {
+    display:flex;
 
-    shAttachedImage = null;
+    align-items:center;
 
-    shAttachedFileText = null;
+    justify-content:space-between;
 
+    padding-bottom:12px;
 
-    const previewBox =
-        document.getElementById(
-            "imagePreviewContainer"
+    margin-bottom:7px;
+
+    border-bottom:1px solid rgba(0,186,255,.12);
+}
+
+.sh-ai-settings-header strong {
+    display:block;
+
+    color:#e9fbff;
+
+    font-size:14px;
+
+    letter-spacing:.1px;
+}
+
+.sh-ai-settings-header span {
+    display:block;
+
+    margin-top:3px;
+
+    color:#59798e;
+
+    font-size:8px;
+}
+
+.sh-settings-close-btn {
+    width:34px;
+    height:34px;
+
+    border-radius:10px;
+
+    border:1px solid rgba(0,186,255,.18);
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(0,186,255,.10),
+            rgba(0,70,110,.12)
         );
 
-    const imageInput =
-        document.getElementById(
-            "chatImageInput"
-        );
+    color:#7edfff;
 
-    const fileInput =
-        document.getElementById(
-            "chatFileInput"
-        );
+    display:flex;
+    align-items:center;
+    justify-content:center;
 
-    const preview =
-        document.getElementById(
-            "selectedImagePreview"
-        );
+    cursor:pointer;
 
+    transition:.18s ease;
+}
 
-    if (previewBox) {
+.sh-settings-close-btn:hover {
+    border-color:rgba(0,210,255,.55);
 
-        previewBox.style.display =
-            "none";
-    }
+    background:
+        rgba(0,186,255,.16);
 
+    box-shadow:
+        0 0 12px rgba(0,186,255,.10);
+}
 
-    if (preview) {
-
-        preview.removeAttribute(
-            "src"
-        );
-
-        preview.style.display =
-            "";
-    }
-
-
-    if (imageInput) {
-
-        imageInput.value = "";
-    }
-
-
-    if (fileInput) {
-
-        fileInput.value = "";
-    }
+.sh-settings-close-btn:active {
+    transform:scale(.90);
 }
 
 
 /* =========================================================
-   ADD AI MESSAGE
+   SETTINGS ACTION BUTTONS
    ========================================================= */
 
-function shAddChatMessage(
-    text,
-    type = "ai"
-) {
+.sh-chat-setting-action {
+    width:100%;
 
-    const container =
-        document.getElementById(
-            "chatMessages"
+    min-height:59px;
+
+    padding:9px 5px;
+
+    display:flex;
+
+    align-items:center;
+
+    gap:10px;
+
+    border:0;
+
+    border-bottom:1px solid rgba(0,186,255,.07);
+
+    border-radius:12px;
+
+    background:transparent;
+
+    color:#ccecf8;
+
+    text-align:left;
+
+    cursor:pointer;
+
+    transition:.18s ease;
+
+    -webkit-tap-highlight-color:transparent;
+}
+
+.sh-chat-setting-action:hover {
+    background:
+        linear-gradient(
+            135deg,
+            rgba(0,186,255,.11),
+            rgba(0,90,140,.04)
         );
+}
 
-    if (!container) {
-        return null;
-    }
+.sh-chat-setting-action:active {
+    transform:scale(.985);
 
-
-    /* ================= USER ================= */
-
-    if (type === "user") {
-
-        const row =
-            document.createElement("div");
-
-        row.className =
-            "sh-message-row user";
-
-
-        const content =
-            document.createElement("div");
-
-        content.className =
-            "sh-message-content";
-
-
-        const bubble =
-            document.createElement("div");
-
-        bubble.className =
-            "sh-user-bubble";
-
-
-        bubble.textContent =
-            text;
-
-
-        content.appendChild(
-            bubble
-        );
-
-        row.appendChild(
-            content
-        );
-
-        container.appendChild(
-            row
-        );
-
-
-        shScrollChatToBottom();
-
-
-        return bubble;
-    }
-
-
-    /* ================= AI ================= */
-
-    const row =
-        document.createElement("div");
-
-    row.className =
-        "sh-message-row ai";
-
-
-    const avatar =
-        document.createElement("div");
-
-    avatar.className =
-        "sh-message-avatar";
-
-    avatar.textContent =
-        "SH";
-
-
-    const content =
-        document.createElement("div");
-
-    content.className =
-        "sh-message-content";
-
-
-    const name =
-        document.createElement("div");
-
-    name.className =
-        "sh-message-name";
-
-    name.innerHTML =
-        'SH AI <span>AI Assistant</span>';
-
-
-    const bubble =
-        document.createElement("div");
-
-    bubble.className =
-        "sh-ai-bubble";
-
-    bubble.textContent =
-        text;
-
-
-    const time =
-        document.createElement("div");
-
-    time.className =
-        "sh-message-time";
-
-    time.textContent =
-        "Just now";
-
-
-    content.appendChild(
-        name
-    );
-
-    content.appendChild(
-        bubble
-    );
-
-    content.appendChild(
-        time
-    );
-
-
-    row.appendChild(
-        avatar
-    );
-
-    row.appendChild(
-        content
-    );
-
-
-    container.appendChild(
-        row
-    );
-
-
-    shScrollChatToBottom();
-
-
-    return bubble;
+    background:
+        rgba(0,186,255,.15);
 }
 
 
 /* =========================================================
-   SCROLL CHAT
+   SETTINGS ICON
    ========================================================= */
 
-function shScrollChatToBottom() {
+.sh-chat-setting-icon {
+    width:37px;
+    height:37px;
 
-    const container =
-        document.getElementById(
-            "chatMessages"
+    flex:0 0 37px;
+
+    display:flex;
+
+    align-items:center;
+    justify-content:center;
+
+    border-radius:11px;
+
+    color:#00d9ff;
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(0,200,255,.15),
+            rgba(0,80,130,.10)
         );
 
-    if (!container) return;
+    border:1px solid rgba(0,200,255,.18);
 
+    box-shadow:
+        0 0 12px rgba(0,186,255,.07),
+        inset 0 0 10px rgba(0,186,255,.04);
+}
 
-    requestAnimationFrame(() => {
+.sh-chat-setting-icon i {
+    font-size:12px;
+}
 
-        container.scrollTo({
+.sh-chat-setting-icon.history {
+    color:#8cecff;
+}
 
-            top:
-                container.scrollHeight,
+.sh-chat-setting-icon.search {
+    color:#71dfff;
+}
 
-            behavior:
-                "smooth"
-        });
+.sh-chat-setting-icon.rename {
+    color:#a5e2ff;
+}
 
-    });
+.sh-chat-setting-icon.recap {
+    color:#00e5ff;
+}
+
+.sh-chat-setting-icon.delete {
+    color:#ff7184;
+
+    background:
+        rgba(255,70,90,.07);
+
+    border-color:
+        rgba(255,70,90,.18);
+
+    box-shadow:
+        0 0 10px rgba(255,70,90,.05);
 }
 
 
 /* =========================================================
-   LOADING MESSAGE
+   SETTINGS TEXT
    ========================================================= */
 
-function shAddLoadingMessage() {
+.sh-chat-setting-text {
+    flex:1;
 
-    return shAddChatMessage(
-        "⏳ SH AI စဉ်းစားနေပါတယ်...",
-        "ai"
-    );
+    min-width:0;
+}
+
+.sh-chat-setting-text strong {
+    display:block;
+
+    color:#dff9ff;
+
+    font-size:10px;
+
+    font-weight:850;
+}
+
+.sh-chat-setting-text small {
+    display:block;
+
+    margin-top:3px;
+
+    color:#58778b;
+
+    font-size:8px;
+
+    line-height:1.4;
+}
+
+.sh-chat-setting-action > .fa-chevron-right {
+    flex:0 0 auto;
+
+    margin-right:3px;
+
+    color:#416e83;
+
+    font-size:9px;
+
+    transition:.18s ease;
+}
+
+.sh-chat-setting-action:hover > .fa-chevron-right {
+    color:#00c8ff;
+
+    transform:translateX(2px);
 }
 
 
 /* =========================================================
-   SEND CHAT MESSAGE
+   DELETE ACTION
    ========================================================= */
 
-async function sendChatMessage() {
-
-    const input =
-        document.getElementById(
-            "chatInput"
+.sh-chat-setting-action.danger:hover {
+    background:
+        linear-gradient(
+            135deg,
+            rgba(255,70,90,.08),
+            rgba(90,20,30,.03)
         );
+}
 
-    if (!input) return;
+.sh-chat-setting-action.danger
+.sh-chat-setting-text strong {
+    color:#ff9aa8;
+}
 
-
-    const text =
-        input.value.trim();
-
-
-    if (
-        !text &&
-        !shAttachedImage &&
-        !shAttachedFileText
-    ) {
-
-        return;
-    }
+.sh-chat-setting-action.danger
+> .fa-chevron-right {
+    color:#7c4d59;
+}
 
 
-    const keys =
-        shGetAllChatApiKeys();
+/* =========================================================
+   DIVIDER
+   ========================================================= */
 
+.sh-chat-setting-divider {
+    height:1px;
 
-    if (!keys.length) {
+    margin:10px 2px;
 
-        shAddChatMessage(
-            "🔑 API Key မတွေ့ပါဘူး။ Settings မှာ Gemini API Key ထည့်ပေးပါ။",
-            "ai"
+    background:
+        linear-gradient(
+            90deg,
+            transparent,
+            rgba(0,186,255,.22),
+            transparent
         );
-
-        return;
-    }
-
-
-    let displayText =
-        text;
-
-
-    if (shAttachedImage) {
-
-        displayText +=
-            (displayText ? "\n" : "") +
-            "🖼️ " +
-            shAttachedImage.name;
-    }
-
-
-    if (shAttachedFileText) {
-
-        displayText +=
-            (displayText ? "\n" : "") +
-            "📄 " +
-            shAttachedFileText.name;
-    }
-
-
-    /* USER MESSAGE */
-
-    shAddChatMessage(
-        displayText,
-        "user"
-    );
-
-
-    input.value = "";
-
-
-    /* LOADING */
-
-    const loadingBubble =
-        shAddLoadingMessage();
-
-
-    /* BUILD PARTS */
-
-    const parts = [];
-
-
-    if (text) {
-
-        parts.push({
-
-            text: text
-        });
-    }
-
-
-    if (shAttachedImage) {
-
-        parts.push({
-
-            inline_data: {
-
-                mime_type:
-                    shAttachedImage.mimeType,
-
-                data:
-                    shAttachedImage.data
-            }
-        });
-    }
-
-
-    if (shAttachedFileText) {
-
-        parts.push({
-
-            text:
-                "\n\nAttached file: " +
-                shAttachedFileText.name +
-                "\n\n" +
-                shAttachedFileText.text
-        });
-    }
-
-
-    /* SAVE USER HISTORY */
-
-    shChatHistory.push({
-
-        role: "user",
-
-        parts: parts
-    });
-
-
-    let success =
-        false;
-
-    let lastError =
-        null;
-
-
-    /*
-       Try current key.
-       If quota / invalid / unavailable,
-       automatically move to next key.
-    */
-
-    while (
-        shCurrentChatKeyIndex <
-        keys.length
-    ) {
-
-        const apiKey =
-            shGetChatApiKey();
-
-
-        if (!apiKey) {
-
-            break;
-        }
-
-
-        try {
-
-            const response =
-                await fetch(
-                    "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent",
-                   {
-                        method:
-                            "POST",
-
-                        headers: {
-
-                            "Content-Type":
-                                "application/json",
-
-                            "x-goog-api-key":
-                                apiKey
-                        },
-
-                        body:
-                            JSON.stringify({
-
-                                systemInstruction: {
-
-                                    parts: [{
-
-                                        text:
-                                            "You are SH AI TEAM, the helpful AI assistant inside SH AI Studio. " +
-                                            "Answer clearly and naturally. " +
-                                            "When the user speaks Burmese, reply naturally in Burmese. " +
-                                            "Do not mention internal API details unless asked."
-                                    }]
-                                },
-
-
-                                contents:
-                                    shChatHistory,
-
-
-                                generationConfig: {
-
-                                    temperature:
-                                        0.7,
-
-                                    maxOutputTokens:
-                                        2048
-                                }
-
-                            })
-                    }
-                );
-
-
-            const data =
-                await response.json();
-
-
-            if (!response.ok) {
-
-                throw new Error(
-                    data?.error?.message ||
-                    "Gemini API Error"
-                );
-            }
-
-
-            const answer =
-                data
-                    ?.candidates?.[0]
-                    ?.content?.parts
-                    ?.map(
-                        p => p.text || ""
-                    )
-                    .join("") ||
-                "AI က အဖြေပြန်မပေးနိုင်သေးပါဘူး။";
-
-
-            /* UPDATE LOADING */
-
-            if (loadingBubble) {
-
-                loadingBubble.textContent =
-                    answer;
-            }
-
-
-            /* SAVE MODEL */
-
-            shChatHistory.push({
-
-                role: "model",
-
-                parts: [{
-
-                    text:
-                        answer
-                }]
-            });
-
-
-            success =
-                true;
-
-
-            /*
-               Successful key stays active.
-            */
-
-            break;
-
-
-        } catch (error) {
-
-            lastError =
-                error;
-
-
-            console.warn(
-                "SH AI KEY ERROR:",
-                shCurrentChatKeyIndex + 1,
-                error
-            );
-
-
-            /*
-               Try next key.
-            */
-
-            if (!shMoveToNextChatKey()) {
-
-                break;
-            }
-        }
-    }
-
-
-    /* ================= ERROR ================= */
-
-    if (!success) {
-
-        if (loadingBubble) {
-
-            loadingBubble.textContent =
-                "❌ API Key တွေအားလုံး အလုပ်မလုပ်သေးပါဘူး။\n\n" +
-                (
-                    lastError?.message ||
-                    "Gemini API Error"
-                );
-        }
-    }
-
-
-    /* ================= CLEAR ATTACHMENT ================= */
-
-    if (success) {
-
-        removeAttachedImage();
-    }
-
-
-    shScrollChatToBottom();
 }
 
 
 /* =========================================================
-   NEW CHAT
+   COMPACT SETTING
    ========================================================= */
 
-function startNewChat() {
-
-    shChatHistory = [];
-
-    shResetChatKeyRotation();
-
-    removeAttachedImage();
-
-
-    const container =
-        document.getElementById(
-            "chatMessages"
-        );
-
-    if (!container) return;
-
-
-    container.innerHTML = "";
-
-
-    shAddWelcomeMessage();
+.sh-chat-setting-action.compact {
+    min-height:55px;
 }
 
 
 /* =========================================================
-   WELCOME MESSAGE
+   GENERAL SETTING ITEM
    ========================================================= */
 
-function shAddWelcomeMessage() {
+.sh-ai-setting-item {
+    min-height:58px;
 
-    const container =
-        document.getElementById(
-            "chatMessages"
-        );
+    padding:10px 4px;
 
-    if (!container) return;
+    display:flex;
 
+    align-items:center;
 
-    const row =
-        document.createElement("div");
+    justify-content:space-between;
 
-    row.className =
-        "sh-message-row ai";
+    gap:10px;
 
+    border-bottom:1px solid rgba(0,186,255,.08);
+}
 
-    const avatar =
-        document.createElement("div");
+.sh-ai-setting-item > div {
+    min-width:0;
+}
 
-    avatar.className =
-        "sh-message-avatar";
+.sh-ai-setting-item strong {
+    display:block;
 
-    avatar.textContent =
-        "SH";
+    color:#d9f7ff;
 
+    font-size:10px;
+}
 
-    const content =
-        document.createElement("div");
+.sh-ai-setting-item span {
+    display:block;
 
-    content.className =
-        "sh-message-content";
+    margin-top:3px;
 
+    color:#58768a;
 
-    const name =
-        document.createElement("div");
+    font-size:8px;
 
-    name.className =
-        "sh-message-name";
+    line-height:1.45;
+}
 
-    name.innerHTML =
-        'SH AI <span>AI Assistant</span>';
+.sh-ai-setting-item > i {
+    color:#47758b;
 
+    font-size:10px;
 
-    const bubble =
-        document.createElement("div");
-
-    bubble.className =
-        "sh-ai-bubble";
-
-    bubble.innerHTML =
-        "မင်္ဂလာပါ 👋<br>" +
-        "ကျွန်တော် SH AI ပါ။<br>" +
-        "ဘာများကူညီပေးရမလဲ။ 🚀";
-
-
-    const time =
-        document.createElement("div");
-
-    time.className =
-        "sh-message-time";
-
-    time.textContent =
-        "Just now";
-
-
-    content.appendChild(
-        name
-    );
-
-    content.appendChild(
-        bubble
-    );
-
-    content.appendChild(
-        time
-    );
-
-
-    row.appendChild(
-        avatar
-    );
-
-    row.appendChild(
-        content
-    );
-
-
-    container.appendChild(
-        row
-    );
+    flex-shrink:0;
 }
 
 
 /* =========================================================
-   QUICK ACTION
+   SWITCH
    ========================================================= */
 
-function shQuickPrompt(prompt) {
+.sh-ai-switch {
+    width:38px;
+    height:21px;
 
-    const input =
-        document.getElementById(
-            "chatInput"
-        );
+    flex:0 0 38px;
 
-    if (!input) return;
+    position:relative;
 
+    display:block;
+}
 
-    input.value =
-        prompt;
+.sh-ai-switch input {
+    display:none;
+}
 
+.sh-ai-switch span {
+    position:absolute;
 
-    input.focus();
+    inset:0;
+
+    border-radius:20px;
+
+    background:#102738;
+
+    border:1px solid rgba(0,186,255,.18);
+
+    cursor:pointer;
+
+    transition:.2s ease;
+}
+
+.sh-ai-switch span::after {
+    content:"";
+
+    position:absolute;
+
+    width:15px;
+    height:15px;
+
+    left:2px;
+    top:2px;
+
+    border-radius:50%;
+
+    background:#7893a3;
+
+    transition:.2s ease;
+}
+
+.sh-ai-switch input:checked + span {
+    background:
+        rgba(0,186,255,.22);
+
+    border-color:
+        rgba(0,200,255,.48);
+
+    box-shadow:
+        0 0 8px rgba(0,186,255,.08);
+}
+
+.sh-ai-switch input:checked + span::after {
+    transform:translateX(17px);
+
+    background:#00c8ff;
+
+    box-shadow:
+        0 0 8px rgba(0,200,255,.65);
 }
 
 
 /* =========================================================
-   CLEAR CHAT
+   OLD MORE MENU — HIDDEN
    ========================================================= */
 
-function shClearChat() {
-
-    const container =
-        document.getElementById(
-            "chatMessages"
-        );
-
-    if (!container) return;
-
-
-    shChatHistory = [];
-
-
-    container.innerHTML = "";
-
-
-    shAddWelcomeMessage();
+.sh-ai-more-menu {
+    display:none !important;
 }
 
 
 /* =========================================================
-   CLOSE MENUS WHEN CLICKING OUTSIDE
+   RESPONSIVE — 430px
    ========================================================= */
 
-document.addEventListener(
-    "click",
-    function(event) {
+@media (max-width:430px) {
 
-        const attachMenu =
-            document.getElementById(
-                "attachMenu"
-            );
+    .sh-chat-header {
+        min-height:70px;
 
-        const plus =
-            document.querySelector(
-                ".sh-chat-plus"
-            );
-
-
-        if (
-            attachMenu &&
-            plus &&
-            !attachMenu.contains(event.target) &&
-            !plus.contains(event.target)
-        ) {
-
-            shCloseAttachMenu();
-        }
-
+        padding-left:13px;
+        padding-right:10px;
     }
-);
+
+    .sh-ai-avatar {
+        width:44px;
+        height:44px;
+
+        flex-basis:44px;
+    }
+
+    .sh-ai-title {
+        font-size:16px;
+    }
+
+    .sh-new-chat-btn {
+        min-height:36px;
+
+        padding:7px 10px;
+    }
+
+    .sh-chat-settings-btn {
+        width:36px;
+        height:36px;
+    }
+
+    .sh-ai-info-bar {
+        margin-left:10px;
+        margin-right:10px;
+    }
+
+    .sh-ai-mode {
+        display:none;
+    }
+
+    .sh-ai-quick-actions {
+        padding-left:10px;
+        padding-right:10px;
+    }
+
+}
 
 
 /* =========================================================
-   ENTER KEY
+   RESPONSIVE — 380px
    ========================================================= */
 
-document.addEventListener(
-    "keydown",
-    function(event) {
+@media (max-width:380px) {
 
-        const input =
-            document.getElementById(
-                "chatInput"
-            );
-
-
-        if (
-            input &&
-            document.activeElement === input &&
-            event.key === "Enter" &&
-            !event.shiftKey
-        ) {
-
-            event.preventDefault();
-
-            sendChatMessage();
-        }
-
+    .sh-ai-title {
+        font-size:14px;
     }
-);
+
+    .sh-ai-pro-badge {
+        display:none;
+    }
+
+    .sh-new-chat-btn span {
+        display:none;
+    }
+
+    .sh-new-chat-btn {
+        width:36px;
+        min-height:36px;
+
+        padding:0;
+    }
+
+    .sh-chat-settings-btn {
+        width:36px;
+        height:36px;
+    }
+
+    .sh-ai-info-bar {
+        margin-left:8px;
+        margin-right:8px;
+    }
+
+    .sh-ai-info-right {
+        display:none;
+    }
+
+    .sh-chat-input-area {
+        padding-left:8px;
+        padding-right:8px;
+    }
+
+    .sh-ai-settings-panel {
+        top:5px;
+        right:5px;
+        bottom:5px;
+
+        width:calc(100% - 10px);
+
+        padding:12px;
+
+        border-radius:18px;
+    }
+
+}
 
 
 /* =========================================================
-   INITIALIZE
+   SAFE HEIGHT FIX
    ========================================================= */
 
-document.addEventListener(
-    "DOMContentLoaded",
-    function() {
+@supports (height:100dvh) {
 
-        /*
-           Make sure welcome message exists
-           only when chat area is empty.
-        */
+    #aiChatbot.sh-ai-chat {
+        height:100dvh;
 
-        const container =
-            document.getElementById(
-                "chatMessages"
-            );
-
-
-        if (
-            container &&
-            container.children.length === 0
-        ) {
-
-            shAddWelcomeMessage();
-        }
-
+        max-height:100dvh;
     }
-);
-let activePickerTarget = null; // 'single' or block ID number
-let singleVoiceValue = "Charon";
-let currentAudioBlob = null;
 
-const MY_PASSWORD = "1911999";
-const API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-tts-preview:generateContent";
-let audioURL = null;
-let singleAudioURL = null;
-let blockCounter = 0;
+    .sh-chat-shell {
+        height:100%;
 
-/* LOCK SCREEN CONTROLS */
-function togglePasswordVisibility() {
-    const input = document.getElementById('passInput');
-    const eyeIcon = document.getElementById('eyeIcon');
-    if (input.type === 'password') {
-        input.type = 'text';
-        if (eyeIcon) {
-            eyeIcon.classList.remove('fa-eye');
-            eyeIcon.classList.add('fa-eye-slash');
-        }
-    } else {
-        input.type = 'password';
-        if (eyeIcon) {
-            eyeIcon.classList.remove('fa-eye-slash');
-            eyeIcon.classList.add('fa-eye');
-        }
+        max-height:100%;
     }
+
 }
 
-function checkUnlockPassword() {
-    const input = document.getElementById('passInput').value;
 
-    if (input === '') {
-        alert('ကျေးဇူးပြု၍ စကားဝှက် ရိုက်ထည့်ပါ!');
-    } else if (input === '1911999') {
+/* =========================================================
+   PREVENT PAGE SCROLL
+   ========================================================= */
 
-        const lockScreen = document.getElementById('cyberpunk-lockscreen');
-        if (lockScreen) {
-            lockScreen.style.transition = 'opacity 0.5s ease';
-            lockScreen.style.opacity = '0';
-            setTimeout(() => {
-                lockScreen.style.display = 'none';
-            }, 500);
-        }
-
-        const appContent = document.getElementById("appContent");
-        if (appContent) {
-            appContent.style.display = "block";
-        }
-
-        const saved = getStoredKey();
-        if (saved) {
-            document.getElementById("apiKey").value = saved;
-        }
-        updateKeyStatus();
-    } else {
-        alert('စကားဝှက် မှားယွင်းနေပါသည်။');
-    }
+#aiChatbot.sh-ai-chat .sh-chat-shell {
+    overflow:hidden;
 }
-/* =========================================
-   SH IMAGE SEARCH — UNSPLASH FREE MODE
+
+#aiChatbot.sh-ai-chat .sh-chat-messages {
+    overscroll-behavior-y:contain;
+
+    touch-action:pan-y;
+}
+
+/* =========================================================
+   SH AI — KEEP CHAT ABOVE BOTTOM NAV
+   ========================================================= */
+
+#aiChatbot.sh-ai-chat {
+    position: relative !important;
+    height: calc(100dvh - 70px) !important;
+    max-height: calc(100dvh - 70px) !important;
+    overflow: hidden !important;
+}
+
+#aiChatbot.sh-ai-chat .sh-chat-shell {
+    position: relative !important;
+    width: 100% !important;
+    height: 100% !important;
+    max-height: 100% !important;
+    display: flex !important;
+    flex-direction: column !important;
+    overflow: hidden !important;
+}
+
+/* Chat messages take the middle space */
+#aiChatbot.sh-ai-chat .sh-chat-messages {
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
+    overflow-y: auto !important;
+}
+
+/* Input stays at the bottom of SH AI page */
+#aiChatbot.sh-ai-chat .sh-chat-input-area {
+    position: relative !important;
+    bottom: auto !important;
+    left: auto !important;
+    right: auto !important;
+    flex: 0 0 auto !important;
+    width: 100% !important;
+    margin-top: auto !important;
+}
+
+/* Never let SH AI cover the bottom navigation */
+#aiChatbot.sh-ai-chat {
+    margin-bottom: 0 !important;
+    padding-bottom: 0 !important;
+    z-index: 1 !important;
+}
+   /* =========================================
+   SH IMAGE SEARCH — NEON GLASS
    ========================================= */
 
-async function searchAssets() {
-
-    const input = document.getElementById('assetSearchInput');
-    const grid = document.getElementById('assetGrid');
-
-    const query = input.value.trim();
-
-    if (!query) {
-        input.focus();
-        return;
-    }
-
-    /* Loading */
-
-    grid.innerHTML = `
-        <div class="sh-empty-state">
-
-            <div class="sh-empty-icon">
-                <i class="fa-solid fa-spinner fa-spin"></i>
-            </div>
-
-            <div class="sh-empty-title">
-                ရှာဖွေနေပါတယ်...
-            </div>
-
-            <div class="sh-empty-text">
-                ${escapeHtml(query)} ပုံများကို ရှာနေပါတယ်
-            </div>
-
-        </div>
-    `;
-
-    /*
-       IMPORTANT:
-       ဒီနေရာမှာ မင်းရဲ့ Unsplash API Key အသစ်ထည့်
-    */
-
-    const accessKey = 'cLaLLiJz6pnN-U2M5LNepEwmYEEPu1Ld1pJRofvNeZs';
-
-    const url =
-        `https://api.unsplash.com/search/photos` +
-        `?query=${encodeURIComponent(query)}` +
-        `&per_page=20` +
-        `&client_id=${encodeURIComponent(accessKey)}`;
-
-    try {
-
-        const response = await fetch(url);
-
-        if (!response.ok) {
-    const errorText = await response.text();
-
-    throw new Error(
-        `Unsplash API Error: ${response.status} - ${errorText}`
-    );
-}
-
-        const data = await response.json();
-
-        if (!data.results || data.results.length === 0) {
-
-            grid.innerHTML = `
-                <div class="sh-empty-state">
-
-                    <div class="sh-empty-icon">
-                        <i class="fa-regular fa-face-frown"></i>
-                    </div>
-
-                    <div class="sh-empty-title">
-                        ပုံမတွေ့ပါ
-                    </div>
-
-                    <div class="sh-empty-text">
-                        အခြားစာလုံးနဲ့ ပြန်ရှာကြည့်ပါ
-                    </div>
-
-                </div>
-            `;
-
-            return;
-        }
-
-        grid.innerHTML = '';
-
-        data.results.forEach(photo => {
-
-            const card = document.createElement('div');
-
-            card.className = 'sh-asset-card';
-
-            const image = document.createElement('img');
-
-            image.src = photo.urls.small;
-
-            image.alt =
-                photo.alt_description ||
-                query;
-
-            image.loading = 'lazy';
-
-            /*
-               Main grid မှာ user name မပြဘူး
-            */
-
-            const overlay =
-                document.createElement('div');
-
-            overlay.className =
-                'sh-image-overlay';
-
-            /*
-               Unsplash download tracking
-            */
-
-            const download =
-                document.createElement('a');
-
-            download.className =
-                'sh-image-download';
-
-            download.href =
-                photo.links.download_location;
-
-            download.target = '_blank';
-
-            download.rel =
-                'noopener noreferrer';
-
-            download.innerHTML =
-                '<i class="fa-solid fa-download"></i>';
-
-            download.title =
-                'Download';
-
-            /*
-               Download ကိုနှိပ်တဲ့အခါ
-               Unsplash download endpoint ကို trigger
-            */
-
-            download.addEventListener(
-                'click',
-                async function(e) {
-
-                    e.preventDefault();
-
-                    try {
-                        await fetch(
-                            photo.links.download_location
-                        );
-                    } catch (err) {
-                        console.warn(
-                            'Download tracking failed',
-                            err
-                        );
-                    }
-
-                    /*
-                       Full image ကိုဖွင့်
-                    */
-
-                    window.open(
-                        photo.urls.full,
-                        '_blank',
-                        'noopener'
-                    );
-                }
-            );
-
-            overlay.appendChild(download);
-
-            card.appendChild(image);
-            card.appendChild(overlay);
-
-            /*
-               ပုံနှိပ်ရင် Preview
-            */
-
-            image.addEventListener(
-                'click',
-                function() {
-                    openImagePreview(photo);
-                }
-            );
-
-            grid.appendChild(card);
-        });
-
-    } catch (error) {
-
-        console.error('UNSPLASH ERROR:', error);
-alert(error.message);
-
-        grid.innerHTML = `
-            <div class="sh-empty-state">
-
-                <div
-                    class="sh-empty-icon"
-                    style="color:#fb7185;"
-                >
-                    <i class="fa-solid fa-triangle-exclamation"></i>
-                </div>
-
-                <div class="sh-empty-title">
-                    ရှာဖွေရာမှာ အမှားဖြစ်နေပါတယ်
-                </div>
-
-                <div class="sh-empty-text">
-                    API Key နဲ့ Internet connection ကို
-                    ပြန်စစ်ကြည့်ပါ
-                </div>
-
-            </div>
-        `;
-    }
-}
-
-
-/* =========================================
-   IMAGE PREVIEW
-   ========================================= */
-
-function openImagePreview(photo) {
-
-    let modal =
-        document.getElementById(
-            'shImagePreviewModal'
+.sh-image-search {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 16px;
+    border-radius: 22px;
+
+    background:
+        radial-gradient(
+            circle at 20% 0%,
+            rgba(34,211,238,0.10),
+            transparent 35%
+        ),
+        linear-gradient(
+            145deg,
+            rgba(10,25,42,0.92),
+            rgba(5,15,28,0.96)
         );
 
-    if (!modal) {
+    border: 1px solid rgba(34,211,238,0.18);
 
-        modal =
-            document.createElement('div');
+    box-shadow:
+        0 20px 50px rgba(0,0,0,0.35),
+        inset 0 1px 0 rgba(255,255,255,0.04);
 
-        modal.id =
-            'shImagePreviewModal';
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
 
-        modal.innerHTML = `
-
-            <div class="sh-preview-backdrop">
-
-                <div class="sh-preview-box">
-
-                    <button
-                        class="sh-preview-close"
-                        onclick="closeImagePreview()"
-                    >
-                        <i class="fa-solid fa-xmark"></i>
-                    </button>
-
-                    <img
-                        id="shPreviewImage"
-                        src=""
-                        alt=""
-                    >
-
-                    <div
-                        class="sh-preview-info"
-                        id="shPreviewInfo"
-                    ></div>
-
-                </div>
-
-            </div>
-        `;
-
-        document.body.appendChild(modal);
-
-        const style =
-            document.createElement('style');
-
-        style.textContent = `
-
-            #shImagePreviewModal {
-                position: fixed;
-                inset: 0;
-                z-index: 99999;
-            }
-
-            .sh-preview-backdrop {
-                position: absolute;
-                inset: 0;
-
-                display: flex;
-                align-items: center;
-                justify-content: center;
-
-                padding: 20px;
-
-                background:
-                    rgba(1,8,16,0.88);
-
-                backdrop-filter: blur(16px);
-                -webkit-backdrop-filter: blur(16px);
-            }
-
-            .sh-preview-box {
-                position: relative;
-
-                width: min(100%, 420px);
-
-                padding: 8px;
-
-                border-radius: 20px;
-
-                background:
-                    rgba(10,25,42,0.78);
-
-                border:
-                    1px solid
-                    rgba(34,211,238,0.25);
-
-                box-shadow:
-                    0 0 40px
-                    rgba(34,211,238,0.10);
-            }
-
-            .sh-preview-box img {
-                width: 100%;
-                max-height: 70vh;
-
-                display: block;
-
-                object-fit: contain;
-
-                border-radius: 15px;
-            }
-
-            .sh-preview-close {
-                position: absolute;
-
-                top: 15px;
-                right: 15px;
-
-                z-index: 2;
-
-                width: 34px;
-                height: 34px;
-
-                border-radius: 10px;
-
-                border:
-                    1px solid
-                    rgba(255,255,255,0.12);
-
-                background:
-                    rgba(0,0,0,0.55);
-
-                color: #fff;
-
-                cursor: pointer;
-            }
-
-            .sh-preview-info {
-                padding: 8px 5px 3px;
-
-                color: #6f8da3;
-                font-size: 8px;
-                text-align: center;
-            }
-        `;
-
-        document.head.appendChild(style);
-    }
-
-    const previewImage =
-        document.getElementById(
-            'shPreviewImage'
-        );
-
-    const info =
-        document.getElementById(
-            'shPreviewInfo'
-        );
-
-    previewImage.src =
-        photo.urls.regular;
-
-    /*
-       Main card မှာမပြပေမယ့်
-       Preview ထဲမှာ attribution ထား
-    */
-
-    info.innerHTML =
-        `Photo by ${escapeHtml(photo.user.name)} · Unsplash`;
-
-    modal.style.display = 'block';
+    overflow: hidden;
 }
 
+/* HEADER */
 
-function closeImagePreview() {
+.sh-image-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 15px;
+}
 
-    const modal =
-        document.getElementById(
-            'shImagePreviewModal'
+.sh-image-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    color: #e8fbff;
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: 0.2px;
+}
+
+.sh-image-title i {
+    color: #22d3ee;
+    font-size: 17px;
+
+    filter:
+        drop-shadow(0 0 6px rgba(34,211,238,0.65));
+}
+
+.sh-image-subtitle {
+    margin-top: 4px;
+    color: #7895ad;
+    font-size: 10px;
+}
+
+/* FREE BADGE */
+
+.sh-free-badge {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+
+    padding: 5px 9px;
+    border-radius: 20px;
+
+    color: #67e8f9;
+    font-size: 9px;
+    font-weight: 800;
+
+    background: rgba(34,211,238,0.08);
+    border: 1px solid rgba(34,211,238,0.22);
+
+    box-shadow:
+        0 0 12px rgba(34,211,238,0.08);
+}
+
+.sh-free-badge span {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+
+    background: #22d3ee;
+
+    box-shadow:
+        0 0 7px #22d3ee;
+}
+
+/* SEARCH BAR */
+
+.sh-search-glass {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+
+    height: 48px;
+    padding: 0 7px 0 14px;
+
+    box-sizing: border-box;
+
+    border-radius: 15px;
+
+    background: rgba(255,255,255,0.035);
+
+    border: 1px solid rgba(34,211,238,0.18);
+
+    box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.035),
+        0 8px 25px rgba(0,0,0,0.18);
+
+    transition: 0.25s ease;
+}
+
+.sh-search-glass:focus-within {
+    border-color: rgba(34,211,238,0.48);
+
+    box-shadow:
+        0 0 0 3px rgba(34,211,238,0.06),
+        0 0 22px rgba(34,211,238,0.08);
+}
+
+.sh-search-glass > i {
+    color: #608198;
+    font-size: 13px;
+}
+
+.sh-search-glass input {
+    flex: 1;
+    min-width: 0;
+
+    height: 100%;
+
+    border: none;
+    outline: none;
+
+    background: transparent;
+
+    color: #e8faff;
+    font-size: 12px;
+}
+
+.sh-search-glass input::placeholder {
+    color: #557188;
+}
+
+/* SEARCH BUTTON */
+
+.sh-search-btn {
+    width: 36px;
+    height: 36px;
+
+    border: 1px solid rgba(34,211,238,0.25);
+    border-radius: 11px;
+
+    background: rgba(34,211,238,0.10);
+
+    color: #67e8f9;
+
+    cursor: pointer;
+
+    transition: 0.2s ease;
+}
+
+.sh-search-btn:active {
+    transform: scale(0.92);
+}
+
+.sh-search-btn:hover {
+    background: rgba(34,211,238,0.18);
+
+    box-shadow:
+        0 0 15px rgba(34,211,238,0.15);
+}
+
+/* IMAGE GRID */
+
+.sh-asset-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+
+    gap: 10px;
+
+    margin-top: 14px;
+}
+
+/* IMAGE CARD */
+
+.sh-asset-card {
+    position: relative;
+
+    height: 165px;
+
+    overflow: hidden;
+
+    border-radius: 15px;
+
+    background: #081522;
+
+    border: 1px solid rgba(34,211,238,0.13);
+
+    box-shadow:
+        0 8px 22px rgba(0,0,0,0.28);
+
+    cursor: pointer;
+
+    transition:
+        transform 0.22s ease,
+        border-color 0.22s ease,
+        box-shadow 0.22s ease;
+}
+
+.sh-asset-card:hover {
+    transform: translateY(-2px);
+
+    border-color:
+        rgba(34,211,238,0.42);
+
+    box-shadow:
+        0 10px 28px rgba(0,0,0,0.4),
+        0 0 18px rgba(34,211,238,0.07);
+}
+
+.sh-asset-card img {
+    width: 100%;
+    height: 100%;
+
+    display: block;
+
+    object-fit: cover;
+
+    transition:
+        transform 0.35s ease;
+}
+
+.sh-asset-card:hover img {
+    transform: scale(1.04);
+}
+
+/* IMAGE BOTTOM GLASS */
+
+.sh-image-overlay {
+    position: absolute;
+
+    left: 0;
+    right: 0;
+    bottom: 0;
+
+    padding: 28px 8px 8px;
+
+    background:
+        linear-gradient(
+            to top,
+            rgba(2,8,15,0.92),
+            rgba(2,8,15,0.28),
+            transparent
         );
 
-    if (modal) {
-        modal.style.display = 'none';
-    }
+    display: flex;
+    justify-content: flex-end;
 }
 
+/* DOWNLOAD BUTTON */
 
-/* =========================================
-   HTML SAFETY
-   ========================================= */
+.sh-image-download {
+    width: 31px;
+    height: 31px;
 
-function escapeHtml(value) {
+    display: flex;
+    align-items: center;
+    justify-content: center;
 
-    const div =
-        document.createElement('div');
+    border-radius: 9px;
 
-    div.textContent =
-        value || '';
+    color: #67e8f9;
 
-    return div.innerHTML;
+    background: rgba(6,182,212,0.13);
+
+    border: 1px solid rgba(34,211,238,0.25);
+
+    backdrop-filter: blur(8px);
+
+    text-decoration: none;
+
+    box-shadow:
+        0 4px 12px rgba(0,0,0,0.25);
+
+    transition: 0.2s ease;
 }
 
+.sh-image-download:hover {
+    background: rgba(34,211,238,0.22);
 
-/* =========================================
-   ENTER KEY SEARCH
-   ========================================= */
+    box-shadow:
+        0 0 14px rgba(34,211,238,0.18);
+}
 
-document.addEventListener(
-    'keydown',
-    function(e) {
+.sh-image-download:active {
+    transform: scale(0.9);
+}
 
-        if (
-            e.key === 'Enter' &&
-            document.activeElement &&
-            document.activeElement.id ===
-                'assetSearchInput'
-        ) {
+/* EMPTY */
 
-            searchAssets();
-        }
+.sh-empty-state {
+    grid-column: 1 / -1;
+
+    min-height: 190px;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    text-align: center;
+
+    border-radius: 17px;
+
+    border: 1px dashed rgba(34,211,238,0.16);
+
+    background:
+        rgba(255,255,255,0.018);
+}
+
+.sh-empty-icon {
+    width: 48px;
+    height: 48px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    margin-bottom: 10px;
+
+    border-radius: 15px;
+
+    color: #22d3ee;
+    font-size: 19px;
+
+    background: rgba(34,211,238,0.06);
+
+    border: 1px solid rgba(34,211,238,0.12);
+
+    box-shadow:
+        0 0 20px rgba(34,211,238,0.06);
+}
+
+.sh-empty-title {
+    color: #a9c4d7;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.sh-empty-text {
+    margin-top: 4px;
+
+    color: #536f84;
+    font-size: 9px;
+}
+
+/* MOBILE */
+
+@media (max-width: 380px) {
+
+    .sh-image-search {
+        padding: 13px;
     }
-);
+
+    .sh-asset-grid {
+        gap: 8px;
+    }
+
+    .sh-asset-card {
+        height: 145px;
+    }
+} 
 /* =========================================================
-   SH PRO ASSET HUB — SUPABASE CLOUD
-   Public Search / Preview / Download
-   Admin Upload / Delete
-   Auto Image Compression
+   SH ASSET HUB — FREE / PRO MODE SWITCH
    ========================================================= */
 
+.sh-asset-mode-switch {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
 
-/* ---------------------------------------------------------
-   1. SUPABASE CONFIG
-   --------------------------------------------------------- */
+    margin: 0 0 14px;
+    padding: 4px;
 
-const SH_SUPABASE_URL ='https://yrlixhgqeltneczvkuko.supabase.co';
+    border-radius: 14px;
+
+    background: rgba(255,255,255,0.025);
+    border: 1px solid rgba(34,211,238,0.12);
+
+    box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.025);
+}
+
+.sh-asset-mode {
+    height: 38px;
+
+    border: 1px solid transparent;
+    border-radius: 10px;
+
+    background: transparent;
+
+    color: #607d94;
+
+    font-size: 11px;
+    font-weight: 700;
+
+    cursor: pointer;
+
+    transition:
+        0.22s ease;
+}
+
+.sh-asset-mode.active {
+    color: #67e8f9;
+
+    background: rgba(34,211,238,0.10);
+
+    border-color:
+        rgba(34,211,238,0.22);
+
+    box-shadow:
+        0 0 15px rgba(34,211,238,0.07),
+        inset 0 1px 0 rgba(255,255,255,0.035);
+}
+
+.sh-asset-mode:active {
+    transform: scale(0.97);
+}
+
+
+/* =========================================================
+   FREE / PRO AREA
+   ========================================================= */
+/* Pro Area ကြီးတစ်ခုလုံး မျက်နှာပြင်အပြည့်ယူစေရန် */
+#assetProArea {
+    width: 100% !important;
+    box-sizing: border-box !important;
+}
+
+/* Free ဘက်က .sh-asset-grid လိုမျိုး Pro Grid ကိုပါ အပြည့်ချဲ့ရန် */
+.sh-pro-asset-grid,
+#proAssetGrid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+    width: 100% !important;
+    box-sizing: border-box !important;
+    margin-top: 13px;
+}
+
+/* ပုံမရှိသေးချိန်ပြမည့် Empty State ကို မျက်နှာပြင်အပြည့် ယူစေရန် */
+.sh-pro-asset-grid .sh-pro-empty-state {
+    grid-column: span 2;
+    width: 100%;
+    text-align: center;
+    box-sizing: border-box;
+}
+
+/* =========================================================
+   PRO HEADER
+   ========================================================= */
+
+.sh-pro-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 10px;
+    margin-bottom: 14px;
+}
+
+.sh-pro-title {
+    color: #e8fbff;
+
+    font-size: 14px;
+    font-weight: 700;
+
+    letter-spacing: 0.15px;
+}
+
+.sh-pro-subtitle {
+    margin-top: 4px;
+
+    color: #7895ad;
+
+    font-size: 9px;
+}
+
+
+/* =========================================================
+   PRO ADD BUTTON
+   ========================================================= */
+
+.sh-pro-add-btn {
+    flex-shrink: 0;
+
+    height: 36px;
+
+    padding: 0 11px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    gap: 6px;
+
+    border-radius: 11px;
+
+    border: 1px solid rgba(34,211,238,0.25);
+
+    background:
+        rgba(34,211,238,0.09);
+
+    color: #67e8f9;
+
+    font-size: 10px;
+    font-weight: 700;
+
+    cursor: pointer;
+
+    transition: 0.2s ease;
+}
+
+.sh-pro-add-btn i {
+    font-size: 11px;
+}
+
+.sh-pro-add-btn:hover {
+    background:
+        rgba(34,211,238,0.17);
+
+    box-shadow:
+        0 0 16px rgba(34,211,238,0.10);
+}
+
+.sh-pro-add-btn:active {
+    transform: scale(0.94);
+}
+
+
+/* =========================================================
+   PRO SEARCH
+   ========================================================= */
+
+.sh-pro-search {
+    display: flex;
+    align-items: center;
+
+    gap: 9px;
+
+    height: 45px;
+
+    padding: 0 13px;
+
+    box-sizing: border-box;
+
+    border-radius: 14px;
+
+    background:
+        rgba(255,255,255,0.035);
+
+    border:
+        1px solid rgba(34,211,238,0.15);
+
+    box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.025),
+        0 7px 20px rgba(0,0,0,0.15);
+
+    transition: 0.25s ease;
+}
+
+.sh-pro-search:focus-within {
+    border-color:
+        rgba(34,211,238,0.42);
+
+    box-shadow:
+        0 0 0 3px rgba(34,211,238,0.05),
+        0 0 18px rgba(34,211,238,0.07);
+}
+
+.sh-pro-search i {
+    color: #608198;
+
+    font-size: 12px;
+}
+
+.sh-pro-search input {
+    flex: 1;
+
+    min-width: 0;
+
+    height: 100%;
+
+    border: none;
+    outline: none;
+
+    background: transparent;
+
+    color: #e8faff;
+
+    font-size: 11px;
+}
+
+.sh-pro-search input::placeholder {
+    color: #557188;
+}
+
+
+/* =========================================================
+   PRO CATEGORY BUTTONS
+   ========================================================= */
+
+.sh-pro-categories {
+    display: flex;
+
+    gap: 7px;
+
+    margin-top: 11px;
+
+    padding-bottom: 3px;
+
+    overflow-x: auto;
+
+    scrollbar-width: none;
+}
+
+.sh-pro-categories::-webkit-scrollbar {
+    display: none;
+}
+
+.sh-category-btn {
+    flex-shrink: 0;
+
+    height: 31px;
+
+    padding: 0 11px;
+
+    border-radius: 10px;
+
+    border:
+        1px solid rgba(34,211,238,0.12);
+
+    background:
+        rgba(255,255,255,0.025);
+
+    color: #668197;
+
+    font-size: 9px;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition: 0.2s ease;
+}
+
+.sh-category-btn:hover,
+.sh-category-btn:active {
+    color: #67e8f9;
+
+    border-color:
+        rgba(34,211,238,0.30);
+
+    background:
+        rgba(34,211,238,0.08);
+}
+
+
+/* =========================================================
+   PRO IMAGE GRID
+   ========================================================= */
+
+#proAssetGrid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+    margin-top: 13px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* =========================================================
+   PRO IMAGE CARD
+   ========================================================= */
+
+.sh-pro-asset-card {
+    position: relative;
+
+    height: 155px;
+
+    overflow: hidden;
+
+    border-radius: 15px;
+
+    background: #081522;
+
+    border:
+        1px solid rgba(34,211,238,0.13);
+
+    box-shadow:
+        0 8px 22px rgba(0,0,0,0.28);
+
+    transition:
+        transform 0.22s ease,
+        border-color 0.22s ease,
+        box-shadow 0.22s ease;
+}
+
+.sh-pro-asset-card:hover {
+    transform: translateY(-2px);
+
+    border-color:
+        rgba(34,211,238,0.38);
+
+    box-shadow:
+        0 10px 28px rgba(0,0,0,0.40),
+        0 0 17px rgba(34,211,238,0.07);
+}
+
+.sh-pro-asset-card img {
+    width: 100%;
+    height: 100%;
+
+    display: block;
+
+    object-fit: cover;
+
+    transition:
+        transform 0.35s ease;
+}
+
+.sh-pro-asset-card:hover img {
+    transform: scale(1.04);
+}
+
+
+/* =========================================================
+   PRO IMAGE INFO
+   ========================================================= */
+
+.sh-pro-asset-info {
+    position: absolute;
+
+    left: 0;
+    right: 0;
+    bottom: 0;
+
+    padding: 25px 8px 8px;
+
+    background:
+        linear-gradient(
+            to top,
+            rgba(2,8,15,0.94),
+            rgba(2,8,15,0.35),
+            transparent
+        );
+}
+
+.sh-pro-asset-category {
+    color: #8feefa;
+
+    font-size: 8px;
+    font-weight: 700;
+
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+
+/* =========================================================
+   PRO DELETE BUTTON
+   ========================================================= */
+
+.sh-pro-delete {
+    position: absolute;
+
+    top: 7px;
+    right: 7px;
+
+    width: 28px;
+    height: 28px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 9px;
+
+    border:
+        1px solid rgba(255,255,255,0.12);
+
+    background:
+        rgba(3,11,22,0.68);
+
+    color: #a5b7c5;
+
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+
+    cursor: pointer;
+
+    transition: 0.2s ease;
+
+    z-index: 3;
+}
+
+.sh-pro-delete:hover {
+    color: #ff7b8a;
+
+    border-color:
+        rgba(255,100,120,0.30);
+
+    background:
+        rgba(255,70,90,0.10);
+
+    box-shadow:
+        0 0 12px rgba(255,70,90,0.10);
+}
+
+.sh-pro-delete:active {
+    transform: scale(0.88);
+}
+
+
+/* =========================================================
+   PRO EMPTY STATE
+   ========================================================= */
+
+.sh-pro-empty {
+    grid-column: 1 / -1;
+
+    min-height: 190px;
+
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+    justify-content: center;
+
+    text-align: center;
+
+    border-radius: 17px;
+
+    border:
+        1px dashed rgba(34,211,238,0.16);
+
+    background:
+        rgba(255,255,255,0.018);
+}
+
+.sh-pro-empty-icon {
+    width: 48px;
+    height: 48px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    margin-bottom: 10px;
+
+    border-radius: 15px;
+
+    color: #22d3ee;
+
+    font-size: 18px;
+
+    background:
+        rgba(34,211,238,0.06);
+
+    border:
+        1px solid rgba(34,211,238,0.12);
+
+    box-shadow:
+        0 0 20px rgba(34,211,238,0.06);
+}
+
+.sh-pro-empty-title {
+    color: #a9c4d7;
+
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.sh-pro-empty-text {
+    margin-top: 4px;
+
+    color: #536f84;
+
+    font-size: 9px;
+}
+
+
+/* =========================================================
+   PRO RESULT COUNT
+   ========================================================= */
+
+.sh-pro-result-count {
+    margin-top: 9px;
+
+    color: #536f84;
+
+    font-size: 8px;
+
+    text-align: center;
+}
+
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 380px) {
+
+    .sh-pro-asset-card {
+        height: 140px;
+    }
+
+    #proAssetGrid {
+        gap: 8px;
+    }
+
+    .sh-pro-add-btn {
+        padding: 0 9px;
+    }
+
+    .sh-pro-title {
+        font-size: 13px;
+    }
+}
+
+/* =========================================================
+   PRO EMPTY — ADD BUTTON
+   ========================================================= */
+
+.sh-pro-empty-btn {
+    margin-top: 12px;
+
+    height: 34px;
+
+    padding: 0 13px;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    gap: 6px;
+
+    border-radius: 10px;
+
+    border: 1px solid rgba(34,211,238,0.22);
+
+    background: rgba(34,211,238,0.08);
+
+    color: #67e8f9;
+
+    font-size: 10px;
+    font-weight: 700;
+
+    cursor: pointer;
+
+    box-shadow:
+        0 0 12px rgba(34,211,238,0.05);
+
+    transition: 0.2s ease;
+}
+
+.sh-pro-empty-btn:hover {
+    background: rgba(34,211,238,0.16);
+
+    border-color:
+        rgba(34,211,238,0.38);
+
+    box-shadow:
+        0 0 16px rgba(34,211,238,0.10);
+}
+
+.sh-pro-empty-btn:active {
+    transform: scale(0.94);
+}
+/* Pro Area နှင့် Search Container အားလုံး မျက်နှာပြင်အပြည့် ယူစေရန် */
+#assetView,
+#shImageSearch,
+#assetProArea {
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+}
+
+/* Pro Tools နဲ့ Categories တွေလည်း အပြည့်ပေါ်စေရန် */
+.sh-pro-tools,
+.sh-pro-categories,
+.sh-pro-asset-grid,
+#proAssetGrid {
+    width: 100% !important;
+    box-sizing: border-box !important;
+}
+
+/* Pro Categories ခလုတ်များကို ဘေးချင်းယှဉ် လှပစွာ စီရန် */
+.sh-pro-categories {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+/* Pro Grid အကွက်များကို Free လိုမျိုး 2 Column အပြည့်ပေါ်စေရန် */
+#proAssetGrid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+    margin-top: 13px;
+}
+
+#cyberpunk-lockscreen {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw; height: 100vh;
+  /* 🌌 မင်း တင်လိုက်တဲ့ bg.jpg ပုံကို အနောက်မှာ ထည့်ပေးထားသည် */
+  background: 
+    linear-gradient(180deg, rgba(2, 10, 25, 0.75) 0%, rgba(1, 5, 15, 0.85) 100%),
+    url('bg.jpg') center/cover no-repeat;
+  z-index: 999999;
+  display: flex; justify-content: center; align-items: center;
+  color: #ffffff;
+  font-family: 'Padauk', 'Orbitron', sans-serif;
+  overflow-y: auto;
+  padding: 15px 0;
+}
+
+/* 📐 Card & UI ကို ဖုန်းမှာ ကြည့်ရ ပိုကြီးပြီး ထင်းသွားစေမည့် Size များ */
+.lock-container {
+  width: 94%;
+  max-width: 520px;
+  display: flex; flex-direction: column; align-items: center; text-align: center;
+}
+
+.brand-logo {
+  width: 130px; height: 130px;
+  border-radius: 50%;
+  object-fit: cover;
+  box-shadow: 0 0 40px #00d2ff, inset 0 0 20px #00d2ff;
+  border: 2.5px solid #00d2ff;
+  margin-bottom: 14px;
+}
+
+.brand-title {
+  font-family: 'Orbitron', sans-serif; font-size: 32px; font-weight: 800;
+  color: #ffffff; text-shadow: 0 0 25px #00d2ff;
+  margin: 0;
+}
+
+.brand-subtitle { font-size: 14px; color: #8ab4f8; letter-spacing: 2px; margin-top: 6px; margin-bottom: 28px; }
+/* 🛡️ Translucent Glassmorphism Card */
+.lock-card {
+  width: 100%;
+  background: rgba(4, 16, 38, 0.75);
+  backdrop-filter: blur(22px); -webkit-backdrop-filter: blur(22px);
+  border: 2px solid rgba(0, 212, 255, 0.65);
+  border-radius: 36px;
+  padding: 40px 30px;
+  box-shadow: 0 0 60px rgba(0, 212, 255, 0.4), inset 0 0 25px rgba(0, 212, 255, 0.2);
+  display: flex; flex-direction: column; align-items: center;
+}
+/* 🌊 အလယ်က သော့အဝိုင်းနဲ့ အသံလှိုင်း (Soundwave Ripple) Animation */
+.lock-icon-circle {
+position: relative;
+  width: 110px; height: 110px; border-radius: 50%;
+  /* 3D ပုံစံပေါ်အောင် Gradient အရောင်စပ်သုံးခြင်း */
+  background: linear-gradient(135deg, rgba(0, 212, 255, 0.25), rgba(0, 30, 60, 0.8));
+    /* အပြင်ဘောင်ကို ပိုထင်ရှားစေခြင်း */
+  border: 2px solid rgba(0, 212, 255, 0.8);
+  
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  
+  /* 3D ဖောင်းကြွအရိပ်နှင့် အလင်းအမှောင် ထည့်သွင်းခြင်း */
+  box-shadow: 
+    0 12px 30px rgba(0, 0, 0, 0.6), /* အပြင်ဘက် ကျရောက်မည့် အရိပ် */
+    0 0 40px rgba(0, 212, 255, 0.5), /* အပြင်ဘက် လင်းလက်မည့် အလင်းတန်း */
+    inset 0 4px 8px rgba(255, 255, 255, 0.4), /* အပေါ်ဘက်မှ အလင်းထိုးကျသကဲ့သို့ 3D အထူအပါး ပုံစံ */
+    inset 0 -4px 8px rgba(0, 0, 0, 0.7); /* အောက်ဘက် အမှောင်စွန်း */
     
-const SH_SUPABASE_ANON_KEY =
-    'sb_publishable_Sqq0AYUqABRVBMHOqFp6QA_QqNi9xJo';
-
-/* IMPORTANT:
-   Do NOT put service_role / secret key here.
-*/
-
-const shSupabase =
-    window.supabase.createClient(
-        SH_SUPABASE_URL,
-        SH_SUPABASE_ANON_KEY
-    );
-
-/* ---------------------------------------------------------
-   2. SETTINGS
-   --------------------------------------------------------- */
-
-const SH_PRO_BUCKET = 'Assets';
-const SH_PRO_TABLE  = 'images';
-
-const SH_MAX_IMAGE_SIZE = 1920;
-const SH_WEBP_QUALITY = 0.88;
-
-
-/* ---------------------------------------------------------
-   3. BASIC HELPERS
-   --------------------------------------------------------- */
-
-function shShowProMessage(message) {
-
-    console.log('[SH Pro]', message);
-
-    if (typeof showToast === 'function') {
-        showToast(message);
-        return;
-    }
-
-    alert(message);
-}
-
-
-function shSafeText(value) {
-
-    return String(value ?? '')
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#039;');
-}
-
-
-/* ---------------------------------------------------------
-   4. OPEN FILE PICKER
-   --------------------------------------------------------- */
-
-function openProAssetPicker() {
-
-    const input =
-        document.getElementById('proAssetFileInput');
-
-    if (!input) {
-        console.error(
-            'proAssetFileInput not found'
-        );
-        return;
-    }
-
-    input.value = '';
-    input.click();
-}
-
-
-/* ---------------------------------------------------------
-   5. IMAGE COMPRESSION
-   --------------------------------------------------------- */
-
-async function shCompressImage(file) {
-
-    return new Promise((resolve, reject) => {
-
-        const reader = new FileReader();
-
-        reader.onload = function () {
-
-            const img = new Image();
-
-            img.onload = function () {
-
-                let width = img.naturalWidth;
-                let height = img.naturalHeight;
-
-                /*
-                 * Keep original size if already small.
-                 * Otherwise scale down to max 1920.
-                 */
-
-                const maxSize =
-                    SH_MAX_IMAGE_SIZE;
-
-                if (
-                    width > maxSize ||
-                    height > maxSize
-                ) {
-
-                    const ratio =
-                        Math.min(
-                            maxSize / width,
-                            maxSize / height
-                        );
-
-                    width =
-                        Math.round(width * ratio);
-
-                    height =
-                        Math.round(height * ratio);
-                }
-
-
-                const canvas =
-                    document.createElement('canvas');
-
-                canvas.width = width;
-                canvas.height = height;
-
-
-                const ctx =
-                    canvas.getContext('2d');
-
-                if (!ctx) {
-                    reject(
-                        new Error(
-                            'Canvas is not supported'
-                        )
-                    );
-                    return;
-                }
-
-
-                /*
-                 * White background prevents transparent
-                 * images becoming black when converted to JPEG.
-                 */
-
-                ctx.fillStyle = '#ffffff';
-
-                ctx.fillRect(
-                    0,
-                    0,
-                    width,
-                    height
-                );
-
-
-                ctx.drawImage(
-                    img,
-                    0,
-                    0,
-                    width,
-                    height
-                );
-
-
-                /*
-                 * Prefer WebP.
-                 */
-
-                canvas.toBlob(
-                    function (blob) {
-
-                        if (!blob) {
-                            reject(
-                                new Error(
-                                    'Image compression failed'
-                                )
-                            );
-                            return;
-                        }
-
-
-                        const compressedName =
-                            (
-                                file.name
-                                    .replace(
-                                        /\.[^/.]+$/,
-                                        ''
-                                    )
-                            ) +
-                            '_' +
-                            Date.now() +
-                            '.webp';
-
-
-                        const compressedFile =
-                            new File(
-                                [blob],
-                                compressedName,
-                                {
-                                    type: 'image/webp'
-                                }
-                            );
-
-
-                        resolve(
-                            compressedFile
-                        );
-
-                    },
-                    'image/webp',
-                    SH_WEBP_QUALITY
-                );
-
-            };
-
-
-            img.onerror = function () {
-
-                reject(
-                    new Error(
-                        'Image could not be loaded'
-                    )
-                );
-
-            };
-
-
-            img.src = reader.result;
-        };
-
-
-        reader.onerror = function () {
-
-            reject(
-                new Error(
-                    'Image could not be read'
-                )
-            );
-
-        };
-
-
-        reader.readAsDataURL(file);
-    });
-}
-
-
-/* ---------------------------------------------------------
-   6. CREATE UNIQUE FILE PATH
-   --------------------------------------------------------- */
-
-function shCreateStoragePath(file) {
-
-    const randomPart =
-        Math.random()
-            .toString(36)
-            .substring(2, 10);
-
-    return (
-        'assets/' +
-        Date.now() +
-        '_' +
-        randomPart +
-        '.webp'
-    );
-}
-
-
-/* ---------------------------------------------------------
-   7. UPLOAD FILES
-   --------------------------------------------------------- */
-
-async function handleProAssetFiles(event) {
-
-    const input = event.target;
-
-    if (!input || !input.files) {
-        return;
-    }
-
-
-    const files =
-        Array.from(input.files)
-            .filter(file =>
-                file.type.startsWith('image/')
-            );
-
-
-    if (!files.length) {
-        shShowProMessage(
-            'ပုံဖိုင် မတွေ့ပါ။'
-        );
-        return;
-    }
-
-
-    /*
-     * Temporary category input.
-     *
-     * Later we can replace this with the
-     * Neon Glass custom category popup.
-     */
-
-    const category =
-        prompt(
-            'ဒီပုံတွေအတွက် Category ထည့်ပါ။\nဥပမာ - ရွှေတိဂုံ'
-        );
-
-
-    if (!category || !category.trim()) {
-
-        shShowProMessage(
-            'Category မထည့်ရသေးပါ။'
-        );
-
-        return;
-    }
-
-
-    const cleanCategory =
-        category.trim();
-
-
-    let successCount = 0;
-
-
-    try {
-
-        for (
-            let i = 0;
-            i < files.length;
-            i++
-        ) {
-
-            const originalFile =
-                files[i];
-
-
-            try {
-
-                /*
-                 * 1. Compress
-                 */
-
-                const compressedFile =
-                    await shCompressImage(
-                        originalFile
-                    );
-
-
-                /*
-                 * 2. Storage path
-                 */
-
-                const storagePath =
-                    shCreateStoragePath(
-                        compressedFile
-                    );
-
-
-                /*
-                 * 3. Upload to Storage
-                 */
-
-                const {
-                    data: storageData,
-                    error: storageError
-                } =
-                    await shSupabase
-                        .storage
-                        .from(SH_PRO_BUCKET)
-                        .upload(
-                            storagePath,
-                            compressedFile,
-                            {
-                                cacheControl:
-                                    '31536000',
-
-                                contentType:
-                                    'image/webp',
-
-                                upsert: false
-                            }
-                        );
-
-
-                if (storageError) {
-
-                    console.error(
-                        'Storage upload error:',
-                        storageError
-                    );
-
-                    throw storageError;
-                }
-
-
-                /*
-                 * 4. Public URL
-                 */
-
-                const {
-                    data: publicData
-                } =
-                    shSupabase
-                        .storage
-                        .from(SH_PRO_BUCKET)
-                        .getPublicUrl(
-                            storagePath
-                        );
-
-
-                const imageUrl =
-                    publicData.publicUrl;
-
-
-                /*
-                 * 5. Save metadata
-                 *    into Images table
-                 */
-
-                const {
-                    data: dbData,
-                    error: dbError
-                } =
-                    await shSupabase
-                        .from(SH_PRO_TABLE)
-                        .insert([
-                            {
-                                title:
-                                    originalFile.name,
-
-                                image_url:
-                                    imageUrl,
-
-                                category:
-                                    cleanCategory
-                            }
-                        ])
-                        .select();
-
-
-                /*
-                 * If DB fails, remove uploaded file
-                 * so we don't leave orphan files.
-                 */
-
-                if (dbError) {
-
-                    await shSupabase
-                        .storage
-                        .from(SH_PRO_BUCKET)
-                        .remove([
-                            storagePath
-                        ]);
-
-                    throw dbError;
-                }
-
-
-                successCount++;
-
-                console.log(
-                    'Uploaded:',
-                    originalFile.name
-                );
-
-            }
-            catch (singleError) {
-
-    console.error(
-        'Single image upload failed:',
-        singleError
-    );
-
-    alert(
-        'Upload Error:\n\n' +
-        (singleError.message || singleError)
-    );
-
-}
-        }
-
-
-        if (successCount > 0) {
-
-            shShowProMessage(
-                `${successCount} ပုံ Upload အောင်မြင်ပါတယ်။ 🎉`
-            );
-
-            await loadSHProAssets();
-
-        }
-        else {
-
-            shShowProMessage(
-                'console.log(error)'
-            );
-
-        }
-
-    }
-    catch (error) {
-
-    console.error(
-        'Pro upload error:',
-        error
-    );
-
-    alert(
-        'UPLOAD ERROR:\n\n' +
-        (error?.message || error)
-    );
-
-    shShowProMessage(
-        'Upload Error: ' +
-        (error?.message || 'Unknown error')
-    );
-
-}
-    finally {
-
-        input.value = '';
-    }
-}
-
-
-/* ---------------------------------------------------------
-   8. LOAD PUBLIC ASSETS
-   --------------------------------------------------------- */
-
-async function loadSHProAssets(
-    searchTerm = ''
-) {
-
-    const grid =
-        document.getElementById(
-            'proAssetGrid'
-        );
-
-
-    if (!grid) {
-        return;
-    }
-
-
-    /*
-     * Loading state
-     */
-
-    grid.innerHTML = `
-        <div class="sh-pro-empty-state">
-            <div class="sh-pro-empty-icon">
-                ⏳
-            </div>
-
-            <div class="sh-pro-empty-title">
-                ပုံတွေရှာနေပါတယ်
-            </div>
-
-            <div class="sh-pro-empty-text">
-                ခဏစောင့်ပါ...
-            </div>
-        </div>
-    `;
-
-
-    try {
-
-        let query =
-            shSupabase
-                .from(SH_PRO_TABLE)
-                .select(
-                    'id,title,image_url,category'
-                )
-                .order(
-                    'id',
-                    {
-                        ascending: false
-                    }
-                );
-
-
-        /*
-         * Search by category/title.
-         */
-
-        if (
-            searchTerm &&
-            searchTerm.trim()
-        ) {
-
-            const keyword =
-                searchTerm.trim();
-
-
-            query =
-                query.or(
-                    `title.ilike.%${keyword}%,category.ilike.%${keyword}%`
-                );
-        }
-
-
-        const {
-            data,
-            error
-        } = await query;
-
-
-        if (error) {
-
-            console.error(
-                'Load assets error:',
-                error
-            );
-
-            grid.innerHTML = `
-                <div class="sh-pro-empty-state">
-                    <div class="sh-pro-empty-icon">
-                        ⚠️
-                    </div>
-
-                    <div class="sh-pro-empty-title">
-                        ပုံတွေယူလို့မရပါ
-                    </div>
-
-                    <div class="sh-pro-empty-text">
-                        ${shSafeText(error.message)}
-                    </div>
-                </div>
-            `;
-
-            return;
-        }
-
-
-               const assets =
-            (Array.isArray(data) ? data : [])
-                .map((item, index) => ({
-                    id: item.id !== undefined && item.id !== null ? item.id : index,
-                    ...item
-                }));
-
-
-        SH_PRO_ASSET_CACHE = assets;
-
-
-        renderSHProAssets(
-            assets
-        );
+  margin-bottom: 24px;
+}   
  
-
-    }
-    catch (error) {
-
-        console.error(
-            'Public asset load error:',
-            error
-        );
-
-        grid.innerHTML = `
-            <div class="sh-pro-empty-state">
-                <div class="sh-pro-empty-icon">
-                    ⚠️
-                </div>
-
-                <div class="sh-pro-empty-title">
-                    Connection Error
-                </div>
-
-                <div class="sh-pro-empty-text">
-                    Internet connection ကို စစ်ပါ။
-                </div>
-            </div>
-        `;
-    }
+/* အသံလှိုင်း ဖြာထွက်မည့် Ripple Ring (၁) */
+.lock-icon-circle::before, .lock-icon-circle::after {
+  content: '';
+  position: absolute;
+  top: -2px; left: -2px; right: -2px; bottom: -2px;
+  border-radius: 50%;
+  border: 2px solid rgba(0, 212, 255, 0.8);
+  animation: soundwaveRipple 2.4s infinite ease-out;
+  pointer-events: none;
 }
 
-
-/* ---------------------------------------------------------
-   9. RENDER ASSET CARDS
-   --------------------------------------------------------- */
-
-function renderSHProAssets(
-    assets
-) {
-
-    const grid =
-        document.getElementById(
-            'proAssetGrid'
-        );
-
-
-    if (!grid) {
-        return;
-    }
-
-
-    if (!assets.length) {
-
-        grid.innerHTML = `
-            <div class="sh-pro-empty-state">
-                <div class="sh-pro-empty-icon">
-                    🔍
-                </div>
-
-                <div class="sh-pro-empty-title">
-                    ပုံမတွေ့ပါ
-                </div>
-
-                <div class="sh-pro-empty-text">
-                    ရှာဖွေတဲ့ Category နဲ့ ကိုက်ညီတဲ့ပုံ မရှိသေးပါ။
-                </div>
-            </div>
-        `;
-
-        return;
-    }
-
-
-    /*
-     * Limit display to 60.
-     */
-
-    const visibleAssets =
-        assets.slice(0, 60);
-
-
-    grid.innerHTML =
-        visibleAssets
-            .map(asset =>
-                createSHProAssetCard(
-                    asset
-                )
-            )
-            .join('');
+/* အသံလှိုင်း ဖြာထွက်မည့် Ripple Ring (၂) */
+.lock-icon-circle::after {
+  animation-delay: 1.2s;
 }
 
-
-/* ---------------------------------------------------------
-   10. CREATE CARD
-   --------------------------------------------------------- */
-
-function createSHProAssetCard(
-    asset
-) {
-
-    const id =
-        Number(asset.id);
-
-
-    const imageUrl =
-        shSafeText(
-            asset.image_url
-        );
-
-
-    const category =
-        shSafeText(
-            asset.category ||
-            'Uncategorized'
-        );
-
-
-    const title =
-        shSafeText(
-            asset.title ||
-            'SH Asset'
-        );
-
-
-    return `
-        <div
-            class="sh-pro-asset-card"
-            data-asset-id="${id}"
-        >
-
-            <div
-                class="sh-pro-image-wrap"
-                onclick="openSHProImagePreview(${id})"
-            >
-
-                <img
-                    src="${imageUrl}"
-                    alt="${title}"
-                    loading="lazy"
-                    onerror="this.style.opacity='0.25'"
-                >
-
-                <div class="sh-pro-image-overlay">
-                    <i class="fa-solid fa-expand"></i>
-                </div>
-
-            </div>
-
-
-            <div class="sh-pro-asset-info">
-
-                <div
-                    class="sh-pro-asset-category"
-                >
-                    ${category}
-                </div>
-
-
-                <div
-                    class="sh-pro-asset-name"
-                >
-                    ${title}
-                </div>
-
-
-                <div
-                    class="sh-pro-card-actions"
-                >
-
-                    <button
-                        class="sh-pro-download"
-                        onclick="event.stopPropagation(); downloadSHProAsset(${id})"
-                    >
-                        <i class="fa-solid fa-download"></i>
-                        Download
-                    </button>
-
-
-                    <!--
-                        DELETE BUTTON
-                        Will be protected by Admin/RLS later.
-                    -->
-
-                    <button
-                        class="sh-pro-delete"
-                        onclick="event.stopPropagation(); deleteSHProAsset(${id})"
-                        title="Delete"
-                    >
-                        <i class="fa-solid fa-trash"></i>
-                    </button>
-
-                </div>
-
-            </div>
-
-        </div>
-    `;
-}
-
-
-/* ---------------------------------------------------------
-   11. KEEP CURRENT ASSETS IN MEMORY
-   --------------------------------------------------------- */
-
-let SH_PRO_ASSET_CACHE = [];
-
-
-/*
- * Override render so preview/download can find asset.
- */
-
-const shOriginalRenderSHProAssets =
-    renderSHProAssets;
-
-
-/* ---------------------------------------------------------
-   12. REDEFINE LOAD WITH CACHE
-   --------------------------------------------------------- */
-
-async function loadSHProAssetsWithCache(
-    searchTerm = ''
-) {
-
-    try {
-
-        let query =
-            shSupabase
-                .from(SH_PRO_TABLE)
-                .select(
-                    'id,title,image_url,category'
-                )
-                .order(
-                    'id',
-                    {
-                        ascending: false
-                    }
-                );
-
-
-        if (
-            searchTerm &&
-            searchTerm.trim()
-        ) {
-
-            const keyword =
-                searchTerm.trim();
-
-
-            query =
-                query.or(
-                    `title.ilike.%${keyword}%,category.ilike.%${keyword}%`
-                );
-        }
-
-
-        const {
-            data,
-            error
-        } = await query;
-
-
-        if (error) {
-            throw error;
-        }
-
-
-        SH_PRO_ASSET_CACHE =
-            Array.isArray(data)
-                ? data
-                : [];
-
-
-        renderSHProAssets(
-            SH_PRO_ASSET_CACHE
-        );
-
-    }
-    catch (error) {
-
-        console.error(
-            error
-        );
-
-        const grid =
-            document.getElementById(
-                'proAssetGrid'
-            );
-
-        if (grid) {
-
-            grid.innerHTML = `
-                <div class="sh-pro-empty-state">
-                    <div class="sh-pro-empty-icon">
-                        ⚠️
-                    </div>
-
-                    <div class="sh-pro-empty-title">
-                        မရပါ
-                    </div>
-
-                    <div class="sh-pro-empty-text">
-                        ${shSafeText(error.message)}
-                    </div>
-                </div>
-            `;
-        }
-    }
-}
-
-
-/* ---------------------------------------------------------
-   13. GET ONE ASSET
-   --------------------------------------------------------- */
-
-function getSHProAssetById(id) {
-    return SH_PRO_ASSET_CACHE.find(
-        asset => 
-            String(asset.id) === String(id)
-    );
-}
-
-
-/* ---------------------------------------------------------
-   14. PREVIEW
-   --------------------------------------------------------- */
-
-function openSHProImagePreview(
-    id
-) {
-
-    const asset =
-        getSHProAssetById(id);
-
-
-    if (!asset) {
-
-        shShowProMessage(
-            'ပုံကို ရှာမတွေ့ပါ။'
-        );
-
-        return;
-    }
-
-
-    const oldPreview =
-        document.getElementById(
-            'shProImagePreview'
-        );
-
-
-    if (oldPreview) {
-        oldPreview.remove();
-    }
-
-
-    const preview =
-        document.createElement('div');
-
-    preview.id =
-        'shProImagePreview';
-
-
-    preview.innerHTML = `
-
-        <div
-            class="sh-pro-preview-backdrop"
-            onclick="closeSHProImagePreview(event)"
-        >
-
-            <div
-                class="sh-pro-preview-box"
-                onclick="event.stopPropagation()"
-            >
-
-                <button
-                    class="sh-pro-preview-close"
-                    onclick="closeSHProImagePreview()"
-                >
-                    <i class="fa-solid fa-xmark"></i>
-                </button>
-
-
-                <img
-                    class="sh-pro-preview-image"
-                    src="${shSafeText(asset.image_url)}"
-                    alt="${shSafeText(asset.title || 'SH Asset')}"
-                >
-
-
-                <div class="sh-pro-preview-info">
-
-                    <div class="sh-pro-preview-category">
-                        ${shSafeText(asset.category || '')}
-                    </div>
-
-                    <div class="sh-pro-preview-title">
-                        ${shSafeText(asset.title || 'SH Asset')}
-                    </div>
-
-                </div>
-
-
-                <button
-                    class="sh-pro-preview-download"
-                    onclick="downloadSHProAsset(${Number(asset.id)})"
-                >
-                    <i class="fa-solid fa-download"></i>
-                    Download
-                </button>
-
-            </div>
-
-        </div>
-    `;
-
-
-    document.body.appendChild(
-        preview
-    );
-}
-
-
-/* ---------------------------------------------------------
-   15. CLOSE PREVIEW
-   --------------------------------------------------------- */
-
-function closeSHProImagePreview(
-    event
-) {
-
-    if (
-        event &&
-        event.target &&
-        event.target.classList &&
-        !event.target.classList.contains(
-            'sh-pro-preview-backdrop'
-        )
-    ) {
-        return;
-    }
-
-
-    const preview =
-        document.getElementById(
-            'shProImagePreview'
-        );
-
-
-    if (preview) {
-        preview.remove();
-    }
-}
-
-
-/* ---------------------------------------------------------
-   16. DOWNLOAD
-   --------------------------------------------------------- */
-
-async function downloadSHProAsset(
-    id
-) {
-
-    const asset =
-        getSHProAssetById(id);
-
-
-    if (!asset) {
-
-        shShowProMessage(
-            'Download လုပ်မယ့်ပုံ မတွေ့ပါ။'
-        );
-
-        return;
-    }
-
-
-    try {
-
-        /*
-         * Fetch image as Blob.
-         * This makes Android / CapCut handling
-         * more reliable than simply opening the URL.
-         */
-
-        const response =
-            await fetch(
-                asset.image_url
-            );
-
-
-        if (!response.ok) {
-            throw new Error(
-                'Image download failed'
-            );
-        }
-
-
-        const blob =
-            await response.blob();
-
-
-        const blobUrl =
-            URL.createObjectURL(
-                blob
-            );
-
-
-        const link =
-            document.createElement('a');
-
-
-        link.href =
-            blobUrl;
-
-
-        link.download =
-            (
-                String(
-                    asset.title ||
-                    'SH_Asset'
-                )
-                .replace(
-                    /\.[^/.]+$/,
-                    ''
-                )
-            ) +
-            '.webp';
-
-
-        document.body.appendChild(
-            link
-        );
-
-
-        link.click();
-
-
-        link.remove();
-
-
-        setTimeout(() => {
-
-            URL.revokeObjectURL(
-                blobUrl
-            );
-
-        }, 1500);
-
-
-    }
-    catch (error) {
-
-        console.error(
-            'Download error:',
-            error
-        );
-
-
-        /*
-         * Fallback:
-         * open public URL.
-         */
-
-        window.open(
-            asset.image_url,
-            '_blank'
-        );
-    }
-}
-
-
-/* ---------------------------------------------------------
-   17. DELETE
-   ---------------------------------------------------------
-   IMPORTANT:
-   This function is NOT secure by itself.
-   Supabase RLS MUST protect DELETE.
-   Later we will restrict this to Admin only.
-   --------------------------------------------------------- */
-
-async function deleteSHProAsset(
-    id
-) {
-
-    const asset =
-        getSHProAssetById(id);
-
-
-    if (!asset) {
-        return;
-    }
-
-
-    const confirmed =
-        confirm(
-            'ဒီပုံကို ဖျက်မှာ သေချာလား?'
-        );
-
-
-    if (!confirmed) {
-        return;
-    }
-
-
-    try {
-
-        /*
-         * First delete DB record.
-         */
-
-        const {
-            error: dbError
-        } =
-            await shSupabase
-                .from(SH_PRO_TABLE)
-                .delete()
-                .eq(
-                    'id',
-                    id
-                );
-
-
-        if (dbError) {
-            throw dbError;
-        }
-
-
-        /*
-         * Then remove Storage file.
-         */
-
-        const storagePath =
-            shGetStoragePathFromPublicUrl(
-                asset.image_url
-            );
-
-
-        if (storagePath) {
-
-            const {
-                error: storageError
-            } =
-                await shSupabase
-                    .storage
-                    .from(SH_PRO_BUCKET)
-                    .remove([
-                        storagePath
-                    ]);
-
-
-            if (storageError) {
-
-                console.warn(
-                    'Storage delete warning:',
-                    storageError
-                );
-            }
-        }
-
-
-        shShowProMessage(
-            'ပုံဖျက်ပြီးပါပြီ။'
-        );
-
-
-        await loadSHProAssets();
-
-
-    }
-    catch (error) {
-
-        console.error(
-            'Delete error:',
-            error
-        );
-
-
-        shShowProMessage(
-            'Delete မလုပ်နိုင်ပါ။ Admin Permission / RLS ကို စစ်ပါ။'
-        );
-    }
-}
-
-
-/* ---------------------------------------------------------
-   18. GET STORAGE PATH
-   --------------------------------------------------------- */
-
-function shGetStoragePathFromPublicUrl(
-    publicUrl
-) {
-
-    try {
-
-        const marker =
-            `/storage/v1/object/public/${SH_PRO_BUCKET}/`;
-
-
-        const index =
-            publicUrl.indexOf(
-                marker
-            );
-
-
-        if (index === -1) {
-            return null;
-        }
-
-
-        return decodeURIComponent(
-            publicUrl.substring(
-                index +
-                marker.length
-            )
-        );
-
-    }
-    catch (error) {
-
-        console.error(
-            error
-        );
-
-        return null;
-    }
-}
-
-
-/* ---------------------------------------------------------
-   19. CATEGORY FILTER
-   --------------------------------------------------------- */
-
-async function filterProAssets(
-    category
-) {
-
-    const input =
-        document.getElementById(
-            'proAssetSearchInput'
-        );
-
-
-    if (input) {
-        input.value =
-            category;
-    }
-
-
-    await loadSHProAssets(
-        category
-    );
-}
-
-
-/* ---------------------------------------------------------
-   20. SEARCH INPUT
-   --------------------------------------------------------- */
-
-(function initSHProSearch() {
-
-    const input =
-        document.getElementById(
-            'proAssetSearchInput'
-        );
-
-
-    if (!input) {
-        return;
-    }
-
-
-    let timer = null;
-
-
-    input.addEventListener(
-        'input',
-        function () {
-
-            clearTimeout(
-                timer
-            );
-
-
-            timer =
-                setTimeout(
-                    () => {
-
-                        loadSHProAssets(
-                            input.value
-                        );
-
-                    },
-                    300
-                );
-        }
-    );
-
-
-    input.addEventListener(
-        'keydown',
-        function (event) {
-
-            if (
-                event.key === 'Enter'
-            ) {
-
-                event.preventDefault();
-
-                loadSHProAssets(
-                    input.value
-                );
-            }
-        }
-    );
-
-})();
-
-
-/* ---------------------------------------------------------
-   21. FREE / PRO SWITCH
-   --------------------------------------------------------- */
-
-function switchAssetMode(
-    mode
-) {
-
-    const freeArea =
-        document.getElementById(
-            'assetFreeArea'
-        );
-
-
-    const proArea =
-        document.getElementById(
-            'assetProArea'
-        );
-
-
-    const freeTab =
-        document.getElementById(
-            'assetFreeTab'
-        );
-
-
-    const proTab =
-        document.getElementById(
-            'assetProTab'
-        );
-
-
-    if (mode === 'pro') {
-
-        if (freeArea) {
-            freeArea.style.display =
-                'none';
-        }
-
-
-        if (proArea) {
-            proArea.style.display =
-                'block';
-        }
-
-
-        if (freeTab) {
-            freeTab.classList.remove(
-                'active'
-            );
-        }
-
-
-        if (proTab) {
-            proTab.classList.add(
-                'active'
-            );
-        }
-
-
-        /*
-         * Load Cloud Assets.
-         */
-
-        loadSHProAssets();
-    }
-
-    else {
-
-        if (freeArea) {
-            freeArea.style.display =
-                'block';
-        }
-
-
-        if (proArea) {
-            proArea.style.display =
-                'none';
-        }
-
-
-        if (freeTab) {
-            freeTab.classList.add(
-                'active'
-            );
-        }
-
-
-        if (proTab) {
-            proTab.classList.remove(
-                'active'
-            );
-        }
-    }
-}
-
-
-/* ---------------------------------------------------------
-   22. TEST SUPABASE
-   --------------------------------------------------------- */
-
-async function testSHSupabaseConnection() {
-
-    try {
-
-        const {
-            data,
-            error
-        } =
-            await shSupabase
-                .from(SH_PRO_TABLE)
-                .select(
-                    'id'
-                )
-                .limit(1);
-
-
-        if (error) {
-
-            console.error(
-                'Supabase connection error:',
-                error
-            );
-
-            shShowProMessage(
-                'Supabase ချိတ်မရပါ။\n' +
-                error.message
-            );
-
-            return false;
-        }
-
-
-        console.log(
-            'SH Supabase connection OK',
-            data
-        );
-
-
-        return true;
-
-    }
-    catch (error) {
-
-        console.error(
-            error
-        );
-
-        return false;
-    }
-}
-
-
-/* ---------------------------------------------------------
-   23. INITIAL START
-   --------------------------------------------------------- */
-
-document.addEventListener(
-    'DOMContentLoaded',
-    function () {
-
-        console.log(
-            'SH Pro Asset Cloud loaded'
-        );
-
-        /*
-         * We don't automatically load until
-         * the user opens PRO.
-         */
-
-    }
-);
-  
-/* FORMAT & STYLE MODAL LOGICS */
-function setAudioFormat(formatValue) {
-  const btnWav = document.getElementById('btnWav');
-  const btnMp3 = document.getElementById('btnMp3');
-  const select = document.getElementById('formatSelect');
-
-  if (formatValue === 'wav') {
-    btnWav.style.background = '#0088ff';
-    btnWav.style.color = '#ffffff';
-    btnMp3.style.background = 'transparent';
-    btnMp3.style.color = '#8b9bb4';
-  } else {
-    btnMp3.style.background = '#0088ff';
-    btnMp3.style.color = '#ffffff';
-    btnWav.style.background = 'transparent';
-    btnWav.style.color = '#8b9bb4';
+/* Ripple Wave Animation Keyframe */
+@keyframes soundwaveRipple {
+  0% {
+    transform: scale(1);
+    opacity: 0.9;
+    box-shadow: 0 0 10px rgba(0, 212, 255, 0.8);
   }
-
-  if (select) {
-    select.value = formatValue;
-    select.dispatchEvent(new Event('change'));
+  100% {
+    transform: scale(1.75);
+    opacity: 0;
+    box-shadow: 0 0 25px rgba(0, 212, 255, 0);
   }
 }
 
-function openSingleStyleModal() {
-  document.getElementById('singleStyleModalOverlay').style.display = 'flex';
+.card-title { font-size: 21px; font-weight: bold; line-height: 1.5; margin-bottom: 8px; color: #fff; text-shadow: 0 0 12px rgba(255,255,255,0.6); }
+.card-subtitle { font-size: 14px; color: #7fa8d9; margin-bottom: 26px; }
+
+/* 💊 Pill-Shaped Input Field */
+.input-group { width: 100%; position: relative; margin-bottom: 22px; }
+.input-group input {
+  width: 100%; padding: 18px 55px;
+  background: rgba(3, 12, 28, 0.9);
+  border: 2px solid #00a2ff;
+  border-radius: 35px;
+  color: #fff; font-size: 17px; outline: none;
+  box-shadow: 0 0 20px rgba(0, 162, 255, 0.35);
+  text-align: left;
+}
+.input-group input::placeholder { color: #5a82ad; }
+.input-group .left-icon { position: absolute; left: 20px; top: 50%; transform: translateY(-50%); color: #00d2ff; font-size: 19px; }
+.input-group .right-icon { position: absolute; right: 20px; top: 50%; transform: translateY(-50%); color: #8ab4f8; cursor: pointer; z-index: 10; font-size: 19px; }
+/* 🚀 Glowing Unlock Button */
+.unlock-btn {
+  width: 100%; padding: 18px;
+  background: linear-gradient(90deg, #0066ff, #00d2ff);
+  border: none; border-radius: 35px;
+  color: #fff; font-size: 19px; font-weight: bold;
+  cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 12px;
+  box-shadow: 0 0 35px #00d2ff;
+  transition: all 0.3s ease;
+}
+.unlock-btn:hover { box-shadow: 0 0 50px #00d2ff; transform: scale(1.02); }
+
+/* 🎵 Waveform Sound Wave */
+.waveform { display: flex; align-items: center; justify-content: center; gap: 5px; margin-top: 25px; margin-bottom: 8px; }
+.bar { width: 4px; height: 14px; background: #00d2ff; border-radius: 3px; animation: wave 1.3s infinite ease-in-out; box-shadow: 0 0 10px #00d2ff; }
+.bar:nth-child(1) { animation-delay: 0.0s; }
+.bar:nth-child(2) { animation-delay: 0.2s; }
+.bar:nth-child(3) { animation-delay: 0.4s; }
+.bar:nth-child(4) { animation-delay: 0.1s; }
+.bar:nth-child(5) { animation-delay: 0.3s; }
+@keyframes wave { 0%, 100% { height: 10px; } 50% { height: 20px; } }
+
+.footer-text { font-size: 12px; color: #6c8ebf; letter-spacing: 1px; }
+/* Audio Wave လိုင်း Pulse ဖြစ်ပြီး လှုပ်ရှားစေမယ့် CSS */
+.wave-container {
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  gap: 5px;
+
+  margin-top: 20px;
 }
 
-function closeSingleStyleModal() {
-  document.getElementById('singleStyleModalOverlay').style.display = 'none';
+.wave-bar {
+  width: 4px;
+
+  height: 20px;
+
+  background-color: #00d2ff;
+
+  border-radius: 2px;
+
+  box-shadow: 0 0 8px #00d2ff;
+
+  animation: wavePulse 1.2s infinite ease-in-out;
 }
 
-function selectSingleStyleOption(element, displayText, promptValue) {
-  document.getElementById('singleSelectedStyleDisplay').innerText = displayText;
-  document.getElementById('singleStyleSelect').value = promptValue;
-  
-  const modalCards = element.parentElement.querySelectorAll('.modal-style-card');
-  modalCards.forEach(card => card.classList.remove('active'));
-  element.classList.add('active');
-  
-  closeSingleStyleModal();
+/* တစ်ချောင်းနဲ့တစ်ချောင်း လှုပ်တာ မတူအောင် Delay ပေးခြင်း */
+.wave-bar:nth-child(1) {
+  animation-delay: 0s;
 }
 
-function openStyleModal() {
-  document.getElementById('styleModalOverlay').style.display = 'flex';
+.wave-bar:nth-child(2) {
+  animation-delay: 0.2s;
 }
 
-function closeStyleModal() {
-  document.getElementById('styleModalOverlay').style.display = 'none';
+.wave-bar:nth-child(3) {
+  animation-delay: 0.4s;
 }
 
-function selectStyleOption(element, displayText, promptValue) {
-  document.getElementById('selectedStyleDisplay').innerText = displayText;
-  document.getElementById('styleSelect').value = promptValue;
-  
-  document.querySelectorAll('#styleModalOverlay .modal-style-card').forEach(card => card.classList.remove('active'));
-  element.classList.add('active');
-  
-  closeStyleModal();
-}
-/* VOICE PICKER MODAL LOGIC */
-function openVoicePicker(target) {
-    activePickerTarget = target;
-    const modal = document.getElementById("voicePickerModal");
-    modal.style.display = "flex";
-
-    let currentVal = "";
-    if (target === 'single') {
-        currentVal = singleVoiceValue;
-    } else {
-        const block = document.getElementById(`speechBlock_${target}`);
-        if(block) currentVal = block.getAttribute("data-speaker");
-    }
-
-    document.querySelectorAll(".voice-card-option").forEach(card => {
-        if(card.getAttribute("data-voice") === currentVal) {
-            card.classList.add("selected");
-        } else {
-            card.classList.remove("selected");
-        }
-    });
+.wave-bar:nth-child(4) {
+  animation-delay: 0.1s;
 }
 
-function closeVoicePicker() {
-    document.getElementById("voicePickerModal").style.display = "none";
+.wave-bar:nth-child(5) {
+  animation-delay: 0.3s;
 }
 
-function selectVoiceOption(voiceVal, displayLabel) {
-    if (activePickerTarget === 'single') {
-        singleVoiceValue = voiceVal;
-        document.getElementById("singleSelectedSpeakerText").textContent = displayLabel;
-    } else {
-        const block = document.getElementById(`speechBlock_${activePickerTarget}`);
-        if(block) {
-            block.setAttribute("data-speaker", voiceVal);
-            block.querySelector(".block-speaker-label").textContent = displayLabel;
-        }
-    }
-    closeVoicePicker();
-}
-
-/* SIDEBAR & OPTIONS */
-function openSidebar() {
-    document.getElementById("mySidebar").style.left = "0";
-    document.getElementById("overlay").style.display = "block";
-}
-
-function closeSidebar() {
-    document.getElementById("mySidebar").style.left = "-310px";
-    document.getElementById("overlay").style.display = "none";
-}
-
-function openHistoryModal() {
-    document.getElementById("historyModal").style.display = "flex";
-    renderHistory();
-}
-
-function closeHistoryModal() {
-    document.getElementById("historyModal").style.display = "none";
-}
-
-function toggleTempSlider() {
-    const isChecked = document.getElementById("tempToggle").checked;
-    document.getElementById("tempSliderWrap").style.display = isChecked ? "block" : "none";
-}
-
-function addSpeechBlock(initialText = "", selectedSpeaker = "Charon") {
-    blockCounter++;
-    const container = document.getElementById("speechBlocksContainer");
-
-    const blockDiv = document.createElement("div");
-    blockDiv.className = "speech-block-card";
-    blockDiv.id = `speechBlock_${blockCounter}`;
-    blockDiv.setAttribute("data-speaker", selectedSpeaker);
-
-    const speakerLabelMap = {
-        "Puck": "Puck (တက်ကြွလှုပ်ရှား လူငယ်သံ)",
-        "Charon": "Charon (သတင်း/ဗဟုသုတပေး တည်ငြိမ်သံ)",
-        "Fenrir": "Fenrir (စိတ်လှုပ်ရှားဖွယ် ဇာတ်လမ်းသံ)",
-        "Orus": "Orus (ပြတ်သားခိုင်မာ ရင့်ကျက်သံ)",
-        "Kore": "Kore (ပြတ်သားခိုင်မာ လူငယ်သံ)",
-        "Leda": "Leda (နုပျိုတက်ကြွ ချိုသာသံ)",
-        "Aoede": "Aoede (ပေါ့ပါးလန်းဆန်း စကားပြောသံ)",
-        "Callirrhoe": "Callirrhoe (အေးဆေးပေါ့ပါး သဘာဝသံ)",
-        "Despina": "Despina (ချောမွေ့ငြိမ့်ညောင်း ဇာတ်လမ်းသံ)"
-    };
-
-    blockDiv.innerHTML = `
-        <div class="block-card-header">
-            <span class="block-card-title">💬 <span class="block-number-text">Speech Block (1)</span></span>
-        </div>
-        <div class="block-card-body">
-            <div class="mic-avatar-circle">🎙️</div>
-            <div style="flex:1; width:100%;">
-                <label style="display:block; font-size:12px; color:#8eb0cb; margin-bottom:6px;">Speaker Voice ရွေးရန်:</label>
-                <div class="speaker-select-trigger" onclick="openVoicePicker(${blockCounter})">
-                    <span class="block-speaker-label">${speakerLabelMap[selectedSpeaker] || selectedSpeaker}</span>
-                    <span>▼</span>
-                </div>
-            </div>
-        </div>
-        <textarea class="block-textarea block-text-input" placeholder="ဒီ block အတွက် ပြောရမည့် စာသား ရိုက်ထည့်ပါ...">${initialText}</textarea>
-        
-        <div class="block-card-footer">
-            <div class="card-controls-left">
-                <button class="btn-card-ctrl" onclick="moveBlockUp(${blockCounter})">↑ Move Up</button>
-                <button class="btn-card-ctrl" onclick="moveBlockDown(${blockCounter})">↓ Move Down</button>
-            </div>
-            <button class="btn-card-delete" onclick="removeSpeechBlock(${blockCounter})">Delete</button>
-        </div>
-    `;
-
-    container.appendChild(blockDiv);
-    reindexBlocks();
-}
-
-function removeSpeechBlock(id) {
-    const block = document.getElementById(`speechBlock_${id}`);
-    if (block) {
-        block.remove();
-        reindexBlocks();
-    }
-}
-
-function moveBlockUp(id) {
-    const block = document.getElementById(`speechBlock_${id}`);
-    if (block && block.previousElementSibling) {
-        block.parentNode.insertBefore(block, block.previousElementSibling);
-        reindexBlocks();
-    }
-}
-
-function moveBlockDown(id) {
-    const block = document.getElementById(`speechBlock_${id}`);
-    if (block && block.nextElementSibling) {
-        block.parentNode.insertBefore(block.nextElementSibling, block);
-        reindexBlocks();
-    }
-}
-
-function reindexBlocks() {
-    const blocks = document.querySelectorAll(".speech-block-card");
-    blocks.forEach((el, index) => {
-        const numText = el.querySelector(".block-number-text");
-        if(numText) numText.textContent = `Speech Block (${index + 1})`;
-    });
-
-    const addBtn = document.getElementById("addBlockBtn");
-    if(addBtn) {
-        addBtn.textContent = `+ Add Speech Block (${blocks.length + 1})`;
-    }
-}
-
-// Initialize default block
-window.addEventListener("DOMContentLoaded", () => {
-    addSpeechBlock();
-});
-
-function updateSpeed(val){
-    document.getElementById("speedVal").textContent = val + "x";
-    const player = document.getElementById("audioPlayer");
-    if(player){
-        player.playbackRate = parseFloat(val);
-    }
-}
-
-function updateSingleSpeed(val){
-    document.getElementById("singleSpeedVal").textContent = val + "x";
-    const player = document.getElementById("singleAudioPlayer");
-    if(player){
-        player.playbackRate = parseFloat(val);
-    }
-}
-
-function getStoredKey(){
-    return localStorage.getItem("gemini_api_key") || "";
-}
-
-function updateKeyStatus(){
-    const key = document.getElementById("apiKey").value.trim();
-    const status = document.getElementById("keyStatus");
-
-    if(key){
-        status.textContent = "Ready";
-        status.classList.add("ok");
-    }else{
-        status.textContent = "Missing";
-        status.classList.remove("ok");
-    }
-}
-
-function saveKey(){
-    const key = document.getElementById("apiKey").value.trim();
-    if(!key){
-        showKeyMessage("API Key မထည့်ရသေးပါ။", "error");
-        return;
-    }
-
-    if(document.getElementById("saveKey").checked){
-        localStorage.setItem("gemini_api_key", key);
-    }
-
-    updateKeyStatus();
-    showKeyMessage("✅ API Key ကို သိမ်းပြီးပါပြီ။", "success");
-}
-
-function changeKey(){
-    const input = document.getElementById("apiKey");
-    input.focus();
-    input.select();
-}
-
-function removeKey(){
-    localStorage.removeItem("gemini_api_key");
-    document.getElementById("apiKey").value = "";
-    updateKeyStatus();
-    showKeyMessage("API Key ကို ဖျက်ပြီးပါပြီ။", "success");
-}
-
-function toggleKey(){
-    const input = document.getElementById("apiKey");
-    input.type = input.type === "password" ? "text" : "password";
-}
-
-function showKeyMessage(text,type){
-    const box = document.getElementById("keyMessage");
-    box.textContent = text;
-    box.className = "message " + type;
-}
-
-async function testKey(){
-    const rawKeys = document.getElementById("apiKey").value.trim();
-    if(!rawKeys){
-        showKeyMessage("အရင်ဆုံး API Key ထည့်ပါ။", "error");
-        return;
-    }
-
-    const keysList = rawKeys.split(",").map(k => k.trim()).filter(k => k.length > 0);
-    showKeyMessage("🔄 API Key ကို စစ်ဆေးနေပါတယ်...", "info");
-
-    try{
-        const response = await fetch("https://generativelanguage.googleapis.com/v1beta/models", {
-            method:"GET",
-            headers: { "x-goog-api-key": keysList[0] }
-        });
-
-        const data = await response.json().catch(()=>({}));
-        if(!response.ok){
-            throw new Error(data?.error?.message || `HTTP ${response.status}`);
-        }
-
-        if(document.getElementById("saveKey").checked){
-            localStorage.setItem("gemini_api_key", rawKeys);
-        }
-
-        updateKeyStatus();
-        showKeyMessage("✅ API Key အလုပ်လုပ်ပါတယ်။", "success");
-
-    }catch(error){
-        showKeyMessage("❌ API Key Error: " + error.message, "error");
-    }
-}
-async function testApiKey() {
-    const apiKey = document.getElementById('apiKey').value.trim();
-    if (!apiKey) {
-        alert('ကျေးဇူးပြု၍ API Key အရင်ထည့်ပါ။');
-        return;
-    }
-    
-    alert('စစ်ဆေးနေပါပြီ... ခဏစောင့်ပါ။');
-    
-    try {
-        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ contents: [{ parts: [{ text: "hi" }] }] })
-        });
-        
-        if (response.ok) {
-            alert('✅ API Key အလုပ်လုပ်ပါသည် (Valid Key)');
-        } else {
-            alert('❌ API Key မမှန်ပါ သို့မဟုတ် သက်တမ်းကုန်နေပါပြီ။');
-        }
-    } catch (error) {
-        alert('⚠️ ချိတ်ဆက်မှု အမှားအယွင်းရှိပါသည်: ' + error.message);
-    }
-}
-
-function cleanScriptText(rawText) {
-    if (!rawText) return "";
-    return rawText
-        .replace(/[\r\n]+/g, ' ')
-        .replace(/\s+/g, ' ')
-        .replace(/([၊။])\1+/g, '$1')
-        .trim();
-}
-
-async function trimSilenceFromPCM(pcmUint8Array, sampleRate = 24000) {
-    const samplesCount = pcmUint8Array.length / 2;
-    if (samplesCount === 0) return pcmUint8Array;
-
-    const float32Array = new Float32Array(samplesCount);
-    const dataView = new DataView(pcmUint8Array.buffer, pcmUint8Array.byteOffset, pcmUint8Array.byteLength);
-
-    for (let i = 0; i < samplesCount; i++) {
-        const int16 = dataView.getInt16(i * 2, true);
-        float32Array[i] = int16 < 0 ? int16 / 32768 : int16 / 32767;
-    }
-
-    let start = 0;
-    let end = float32Array.length;
-    const threshold = 0.015;
-
-    for (let i = 0; i < float32Array.length; i++) {
-        if (Math.abs(float32Array[i]) > threshold) {
-            start = Math.max(0, i - 240);
-            break;
-        }
-    }
-
-    for (let i = float32Array.length - 1; i >= 0; i--) {
-        if (Math.abs(float32Array[i]) > threshold) {
-            end = Math.min(float32Array.length, i + 240);
-            break;
-        }
-    }
-
-    if (start >= end) return pcmUint8Array;
-
-    const trimmedSamples = float32Array.subarray(start, end);
-    const trimmedPCM = new Uint8Array(trimmedSamples.length * 2);
-    const trimmedView = new DataView(trimmedPCM.buffer);
-
-    for (let i = 0; i < trimmedSamples.length; i++) {
-        const s = Math.max(-1, Math.min(1, trimmedSamples[i]));
-        const val = s < 0 ? s * 32768 : s * 32767;
-        trimmedView.setInt16(i * 2, val, true);
-    }
-
-    return trimmedPCM;
-}
-function switchTab(tabName) {
-    const singleTab = document.getElementById('singleTab');
-    const multiTab = document.getElementById('multiTab');
-    const singleBtn = document.getElementById('singleTabBtn');
-    const multiBtn = document.getElementById('multiTabBtn');
-
-    if (tabName === 'single') {
-        singleTab.style.display = 'block';
-        multiTab.style.display = 'none';
-        
-        singleBtn.style.background = 'rgba(0,210,255,0.2)';
-        singleBtn.style.borderColor = '#00d2ff';
-        singleBtn.style.color = '#fff';
-
-        multiBtn.style.background = 'rgba(15,23,42,0.8)';
-        multiBtn.style.borderColor = 'rgba(255,255,255,0.1)';
-        multiBtn.style.color = '#8eb0cb';
-    } else {
-        singleTab.style.display = 'none';
-        multiTab.style.display = 'block';
-
-        multiBtn.style.background = 'rgba(0,210,255,0.2)';
-        multiBtn.style.borderColor = '#00d2ff';
-        multiBtn.style.color = '#fff';
-
-        singleBtn.style.background = 'rgba(15,23,42,0.8)';
-        singleBtn.style.borderColor = 'rgba(255,255,255,0.1)';
-        singleBtn.style.color = '#8eb0cb';
-    }
-}
-
-/* MAIN VOICE GENERATION LOGIC (MULTI-VOICE) */
-async function generateVoice(){
-    const rawKeys = document.getElementById("apiKey").value.trim();
-    const style = document.getElementById("styleSelect").value;
-    const speed = document.getElementById("speedSlider").value;
-    const format = document.getElementById("formatSelect").value;
-
-    const blockElements = document.querySelectorAll(".speech-block-card");
-    if (blockElements.length === 0) {
-        showGenerateMessage("📝 Speech Block အနည်းဆုံး တစ်ခု ထည့်ပါ။", "error");
-        return;
-    }
-
-    let blocksData = [];
-    let fullCombinedText = "";
-    let primaryVoice = "";
-
-    const isCleanerActive = document.getElementById("cleanerToggle").checked;
-
-    blockElements.forEach((el) => {
-        let textVal = el.querySelector(".block-text-input").value.trim();
-        const speakerVal = el.getAttribute("data-speaker") || "Charon";
-
-        if (isCleanerActive) {
-            textVal = cleanScriptText(textVal);
-            el.querySelector(".block-text-input").value = textVal;
-        }
-
-        if (textVal) {
-            if (!primaryVoice) primaryVoice = speakerVal;
-            blocksData.push({ text: textVal, speaker: speakerVal });
-            fullCombinedText += `[${speakerVal}]: ${textVal}\n`;
-        }
-    });
-
-    if (blocksData.length === 0) {
-        showGenerateMessage("📝 စကားပြော စာသားများ ရိုက်ထည့်ပါ...", "error");
-        return;
-    }
-
-    const btn = document.getElementById("generateBtn");
-
-    if(!rawKeys){
-        showGenerateMessage("🔑 အရင်ဆုံး Gemini API Key ထည့်ပါ။", "error");
-        return;
-    }
-
-    const keysList = rawKeys.split(",").map(k => k.trim()).filter(k => k.length > 0);
-
-    btn.disabled = true;
-    btn.innerHTML = '<span class="loading"></span>Generating Multi-Voice Audio...';
-
-    document.getElementById("generateMessage").className = "message";
-    document.getElementById("result").style.display = "none";
-
-    let speechContentPrompt = blocksData.map(b => `<speaker name="${b.speaker}">${b.text}</speaker>`).join("\n");
-
-    const prompt = `${style}
-
-Clear, natural Burmese conversational tone with friendly, engaging, casual narration.
-
-<speak xml:lang="my-MM">
-${speechContentPrompt}
-</speak>`;
-
-    const useTemp = document.getElementById("tempToggle").checked;
-    const customTemp = useTemp ? parseFloat(document.getElementById("tempSlider").value) : 0.6;
-
-    const body = {
-        contents:[{ parts:[{ text:prompt }] }],
-        generationConfig:{
-            responseModalities:["AUDIO"],
-            temperature: customTemp,
-            speechConfig:{
-                voiceConfig:{
-                    prebuiltVoiceConfig:{ voiceName: primaryVoice || "Charon" }
-                }
-            }
-        }
-    };
-
-    let success = false;
-    let lastError = "";
-
-    for(let i=0; i<keysList.length; i++){
-        const currentKey = keysList[i];
-        try{
-            showGenerateMessage(`🔄 API Key ${i+1}/${keysList.length} ဖြင့် စမ်းနေပါတယ်...`, "info");
-
-            const response = await fetch(API_URL, {
-                method:"POST",
-                headers:{
-                    "Content-Type": "application/json",
-                    "x-goog-api-key": currentKey
-                },
-                body: JSON.stringify(body)
-            });
-
-            const data = await response.json().catch(()=>({}));
-            if(!response.ok){
-                const apiError = data?.error;
-                let errorText = apiError?.message || `HTTP ${response.status}`;
-                if(apiError?.status) errorText += ` (${apiError.status})`;
-                throw new Error(errorText);
-            }
-
-            const base64 = data?.candidates?.[0]?.content?.parts?.find(p => p.inlineData)?.inlineData?.data;
-            if(!base64){
-                throw new Error("Gemini က Audio Data မပြန်လာပါ။ Response ကို စစ်ပါ။");
-            }
-
-            let pcm = base64ToUint8Array(base64);
-
-            if (document.getElementById("trimmerToggle").checked) {
-                showGenerateMessage("✂️ အသံနားချိန် Silence များကို ညှပ်ထုတ်နေပါသည်...", "info");
-                pcm = await trimSilenceFromPCM(pcm, 24000);
-            }
-
-            const wav = pcmToWav(pcm, 24000, 1, 16);
-            const blob = new Blob([wav], { type:"audio/wav" });
-            currentAudioBlob = blob;
-
-            if(audioURL) URL.revokeObjectURL(audioURL);
-            audioURL = URL.createObjectURL(blob);
-
-            const player = document.getElementById("audioPlayer");
-            player.src = audioURL;
-            player.playbackRate = parseFloat(speed);
-
-            const download = document.getElementById("downloadBtn");
-            download.style.display = "block";
-
-            document.getElementById("result").style.display = "block";
-
-            await saveHistoryDB({
-                id: Date.now(),
-                text: fullCombinedText,
-                voice: `Multi (${blocksData.length} speakers)`,
-                style: style,
-                speed: speed,
-                format: format,
-                audioBlob: blob,
-                date: new Date().toLocaleString()
-            });
-
-            showGenerateMessage("✅ အသံဖန်တီးပြီးပါပြီ။", "success");
-            success = true;
-            break;
-
-        }catch(error){
-            lastError = error.message || "Unknown Error";
-        }
-    }
-
-    if(!success){
-        showGenerateMessage("❌ Generate မအောင်မြင်ပါ။\n\nအကြောင်းရင်း:\n" + lastError, "error");
-    }
-
-    btn.disabled = false;
-    btn.innerHTML = "🔊 Generate Multi-Voice Audio";
-}
-
-/* SINGLE-VOICE GENERATION LOGIC */
-async function generateSingleVoice(){
-    const rawKeys = document.getElementById("apiKey").value.trim();
-    const voice = singleVoiceValue;
-    let textVal = document.getElementById("singleTextInput").value.trim();
-    const style = document.getElementById("singleStyleSelect").value;
-    const speed = document.getElementById("singleSpeedSlider").value;
-    const format = document.getElementById("formatSelect").value;
-
-    const isCleanerActive = document.getElementById("cleanerToggle").checked;
-    if (isCleanerActive) {
-        textVal = cleanScriptText(textVal);
-        document.getElementById("singleTextInput").value = textVal;
-    }
-
-    if (!textVal) {
-        showSingleGenerateMessage("📝 ဖတ်ရမည့် စာသား ရိုက်ထည့်ပါ...", "error");
-        return;
-    }
-
-    if(!rawKeys){
-        showSingleGenerateMessage("🔑 အရင်ဆုံး Gemini API Key ထည့်ပါ။", "error");
-        return;
-    }
-
-    const btn = document.getElementById("singleGenerateBtn");
-    const keysList = rawKeys.split(",").map(k => k.trim()).filter(k => k.length > 0);
-
-    btn.disabled = true;
-    btn.innerHTML = '<span class="loading"></span>Generating Single-Voice Audio...';
-
-    document.getElementById("singleGenerateMessage").className = "message";
-    document.getElementById("singleResult").style.display = "none";
-
-    const prompt = `${style}
-
-Clear, natural Burmese conversational tone with friendly, engaging, casual narration.
-
-<speak xml:lang="my-MM">
-<speaker name="${voice}">${textVal}</speaker>
-</speak>`;
-
-    const useTemp = document.getElementById("tempToggle").checked;
-    const customTemp = useTemp ? parseFloat(document.getElementById("tempSlider").value) : 0.6;
-
-    const body = {
-        contents:[{ parts:[{ text:prompt }] }],
-        generationConfig:{
-            responseModalities:["AUDIO"],
-            temperature: customTemp,
-            speechConfig:{
-                voiceConfig:{
-                    prebuiltVoiceConfig:{ voiceName: voice }
-                }
-            }
-        }
-    };
-
-    let success = false;
-    let lastError = "";
-
-    for(let i=0; i<keysList.length; i++){
-        const currentKey = keysList[i];
-        try{
-            showSingleGenerateMessage(`🔄 API Key ${i+1}/${keysList.length} ဖြင့် စမ်းနေပါတယ်...`, "info");
-
-            const response = await fetch(API_URL, {
-                method:"POST",
-                headers:{
-                    "Content-Type": "application/json",
-                    "x-goog-api-key": currentKey
-                },
-                body: JSON.stringify(body)
-            });
-
-            const data = await response.json().catch(()=>({}));
-            if(!response.ok){
-                const apiError = data?.error;
-                let errorText = apiError?.message || `HTTP ${response.status}`;
-                if(apiError?.status) errorText += ` (${apiError.status})`;
-                throw new Error(errorText);
-            }
-
-            const base64 = data?.candidates?.[0]?.content?.parts?.find(p => p.inlineData)?.inlineData?.data;
-            if(!base64){
-                throw new Error("Gemini က Audio Data မပြန်လာပါ။ Response ကို စစ်ပါ။");
-            }
-
-            let pcm = base64ToUint8Array(base64);
-
-            if (document.getElementById("trimmerToggle").checked) {
-                showSingleGenerateMessage("✂️ အသံနားချိန် Silence များကို ညှပ်ထုတ်နေပါသည်...", "info");
-                pcm = await trimSilenceFromPCM(pcm, 24000);
-            }
-
-            const wav = pcmToWav(pcm, 24000, 1, 16);
-            const blob = new Blob([wav], { type:"audio/wav" });
-
-            if(singleAudioURL) URL.revokeObjectURL(singleAudioURL);
-            singleAudioURL = URL.createObjectURL(blob);
-
-            const player = document.getElementById("singleAudioPlayer");
-            player.src = singleAudioURL;
-            player.playbackRate = parseFloat(speed);
-
-            const download = document.getElementById("singleDownloadBtn");
-            download.onclick = (e) => {
-                e.preventDefault();
-                try {
-                    const reader = new FileReader();
-                    reader.onloadend = function () {
-                        const downloadLink = document.createElement("a");
-                        downloadLink.href = reader.result;
-                        downloadLink.download = `sh_single_audio_${Date.now()}.${format}`;
-                        document.body.appendChild(downloadLink);
-                        downloadLink.click();
-                        document.body.removeChild(downloadLink);
-                    };
-                    reader.readAsDataURL(blob);
-                } catch (err) {
-                    window.open(singleAudioURL, "_blank");
-                }
-            };
-
-            document.getElementById("singleResult").style.display = "block";
-
-            await saveHistoryDB({
-                id: Date.now(),
-                text: textVal,
-                voice: voice,
-                style: style,
-                speed: speed,
-                format: format,
-                audioBlob: blob,
-                date: new Date().toLocaleString()
-            });
-
-            showSingleGenerateMessage("✅ အသံဖန်တီးပြီးပါပြီ။", "success");
-            success = true;
-            break;
-
-        }catch(error){
-            lastError = error.message || "Unknown Error";
-        }
-    }
-
-    if(!success){
-        showSingleGenerateMessage("❌ Generate မအောင်မြင်ပါ။\n\nအကြောင်းရင်း:\n" + lastError, "error");
-    }
-
-    btn.disabled = false;
-    btn.innerHTML = "🔊 Generate Single-Voice Audio";
-}
-
-// Download Button Click Handler
-function triggerDownload(e) {
-    if (e) e.preventDefault();
-    if (!currentAudioBlob) return;
-
-    const format = document.getElementById("formatSelect").value || "wav";
-    const reader = new FileReader();
-    reader.onloadend = function() {
-        const base64Data = reader.result;
-        const a = document.createElement('a');
-        a.href = base64Data;
-        a.download = `sh_multi_audio_${Date.now()}.${format}`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-    };
-    reader.readAsDataURL(currentAudioBlob);
-}
-
-/* HELPER FUNCTIONS */
-function base64ToUint8Array(base64){
-    const binary = atob(base64);
-    const bytes = new Uint8Array(binary.length);
-    for(let i=0; i<binary.length; i++){
-        bytes[i] = binary.charCodeAt(i);
-    }
-    return bytes;
-}
-
-function pcmToWav(pcmData, sampleRate, channels, bitDepth){
-    const bytesPerSample = bitDepth / 8;
-    const blockAlign = channels * bytesPerSample;
-    const buffer = new ArrayBuffer(44 + pcmData.length);
-    const view = new DataView(buffer);
-
-    writeString(view, 0, "RIFF");
-    view.setUint32(4, 36 + pcmData.length, true);
-    writeString(view, 8, "WAVE");
-    writeString(view, 12, "fmt ");
-    view.setUint32(16, 16, true);
-    view.setUint16(20, 1, true);
-    view.setUint16(22, channels, true);
-    view.setUint32(24, sampleRate, true);
-    view.setUint32(28, sampleRate * blockAlign, true);
-    view.setUint16(32, blockAlign, true);
-    view.setUint16(34, bitDepth, true);
-    writeString(view, 36, "data");
-    view.setUint32(40, pcmData.length, true);
-
-    new Uint8Array(buffer, 44).set(pcmData);
-    return buffer;
-}
-
-function writeString(view, offset, string){
-    for(let i=0; i<string.length; i++){
-        view.setUint8(offset + i, string.charCodeAt(i));
-    }
-}
-  function switchView(viewId, element) {
-    // ၁။ View အားလုံးကို ဖျောက်မယ်
-    document.querySelectorAll('.view-container').forEach(el => {
-        el.style.display = 'none';
-    });
-    
-    // ၂။ ရွေးလိုက်တဲ့ View ကို ဖော်မယ်
-    const targetView = document.getElementById(viewId);
-    if (targetView) {
-        targetView.style.display = 'block';
-    }
-
-    // ၃။ Navigation ခလုတ်တွေ အားလုံးကို မူလအရောင် (မီးခိုးပြာရောင်) ပြန်ပြောင်းမယ်
-    document.querySelectorAll('.nav-btn').forEach(btn => {
-        btn.style.color = '#8eb0cb';
-    });
-
-    // ၄။ အခု နှိပ်လိုက်တဲ့ ခလုတ်ကိုပဲ အပြာရောင် (Active) ဖြစ်စေမယ်
-    if (element) {
-    element.style.color = '#00baff';
-}
-
-    if (viewId === 'voiceGenerator' || viewId === 'generator') {
-    shRenderVoiceLibrary();
-}
+@keyframes wavePulse {
+  0%,
+  100% {
+    height: 10px;
+
+    opacity: 0.5;
   }
-function showGenerateMessage(text, type){
-    const box = document.getElementById("generateMessage");
-    box.textContent = text;
-    box.className = "message " + type;
+
+  50% {
+    height: 20px;
+
+    opacity: 1;
+
+    box-shadow: 0 0 15px #00d2ff;
+  }
 }
 
-function showSingleGenerateMessage(text, type){
-    const box = document.getElementById("singleGenerateMessage");
-    box.textContent = text;
-    box.className = "message " + type;
+/* Glassmorphism Effect (မှန်ကြည်ရောင် UI) */
+.glass-box {
+  background: rgba(11, 26, 48, 0.65) !important;
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+}
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
 }
 
-/* INDEXEDDB STORAGE */
-const DB_NAME = "VoiceStudioDB";
-const DB_VERSION = 1;
-const STORE_NAME = "audio_history";
-
-function openDB() {
-    return new Promise((resolve, reject) => {
-        const request = indexedDB.open(DB_NAME, DB_VERSION);
-        request.onupgradeneeded = (e) => {
-            const db = e.target.result;
-            if (!db.objectStoreNames.contains(STORE_NAME)) {
-                db.createObjectStore(STORE_NAME, { keyPath: "id" });
-            }
-        };
-        request.onsuccess = (e) => resolve(e.target.result);
-        request.onerror = (e) => reject(e.target.error);
-    });
+/* Neon Blue Glowing Placeholder */
+.speech-textarea::placeholder {
+    color: rgba(0, 243, 255, 0.5);
+    text-shadow: 0 0 8px rgba(0, 243, 255, 0.4);
 }
 
-async function saveHistoryDB(item) {
-    try {
-        const db = await openDB();
-        const tx = db.transaction(STORE_NAME, "readwrite");
-        const store = tx.objectStore(STORE_NAME);
-        await new Promise((resolve, reject) => {
-            const req = store.put(item);
-            req.onsuccess = resolve;
-            req.onerror = reject;
-        });
-    } catch (err) {
-        console.error("IndexedDB Save Error:", err);
+.speech-textarea:focus {
+    box-shadow: 0 0 15px rgba(0, 243, 255, 0.3);
+}
+
+/* Single နဲ့ Multi နှစ်ခုလုံး ၁၀၀% ဒီဇိုင်းတူညီစေမည့် Trigger Box CSS */
+.style-trigger-box {
+  width: 100%;
+  box-sizing: border-box;
+  background-color: #0b1a30;
+  border: 1px solid #1c355e;
+  border-radius: 10px;
+  padding: 12px 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  color: #ffffff;
+  margin-top: 8px;
+  margin-bottom: 15px;
+}
+
+.style-trigger-box span:first-child {
+  font-size: 13.5px;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex: 1;
+  margin-right: 8px;
+}
+
+/* Custom Dropdown UI */
+.custom-dropdown {
+    position: relative;
+    width: 100%;
+    margin-bottom: 15px;
+}
+.dropdown-trigger {
+    background: #101929;
+    border: 1px solid #24354d;
+    color: #fff;
+    padding: 12px 15px;
+    border-radius: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    font-size: 14px;
+}
+.dropdown-options {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: #182538;
+    border: 1px solid #24354d;
+    border-radius: 8px;
+    margin-top: 5px;
+    z-index: 999;
+    box-shadow: 0 8px 16px rgba(0,0,0,0.4);
+    overflow: hidden;
+}
+.dropdown-item {
+    padding: 12px 15px;
+    color: #d1e4f5;
+    font-size: 14px;
+    cursor: pointer;
+    white-space: nowrap;
+    border-bottom: 1px solid #202e42;
+}
+.dropdown-item:hover {
+    background: #24354d;
+    color: #00baff;
+}
+.hidden {
+    display: none;
+}
+
+body{
+    font-family:Arial,"Noto Sans Myanmar","Pyidaungsu",sans-serif;
+    background:
+        radial-gradient(circle at top,#123b70 0%,#061426 42%,#020914 100%);
+    color:#eaf6ff;
+    min-height:100vh;
+}
+
+/* HEADER & SIDEBAR STYLES */
+.app-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 18px;
+    background: rgba(6, 26, 53, 0.95);
+    border-bottom: 1px solid #008cff;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    backdrop-filter: blur(8px);
+}
+
+.menu-toggle-btn {
+    background: #073660;
+    border: 1px solid #008cff;
+    color: #00baff;
+    font-size: 22px;
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: 0.2s;
+}
+
+.menu-toggle-btn:hover {
+    background: #008cff;
+    color: white;
+}
+
+.app-header-title {
+    font-size: 18px;
+    font-weight: bold;
+    color: #eaf6ff;
+}
+
+.sidebar {
+    height: 100%;
+    width: 310px;
+    position: fixed;
+    z-index: 1000;
+    top: 0;
+    left: -310px;
+    background-color: #06182e;
+    border-right: 1px solid #008cff;
+    color: #eaf6ff;
+    transition: 0.3s ease-in-out;
+    padding: 20px;
+    box-shadow: 5px 0px 25px rgba(0,0,0,0.7);
+    overflow-y: auto;
+}
+
+.sidebar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #144e7c;
+    padding-bottom: 15px;
+    margin-bottom: 20px;
+}
+
+.sidebar-header h2 {
+    font-size: 20px;
+    color: #00baff;
+}
+
+.sidebar-close-btn {
+    background: none;
+    border: none;
+    color: #b7d5ee;
+    font-size: 28px;
+    cursor: pointer;
+}
+
+.sidebar-item {
+    margin-bottom: 20px;
+}
+
+.sidebar-item label {
+    display: block;
+    font-size: 14px;
+    color: #8eb0cb;
+    margin-bottom: 8px;
+}
+
+#overlay {
+    display: none;
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    background: rgba(0,0,0,0.6);
+    backdrop-filter: blur(3px);
+    z-index: 999;
+}
+
+.container{
+    width:100%;
+    max-width:760px;
+    margin:auto;
+    padding:18px 14px 50px;
+}
+
+.hero{
+    border:1px solid #008cff;
+    border-radius:28px;
+    padding:28px 20px;
+    background:linear-gradient(135deg,#102f58,#061a35);
+    box-shadow:
+        0 0 25px rgba(0,153,255,.18),
+        inset 0 0 30px rgba(0,119,255,.05);
+    margin-bottom:24px;
+}
+
+.hero-icon{
+    width:75px;
+    height:75px;
+    border:1px solid #008cff;
+    border-radius:22px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:42px;
+    margin-bottom:18px;
+}
+
+.hero h1{
+    font-size:30px;
+    margin-bottom:8px;
+}
+
+.hero p{
+    color:#b7d5ee;
+    line-height:1.7;
+}
+
+.hero .credit{
+    color:#00baff;
+    margin-top:12px;
+    font-weight:bold;
+}
+
+/* TAB NAVIGATION */
+.tab-navigation {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 18px;
+}
+
+.tab-btn {
+    flex: 1;
+    padding: 14px;
+    border-radius: 16px;
+    background: #072242;
+    border: 1px solid #087ed4;
+    color: #8eb0cb;
+    font-size: 15px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.tab-btn.active {
+    background: linear-gradient(135deg, #008cff, #0052b3);
+    color: white;
+    border-color: #00baff;
+    box-shadow: 0 4px 15px rgba(0,140,255,0.3);
+}
+
+.page-content {
+    display: none;
+}
+
+.page-content.active {
+    display: block;
+}
+
+.section{
+    background:rgba(7,25,49,.82);
+    border:1px solid rgba(0,136,255,.35);
+    border-radius:24px;
+    padding:20px;
+    margin-bottom:18px;
+}
+
+.section-title{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:18px;
+}
+
+.section-title h2{
+    font-size:21px;
+}
+
+.badge{
+    background:#073660;
+    color:#00baff;
+    padding:9px 14px;
+    border-radius:20px;
+    font-size:13px;
+    font-weight:bold;
+}
+
+.subtitle{
+    color:#8eb0cb;
+    font-size:14px;
+    margin-top:6px;
+}
+
+.status{
+    padding:8px 14px;
+    border-radius:20px;
+    font-size:13px;
+    background:#321d36;
+    color:#ff91a9;
+}
+
+.status.ok{
+    background:#123d2c;
+    color:#58f0a2;
+}
+
+.input-wrap{
+    position:relative;
+    margin-top:14px;
+}
+
+input,textarea,select{
+    width:100%;
+    border:1px solid #087ed4;
+    outline:none;
+    background:#07182d;
+    color:#eaf6ff;
+    border-radius:17px;
+    padding:17px;
+    font-size:16px;
+}
+
+input:focus,textarea:focus,select:focus{
+    border-color:#00bfff;
+    box-shadow:0 0 15px rgba(0,191,255,.18);
+}
+
+.key-input{
+    padding-right:55px;
+}
+
+.eye{
+    position:absolute;
+    right:7px;
+    top:7px;
+    width:43px;
+    height:43px;
+    border:0;
+    border-radius:13px;
+    background:#102f55;
+    color:white;
+    font-size:20px;
+}
+
+.checkbox-row{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    color:#bdd5e9;
+    margin:16px 4px;
+    font-size:14px;
+}
+
+.checkbox-row input{
+    width:20px;
+    height:20px;
+    accent-color:#00aaff;
+}
+
+.buttons{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:12px;
+}
+
+button{
+    border:0;
+    cursor:pointer;
+    transition:.2s;
+}
+
+.btn{
+    min-height:55px;
+    border-radius:17px;
+    background:linear-gradient(135deg,#103b6b,#09294d);
+    border:1px solid #087ed4;
+    color:#eaf6ff;
+    font-size:16px;
+    font-weight:bold;
+}
+
+.btn:hover{
+    transform:translateY(-2px);
+    border-color:#00c4ff;
+    box-shadow:0 0 18px rgba(0,183,255,.2);
+}
+
+.btn-danger{
+    border-color:#a73b70;
+    background:linear-gradient(135deg,#321a3d,#24152d);
+    color:#ff9ab8;
+}
+
+/* CUSTOM STYLE FOR SPEECH BLOCK CARD */
+.speech-block-card {
+    background: #041226;
+    border: 1px solid #0a4f8a;
+    border-radius: 20px;
+    padding: 18px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+}
+
+.block-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 14px;
+}
+
+.block-card-title {
+    font-size: 16px;
+    font-weight: bold;
+    color: #00baff;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.block-card-body {
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+    margin-bottom: 14px;
+}
+
+.mic-avatar-circle {
+    width: 65px;
+    height: 65px;
+    border-radius: 50%;
+    border: 2px solid #008cff;
+    background: radial-gradient(circle, #083c72 0%, #031730 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+    flex-shrink: 0;
+    box-shadow: 0 0 15px rgba(0,140,255,0.3);
+}
+
+.speaker-select-trigger {
+    width: 100%;
+    background: #071c33;
+    border: 1px solid #087ed4;
+    border-radius: 14px;
+    padding: 14px;
+    color: #eaf6ff;
+    font-size: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+}
+
+.speaker-select-trigger:hover {
+    border-color: #00bfff;
+}
+
+.block-textarea {
+    width: 100%;
+    min-height: 90px;
+    background: #06182e;
+    border: 1px solid #0f406d;
+    border-radius: 14px;
+    padding: 14px;
+    color: #eaf6ff;
+    font-size: 15px;
+    resize: vertical;
+    margin-bottom: 14px;
+}
+
+.block-card-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 1px solid rgba(15, 64, 109, 0.5);
+    padding-top: 12px;
+}
+
+.card-controls-left {
+    display: flex;
+    gap: 8px;
+}
+
+.btn-card-ctrl {
+    background: #08284b;
+    border: 1px solid #0c589c;
+    color: #aed9ff;
+    padding: 8px 14px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.btn-card-ctrl:hover {
+    background: #008cff;
+    color: white;
+}
+
+.btn-card-delete {
+    background: #3d0c1e;
+    border: 1px solid #8c1d40;
+    color: #ff8cae;
+    padding: 8px 16px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.btn-card-delete:hover {
+    background: #8c1d40;
+    color: white;
+}
+
+.add-block-btn {
+    width: 100%;
+    padding: 16px;
+    border-radius: 18px;
+    background: #073660;
+    border: 1px dashed #008cff;
+    color: #00baff;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    margin-bottom: 20px;
+    transition: 0.2s;
+}
+
+.add-block-btn:hover {
+    background: #008cff;
+    color: white;
+}
+
+.generate{
+    width:100%;
+    margin-top:15px;
+    min-height:60px;
+    border-radius:18px;
+    background:linear-gradient(135deg,#00a9ff,#0066d6);
+    color:white;
+    font-size:18px;
+    font-weight:bold;
+    box-shadow:0 8px 25px rgba(0,133,255,.22);
+}
+
+.generate:disabled{
+    opacity:.5;
+}
+
+.result{
+    display:none;
+    margin-top:18px;
+    padding:18px;
+    border-radius:18px;
+    background:#071d34;
+    border:1px solid #17659b;
+}
+
+audio{
+    width:100%;
+    margin-top:12px;
+}
+
+.download{
+    display:block;
+    text-align:center;
+    text-decoration:none;
+    margin-top:12px;
+    padding:14px;
+    border-radius:14px;
+    background:#0c355d;
+    color:#6edaff;
+    border:1px solid #167bb9;
+    cursor: pointer;
+}
+
+.message{
+    display:none;
+    margin-top:15px;
+    padding:14px;
+    border-radius:14px;
+    line-height:1.6;
+    font-size:14px;
+    word-break:break-word;
+}
+
+.message.error{
+    display:block;
+    background:#351824;
+    color:#ff9caf;
+    border:1px solid #8e3451;
+}
+
+.message.success{
+    display:block;
+    background:#113427;
+    color:#6af0aa;
+    border:1px solid #287b55;
+}
+
+.message.info{
+    display:block;
+    background:#102d46;
+    color:#7fdcff;
+    border:1px solid #17659b;
+}
+
+.loading{
+    display:inline-block;
+    width:18px;
+    height:18px;
+    border:3px solid rgba(255,255,255,.3);
+    border-top-color:white;
+    border-radius:50%;
+    animation:spin .7s linear infinite;
+    vertical-align:middle;
+    margin-right:8px;
+}
+
+@keyframes spin{
+    to{transform:rotate(360deg)}
+}
+
+/* CUSTOM VOICE SELECTOR MODAL & BOXES */
+.voice-picker-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(2, 9, 20, 0.88);
+    backdrop-filter: blur(8px);
+    z-index: 10000;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+}
+
+.voice-picker-content {
+    background: #06182e;
+    border: 1px solid #008cff;
+    border-radius: 24px;
+    width: 100%;
+    max-width: 520px;
+    max-height: 85vh;
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.8);
+}
+
+.voice-picker-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #144e7c;
+    padding-bottom: 12px;
+    margin-bottom: 16px;
+}
+
+.voice-picker-header h3 {
+    font-size: 18px;
+    color: #00baff;
+}
+
+.voice-grid {
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding-right: 4px;
+}
+
+.voice-category-title {
+    font-size: 13px;
+    font-weight: bold;
+    color: #8eb0cb;
+    margin-top: 8px;
+    margin-bottom: 2px;
+}
+
+.voice-card-option {
+    background: #082242;
+    border: 1px solid #0f4d85;
+    border-radius: 14px;
+    padding: 14px;
+    cursor: pointer;
+    transition: 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.voice-card-option:hover {
+    border-color: #00baff;
+    background: #0a2d58;
+}
+
+.voice-card-option.selected {
+    border: 2px solid #00baff;
+    background: linear-gradient(135deg, #093769, #072244);
+    box-shadow: 0 0 12px rgba(0,186,255,0.25);
+}
+
+.voice-card-info {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.voice-card-name {
+    font-size: 16px;
+    font-weight: bold;
+    color: #ffffff;
+}
+
+.voice-card-desc {
+    font-size: 13px;
+    color: #8eb0cb;
+}
+
+.voice-card-radio {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: 2px solid #087ed4;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.voice-card-option.selected .voice-card-radio {
+    border-color: #00baff;
+    background: #00baff;
+}
+
+.voice-card-radio::after {
+    content: "";
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: white;
+    display: none;
+}
+
+.voice-card-option.selected .voice-card-radio::after {
+    display: block;
+}
+
+.history-item{
+    background:#071c33;
+    border:1px solid #164e78;
+    border-radius:17px;
+    padding:15px;
+    margin-bottom:12px;
+}
+
+.history-top{
+    display:flex;
+    justify-content:space-between;
+    gap:10px;
+    margin-bottom:8px;
+}
+
+.history-title{
+    font-weight:bold;
+    color:#eaf6ff;
+}
+
+.history-date{
+    color:#6688a5;
+    font-size:11px;
+    white-space:nowrap;
+}
+
+.history-text{
+    color:#a9c5db;
+    font-size:13px;
+    line-height:1.6;
+    white-space:pre-wrap;
+    max-height:100px;
+    overflow:hidden;
+}
+
+.history-info{
+    color:#00baff;
+    font-size:12px;
+    margin-top:9px;
+}
+
+.history-buttons{
+    display:grid;
+    grid-template-columns:1fr 1fr 1fr;
+    gap:8px;
+    margin-top:12px;
+}
+
+.history-btn{
+    padding:9px;
+    border-radius:12px;
+    background:#10365a;
+    border:1px solid #17659b;
+    color:#9be4ff;
+    font-weight:bold;
+    font-size:13px;
+    cursor:pointer;
+}
+
+.history-delete{
+    background:#321a2a;
+    border-color:#78324d;
+    color:#ff9ab8;
+}
+
+.empty-history{
+    text-align:center;
+    color:#6688a5;
+    padding:30px 10px;
+    font-size:15px;
+    font-weight:bold;
+}
+
+.footer{
+    text-align:center;
+    color:#56738c;
+    font-size:12px;
+    margin-top:25px;
+}
+
+#appContent{
+    display:none;
+}
+
+/* Voice Style Modal Styles */
+.style-modal-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(4px);
+  z-index: 9999;
+  justify-content: center;
+  align-items: center;
+}
+
+.style-modal-content {
+  background: #0b1728;
+  border: 1px solid #1e3a5f;
+  border-radius: 16px;
+  width: 90%;
+  max-width: 400px;
+  padding: 20px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+}
+
+.style-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+  border-bottom: 1px solid #1c355e;
+  padding-bottom: 10px;
+}
+
+.style-modal-header h3 {
+  margin: 0;
+  color: #38bdf8;
+  font-size: 16px;
+}
+
+.style-close-btn {
+  color: #94a3b8;
+  font-size: 22px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.style-modal-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.modal-style-card {
+  background: #112238;
+  border: 1px solid #1e3a5f;
+  border-radius: 12px;
+  padding: 12px 16px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.modal-style-card.active {
+  border: 2px solid #0088ff;
+  background: #152d4a;
+}
+
+.modal-style-card h4 {
+  margin: 0 0 4px 0;
+  color: #ffffff;
+  font-size: 14px;
+}
+
+.modal-style-card p {
+  margin: 0;
+  color: #8b9bb4;
+  font-size: 12px;
+}
+
+@media(max-width:480px){
+    .container{
+        padding:12px 10px 40px;
+    }
+
+    .hero{
+        padding:22px 16px;
+    }
+
+    .hero h1{
+        font-size:26px;
+    }
+
+    .section{
+        padding:16px;
+        border-radius:20px;
+    }
+
+    .block-card-body {
+        flex-direction: column;
+    }
+
+    .mic-avatar-circle {
+        margin: 0 auto;
     }
 }
 
-async function getHistoryDB() {
-    try {
-        const db = await openDB();
-        const tx = db.transaction(STORE_NAME, "readonly");
-        const store = tx.objectStore(STORE_NAME);
-        return new Promise((resolve, reject) => {
-            const req = store.getAll();
-            req.onsuccess = () => resolve(req.result.sort((a,b) => b.id - a.id));
-            req.onerror = reject;
-        });
-    } catch (err) {
-        console.error("IndexedDB Get Error:", err);
-        return [];
+/* ================= SH AI STUDIO PREMIUM UI ================= */
+:root{
+  --sh-bg:#050b16;
+  --sh-panel:rgba(9,20,38,.78);
+  --sh-panel2:rgba(12,28,51,.88);
+  --sh-line:rgba(72,150,255,.20);
+  --sh-cyan:#38d9ff;
+  --sh-blue:#4b7dff;
+  --sh-text:#f4f8ff;
+  --sh-muted:#8fa8c5;
+  --sh-green:#51e6a4;
+}
+body{background:radial-gradient(circle at 50% -10%,rgba(32,104,255,.16),transparent 38%),var(--sh-bg)!important;color:var(--sh-text)!important;}
+.container{width:min(100%,760px)!important;padding:16px 14px 46px!important;}
+.container>.hero{display:none!important;}
+#appContent{display:none;}
+#appContent>.premium-shell{display:block;}
+.premium-shell{margin:0 0 18px;}
+.premium-topbar{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 4px 16px;position:sticky;top:0;z-index:50;background:linear-gradient(180deg,rgba(5,11,22,.97),rgba(5,11,22,.78),transparent);backdrop-filter:blur(12px);}
+.premium-brand{display:flex;align-items:center;gap:11px;min-width:0;}
+.premium-logo{width:44px;height:44px;border-radius:14px;object-fit:cover;border:1px solid rgba(56,217,255,.55);box-shadow:0 0 22px rgba(56,217,255,.22);}
+.premium-brand h1{font-size:18px!important;margin:0!important;line-height:1.15;color:#fff!important;text-shadow:0 0 18px rgba(56,217,255,.22);}
+.premium-brand small{display:block;color:var(--sh-muted);font-size:10px;margin-top:4px;letter-spacing:.6px;}
+.premium-menu{width:42px;height:42px;border-radius:13px;border:1px solid var(--sh-line);background:rgba(16,33,57,.72);color:#cfe8ff;font-size:18px;}
+.premium-hero{position:relative;overflow:hidden;padding:20px;border:1px solid rgba(65,147,255,.23);border-radius:25px;background:linear-gradient(145deg,rgba(13,34,63,.96),rgba(6,15,29,.94));box-shadow:0 20px 60px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.03);}
+.premium-hero:before{content:"";position:absolute;width:180px;height:180px;right:-80px;top:-90px;border-radius:50%;background:rgba(56,217,255,.14);filter:blur(5px);}
+.premium-kicker{color:var(--sh-cyan);font-size:11px;font-weight:800;letter-spacing:1.7px;text-transform:uppercase;margin-bottom:8px;}
+.premium-hero h2{margin:0 0 7px!important;color:#fff!important;font-size:25px!important;line-height:1.2!important;}
+.premium-hero p{margin:0;color:#9db5d1;font-size:12px;line-height:1.65;max-width:520px;}
+.premium-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px;}
+.premium-action{border:1px solid rgba(73,158,255,.25);border-radius:15px;padding:12px;background:rgba(16,39,68,.72);color:#eaf6ff;font-weight:700;font-size:12px;cursor:pointer;box-shadow:inset 0 1px 0 rgba(255,255,255,.03);}
+.premium-action.primary{background:linear-gradient(135deg,#1269ff,#13bfe7);border-color:rgba(94,223,255,.7);box-shadow:0 10px 28px rgba(18,105,255,.24);}
+.premium-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-top:12px;}
+.premium-stat{padding:12px 10px;border:1px solid var(--sh-line);border-radius:17px;background:rgba(8,20,36,.72);}
+.premium-stat strong{display:block;color:#fff;font-size:15px;}
+.premium-stat span{display:block;color:#7590ad;font-size:10px;margin-top:4px;}
+.voice-library{margin-top:14px;border:1px solid rgba(65,147,255,.20);border-radius:25px;background:linear-gradient(145deg,rgba(9,22,40,.93),rgba(5,13,25,.95));padding:15px;box-shadow:0 18px 55px rgba(0,0,0,.3);}
+.library-head{display:flex;align-items:flex-end;justify-content:space-between;gap:10px;margin-bottom:13px;}
+.library-head h3{margin:0;color:#fff;font-size:18px;}
+.library-head p{margin:4px 0 0;color:#7892ae;font-size:10px;}
+.library-badge{border:1px solid rgba(81,230,164,.25);background:rgba(81,230,164,.08);color:var(--sh-green);border-radius:999px;padding:7px 9px;font-size:9px;font-weight:800;white-space:nowrap;}
+.voice-library-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.premium-voice-card{position:relative;min-width:0;padding:11px;border:1px solid rgba(73,140,220,.18);border-radius:20px;background:linear-gradient(145deg,rgba(15,34,58,.9),rgba(8,19,34,.94));transition:.22s;overflow:hidden;}
+.premium-voice-card:hover{transform:translateY(-2px);border-color:rgba(56,217,255,.52);box-shadow:0 12px 30px rgba(0,0,0,.28),0 0 24px rgba(56,217,255,.08);}
+.voice-avatar-wrap{position:relative;margin-bottom:9px;}
+.premium-voice-avatar{width:100%;aspect-ratio:1.15/1;border-radius:15px;object-fit:cover;display:block;background:#09182b;border:1px solid rgba(125,177,255,.14);}
+.voice-cached-dot{position:absolute;right:7px;top:7px;width:9px;height:9px;border-radius:50%;background:#566b84;box-shadow:0 0 0 4px rgba(0,0,0,.22);}
+.premium-voice-card.cached .voice-cached-dot{background:var(--sh-green);box-shadow:0 0 12px rgba(81,230,164,.75),0 0 0 4px rgba(0,0,0,.22);}
+.voice-name-row{display:flex;align-items:center;justify-content:space-between;gap:6px;}
+.voice-name-row strong{font-size:14px;color:#fff;}
+.voice-mini-tag{font-size:8px;color:#80a1c4;border:1px solid rgba(128,161,196,.18);border-radius:999px;padding:3px 5px;white-space:nowrap;}
+.voice-desc{font-size:9px;color:#7994b1;margin:5px 0 9px;min-height:26px;line-height:1.45;}
+.voice-card-actions{display:grid;grid-template-columns:1fr 1fr;gap:6px;}
+.voice-card-actions button{border:1px solid rgba(74,146,225,.2);border-radius:11px;padding:8px 5px;background:rgba(16,38,64,.9);color:#d8efff;font-size:10px;font-weight:800;cursor:pointer;}
+.voice-card-actions .preview{background:linear-gradient(135deg,rgba(20,110,255,.95),rgba(18,190,226,.9));border-color:rgba(70,220,255,.55);}
+.voice-card-actions button:disabled{opacity:.65;cursor:wait;}
+.premium-section-label{display:flex;align-items:center;justify-content:space-between;margin:18px 3px 9px;}
+.premium-section-label strong{font-size:13px;color:#dff4ff;}
+.premium-section-label span{font-size:9px;color:#6e89a5;}
+/* Restyle the existing app so it sits under the premium dashboard. */
+.section{background:linear-gradient(145deg,rgba(10,24,43,.88),rgba(6,15,28,.92))!important;border:1px solid rgba(72,150,255,.16)!important;border-radius:23px!important;box-shadow:0 15px 45px rgba(0,0,0,.22)!important;}
+.section-title h2{color:#f2f8ff!important;}
+.subtitle{color:#7f9ab8!important;}
+.tab-navigation{background:rgba(6,15,28,.9)!important;border:1px solid rgba(72,150,255,.16)!important;border-radius:17px!important;padding:5px!important;}
+.tab-btn{border-radius:13px!important;color:#7f9ab8!important;}
+.tab-btn.active{background:linear-gradient(135deg,#1165ff,#0bbbd9)!important;color:#fff!important;box-shadow:0 8px 25px rgba(17,101,255,.2)!important;}
+.speech-block-card{background:linear-gradient(145deg,rgba(12,28,49,.92),rgba(7,17,31,.95))!important;border:1px solid rgba(72,150,255,.17)!important;border-radius:21px!important;box-shadow:0 12px 35px rgba(0,0,0,.22)!important;}
+.speaker-select-trigger{background:rgba(7,18,32,.85)!important;border-color:rgba(72,150,255,.24)!important;border-radius:13px!important;}
+.block-textarea,textarea{background:rgba(5,14,26,.86)!important;border-color:rgba(72,150,255,.20)!important;border-radius:15px!important;}
+.btn,.generate,.btn-card-ctrl{border-radius:13px!important;}
+@media(max-width:520px){.voice-library-grid{grid-template-columns:1fr 1fr}.premium-hero h2{font-size:22px!important}.container{padding-left:11px!important;padding-right:11px!important}.premium-stats{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:370px){.voice-library-grid{grid-template-columns:1fr}.premium-actions{grid-template-columns:1fr}.premium-stats{grid-template-columns:1fr 1fr}.premium-stat:last-child{grid-column:1/-1}}
+
+@keyframes wavePulse {
+    0% { opacity: 0.4; transform: scale(0.95); text-shadow: 0 0 5px rgba(0,210,255,0.2); }
+    50% { opacity: 1; transform: scale(1.08); text-shadow: 0 0 12px rgba(0,210,255,0.8); }
+    100% { opacity: 0.4; transform: scale(0.95); text-shadow: 0 0 5px rgba(0,210,255,0.2); }
+}
+.animated-wave {
+    animation: wavePulse 1.5s infinite ease-in-out;
+}
+    .voice-library-grid {
+    display: grid !important;
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 8px !important;
+    justify-content: center !important;
+    align-items: center !important;
+}
+.voice-card img, 
+#premiumVoiceGrid img {
+    display: block !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+}
+
+.voice-card {
+    text-align: center !important;
+}
+
+/* TELEGRAM PREMIUM WAVE */
+.tg-wave {
+    position: absolute;
+    width: 76px;
+    height: 76px;
+    border: 2px solid rgba(0,186,255,.45);
+    border-radius: 50%;
+    animation: tgWave 2.4s ease-out infinite;
+    pointer-events: none;
+}
+
+.tg-wave.wave2 {
+    animation-delay: .8s;
+}
+
+.tg-wave.wave3 {
+    animation-delay: 1.6s;
+}
+
+@keyframes tgWave {
+    0% {
+        transform: scale(.75);
+        opacity: .65;
+    }
+    70% {
+        transform: scale(1.45);
+        opacity: .12;
+    }
+    100% {
+        transform: scale(1.65);
+        opacity: 0;
     }
 }
 
-async function deleteHistoryItem(id) {
-    try {
-        const db = await openDB();
-        const tx = db.transaction(STORE_NAME, "readwrite");
-        const store = tx.objectStore(STORE_NAME);
-        await new Promise((resolve, reject) => {
-            const req = store.delete(id);
-            req.onsuccess = resolve;
-            req.onerror = reject;
-        });
-        renderHistory();
-    } catch (err) {
-        console.error("IndexedDB Delete Error:", err);
+/* FLOATING ICONS - Spaced across corners */
+.tg-float {
+    position: absolute;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    opacity: 0.85;
+    animation: tgFloat 2.7s ease-in-out infinite;
+    pointer-events: none;
+    z-index: 4;
+}
+
+/* Top-Right Corner (Bell) */
+.tg-noti {
+    top: -3px;
+    right: -3px;
+    background: #00baff;
+    color: #fff;
+    animation-delay: 0s;
+}
+
+/* Top-Left Corner (Message) */
+.tg-msg {
+    top: -3px;
+    left: -3px;
+    background: #1677ff;
+    color: #fff;
+    animation-delay: .9s;
+}
+
+/* Bottom-Right Corner (Gift) */
+.tg-gift {
+    bottom: -3px;
+    right: -3px;
+    background: #9b59ff;
+    color: #fff;
+    animation-delay: 1.8s;
+}
+
+@keyframes tgFloat {
+    0%, 100% {
+        opacity: .4;
+        transform: scale(.9) translateY(2px);
+    }
+    30% {
+        opacity: 1;
+        transform: scale(1.1) translateY(0);
+    }
+    55% {
+        opacity: .7;
+        transform: scale(1) translateY(-2px);
     }
 }
-
-async function clearHistory() {
-    const history = await getHistoryDB();
-    if(history.length === 0) return;
-    if(!confirm("History အားလုံးကို ဖျက်မှာ သေချာပါသလား?")) return;
-
-    try {
-        const db = await openDB();
-        const tx = db.transaction(STORE_NAME, "readwrite");
-        const store = tx.objectStore(STORE_NAME);
-        await new Promise((resolve, reject) => {
-            const req = store.clear();
-            req.onsuccess = resolve;
-            req.onerror = reject;
-        });
-        renderHistory();
-    } catch (err) {
-        console.error("IndexedDB Clear Error:", err);
+    @keyframes soundWave {
+        0% { transform: scaleY(0.3); opacity: 0.3; }
+        100% { transform: scaleY(1.2); opacity: 1; box-shadow: 0 0 10px #00d2ff; }
     }
-}
-
-async function renderHistory() {
-    const list = document.getElementById("modalHistoryList");
-    if (!list) return;
-
-    const history = await getHistoryDB();
-
-    if (history.length === 0) {
-        list.innerHTML = `<div class="empty-history">📭 History မရှိသေးပါ</div>`;
-        return;
-    }
-
-    list.innerHTML = history.map(item => {
-        let audioSrc = "";
-        if(item.audioBlob) {
-            audioSrc = URL.createObjectURL(item.audioBlob);
-        }
-
-        return `
-            <div class="history-item">
-                <div class="history-top">
-                    <div class="history-title">🎙️ Voice #${item.id}</div>
-                    <div class="history-date">${escapeHTML(item.date)}</div>
-                </div>
-
-                <div class="history-text">${escapeHTML(item.text)}</div>
-
-                <div class="history-info">
-                    🎙️ ${escapeHTML(item.voice || "Multi-Voice")} &nbsp;|&nbsp;
-                    ⚡ ${escapeHTML(item.speed)}x &nbsp;|&nbsp;
-                    📁 ${escapeHTML((item.format || "wav").toUpperCase())}
-                </div>
-
-                ${audioSrc ? `<audio controls src="${audioSrc}" style="width:100%; margin-top:8px;"></audio>` : ''}
-
-                <div class="history-buttons">
-                    ${audioSrc ? `<a class="history-btn" style="text-align:center; text-decoration:none;" href="${audioSrc}" download="sh_audio_${item.id}.${item.format || 'wav'}">⬇️ Save</a>` : ''}
-
-                    <button class="history-btn history-delete" style="grid-column: span 2;" onclick="deleteHistoryItem(${item.id})">
-                        🗑️ Delete
-                    </button>
-                </div>
-            </div>
-        `;
-    }).join("");
-}
-
-function escapeHTML(value){
-    return String(value)
-        .replace(/&/g,"&amp;")
-        .replace(/</g,"&lt;")
-        .replace(/>/g,"&gt;")
-        .replace(/"/g,"&quot;")
-        .replace(/'/g,"&#039;");
-}
-
-/* ================= SH PREMIUM VOICE DEMO CACHE ================= */
-const SH_DEMO_DB = 'SHVoiceDemoDB';
-const SH_DEMO_VERSION = 1;
-const SH_DEMO_STORE = 'voice_demos';
-const SH_DEMO_TEXT = {
-  Puck: 'မင်္ဂလာပါ၊ ကျွန်တော့်နာမည်ကတော့ ပတ်ခ်ပါ။',
-  Charon: 'မင်္ဂလာပါ၊ ကျွန်တော့်နာမည်ကတော့ ချာကွန်ပါ။',
-  Fenrir: 'မင်္ဂလာပါ၊ ကျွန်တော့်နာမည်ကတော့ ဖန်နီယာပါ။',
-  Orus: 'မင်္ဂလာပါ၊ ကျွန်တော့်နာမည်ကတော့ အိုရပ်စ်ပါ။',
-  Kore: 'မင်္ဂလာပါ၊ ကျွန်မနာမည်ကတော့ ကိုးရီးပါ။',
-  Leda: 'မင်္ဂလာပါ၊ ကျွန်မနာမည်ကတော့ လီဒါပါ။',
-  Aoede: 'မင်္ဂလာပါ၊ ကျွန်မနာမည်ကတော့ အော်ဒီပါ။',
-  Callirrhoe: 'မင်္ဂလာပါ၊ ကျွန်မနာမည်ကတော့ ကလီရိုးပါ။',
-  Despina: 'မင်္ဂလာပါ၊ ကျွန်မနာမည်ကတော့ ဒက်စပီနာပါ။'
-};
-const SH_VOICES = [
-  ['Charon','တည်ငြိမ်ပြီး ရှင်းလင်းတဲ့ အသံ','charon.jpg'],
-  ['Puck','တက်ကြွလှုပ်ရှား လူငယ်သံ','puck.jpg'],
-  ['Fenrir','စိတ်လှုပ်ရှားဖွယ် ဇာတ်လမ်းသံ','fenrir.jpg'],
-  ['Orus','ပြတ်သားခိုင်မာ ရင့်ကျက်သံ','orus.jpg'],
-  ['Kore','ပြတ်သားခိုင်မာ လူငယ်သံ','kore.jpg'],
-  ['Leda','နုပျိုတက်ကြွ ချိုသာသံ','leda.jpg'],
-  ['Aoede','ပေါ့ပါးလန်းဆန်း စကားပြောသံ','aoede.jpg'],
-  ['Callirrhoe','အေးဆေးပေါ့ပါး သဘာဝသံ','callirrhoe.jpg'],
-  ['Despina','ချောမွေ့ငြိမ့်ညောင်း ဇာတ်လမ်းသံ','despina.jpg']
-];
-function shOpenDemoDB(){
-  return new Promise((resolve,reject)=>{
-    const r=indexedDB.open(SH_DEMO_DB,SH_DEMO_VERSION);
-    r.onupgradeneeded=e=>{const db=e.target.result;if(!db.objectStoreNames.contains(SH_DEMO_STORE))db.createObjectStore(SH_DEMO_STORE,{keyPath:'voice'});};
-    r.onsuccess=()=>resolve(r.result); r.onerror=()=>reject(r.error);
-  });
-}
-async function shGetDemo(voice){
-  const db=await shOpenDemoDB();
-  return new Promise((resolve,reject)=>{const tx=db.transaction(SH_DEMO_STORE,'readonly');const r=tx.objectStore(SH_DEMO_STORE).get(voice);r.onsuccess=()=>resolve(r.result||null);r.onerror=()=>reject(r.error);});
-}
-async function shSaveDemo(voice,blob){
-  const db=await shOpenDemoDB();
-  return new Promise((resolve,reject)=>{const tx=db.transaction(SH_DEMO_STORE,'readwrite');tx.objectStore(SH_DEMO_STORE).put({voice,blob,createdAt:Date.now()});tx.oncomplete=()=>resolve();tx.onerror=()=>reject(tx.error);});
-}
-function shMarkCached(voice,cached=true){
-  const card=document.querySelector(`.premium-voice-card[data-voice="${voice}"]`);
-  if(card)card.classList.toggle('cached',cached);
-  const btn=card?.querySelector('.preview');
-  if(btn && cached)btn.textContent='▶ Play';
-}
-async function shRefreshCacheMarks(){
-  for(const [voice] of SH_VOICES){try{if(await shGetDemo(voice))shMarkCached(voice,true);}catch(e){}}
-}
-function shRenderVoiceLibrary(){
-    const grid = document.getElementById('premiumVoiceGrid');
-    if(!grid) return;
-
-    grid.innerHTML = SH_VOICES.map(([voice, desc, img]) => {
-        return `<article class="voice-card premium-voice-card" data-voice="${voice}" style="box-sizing: border-box;">
-            <div class="voice-avatar-wrap" onclick="shChooseVoice('${voice}')">
-                <img src="${img}" alt="${voice}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
-            </div>
-
-            <div class="voice-name-row" onclick="shChooseVoice('${voice}')">
-                <strong>${voice}</strong>
-                <span style="font-size: 9px; color: #00baff;">GEMINI TTS</span>
-            </div>
-
-            <div class="voice-desc" onclick="shChooseVoice('${voice}')">${desc}</div>
-
-            <div style="display:flex; gap:5px; margin-top:10px; width:100%; box-sizing:border-box;">
-
-                <button
-                    class="btn preview"
-                    onclick="shPreviewVoice('${voice}', this)"
-                    style="flex:1; padding:7px 2px; background:rgba(0,186,255,0.2); border:1px solid #00baff; border-radius:8px; color:#fff; cursor:pointer; font-size:11px; text-align:center;">
-                    ▶ Play
-                </button>
-
-                <button
-                    class="btn use"
-                    onclick="shChooseVoice('${voice}')"
-                    style="flex:1; padding:7px 2px; background:rgba(0,255,136,0.2); border:1px solid #00ff88; border-radius:8px; color:#fff; cursor:pointer; font-size:11px; text-align:center;">
-                    Use
-                </button>
-
-            </div>
-        </article>`;
-    }).join('');
-}
-async function shDownloadDemo(voice, button){
-    try{
-        const cached = await shGetDemo(voice);
-
-        if(!cached?.blob){
-            alert('အရင်ဆုံး Preview ကိုနှိပ်ပြီး အသံဖန်တီးပေးပါ။');
-            return;
-        }
-
-        const url = URL.createObjectURL(cached.blob);
-
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `SH-${voice}-Preview.wav`;
-        document.body.appendChild(a);
-        a.click();
-        a.remove();
-
-        setTimeout(() => URL.revokeObjectURL(url), 1000);
-
-    }catch(e){
-        alert('Download မအောင်မြင်ပါ။\n\n' + (e.message || e));
-    }
-}
-const SH_LOCAL_VOICE_FILES = {
-    Puck: 'Puck.wav',
-    Charon: 'Charon.wav',
-    Fenrir: 'Fenrir.mp3',
-    Orus: 'Orus.wav',
-    Kore: 'Kore.wav',
-    Leda: 'Leda.wav',
-    Aoede: 'Aoede.wav',
-    Callirrhoe: 'Callirrhoe.wav',
-    Despina: 'Despina.wav'
-};
-
-let shVoiceAudio = null;
-let shPlayingButton = null;
-
-function shPreviewVoice(voice, button){
-    try{
-        const src = SH_LOCAL_VOICE_FILES[voice];
-
-        if(!src){
-            alert('ဒီအသံဖိုင် မတွေ့ပါ။');
-            return;
-        }
-
-        // အရင်ဖွင့်နေတဲ့အသံရှိရင် ရပ်
-        if(shVoiceAudio){
-            shVoiceAudio.pause();
-            shVoiceAudio.currentTime = 0;
-
-            if(shPlayingButton){
-                shPlayingButton.textContent = '▶ Play';
-            }
-        }
-
-        // Local audio file ကို တိုက်ရိုက်ဖွင့်
-        shVoiceAudio = new Audio('./' + src);
-        shPlayingButton = button;
-
-        button.textContent = '⏸ Stop';
-
-        shVoiceAudio.onended = () => {
-            button.textContent = '▶ Play';
-            shVoiceAudio = null;
-            shPlayingButton = null;
-        };
-
-        shVoiceAudio.onerror = () => {
-            button.textContent = '▶ Play';
-            shVoiceAudio = null;
-            shPlayingButton = null;
-
-            alert(
-                'အသံဖိုင် ဖွင့်မရပါ။\n\n' +
-                'File name ကို စစ်ပေးပါ။\n' +
-                'ဥပမာ - Charon.wav'
-            );
-        };
-
-        shVoiceAudio.play().catch(() => {
-            button.textContent = '▶ Play';
-        });
-
-    }catch(e){
-        button.textContent = '▶ Play';
-
-        alert(
-            'အသံဖိုင် ဖွင့်မရပါ။\n\n' +
-            (e.message || e)
-        );
-    }
-}
-
-function shRenderVoiceLibrary(){
-    const grid = document.getElementById('premiumVoiceGrid');
-    if(!grid) return;
-
-    grid.innerHTML = SH_VOICES.map(([voice, desc, img]) => {
-        return `<article class="voice-card premium-voice-card" data-voice="${voice}" style="box-sizing: border-box;">
-
-            <div class="voice-avatar-wrap" onclick="shChooseVoice('${voice}')">
-                <img src="${img}" alt="${voice}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
-            </div>
-
-            <div class="voice-name-row" onclick="shChooseVoice('${voice}')">
-                <strong>${voice}</strong>
-                <span style="font-size: 9px; color: #00baff;">GEMINI TTS</span>
-            </div>
-
-            <div class="voice-desc" onclick="shChooseVoice('${voice}')">${desc}</div>
-
-            <div style="display:flex; gap:5px; margin-top:10px; width:100%; box-sizing:border-box;">
-
-                <button
-                    class="btn preview"
-                    onclick="shPreviewVoice('${voice}', this)"
-                    style="flex:1; padding:7px 2px; background:rgba(0,186,255,0.2); border:1px solid #00baff; border-radius:8px; color:#fff; cursor:pointer; font-size:11px; text-align:center;">
-                    ▶ Play
-                </button>
-
-                <button
-                    class="btn use"
-                    onclick="shChooseVoice('${voice}')"
-                    style="flex:1; padding:7px 2px; background:rgba(0,255,136,0.2); border:1px solid #00ff88; border-radius:8px; color:#fff; cursor:pointer; font-size:11px; text-align:center;">
-                    Use
-                </button>
-
-            </div>
-
-        </article>`;
-    }).join('');
-}
-
-window.addEventListener('DOMContentLoaded', () => {
-    shRenderVoiceLibrary();
-    switchView('mainDashboard');
-});
