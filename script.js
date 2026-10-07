@@ -2332,18 +2332,20 @@ async function loadSHProAssets(
             return;
         }
 
+         const assets =
+            (Array.isArray(data) ? data : [])
+                .map((item, index) => ({
+                    id: item.id !== undefined && item.id !== null ? item.id : index,
+                    ...item
+                }));
 
-        const assets =
-            Array.isArray(data)
-                ? data
-                : [];
+         SH_PRO_ASSET_CACHE = assets;
 
 
         renderSHProAssets(
             assets
-        );
-
-    }
+        );     
+        
     catch (error) {
 
         console.error(
@@ -2434,19 +2436,13 @@ function renderSHProAssets(
    10. CREATE CARD
    --------------------------------------------------------- */
 
-function createSHProAssetCard(
-    asset
-) {
-
-    const id =
-        Number(asset.id);
-
+ function createSHProAssetCard(asset) {
+    const id = asset.id;
 
     const imageUrl =
         shSafeText(
             asset.image_url
         );
-
 
     const category =
         shSafeText(
@@ -2454,13 +2450,11 @@ function createSHProAssetCard(
             'Uncategorized'
         );
 
-
     const title =
         shSafeText(
             asset.title ||
             'SH Asset'
         );
-
 
     return `
         <div
@@ -2470,7 +2464,7 @@ function createSHProAssetCard(
 
             <div
                 class="sh-pro-image-wrap"
-                onclick="openSHProImagePreview(${id})"
+                onclick="openSHProImagePreview('${id}')"
             >
 
                 <img
@@ -2509,21 +2503,16 @@ function createSHProAssetCard(
 
                     <button
                         class="sh-pro-download"
-                        onclick="event.stopPropagation(); downloadSHProAsset(${id})"
+                        onclick="event.stopPropagation(); downloadSHProAsset('${id}')"
                     >
                         <i class="fa-solid fa-download"></i>
                         Download
                     </button>
 
 
-                    <!--
-                        DELETE BUTTON
-                        Will be protected by Admin/RLS later.
-                    -->
-
                     <button
                         class="sh-pro-delete"
-                        onclick="event.stopPropagation(); deleteSHProAsset(${id})"
+                        onclick="event.stopPropagation(); deleteSHProAsset('${id}')"
                         title="Delete"
                     >
                         <i class="fa-solid fa-trash"></i>
@@ -2536,7 +2525,6 @@ function createSHProAssetCard(
         </div>
     `;
 }
-
 
 /* ---------------------------------------------------------
    11. KEEP CURRENT ASSETS IN MEMORY
