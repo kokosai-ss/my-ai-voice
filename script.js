@@ -2193,7 +2193,7 @@ async function handleProAssetFiles(event) {
         else {
 
             shShowProMessage(
-                'ပုံတင်မရပါ။ Supabase Permission / Policy ကို စစ်ပါ။'
+                'console.log(error)'
             );
 
         }
