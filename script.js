@@ -2223,219 +2223,127 @@ async function handleProAssetFiles(event) {
     }
 }
 
-
 /* ---------------------------------------------------------
-   8. LOAD PUBLIC ASSETS
-   --------------------------------------------------------- */
+8. LOAD PUBLIC ASSETS WITH PAGINATION (FIXED)
+--------------------------------------------------------- */
 
-async function loadSHProAssets(
-    searchTerm = ''
-) {
+let SH_CURRENT_PAGE = 0;
+const SH_PAGE_SIZE = 20; // တစ်ကြိမ်လျှင် ၂၀ ပုံသာ ဆွဲယူမည် (RAM အကုန်သက်သာစေသည်)
+let SH_PRO_ASSET_CACHE = [];
+let SH_HAS_MORE = true;
 
-    const grid =
-        document.getElementById(
-            'proAssetGrid'
-        );
+async function loadSHProAssets(searchTerm = '', isLoadMore = false) {
+  const grid = document.getElementById('proAssetGrid');
+  if (!grid) return;
 
-
-    if (!grid) {
-        return;
-    }
-
-
-    /*
-     * Loading state
-     */
-
+  // Search အသစ်လုပ်လျှင် သို့မဟုတ် မူရင်းအတိုင်း ပြန်စလျှင် Page ကို 0 သို့ ပြန်တင်မည်
+  if (!isLoadMore) {
+    SH_CURRENT_PAGE = 0;
+    SH_PRO_ASSET_CACHE = [];
+    SH_HAS_MORE = true;
     grid.innerHTML = `
-        <div class="sh-pro-empty-state">
-            <div class="sh-pro-empty-icon">
-                ⏳
-            </div>
-
-            <div class="sh-pro-empty-title">
-                ပုံတွေရှာနေပါတယ်
-            </div>
-
-            <div class="sh-pro-empty-text">
-                ခဏစောင့်ပါ...
-            </div>
-        </div>
+      <div class="sh-pro-empty-state">
+        <div class="sh-pro-empty-icon">⏳</div>
+        <div class="sh-pro-empty-title">ပုံတွေရှာနေပါတယ်</div>
+        <div class="sh-pro-empty-text">ခဏစောင့်ပါ...</div>
+      </div>
     `;
+  }
 
+  try {
+    const from = SH_CURRENT_PAGE * SH_PAGE_SIZE;
+    const to = from + SH_PAGE_SIZE - 1;
 
-    try {
+    let query = shSupabase
+      .from(SH_PRO_TABLE)
+      .select('id,title,image_url,category')
+      .order('id', { ascending: false })
+      .range(from, to); // 🔴 ပင်မအမှားကို ပြင်ဆင်သည့်နေရာ: Supabase ထံမှ ၂၀ ခုစီသာ Range ဖြင့် ပိုင်းယူမည်
 
-        let query =
-            shSupabase
-                .from(SH_PRO_TABLE)
-                .select(
-                    'id,title,image_url,category'
-                )
-                .order(
-                    'id',
-                    {
-                        ascending: false
-                    }
-                );
-
-
-        /*
-         * Search by category/title.
-         */
-
-        if (
-            searchTerm &&
-            searchTerm.trim()
-        ) {
-
-            const keyword =
-                searchTerm.trim();
-
-
-            query =
-                query.or(
-                    `title.ilike.%${keyword}%,category.ilike.%${keyword}%`
-                );
-        }
-
-
-        const {
-            data,
-            error
-        } = await query;
-
-
-        if (error) {
-
-            console.error(
-                'Load assets error:',
-                error
-            );
-
-            grid.innerHTML = `
-                <div class="sh-pro-empty-state">
-                    <div class="sh-pro-empty-icon">
-                        ⚠️
-                    </div>
-
-                    <div class="sh-pro-empty-title">
-                        ပုံတွေယူလို့မရပါ
-                    </div>
-
-                    <div class="sh-pro-empty-text">
-                        ${shSafeText(error.message)}
-                    </div>
-                </div>
-            `;
-
-            return;
-        }
-
-
-               const assets =
-            (Array.isArray(data) ? data : [])
-                .map((item, index) => ({
-                    id: item.id !== undefined && item.id !== null ? item.id : index,
-                    ...item
-                }));
-
-
-        SH_PRO_ASSET_CACHE = assets;
-
-
-        renderSHProAssets(
-            assets
-        );
- 
-
+    if (searchTerm && searchTerm.trim()) {
+      const keyword = searchTerm.trim();
+      query = query.or(`title.ilike.%${keyword}%,category.ilike.%${keyword}%`);
     }
-    catch (error) {
 
-        console.error(
-            'Public asset load error:',
-            error
-        );
+    const { data, error } = await query;
 
-        grid.innerHTML = `
-            <div class="sh-pro-empty-state">
-                <div class="sh-pro-empty-icon">
-                    ⚠️
-                </div>
-
-                <div class="sh-pro-empty-title">
-                    Connection Error
-                </div>
-
-                <div class="sh-pro-empty-text">
-                    Internet connection ကို စစ်ပါ။
-                </div>
-            </div>
-        `;
+    if (error) {
+      throw error;
     }
+
+    const assets = Array.isArray(data) ? data : [];
+
+    // ပုံ ၂၀ ထက် နည်းသွားပါက အဆုံးရောက်ပြီဟု သတ်မှတ်မည်
+    if (assets.length < SH_PAGE_SIZE) {
+      SH_HAS_MORE = false;
+    }
+
+    if (isLoadMore) {
+      SH_PRO_ASSET_CACHE = [...SH_PRO_ASSET_CACHE, ...assets];
+    } else {
+      SH_PRO_ASSET_CACHE = assets;
+    }
+
+    renderSHProAssets(SH_PRO_ASSET_CACHE);
+
+  } catch (error) {
+    console.error('Public asset load error:', error);
+    if (!isLoadMore) {
+      grid.innerHTML = `
+        <div class="sh-pro-empty-state">
+          <div class="sh-pro-empty-icon">⚠️</div>
+          <div class="sh-pro-empty-title">ပုံတွေယူလို့မရပါ</div>
+          <div class="sh-pro-empty-text">${shSafeText(error.message)}</div>
+        </div>
+      `;
+    }
+  }
 }
-
 
 /* ---------------------------------------------------------
-   9. RENDER ASSET CARDS
-   --------------------------------------------------------- */
+9. RENDER ASSET CARDS (FIXED)
+--------------------------------------------------------- */
 
-function renderSHProAssets(
-    assets
-) {
+function renderSHProAssets(assets) {
+  const grid = document.getElementById('proAssetGrid');
+  if (!grid) return;
 
-    const grid =
-        document.getElementById(
-            'proAssetGrid'
-        );
+  if (!assets.length) {
+    grid.innerHTML = `
+      <div class="sh-pro-empty-state">
+        <div class="sh-pro-empty-icon">🔍</div>
+        <div class="sh-pro-empty-title">ပုံမတွေ့ပါ</div>
+        <div class="sh-pro-empty-text">ရှာဖွေတဲ့ Category နဲ့ ကိုက်ညီတဲ့ပုံ မရှိသေးပါ။</div>
+      </div>
+    `;
+    return;
+  }
 
+  // Card များကို Render လုပ်မည်
+  let cardsHtml = assets.map(asset => createSHProAssetCard(asset)).join('');
 
-    if (!grid) {
-        return;
-    }
+  // နောက်ထပ် ပုံများ ကျန်သေးပါက Load More ခလုတ် ပြပေးမည်
+  if (SH_HAS_MORE) {
+    cardsHtml += `
+      <div style="grid-column: 1 / -1; text-align: center; margin: 20px 0;">
+        <button id="shLoadMoreBtn" class="sh-pro-download" onclick="shProLoadNextPage()" style="padding: 10px 24px; font-size: 14px;">
+          <i class="fa-solid fa-arrows-rotate"></i> နောက်ထပ်ပုံများ ကြည့်ရန် (Load More)
+        </button>
+      </div>
+    `;
+  }
 
-
-    if (!assets.length) {
-
-        grid.innerHTML = `
-            <div class="sh-pro-empty-state">
-                <div class="sh-pro-empty-icon">
-                    🔍
-                </div>
-
-                <div class="sh-pro-empty-title">
-                    ပုံမတွေ့ပါ
-                </div>
-
-                <div class="sh-pro-empty-text">
-                    ရှာဖွေတဲ့ Category နဲ့ ကိုက်ညီတဲ့ပုံ မရှိသေးပါ။
-                </div>
-            </div>
-        `;
-
-        return;
-    }
-
-
-    /*
-     * Limit display to 60.
-     */
-
-    const visibleAssets =
-        assets.slice(0, 60);
-
-
-    grid.innerHTML =
-        visibleAssets
-            .map(asset =>
-                createSHProAssetCard(
-                    asset
-                )
-            )
-            .join('');
+  grid.innerHTML = cardsHtml;
 }
 
-
+// Next Page ကို ခေါ်ယူပေးမည့် Function
+function shProLoadNextPage() {
+  SH_CURRENT_PAGE++;
+  const searchInput = document.getElementById('proAssetSearchInput');
+  const term = searchInput ? searchInput.value : '';
+  loadSHProAssets(term, true);
+}        
+   
 /* ---------------------------------------------------------
    10. CREATE CARD
    --------------------------------------------------------- */
@@ -2542,118 +2450,7 @@ function createSHProAssetCard(
         </div>
     `;
 }
-
-
-/* ---------------------------------------------------------
-   11. KEEP CURRENT ASSETS IN MEMORY
-   --------------------------------------------------------- */
-
-let SH_PRO_ASSET_CACHE = [];
-
-
-/*
- * Override render so preview/download can find asset.
- */
-
-const shOriginalRenderSHProAssets =
-    renderSHProAssets;
-
-
-/* ---------------------------------------------------------
-   12. REDEFINE LOAD WITH CACHE
-   --------------------------------------------------------- */
-
-async function loadSHProAssetsWithCache(
-    searchTerm = ''
-) {
-
-    try {
-
-        let query =
-            shSupabase
-                .from(SH_PRO_TABLE)
-                .select(
-                    'id,title,image_url,category'
-                )
-                .order(
-                    'id',
-                    {
-                        ascending: false
-                    }
-                );
-
-
-        if (
-            searchTerm &&
-            searchTerm.trim()
-        ) {
-
-            const keyword =
-                searchTerm.trim();
-
-
-            query =
-                query.or(
-                    `title.ilike.%${keyword}%,category.ilike.%${keyword}%`
-                );
-        }
-
-
-        const {
-            data,
-            error
-        } = await query;
-
-
-        if (error) {
-            throw error;
-        }
-
-
-        SH_PRO_ASSET_CACHE =
-            Array.isArray(data)
-                ? data
-                : [];
-
-
-        renderSHProAssets(
-            SH_PRO_ASSET_CACHE
-        );
-
-    }
-    catch (error) {
-
-        console.error(
-            error
-        );
-
-        const grid =
-            document.getElementById(
-                'proAssetGrid'
-            );
-
-        if (grid) {
-
-            grid.innerHTML = `
-                <div class="sh-pro-empty-state">
-                    <div class="sh-pro-empty-icon">
-                        ⚠️
-                    </div>
-
-                    <div class="sh-pro-empty-title">
-                        မရပါ
-                    </div>
-
-                    <div class="sh-pro-empty-text">
-                        ${shSafeText(error.message)}
-                    </div>
-                </div>
-            `;
-        }
-    }
-}
-
-
+            
 /* ---------------------------------------------------------
    13. GET ONE ASSET
    --------------------------------------------------------- */
