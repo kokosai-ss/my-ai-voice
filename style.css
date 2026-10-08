@@ -1091,6 +1091,45 @@
 .sh-pro-asset-card button {
     display: none !important;
 }
+/* Mode Selection Tabs (Single Shot vs Movie Director) */
+.mode-tabs {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 16px;
+    background: rgba(8, 21, 34, 0.8);
+    padding: 6px;
+    border-radius: 12px;
+    border: 1px solid rgba(34, 211, 238, 0.2);
+}
+
+.tab-btn {
+    flex: 1;
+    padding: 10px;
+    background: transparent;
+    border: none;
+    color: #94a3b8;
+    font-weight: 600;
+    font-size: 13px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.tab-btn.active {
+    background: linear-gradient(135deg, #06b6d4, #0284c7);
+    color: #ffffff;
+    box-shadow: 0 0 15px rgba(34, 211, 238, 0.4);
+}
+
+/* Multi-shot scene card styling */
+.scene-card {
+    background: rgba(8, 21, 34, 0.85);
+    border: 1px solid rgba(34, 211, 238, 0.3);
+    padding: 14px;
+    border-radius: 12px;
+    margin-bottom: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
 
 #cyberpunk-lockscreen {
   position: fixed;
