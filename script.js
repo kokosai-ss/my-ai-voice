@@ -275,6 +275,38 @@ function copyAllMultiScenes() {
     navigator.clipboard.writeText(content);
     showNeonAlert("ဇာတ်လမ်း အခန်းဆက် အားလုံးကို Copy ကူးပြီးပါပြီ!");
 }
+// AI Script ထဲက Single Shot နဲ့ Movie Director Tab များ ပြောင်းရန်
+function switchAiSubTab(tab) {
+    const subSingle = document.getElementById('subSectionSingle');
+    const subMulti = document.getElementById('subSectionMulti');
+    const btnSingle = document.getElementById('tabSingleBtn');
+    const btnMulti = document.getElementById('tabMultiBtn');
+
+    if (tab === 'single') {
+        subSingle.style.display = 'block';
+        subMulti.style.display = 'none';
+        
+        btnSingle.style.background = "linear-gradient(135deg, #06b6d4, #0284c7)";
+        btnSingle.style.color = "#fff";
+        btnSingle.style.boxShadow = "0 0 10px rgba(34, 211, 238, 0.4)";
+
+        btnMulti.style.background = "transparent";
+        btnMulti.style.color = "#94a3b8";
+        btnMulti.style.boxShadow = "none";
+    } else {
+        subSingle.style.display = 'none';
+        subMulti.style.display = 'block';
+
+        btnMulti.style.background = "linear-gradient(135deg, #06b6d4, #0284c7)";
+        btnMulti.style.color = "#fff";
+        btnMulti.style.boxShadow = "0 0 10px rgba(34, 211, 238, 0.4)";
+
+        btnSingle.style.background = "transparent";
+        btnSingle.style.color = "#94a3b8";
+        btnSingle.style.boxShadow = "none";
+    }
+}
+
 
 let activePickerTarget = null; // 'single' or block ID number
 let singleVoiceValue = "Charon";
