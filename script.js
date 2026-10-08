@@ -172,109 +172,264 @@ Required JSON format:
     }
 }
 
-// --- 2. MOVIE DIRECTOR (MULTI-SHOT) API HANDLER ---
+// =============================================================
+// 2. MOVIE DIRECTOR (MULTI-SHOT) API HANDLER
+// OPENROUTER STREAMING + GEMINI FALLBACK
+// =============================================================
 
 async function generateMultiShotMovie() {
 
-    const movieIdea =
-        document.getElementById('movieIdeaInput').value.trim();
+    // =========================================================
+    // SAFE GLOBAL VALUES
+    // =========================================================
 
-    if (!movieIdea) {
-        return showNeonAlert(
-            "ဇာတ်လမ်း အစပျိုး Idea လေး အရင် ရိုက်ထည့်ပေးပါ သားရီး!"
-        );
-    }
+    const safeRatio =
+        (
+            typeof currentMultiRatio !== "undefined" &&
+            currentMultiRatio
+        )
+            ? currentMultiRatio
+            : "16:9";
 
-    const openRouterKey =
-        localStorage.getItem('openrouter_api_key') || "";
 
-    const geminiKey =
-        localStorage.getItem('gemini_api_key') ||
-        localStorage.getItem('geminiApiKey') ||
-        localStorage.getItem('sh_gemini_api_key') ||
-        "";
+    // =========================================================
+    // MAIN TRY
+    // =========================================================
 
-    if (!openRouterKey && !geminiKey) {
-        return showNeonAlert(
-            "API Key Settings ထဲမှာ OpenRouter သို့မဟုတ် Gemini Key သတ်မှတ်ပေးပါဗျာ!"
-        );
-    }
+    try {
 
-    const multiResultBox =
-        document.getElementById('multiResultBox');
+        // -----------------------------------------------------
+        // MOVIE IDEA
+        // -----------------------------------------------------
 
-    const multiResultContent =
-        document.getElementById('multiResultContent');
+        const movieInput =
+            document.getElementById("movieIdeaInput");
 
-    multiResultBox.style.display = 'block';
+        if (!movieInput) {
+            throw new Error(
+                "movieIdeaInput မတွေ့ပါ။ Movie Director HTML ကို စစ်ပေးပါ။"
+            );
+        }
 
-    multiResultContent.innerHTML = `
-        <div style="
-            padding:16px;
-            color:#00f3ff;
-            text-align:center;
-        ">
-            <i class="fa-solid fa-spinner fa-spin"></i>
-            Movie Director စတင်နေပါတယ်...
-        </div>
-    `;
+        const movieIdea =
+            movieInput.value.trim();
 
-    // ---------------------------------------------------------
-    // SYSTEM INSTRUCTION
-    // ---------------------------------------------------------
 
-    const systemInstruction = `
+        if (!movieIdea) {
+
+            showNeonAlert(
+                "ဇာတ်လမ်း အစပျိုး Idea လေး အရင် ရိုက်ထည့်ပေးပါ သားရီး!"
+            );
+
+            return;
+        }
+
+
+        // -----------------------------------------------------
+        // API KEYS
+        // -----------------------------------------------------
+
+        const openRouterKey =
+            localStorage.getItem(
+                "openrouter_api_key"
+            ) || "";
+
+
+        const geminiKey =
+            localStorage.getItem(
+                "gemini_api_key"
+            ) ||
+            localStorage.getItem(
+                "geminiApiKey"
+            ) ||
+            localStorage.getItem(
+                "sh_gemini_api_key"
+            ) ||
+            "";
+
+
+        if (
+            !openRouterKey &&
+            !geminiKey
+        ) {
+
+            showNeonAlert(
+                "API Key Settings ထဲမှာ OpenRouter သို့မဟုတ် Gemini Key သတ်မှတ်ပေးပါဗျာ!"
+            );
+
+            return;
+        }
+
+
+        // -----------------------------------------------------
+        // RESULT ELEMENTS
+        // -----------------------------------------------------
+
+        const multiResultBox =
+            document.getElementById(
+                "multiResultBox"
+            );
+
+        const multiResultContent =
+            document.getElementById(
+                "multiResultContent"
+            );
+
+
+        if (!multiResultBox) {
+            throw new Error(
+                "multiResultBox မတွေ့ပါ"
+            );
+        }
+
+
+        if (!multiResultContent) {
+            throw new Error(
+                "multiResultContent မတွေ့ပါ"
+            );
+        }
+
+
+        // -----------------------------------------------------
+        // START MESSAGE
+        // -----------------------------------------------------
+
+        multiResultBox.style.display =
+            "block";
+
+
+        multiResultContent.innerHTML = `
+            <div style="
+                padding:18px;
+                color:#00f3ff;
+                text-align:center;
+                background:rgba(0,0,20,0.6);
+                border:1px solid rgba(0,243,255,0.2);
+                border-radius:10px;
+            ">
+
+                <i class="fa-solid fa-spinner fa-spin"
+                   style="font-size:22px;">
+                </i>
+
+                <div style="
+                    margin-top:10px;
+                    font-weight:bold;
+                ">
+                    Movie Director စတင်နေပါတယ်...
+                </div>
+
+                <div style="
+                    margin-top:6px;
+                    color:#94a3b8;
+                    font-size:11px;
+                ">
+                    API Request ပြင်ဆင်နေပါတယ်...
+                </div>
+
+            </div>
+        `;
+
+
+        // =====================================================
+        // SYSTEM INSTRUCTION
+        // =====================================================
+
+        const systemInstruction = `
+
 You are an expert Movie Director and AI Video Prompt Engineer.
 
-CRITICAL RULE FOR CHARACTER CONSISTENCY:
+CRITICAL CHARACTER CONSISTENCY RULE:
 
-Whenever characters (whether humans, animated fruit characters,
-animals, creatures, robots, or objects) are introduced, you MUST
-lock their core physical appearance, exact colors, facial features,
-clothing, hairstyle, body shape, age, and visual style.
+Whenever a character is introduced, create and maintain a
+consistent visual identity.
 
-Once a character has been established, keep these details EXACTLY
-CONSISTENT across every following scene.
+Lock and preserve:
 
-Do not randomly change character appearance.
+- character identity
+- physical appearance
+- exact colors
+- facial features
+- hairstyle
+- clothing
+- body shape
+- approximate age
+- species
+- visual style
+
+Once a character has been established, DO NOT randomly change
+their appearance in later scenes.
+
+Maintain strict continuity across all scenes.
+
+If a character appears in multiple scenes, their appearance
+must remain consistent.
 
 Maintain story continuity from the conversation history.
 
-The Burmese dialogue or voiceover must be natural and suitable
-for Burmese movie recap / storytelling.
+Do not restart the story unless explicitly requested.
 
-The English Flow AI prompt must clearly describe the scene,
-characters, environment, camera movement, lighting, cinematic style,
-and character consistency.
+Do not invent unrelated characters.
+
+The Burmese dialogue or voiceover must sound natural and be
+suitable for Burmese movie recap / storytelling.
+
+The English Flow AI prompt must clearly describe:
+
+- characters
+- character appearance
+- character actions
+- environment
+- camera angle
+- camera movement
+- lighting
+- facial expressions
+- cinematic atmosphere
+- visual continuity
+- aspect ratio
+
+The Flow AI prompt must preserve character consistency
+between scenes.
+
 `;
 
-    // ---------------------------------------------------------
-    // PROMPT
-    // ---------------------------------------------------------
 
-    const promptText = `
+        // =====================================================
+        // USER PROMPT
+        // =====================================================
+
+        const promptText = `
+
 Based on the conversation history and the latest input,
 create the NEXT sequence of 4 to 6 video scenes.
 
 IMPORTANT:
+
 Continue directly from the previous story.
+
 Do NOT restart the story.
+
 Do NOT change established characters.
+
 Do NOT contradict previous scenes.
+
+Do NOT forget established character appearance.
 
 For EACH scene provide:
 
 1. Time range
-   Example: "0-8s", "8-16s"
+Example:
+"0-8s"
 
 2. Burmese character dialogue or voiceover script.
 
 3. Cinematic English prompt for Flow AI video generation.
 
-The Flow AI prompt must maintain strict character appearance
-consistency from previous scenes.
+The Flow AI prompt must maintain strict character
+appearance consistency from previous scenes.
 
 Include:
+
 - camera angle
 - camera movement
 - environment
@@ -283,12 +438,14 @@ Include:
 - facial expressions
 - cinematic atmosphere
 - visual continuity
-- matching aspect ratio --ar ${currentMultiRatio}
+- matching aspect ratio --ar ${safeRatio}
 
 Return ONLY a valid raw JSON array.
 
 Do NOT use markdown.
+
 Do NOT use \`\`\`json.
+
 Do NOT add explanations before or after the JSON.
 
 Required format:
@@ -298,654 +455,996 @@ Required format:
     "scene_number": 1,
     "time_range": "0-8s",
     "burmese_dialogue": "မြန်မာစကားပြောခန်း သို့မဟုတ် Voiceover",
-    "flow_prompt": "Cinematic English prompt --ar ${currentMultiRatio}"
+    "flow_prompt": "Cinematic English prompt --ar ${safeRatio}"
   }
 ]
+
 `;
 
-    // ---------------------------------------------------------
-    // ADD USER MESSAGE TO MEMORY
-    // ---------------------------------------------------------
 
-    movieChatHistory.push({
-        role: "user",
-        parts: [
-            {
-                text:
-                    `Story Idea / Continuation Request: "${movieIdea}"\n\n${promptText}`
-            }
-        ]
-    });
-
-    const currentContents = [...movieChatHistory];
-
-    // ---------------------------------------------------------
-    // JSON EXTRACTION
-    // ---------------------------------------------------------
-
-    function extractMovieScenes(rawText) {
-
-        if (!rawText) {
-            throw new Error("AI Response မရရှိပါ");
-        }
-
-        let cleaned = rawText.trim();
-
-        // Remove markdown code fences if model accidentally adds them
-        cleaned = cleaned
-            .replace(/^```json\s*/i, "")
-            .replace(/^```\s*/i, "")
-            .replace(/\s*```$/i, "")
-            .trim();
-
-        const start = cleaned.indexOf("[");
-        const end = cleaned.lastIndexOf("]");
-
-        if (start === -1 || end === -1 || end <= start) {
-            throw new Error("JSON Array ထွက်မလာပါ");
-        }
-
-        const jsonText =
-            cleaned.substring(start, end + 1);
-
-        try {
-            return JSON.parse(jsonText);
-        } catch (error) {
-            console.error("JSON Parse Error:", error);
-            console.log("Raw AI Text:", rawText);
-
-            throw new Error(
-                "AI ရဲ့ JSON ကို ဖတ်မရပါ။ နောက်တစ်ကြိမ် ပြန်စမ်းကြည့်ပါ။"
-            );
-        }
-    }
-
-    // ---------------------------------------------------------
-    // ESCAPE HTML
-    // ---------------------------------------------------------
-
-    function escapeHtml(value) {
-
-        return String(value ?? "")
-            .replace(/&/g, "&amp;")
-            .replace(/</g, "&lt;")
-            .replace(/>/g, "&gt;")
-            .replace(/"/g, "&quot;")
-            .replace(/'/g, "&#039;");
-    }
-
-    // ---------------------------------------------------------
-    // RENDER FINAL SCENES
-    // ---------------------------------------------------------
-
-    function renderMovieScenes(scenes) {
-
-        if (!Array.isArray(scenes) || scenes.length === 0) {
-            throw new Error("Scene များ မတွေ့ပါ");
-        }
-
-        let htmlOutput = "";
-
-        scenes.forEach((s, index) => {
-
-            const sceneNumber =
-                s.scene_number ?? (index + 1);
-
-            const timeRange =
-                escapeHtml(s.time_range || "");
-
-            const dialogue =
-                escapeHtml(s.burmese_dialogue || "");
-
-            const flowPrompt =
-                escapeHtml(s.flow_prompt || "");
-
-            const safeFlowPrompt =
-                String(s.flow_prompt || "")
-                    .replace(/\\/g, "\\\\")
-                    .replace(/`/g, "\\`")
-                    .replace(/\$/g, "\\$");
-
-            htmlOutput += `
-                <div style="
-                    background:rgba(0,0,20,0.6);
-                    border:1px solid rgba(0,243,255,0.2);
-                    padding:12px;
-                    border-radius:10px;
-                    margin-bottom:12px;
-                ">
-
-                    <div style="
-                        display:flex;
-                        justify-content:space-between;
-                        align-items:center;
-                        gap:8px;
-                        margin-bottom:6px;
-                    ">
-
-                        <span style="
-                            color:#00f3ff;
-                            font-weight:bold;
-                        ">
-                            🎬 Scene ${sceneNumber}
-                            (${timeRange})
-                        </span>
-
-                        <button
-                            class="copy-all-btn"
-                            onclick="
-                                navigator.clipboard.writeText(\`${safeFlowPrompt}\`);
-                                showNeonAlert('Scene ${sceneNumber} Flow Prompt ကို ကူးပြီးပါပြီ!');
-                            "
-                        >
-                            <i class="fa-solid fa-copy"></i>
-                            Prompt ကူးမည်
-                        </button>
-
-                    </div>
-
-                    <p style="
-                        margin-bottom:6px;
-                        font-size:13px;
-                    ">
-                        🇲🇲
-                        <b>မြန်မာစကားပြောခန်း / Voiceover:</b>
-                        <br>
-
-                        <span style="
-                            color:#f8fafc;
-                        ">
-                            ${dialogue}
-                        </span>
-                    </p>
-
-                    <p style="
-                        font-size:13px;
-                    ">
-                        🇬🇧
-                        <b>Flow AI Prompt:</b>
-                        <br>
-
-                        <span style="
-                            color:#94a3b8;
-                            font-family:monospace;
-                            white-space:pre-wrap;
-                        ">
-                            ${flowPrompt}
-                        </span>
-                    </p>
-
-                </div>
-            `;
-        });
-
-        multiResultContent.innerHTML = htmlOutput;
-    }
-
-    // ---------------------------------------------------------
-    // SAVE MODEL MEMORY
-    // ---------------------------------------------------------
-
-    function saveMovieModelMemory(rawText) {
-
-        movieChatHistory.push({
-            role: "model",
-            parts: [
-                {
-                    text: rawText
-                }
-            ]
-        });
-    }
-
-    // =========================================================
-    // OPENROUTER STREAMING
-    // =========================================================
-
-// =========================================================
-// OPENROUTER STREAMING — FIXED + TIMEOUT + DEBUG
-// =========================================================
-
-async function runOpenRouter() {
-
-    if (!openRouterKey) {
-        throw new Error("OpenRouter API Key မရှိပါ");
-    }
-
-    // -----------------------------------------------------
-    // SHOW STATUS IMMEDIATELY
-    // -----------------------------------------------------
-
-    multiResultContent.innerHTML = `
-        <div style="
-            background:rgba(0,0,20,0.6);
-            border:1px solid rgba(0,243,255,0.25);
-            padding:16px;
-            border-radius:10px;
-            text-align:center;
-        ">
-            <div style="
-                color:#00f3ff;
-                font-weight:bold;
-                margin-bottom:8px;
-            ">
-                <i class="fa-solid fa-bolt"></i>
-                OpenRouter ကို ချိတ်နေပါတယ်...
-            </div>
-
-            <div style="
-                color:#94a3b8;
-                font-size:12px;
-            ">
-                API Request ပို့နေပါတယ်...
-            </div>
-        </div>
-    `;
-
-    // -----------------------------------------------------
-    // TIMEOUT
-    // -----------------------------------------------------
-
-    const controller = new AbortController();
-
-    const timeoutId = setTimeout(() => {
-        controller.abort();
-    }, 30000);
-
-
-    try {
-
-        // -------------------------------------------------
-        // OPENROUTER REQUEST
-        // -------------------------------------------------
-
-        const response = await fetch(
-            "https://openrouter.ai/api/v1/chat/completions",
-            {
-                method: "POST",
-
-                signal: controller.signal,
-
-                headers: {
-                    "Authorization":
-                        `Bearer ${openRouterKey}`,
-
-                    "Content-Type":
-                        "application/json",
-
-                    "HTTP-Referer":
-                        window.location.href,
-
-                    "X-Title":
-                        "SH AI Studio"
-                },
-
-                body: JSON.stringify({
-
-                    model: "openrouter/free",
-
-                    stream: true,
-
-                    messages: [
-                        {
-                            role: "system",
-                            content: systemInstruction
-                        },
-
-                        ...currentContents.map(item => ({
-                            role:
-                                item.role === "model"
-                                    ? "assistant"
-                                    : "user",
-
-                            content:
-                                item.parts
-                                    ?.map(p => p.text || "")
-                                    .join("") || ""
-                        }))
-                    ]
-                })
-            }
-        );
-
-
-        clearTimeout(timeoutId);
-
-
-        // -------------------------------------------------
-        // HTTP ERROR
-        // -------------------------------------------------
-
-        if (!response.ok) {
-
-            const errorText =
-                await response.text();
-
-            throw new Error(
-                `OpenRouter HTTP ${response.status}: ${errorText}`
-            );
-        }
-
-
-        // -------------------------------------------------
-        // STREAMING NOT SUPPORTED
-        // -------------------------------------------------
-
-        if (!response.body) {
-
-            throw new Error(
-                "OpenRouter Streaming response မရရှိပါ"
-            );
-        }
-
-
-        // -------------------------------------------------
-        // SHOW STREAMING UI
-        // -------------------------------------------------
-
-        multiResultContent.innerHTML = `
-            <div style="
-                background:rgba(0,0,20,0.6);
-                border:1px solid rgba(0,243,255,0.25);
-                padding:14px;
-                border-radius:10px;
-            ">
-
-                <div style="
-                    color:#00f3ff;
-                    font-weight:bold;
-                    margin-bottom:10px;
-                ">
-                    <i class="fa-solid fa-bolt"></i>
-                    OpenRouter Streaming...
-                </div>
-
-                <pre
-                    id="movieStreamingText"
-                    style="
-                        white-space:pre-wrap;
-                        word-break:break-word;
-                        color:#e2e8f0;
-                        font-family:inherit;
-                        font-size:13px;
-                        line-height:1.6;
-                        margin:0;
-                    "
-                ></pre>
-
-            </div>
-        `;
-
-
-        const streamingText =
-            document.getElementById(
-                "movieStreamingText"
-            );
-
-
-        // -------------------------------------------------
-        // READER
-        // -------------------------------------------------
-
-        const reader =
-            response.body.getReader();
-
-        const decoder =
-            new TextDecoder("utf-8");
-
-        let rawText = "";
-
-        let buffer = "";
-
-
-        // -------------------------------------------------
-        // READ STREAM
-        // -------------------------------------------------
-
-        while (true) {
-
-            const {
-                value,
-                done
-            } = await reader.read();
-
-
-            if (done) {
-                break;
-            }
-
-
-            buffer += decoder.decode(
-                value,
-                {
-                    stream: true
-                }
-            );
-
-
-            const lines =
-                buffer.split("\n");
-
-
-            buffer =
-                lines.pop() || "";
-
-
-            for (const line of lines) {
-
-                const trimmed =
-                    line.trim();
-
-
-                if (!trimmed) {
-                    continue;
-                }
-
-
-                if (
-                    !trimmed.startsWith("data:")
-                ) {
-                    continue;
-                }
-
-
-                const dataText =
-                    trimmed
-                        .substring(5)
-                        .trim();
-
-
-                if (
-                    dataText === "[DONE]"
-                ) {
-                    continue;
-                }
-
-
-                try {
-
-                    const data =
-                        JSON.parse(dataText);
-
-
-                    // -----------------------------------------
-                    // POSSIBLE OPENROUTER ERROR INSIDE STREAM
-                    // -----------------------------------------
-
-                    if (data?.error) {
-
-                        throw new Error(
-                            data.error.message ||
-                            "OpenRouter Streaming Error"
-                        );
-                    }
-
-
-                    // -----------------------------------------
-                    // GET DELTA
-                    // -----------------------------------------
-
-                    const delta =
-                        data
-                            ?.choices?.[0]
-                            ?.delta
-                            ?.content;
-
-
-                    if (delta) {
-
-                        rawText += delta;
-
-
-                        if (streamingText) {
-
-                            streamingText.textContent =
-                                rawText;
-
-
-                            streamingText.scrollTop =
-                                streamingText.scrollHeight;
-                        }
-                    }
-
-                } catch (parseError) {
-
-                    // JSON chunk မပြည့်သေးရင် ဆက်ဖတ်မယ်
-                    console.log(
-                        "OpenRouter stream chunk:",
-                        dataText
-                    );
-                }
-            }
-        }
-
-
-        // -------------------------------------------------
-        // FINAL CHECK
-        // -------------------------------------------------
-
-        if (!rawText.trim()) {
-
-            throw new Error(
-                "OpenRouter ချိတ်ဆက်ပြီးပါပြီ၊ ဒါပေမယ့် AI Response စာသား မပြန်လာပါ"
-            );
-        }
-
-
-        return rawText;
-
-
-    } catch (error) {
-
-        clearTimeout(timeoutId);
-
-
-        // -------------------------------------------------
-        // TIMEOUT ERROR
-        // -------------------------------------------------
+        // =====================================================
+        // MOVIE MEMORY CHECK
+        // =====================================================
 
         if (
-            error?.name === "AbortError"
+            typeof movieChatHistory === "undefined"
         ) {
 
             throw new Error(
-                "OpenRouter Request Timeout — စက္ကန့် ၃၀ အတွင်း Response မရပါ"
+                "movieChatHistory မရှိပါ။ Movie Memory JavaScript ကို စစ်ပေးပါ။"
             );
         }
 
 
-        throw error;
-    }
-}
-                        
-    // =========================================================
-    // GEMINI FALLBACK
-    // =========================================================
+        // =====================================================
+        // ADD USER MESSAGE
+        // =====================================================
 
-    async function runGeminiFallback() {
+        movieChatHistory.push({
 
-        if (!geminiKey) {
-            throw new Error(
-                "Gemini API Key မရှိပါ"
-            );
-        }
+            role: "user",
 
-        multiResultContent.innerHTML = `
-            <p style="
-                color:#ffaa00;
-                text-align:center;
-                padding:16px;
-            ">
-                ⚠️ OpenRouter မအောင်မြင်ပါ။
-                <br>
-                🔄 Gemini ကို အလိုအလျောက် ပြောင်းပြီး
-                ဆက်လုပ်နေပါတယ်...
-            </p>
-        `;
+            parts: [
+                {
+                    text:
+                        `Story Idea / Continuation Request: "${movieIdea}"
 
-        const response = await fetch(
-            `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=${geminiKey}`,
-            {
-                method: "POST",
+${promptText}`
+                }
+            ]
 
-                headers: {
-                    "Content-Type":
-                        "application/json"
-                },
+        });
 
-                body: JSON.stringify({
 
-                    system_instruction: {
-                        parts: [
-                            {
-                                text:
-                                    systemInstruction
-                            }
-                        ]
-                    },
+        // =====================================================
+        // COPY CURRENT MEMORY
+        // =====================================================
 
-                    contents:
-                        currentContents
-                })
+        const currentContents =
+            [...movieChatHistory];
+
+
+        // =====================================================
+        // JSON EXTRACTION
+        // =====================================================
+
+        function extractMovieScenes(rawText) {
+
+            if (!rawText) {
+
+                throw new Error(
+                    "AI Response မရရှိပါ"
+                );
             }
-        );
 
-        const data =
-            await response.json();
 
-        if (!response.ok || data.error) {
+            let cleaned =
+                String(rawText).trim();
 
-            throw new Error(
-                data?.error?.message ||
-                `Gemini HTTP ${response.status}`
-            );
+
+            // Remove markdown fences
+            cleaned =
+                cleaned
+                    .replace(
+                        /^```json\s*/i,
+                        ""
+                    )
+                    .replace(
+                        /^```\s*/i,
+                        ""
+                    )
+                    .replace(
+                        /\s*```$/i,
+                        ""
+                    )
+                    .trim();
+
+
+            const start =
+                cleaned.indexOf("[");
+
+
+            const end =
+                cleaned.lastIndexOf("]");
+
+
+            if (
+                start === -1 ||
+                end === -1 ||
+                end <= start
+            ) {
+
+                console.error(
+                    "AI RAW RESPONSE:",
+                    rawText
+                );
+
+                throw new Error(
+                    "JSON Array ထွက်မလာပါ။ AI Response ကို စစ်ပေးပါ။"
+                );
+            }
+
+
+            const jsonText =
+                cleaned.substring(
+                    start,
+                    end + 1
+                );
+
+
+            try {
+
+                return JSON.parse(
+                    jsonText
+                );
+
+            } catch (error) {
+
+                console.error(
+                    "JSON Parse Error:",
+                    error
+                );
+
+                console.error(
+                    "Raw AI Text:",
+                    rawText
+                );
+
+                throw new Error(
+                    "AI ရဲ့ JSON ကို ဖတ်မရပါ။ နောက်တစ်ကြိမ် ပြန်စမ်းကြည့်ပါ။"
+                );
+            }
+
         }
 
-        const rawText =
-            data?.candidates?.[0]?.content?.parts
-                ?.map(part => part.text || "")
-                .join("") || "";
 
-        if (!rawText) {
-            throw new Error(
-                "Gemini က စာပြန်မပေးပါ"
-            );
+        // =====================================================
+        // HTML ESCAPE
+        // =====================================================
+
+        function escapeHtml(value) {
+
+            return String(
+                value ?? ""
+            )
+                .replace(
+                    /&/g,
+                    "&amp;"
+                )
+                .replace(
+                    /</g,
+                    "&lt;"
+                )
+                .replace(
+                    />/g,
+                    "&gt;"
+                )
+                .replace(
+                    /"/g,
+                    "&quot;"
+                )
+                .replace(
+                    /'/g,
+                    "&#039;"
+                );
+
         }
 
-        return rawText;
-    }
 
-    // =========================================================
-    // MAIN AI FLOW
-    // =========================================================
+        // =====================================================
+        // RENDER MOVIE SCENES
+        // =====================================================
 
-    let finalRawText = "";
-    let usedProvider = "";
+        function renderMovieScenes(
+            scenes
+        ) {
 
-    try {
+            if (
+                !Array.isArray(
+                    scenes
+                ) ||
+                scenes.length === 0
+            ) {
+
+                throw new Error(
+                    "Scene များ မတွေ့ပါ"
+                );
+            }
+
+
+            let htmlOutput =
+                "";
+
+
+            scenes.forEach(
+                (
+                    scene,
+                    index
+                ) => {
+
+                    const sceneNumber =
+                        scene.scene_number ??
+                        (
+                            index + 1
+                        );
+
+
+                    const timeRange =
+                        escapeHtml(
+                            scene.time_range ||
+                            ""
+                        );
+
+
+                    const dialogue =
+                        escapeHtml(
+                            scene.burmese_dialogue ||
+                            ""
+                        );
+
+
+                    const flowPrompt =
+                        escapeHtml(
+                            scene.flow_prompt ||
+                            ""
+                        );
+
+
+                    const safeFlowPrompt =
+                        String(
+                            scene.flow_prompt ||
+                            ""
+                        )
+                            .replace(
+                                /\\/g,
+                                "\\\\"
+                            )
+                            .replace(
+                                /`/g,
+                                "\\`"
+                            )
+                            .replace(
+                                /\$/g,
+                                "\\$"
+                            );
+
+
+                    htmlOutput += `
+
+                        <div style="
+                            background:rgba(0,0,20,0.6);
+                            border:1px solid rgba(0,243,255,0.2);
+                            padding:12px;
+                            border-radius:10px;
+                            margin-bottom:12px;
+                        ">
+
+                            <div style="
+                                display:flex;
+                                justify-content:space-between;
+                                align-items:center;
+                                gap:8px;
+                                margin-bottom:6px;
+                            ">
+
+                                <span style="
+                                    color:#00f3ff;
+                                    font-weight:bold;
+                                ">
+                                    🎬 Scene ${sceneNumber}
+                                    (${timeRange})
+                                </span>
+
+
+                                <button
+                                    class="copy-all-btn"
+                                    onclick="
+                                        navigator.clipboard.writeText(\`${safeFlowPrompt}\`);
+                                        showNeonAlert('Scene ${sceneNumber} Flow Prompt ကို ကူးပြီးပါပြီ!');
+                                    "
+                                >
+
+                                    <i class="fa-solid fa-copy"></i>
+
+                                    Prompt ကူးမည်
+
+                                </button>
+
+                            </div>
+
+
+                            <p style="
+                                margin-bottom:6px;
+                                font-size:13px;
+                            ">
+
+                                🇲🇲
+
+                                <b>
+                                    မြန်မာစကားပြောခန်း / Voiceover:
+                                </b>
+
+                                <br>
+
+                                <span style="
+                                    color:#f8fafc;
+                                ">
+                                    ${dialogue}
+                                </span>
+
+                            </p>
+
+
+                            <p style="
+                                font-size:13px;
+                            ">
+
+                                🇬🇧
+
+                                <b>
+                                    Flow AI Prompt:
+                                </b>
+
+                                <br>
+
+                                <span style="
+                                    color:#94a3b8;
+                                    font-family:monospace;
+                                    white-space:pre-wrap;
+                                ">
+                                    ${flowPrompt}
+                                </span>
+
+                            </p>
+
+                        </div>
+
+                    `;
+
+                }
+            );
+
+
+            multiResultContent.innerHTML =
+                htmlOutput;
+
+        }
+
+
+        // =====================================================
+        // SAVE MODEL MEMORY
+        // =====================================================
+
+        function saveMovieModelMemory(
+            rawText
+        ) {
+
+            movieChatHistory.push({
+
+                role: "model",
+
+                parts: [
+                    {
+                        text: rawText
+                    }
+                ]
+
+            });
+
+        }
+
+
+        // =====================================================
+        // OPENROUTER STREAMING
+        // =====================================================
+
+        async function runOpenRouter() {
+
+            if (!openRouterKey) {
+
+                throw new Error(
+                    "OpenRouter API Key မရှိပါ"
+                );
+
+            }
+
+
+            // -------------------------------------------------
+            // IMPORTANT
+            // -------------------------------------------------
+            // ဒီ model ကို မင်း 3.8 Flash သုံးမယ်ဆိုရင်
+            // OpenRouter မှာ အသုံးပြုနေတဲ့ model ID နဲ့
+            // ကိုက်ညီအောင် ဒီတစ်နေရာမှာပဲ ပြောင်းနိုင်တယ်။
+            // -------------------------------------------------
+
+            const openRouterModel =
+                "google/gemini-3.8-flash";
+
+
+            multiResultContent.innerHTML = `
+
+                <div style="
+                    padding:16px;
+                    background:rgba(0,0,20,0.6);
+                    border:1px solid rgba(0,243,255,0.25);
+                    border-radius:10px;
+                ">
+
+                    <div style="
+                        color:#00f3ff;
+                        font-weight:bold;
+                        text-align:center;
+                    ">
+
+                        <i class="fa-solid fa-bolt"></i>
+
+                        OpenRouter ကို ချိတ်နေပါတယ်...
+
+                    </div>
+
+
+                    <div style="
+                        color:#94a3b8;
+                        font-size:11px;
+                        text-align:center;
+                        margin-top:6px;
+                    ">
+
+                        Streaming response စောင့်နေပါတယ်...
+
+                    </div>
+
+                </div>
+
+            `;
+
+
+            // -------------------------------------------------
+            // TIMEOUT
+            // -------------------------------------------------
+
+            const controller =
+                new AbortController();
+
+
+            const timeoutId =
+                setTimeout(
+                    () => {
+
+                        controller.abort();
+
+                    },
+                    45000
+                );
+
+
+            try {
+
+                const response =
+                    await fetch(
+
+                        "https://openrouter.ai/api/v1/chat/completions",
+
+                        {
+
+                            method: "POST",
+
+                            signal:
+                                controller.signal,
+
+
+                            headers: {
+
+                                "Authorization":
+                                    `Bearer ${openRouterKey}`,
+
+                                "Content-Type":
+                                    "application/json",
+
+                                "HTTP-Referer":
+                                    window.location.href,
+
+                                "X-Title":
+                                    "SH AI Studio"
+
+                            },
+
+
+                            body:
+                                JSON.stringify({
+
+                                    model:
+                                        openRouterModel,
+
+                                    stream:
+                                        true,
+
+                                    messages: [
+
+                                        {
+                                            role:
+                                                "system",
+
+                                            content:
+                                                systemInstruction
+                                        },
+
+                                        ...currentContents.map(
+                                            item => ({
+
+                                                role:
+                                                    item.role === "model"
+                                                        ? "assistant"
+                                                        : "user",
+
+                                                content:
+                                                    item.parts
+                                                        ?.map(
+                                                            p =>
+                                                                p.text ||
+                                                                ""
+                                                        )
+                                                        .join(
+                                                            ""
+                                                        ) ||
+                                                    ""
+
+                                            })
+                                        )
+
+                                    ]
+
+                                })
+
+                        }
+
+                    );
+
+
+                clearTimeout(
+                    timeoutId
+                );
+
+
+                // -------------------------------------------------
+                // HTTP ERROR
+                // -------------------------------------------------
+
+                if (!response.ok) {
+
+                    const errorText =
+                        await response.text();
+
+
+                    throw new Error(
+                        `OpenRouter HTTP ${response.status}: ${errorText}`
+                    );
+
+                }
+
+
+                if (!response.body) {
+
+                    throw new Error(
+                        "OpenRouter Streaming response မရရှိပါ"
+                    );
+
+                }
+
+
+                // -------------------------------------------------
+                // STREAM UI
+                // -------------------------------------------------
+
+                multiResultContent.innerHTML = `
+
+                    <div style="
+                        background:rgba(0,0,20,0.6);
+                        border:1px solid rgba(0,243,255,0.2);
+                        padding:14px;
+                        border-radius:10px;
+                    ">
+
+                        <div style="
+                            color:#00f3ff;
+                            font-weight:bold;
+                            margin-bottom:10px;
+                        ">
+
+                            <i class="fa-solid fa-bolt"></i>
+
+                            OpenRouter Streaming...
+
+                        </div>
+
+
+                        <pre
+                            id="movieStreamingText"
+                            style="
+                                white-space:pre-wrap;
+                                word-break:break-word;
+                                color:#e2e8f0;
+                                font-family:inherit;
+                                font-size:13px;
+                                line-height:1.6;
+                                margin:0;
+                            "
+                        ></pre>
+
+                    </div>
+
+                `;
+
+
+                const streamingText =
+                    document.getElementById(
+                        "movieStreamingText"
+                    );
+
+
+                const reader =
+                    response.body.getReader();
+
+
+                const decoder =
+                    new TextDecoder(
+                        "utf-8"
+                    );
+
+
+                let rawText =
+                    "";
+
+                let buffer =
+                    "";
+
+
+                // -------------------------------------------------
+                // READ STREAM
+                // -------------------------------------------------
+
+                while (true) {
+
+                    const {
+                        value,
+                        done
+                    } =
+                        await reader.read();
+
+
+                    if (done) {
+                        break;
+                    }
+
+
+                    buffer +=
+                        decoder.decode(
+                            value,
+                            {
+                                stream: true
+                            }
+                        );
+
+
+                    const lines =
+                        buffer.split(
+                            "\n"
+                        );
+
+
+                    buffer =
+                        lines.pop() ||
+                        "";
+
+
+                    for (
+                        const line
+                        of lines
+                    ) {
+
+                        const trimmed =
+                            line.trim();
+
+
+                        if (
+                            !trimmed
+                        ) {
+                            continue;
+                        }
+
+
+                        if (
+                            !trimmed.startsWith(
+                                "data:"
+                            )
+                        ) {
+                            continue;
+                        }
+
+
+                        const dataText =
+                            trimmed
+                                .substring(
+                                    5
+                                )
+                                .trim();
+
+
+                        if (
+                            dataText ===
+                            "[DONE]"
+                        ) {
+                            continue;
+                        }
+
+
+                        let data;
+
+
+                        try {
+
+                            data =
+                                JSON.parse(
+                                    dataText
+                                );
+
+                        } catch (
+                            parseError
+                        ) {
+
+                            console.log(
+                                "OpenRouter SSE:",
+                                dataText
+                            );
+
+                            continue;
+                        }
+
+
+                        // -------------------------------------------------
+                        // OPENROUTER ERROR INSIDE STREAM
+                        // -------------------------------------------------
+
+                        if (
+                            data?.error
+                        ) {
+
+                            throw new Error(
+                                data.error.message ||
+                                "OpenRouter Streaming Error"
+                            );
+
+                        }
+
+
+                        const delta =
+                            data
+                                ?.choices?.[0]
+                                ?.delta
+                                ?.content;
+
+
+                        if (
+                            delta
+                        ) {
+
+                            rawText +=
+                                delta;
+
+
+                            if (
+                                streamingText
+                            ) {
+
+                                streamingText.textContent =
+                                    rawText;
+
+
+                                streamingText.scrollTop =
+                                    streamingText.scrollHeight;
+
+                            }
+
+                        }
+
+                    }
+
+                }
+
+
+                // -------------------------------------------------
+                // FINAL CHECK
+                // -------------------------------------------------
+
+                if (
+                    !rawText.trim()
+                ) {
+
+                    throw new Error(
+                        "OpenRouter ချိတ်ဆက်ပြီးပါပြီ၊ ဒါပေမယ့် AI Response စာသား မပြန်လာပါ"
+                    );
+
+                }
+
+
+                return rawText;
+
+
+            } catch (error) {
+
+                clearTimeout(
+                    timeoutId
+                );
+
+
+                if (
+                    error?.name ===
+                    "AbortError"
+                ) {
+
+                    throw new Error(
+                        "OpenRouter Request Timeout — ၄၅ စက္ကန့်အတွင်း Response မရပါ"
+                    );
+
+                }
+
+
+                throw error;
+
+            }
+
+        }
+
+
+        // =====================================================
+        // GEMINI FALLBACK
+        // =====================================================
+
+        async function runGeminiFallback() {
+
+            if (!geminiKey) {
+
+                throw new Error(
+                    "Gemini API Key မရှိပါ"
+                );
+
+            }
+
+
+            multiResultContent.innerHTML = `
+
+                <div style="
+                    padding:16px;
+                    color:#ffaa00;
+                    text-align:center;
+                    background:rgba(30,20,0,0.4);
+                    border:1px solid rgba(255,170,0,0.2);
+                    border-radius:10px;
+                ">
+
+                    ⚠️ OpenRouter မအောင်မြင်ပါ။
+
+                    <br><br>
+
+                    🔄 Gemini ကို အလိုအလျောက်
+                    ပြောင်းပြီး ဆက်လုပ်နေပါတယ်...
+
+                </div>
+
+            `;
+
+
+            const response =
+                await fetch(
+
+                    `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=${encodeURIComponent(geminiKey)}`,
+
+                    {
+
+                        method: "POST",
+
+                        headers: {
+
+                            "Content-Type":
+                                "application/json"
+
+                        },
+
+
+                        body:
+                            JSON.stringify({
+
+                                system_instruction: {
+
+                                    parts: [
+
+                                        {
+                                            text:
+                                                systemInstruction
+                                        }
+
+                                    ]
+
+                                },
+
+
+                                contents:
+                                    currentContents
+
+                            })
+
+                    }
+
+                );
+
+
+            const data =
+                await response.json()
+                    .catch(
+                        () => ({})
+                    );
+
+
+            if (
+                !response.ok ||
+                data.error
+            ) {
+
+                throw new Error(
+
+                    data?.error?.message ||
+
+                    `Gemini HTTP ${response.status}`
+
+                );
+
+            }
+
+
+            const rawText =
+                data
+                    ?.candidates?.[0]
+                    ?.content?.parts
+                    ?.map(
+                        part =>
+                            part.text ||
+                            ""
+                    )
+                    .join(
+                        ""
+                    ) ||
+                "";
+
+
+            if (
+                !rawText.trim()
+            ) {
+
+                throw new Error(
+                    "Gemini က စာပြန်မပေးပါ"
+                );
+
+            }
+
+
+            return rawText;
+
+        }
+
+
+        // =====================================================
+        // MAIN AI FLOW
+        // =====================================================
+
+        let finalRawText =
+            "";
+
+        let usedProvider =
+            "";
+
 
         // -----------------------------------------------------
-        // 1. OPENROUTER FIRST
+        // OPENROUTER FIRST
         // -----------------------------------------------------
 
         if (openRouterKey) {
@@ -955,24 +1454,25 @@ async function runOpenRouter() {
                 finalRawText =
                     await runOpenRouter();
 
+
                 usedProvider =
                     "OpenRouter";
 
-            } catch (openRouterError) {
+            } catch (
+                openRouterError
+            ) {
 
                 console.error(
                     "OpenRouter Error:",
                     openRouterError
                 );
 
-                // -------------------------------------------------
-                // 2. GEMINI FALLBACK
-                // -------------------------------------------------
 
                 if (geminiKey) {
 
                     finalRawText =
                         await runGeminiFallback();
+
 
                     usedProvider =
                         "Gemini Fallback";
@@ -980,78 +1480,185 @@ async function runOpenRouter() {
                 } else {
 
                     throw openRouterError;
+
                 }
+
             }
 
         } else {
 
-            // No OpenRouter Key → Gemini directly
+            // -------------------------------------------------
+            // NO OPENROUTER KEY
+            // GEMINI DIRECT
+            // -------------------------------------------------
 
             finalRawText =
                 await runGeminiFallback();
 
+
             usedProvider =
                 "Gemini";
+
         }
 
-        // -------------------------------------------------------
-        // SAVE AI RESPONSE TO MEMORY ONLY ONCE
-        // -------------------------------------------------------
 
-        saveMovieModelMemory(finalRawText);
+        // =====================================================
+        // SAVE AI MEMORY
+        // =====================================================
 
-        // -------------------------------------------------------
-        // PARSE JSON
-        // -------------------------------------------------------
+        saveMovieModelMemory(
+            finalRawText
+        );
+
+
+        // =====================================================
+        // PARSE SCENES
+        // =====================================================
 
         const scenes =
-            extractMovieScenes(finalRawText);
+            extractMovieScenes(
+                finalRawText
+            );
 
-        // -------------------------------------------------------
-        // RENDER SCENES
-        // -------------------------------------------------------
 
-        renderMovieScenes(scenes);
+        // =====================================================
+        // RENDER
+        // =====================================================
+
+        renderMovieScenes(
+            scenes
+        );
+
+
+        // =====================================================
+        // DEBUG
+        // =====================================================
 
         console.log(
-            `Movie Director Provider: ${usedProvider}`
+            "================================"
         );
+
+        console.log(
+            "Movie Director Provider:",
+            usedProvider
+        );
+
+        console.log(
+            "Movie Director Ratio:",
+            safeRatio
+        );
+
+        console.log(
+            "Movie Director Scenes:",
+            scenes.length
+        );
+
+        console.log(
+            "================================"
+        );
+
 
     } catch (err) {
 
+        // =====================================================
+        // GLOBAL ERROR HANDLER
+        // =====================================================
+
         console.error(
-            "Multi-Shot Error:",
+            "Movie Director Error:",
             err
         );
 
-        // -------------------------------------------------------
-        // REMOVE USER MESSAGE IF BOTH PROVIDERS FAIL
-        // -------------------------------------------------------
+
+        // -----------------------------------------------------
+        // REMOVE LAST USER MEMORY
+        // -----------------------------------------------------
 
         if (
+            typeof movieChatHistory !==
+            "undefined" &&
             movieChatHistory.length > 0 &&
-            movieChatHistory[movieChatHistory.length - 1]
-                .role === "user"
+            movieChatHistory[
+                movieChatHistory.length - 1
+            ]?.role === "user"
         ) {
+
             movieChatHistory.pop();
+
         }
 
-        multiResultContent.innerHTML = `
-            <div style="
-                color:#ff4d4d;
-                background:rgba(255,0,0,0.05);
-                border:1px solid rgba(255,77,77,0.25);
-                padding:14px;
-                border-radius:10px;
-            ">
-                ❌ Movie Director Error
-                <br><br>
-                ${escapeHtml(err.message)}
-            </div>
-        `;
-    }
-}
 
+        // -----------------------------------------------------
+        // SHOW REAL ERROR
+        // -----------------------------------------------------
+
+        const errorBox =
+            document.getElementById(
+                "multiResultContent"
+            );
+
+
+        if (
+            errorBox
+        ) {
+
+            errorBox.innerHTML = `
+
+                <div style="
+                    color:#ff4d4d;
+                    background:rgba(255,0,0,0.06);
+                    border:1px solid rgba(255,77,77,0.3);
+                    padding:16px;
+                    border-radius:10px;
+                    line-height:1.6;
+                ">
+
+                    <div style="
+                        font-size:15px;
+                        font-weight:bold;
+                        margin-bottom:10px;
+                    ">
+
+                        ❌ Movie Director Error
+
+                    </div>
+
+
+                    <div style="
+                        color:#fca5a5;
+                        font-size:12px;
+                        word-break:break-word;
+                    ">
+
+                        ${String(
+                            err?.message ||
+                            err ||
+                            "Unknown Error"
+                        )
+                            .replace(
+                                /&/g,
+                                "&amp;"
+                            )
+                            .replace(
+                                /</g,
+                                "&lt;"
+                            )
+                            .replace(
+                                />/g,
+                                "&gt;"
+                            )}
+
+                    </div>
+
+                </div>
+
+            `;
+
+        }
+
+    }
+
+}
 
 // =============================================================
 // RESET MOVIE MEMORY
