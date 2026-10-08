@@ -3092,6 +3092,10 @@
     font-size: 12px;
     cursor: pointer;
 }
+.sh-pro-asset-name,
+.sh-pro-preview-title {
+    display: none !important;
+}
 
 #cyberpunk-lockscreen {
   position: fixed;
