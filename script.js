@@ -502,23 +502,82 @@ Required format:
     // OPENROUTER STREAMING
     // =========================================================
 
-    async function runOpenRouter() {
+// =========================================================
+// OPENROUTER STREAMING — FIXED + TIMEOUT + DEBUG
+// =========================================================
 
-        if (!openRouterKey) {
-            throw new Error("OpenRouter API Key မရှိပါ");
-        }
+async function runOpenRouter() {
+
+    if (!openRouterKey) {
+        throw new Error("OpenRouter API Key မရှိပါ");
+    }
+
+    // -----------------------------------------------------
+    // SHOW STATUS IMMEDIATELY
+    // -----------------------------------------------------
+
+    multiResultContent.innerHTML = `
+        <div style="
+            background:rgba(0,0,20,0.6);
+            border:1px solid rgba(0,243,255,0.25);
+            padding:16px;
+            border-radius:10px;
+            text-align:center;
+        ">
+            <div style="
+                color:#00f3ff;
+                font-weight:bold;
+                margin-bottom:8px;
+            ">
+                <i class="fa-solid fa-bolt"></i>
+                OpenRouter ကို ချိတ်နေပါတယ်...
+            </div>
+
+            <div style="
+                color:#94a3b8;
+                font-size:12px;
+            ">
+                API Request ပို့နေပါတယ်...
+            </div>
+        </div>
+    `;
+
+    // -----------------------------------------------------
+    // TIMEOUT
+    // -----------------------------------------------------
+
+    const controller = new AbortController();
+
+    const timeoutId = setTimeout(() => {
+        controller.abort();
+    }, 30000);
+
+
+    try {
+
+        // -------------------------------------------------
+        // OPENROUTER REQUEST
+        // -------------------------------------------------
 
         const response = await fetch(
             "https://openrouter.ai/api/v1/chat/completions",
             {
                 method: "POST",
 
+                signal: controller.signal,
+
                 headers: {
                     "Authorization":
                         `Bearer ${openRouterKey}`,
 
                     "Content-Type":
-                        "application/json"
+                        "application/json",
+
+                    "HTTP-Referer":
+                        window.location.href,
+
+                    "X-Title":
+                        "SH AI Studio"
                 },
 
                 body: JSON.stringify({
@@ -549,6 +608,14 @@ Required format:
             }
         );
 
+
+        clearTimeout(timeoutId);
+
+
+        // -------------------------------------------------
+        // HTTP ERROR
+        // -------------------------------------------------
+
         if (!response.ok) {
 
             const errorText =
@@ -559,25 +626,27 @@ Required format:
             );
         }
 
+
+        // -------------------------------------------------
+        // STREAMING NOT SUPPORTED
+        // -------------------------------------------------
+
         if (!response.body) {
+
             throw new Error(
-                "Streaming response မရရှိပါ"
+                "OpenRouter Streaming response မရရှိပါ"
             );
         }
 
-        const reader =
-            response.body.getReader();
 
-        const decoder =
-            new TextDecoder("utf-8");
-
-        let rawText = "";
-        let buffer = "";
+        // -------------------------------------------------
+        // SHOW STREAMING UI
+        // -------------------------------------------------
 
         multiResultContent.innerHTML = `
             <div style="
                 background:rgba(0,0,20,0.6);
-                border:1px solid rgba(0,243,255,0.2);
+                border:1px solid rgba(0,243,255,0.25);
                 padding:14px;
                 border-radius:10px;
             ">
@@ -591,75 +660,148 @@ Required format:
                     OpenRouter Streaming...
                 </div>
 
-                <pre id="movieStreamingText" style="
-                    white-space:pre-wrap;
-                    word-break:break-word;
-                    color:#e2e8f0;
-                    font-family:inherit;
-                    font-size:13px;
-                    line-height:1.6;
-                    margin:0;
-                "></pre>
+                <pre
+                    id="movieStreamingText"
+                    style="
+                        white-space:pre-wrap;
+                        word-break:break-word;
+                        color:#e2e8f0;
+                        font-family:inherit;
+                        font-size:13px;
+                        line-height:1.6;
+                        margin:0;
+                    "
+                ></pre>
 
             </div>
         `;
+
 
         const streamingText =
             document.getElementById(
                 "movieStreamingText"
             );
 
+
+        // -------------------------------------------------
+        // READER
+        // -------------------------------------------------
+
+        const reader =
+            response.body.getReader();
+
+        const decoder =
+            new TextDecoder("utf-8");
+
+        let rawText = "";
+
+        let buffer = "";
+
+
+        // -------------------------------------------------
+        // READ STREAM
+        // -------------------------------------------------
+
         while (true) {
 
-            const { value, done } =
-                await reader.read();
+            const {
+                value,
+                done
+            } = await reader.read();
 
-            if (done) break;
 
-            buffer +=
-                decoder.decode(value, {
+            if (done) {
+                break;
+            }
+
+
+            buffer += decoder.decode(
+                value,
+                {
                     stream: true
-                });
+                }
+            );
+
 
             const lines =
                 buffer.split("\n");
 
+
             buffer =
                 lines.pop() || "";
+
 
             for (const line of lines) {
 
                 const trimmed =
                     line.trim();
 
-                if (!trimmed) continue;
 
-                if (!trimmed.startsWith("data:")) {
+                if (!trimmed) {
                     continue;
                 }
+
+
+                if (
+                    !trimmed.startsWith("data:")
+                ) {
+                    continue;
+                }
+
 
                 const dataText =
-                    trimmed.substring(5).trim();
+                    trimmed
+                        .substring(5)
+                        .trim();
 
-                if (dataText === "[DONE]") {
+
+                if (
+                    dataText === "[DONE]"
+                ) {
                     continue;
                 }
+
 
                 try {
 
                     const data =
                         JSON.parse(dataText);
 
+
+                    // -----------------------------------------
+                    // POSSIBLE OPENROUTER ERROR INSIDE STREAM
+                    // -----------------------------------------
+
+                    if (data?.error) {
+
+                        throw new Error(
+                            data.error.message ||
+                            "OpenRouter Streaming Error"
+                        );
+                    }
+
+
+                    // -----------------------------------------
+                    // GET DELTA
+                    // -----------------------------------------
+
                     const delta =
-                        data?.choices?.[0]?.delta?.content;
+                        data
+                            ?.choices?.[0]
+                            ?.delta
+                            ?.content;
+
 
                     if (delta) {
 
                         rawText += delta;
 
+
                         if (streamingText) {
+
                             streamingText.textContent =
                                 rawText;
+
 
                             streamingText.scrollTop =
                                 streamingText.scrollHeight;
@@ -668,20 +810,54 @@ Required format:
 
                 } catch (parseError) {
 
-                    // SSE chunk မပြည့်သေးရင် ignore
+                    // JSON chunk မပြည့်သေးရင် ဆက်ဖတ်မယ်
+                    console.log(
+                        "OpenRouter stream chunk:",
+                        dataText
+                    );
                 }
             }
         }
 
+
+        // -------------------------------------------------
+        // FINAL CHECK
+        // -------------------------------------------------
+
         if (!rawText.trim()) {
+
             throw new Error(
-                "OpenRouter က စာပြန်မပေးပါ"
+                "OpenRouter ချိတ်ဆက်ပြီးပါပြီ၊ ဒါပေမယ့် AI Response စာသား မပြန်လာပါ"
             );
         }
 
-        return rawText;
-    }
 
+        return rawText;
+
+
+    } catch (error) {
+
+        clearTimeout(timeoutId);
+
+
+        // -------------------------------------------------
+        // TIMEOUT ERROR
+        // -------------------------------------------------
+
+        if (
+            error?.name === "AbortError"
+        ) {
+
+            throw new Error(
+                "OpenRouter Request Timeout — စက္ကန့် ၃၀ အတွင်း Response မရပါ"
+            );
+        }
+
+
+        throw error;
+    }
+}
+                        
     // =========================================================
     // GEMINI FALLBACK
     // =========================================================
