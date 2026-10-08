@@ -1,9 +1,11 @@
 let selectedFlowBase64 = "";
+let selectedFlowMimeType = "image/jpeg"; // Dynamic Mime Type (JPG, PNG, WEBP အကုန်ရမည်)
 
 // ပုံ Preview ပြသခြင်း
 function previewFlowImg(event) {
     const file = event.target.files[0];
     if (file) {
+        selectedFlowMimeType = file.type || "image/jpeg"; // ပုံရဲ့ Mime Type အမှန်ကို ယူမည်
         const reader = new FileReader();
         reader.onload = function(e) {
             document.getElementById('flowImgPreview').src = e.target.result;
@@ -19,22 +21,26 @@ function previewFlowImg(event) {
 async function generateScriptAndFlowPrompt() {
     if (!selectedFlowBase64) return showNeonAlert("ကျေးဇူးပြု၍ ပုံတစ်ပုံ ရွေးပေးပါ!");
 
+    // Settings ထဲတွင် သိမ်းထားပြီးသား API Key ကို အလိုအလျောက် ယူမည်
+    const apiKey = localStorage.getItem('gemini_api_key') || 
+                   localStorage.getItem('geminiApiKey') || 
+                   localStorage.getItem('sh_gemini_api_key');
+
+    if (!apiKey) {
+        return showNeonAlert("API Key Settings ထဲမှာ Key သတ်မှတ်ပေးပါဗျာ!");
+    }
+
     const btn = document.getElementById('genFlowBtn');
     btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> ⚡ AI စဉ်းစားနေသည်...`;
     btn.disabled = true;
 
-// Settings ထဲတွင် သိမ်းထားပြီးသား API Key ကို အလိုအလျောက် ယူမည်
-const apiKey = localStorage.getItem('gemini_api_key') || 
-               localStorage.getItem('geminiApiKey') || 
-               localStorage.getItem('sh_gemini_api_key');
-
-if (!apiKey) {
-    return showNeonAlert("API Key Settings ထဲမှာ Key သတ်မှတ်ပေးပါဗျာ!");
-}
-    const promptText = `Analyze this image for a short movie recap:
-1. Write an engaging 2-sentence Burmese voiceover script for the scene.
-2. Write a cinematic English prompt for Google Flow AI/Veo (include character details, camera movement, lighting, atmosphere).
-Output MUST be raw JSON format strictly like this: {"burmese_script": "...", "flow_prompt": "..."}`;
+    const promptText = `Analyze this image for a short movie recap.
+Return ONLY a valid raw JSON object without any preamble or markdown formatting like \`\`\`json.
+Required JSON format:
+{
+  "burmese_script": "2 sentences of engaging Burmese voiceover script",
+  "flow_prompt": "Cinematic English prompt for video generation with character details, camera movement, lighting, and atmosphere"
+}`;
 
     try {
         const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
@@ -44,25 +50,40 @@ Output MUST be raw JSON format strictly like this: {"burmese_script": "...", "fl
                 contents: [{
                     parts: [
                         { text: promptText },
-                        { inline_data: { mime_type: "image/jpeg", data: selectedFlowBase64 } }
+                        { inline_data: { mime_type: selectedFlowMimeType, data: selectedFlowBase64 } }
                     ]
                 }]
             })
         });
 
         const data = await response.json();
+
+        // API တုံ့ပြန်မှု အမှား စစ်ဆေးခြင်း
+        if (data.error) {
+            throw new Error(data.error.message || "API Request မအောင်မြင်ပါ");
+        }
+
+        if (!data.candidates || !data.candidates[0]?.content?.parts?.[0]?.text) {
+            throw new Error("Gemini ထံမှ တုံ့ပြန်မှု မရရှိပါ");
+        }
+
         const rawText = data.candidates[0].content.parts[0].text;
         
-        // Clean JSON formatting from API output
-        const cleanJson = rawText.replace(/```json|```/g, '').trim();
-        const parsed = JSON.parse(cleanJson);
+        // JSON သီးသန့် ရှာဖွေထုတ်ယူခြင်း
+        const jsonMatch = rawText.match(/\{[\s\S]*\}/);
+        if (!jsonMatch) {
+            throw new Error("JSON Format ဖြင့် စာပြန်မလာပါ");
+        }
 
-        document.getElementById('outBurmeseScript').innerText = parsed.burmese_script;
-        document.getElementById('outFlowPrompt').innerText = parsed.flow_prompt;
+        const parsed = JSON.parse(jsonMatch[0]);
+
+        document.getElementById('outBurmeseScript').innerText = parsed.burmese_script || "Script ထုတ်မရပါ။";
+        document.getElementById('outFlowPrompt').innerText = parsed.flow_prompt || "Prompt ထုတ်မရပါ။";
         document.getElementById('flowResultBox').style.display = "block";
 
     } catch (err) {
-        showNeonAlert("Error ဖြစ်သွားပါသည်။ အင်တာနက် သို့မဟုတ် API Key ကို စစ်ဆေးပေးပါဗျာ။");
+        console.error("Gemini Error Detail:", err);
+        showNeonAlert("Error ဖြစ်သွားပါသည်: " + err.message);
     } finally {
         btn.innerHTML = `<i class="fa-solid fa-bolt"></i> Script & Prompt ဖန်တီးမည်`;
         btn.disabled = false;
@@ -83,7 +104,6 @@ function copyFlowPrompt() {
     navigator.clipboard.writeText(text);
     showNeonAlert("Flow AI Prompt ကို Copy ကူးပြီးပါပြီ!");
 }
-
 let activePickerTarget = null; // 'single' or block ID number
 let singleVoiceValue = "Charon";
 let currentAudioBlob = null;
