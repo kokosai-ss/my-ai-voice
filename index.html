@@ -373,6 +373,28 @@ cursor:pointer;
     <img id="flowImgPreview" src="" style="max-width: 100%; max-height: 250px; border-radius: 12px; border: 1px solid rgba(34, 211, 238, 0.4); box-shadow: 0 0 15px rgba(34, 211, 238, 0.2);">
 </div>
 
+<!-- Aspect Ratio ရွေးချယ်ရန် အကွက် -->
+<div style="margin-top: 15px; text-align: left;">
+    <label style="color: #22d3ee; font-size: 13px; font-weight: bold; display: block; margin-bottom: 6px;">
+        <i class="fa-solid fa-crop"></i> Thumbnail အချိုးအစား (Aspect Ratio) ရွေးပါ:
+    </label>
+    <div style="display: flex; gap: 10px;">
+        <button type="button" id="btn169" onclick="setRatio('16:9')" style="flex: 1; padding: 10px; background: rgba(34, 211, 238, 0.2); border: 1px solid #22d3ee; color: #fff; border-radius: 8px; cursor: pointer; font-size: 12px; font-weight: bold; transition: 0.3s;">
+            <i class="fa-brands fa-youtube" style="color: #ff0000; font-size: 14px;"></i> YouTube (16:9)
+        </button>
+        <button type="button" id="btn916" onclick="setRatio('9:16')" style="flex: 1; padding: 10px; background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(255, 255, 255, 0.2); color: #aaa; border-radius: 8px; cursor: pointer; font-size: 12px; font-weight: bold; transition: 0.3s;">
+            <i class="fa-brands fa-tiktok" style="color: #00f2fe; font-size: 14px;"></i> TikTok/Reels (9:16)
+        </button>
+    </div>
+</div>
+
+<!-- Output Result Box ထဲတွင် Thumbnail ပုံပြသပေးမည့်နေရာ -->
+<div id="thumbnailResultWrapper" style="margin-top: 15px; display: none; text-align: center;">
+    <label style="color: #22d3ee; font-size: 13px; font-weight: bold; display: block; text-align: left; margin-bottom: 8px;">
+        <i class="fa-solid fa-image"></i> AI ဖန်တီးပေးသော Thumbnail ပုံ:
+    </label>
+    <img id="outThumbnailImg" src="" style="max-width: 100%; border-radius: 10px; border: 1px solid rgba(34, 211, 238, 0.5); box-shadow: 0 0 15px rgba(34, 211, 238, 0.3);">
+</div>
 
         <!-- Generate Button -->
         <button id="genFlowBtn" onclick="generateScriptAndFlowPrompt()" style="display: none; width: 100%; margin-top: 16px; background: linear-gradient(135deg, #06b6d4, #0284c7); color: #fff; border: none; padding: 12px; border-radius: 10px; font-weight: bold; font-size: 13px; cursor: pointer; box-shadow: 0 0 15px rgba(34, 211, 238, 0.4); transition: 0.3s;">
