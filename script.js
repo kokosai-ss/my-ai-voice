@@ -197,12 +197,11 @@ async function generateMultiShotMovie() {
     
     multiResultBox.style.display = 'block';
     multiResultContent.innerHTML = `<p style="color: #00f3ff; text-align:center;"><i class="fa-solid fa-spinner fa-spin"></i> Movie Director က အခန်းဆက် ဇာတ်ညွှန်းနှင့် စကားပြောခန်းများ ဖန်တီးနေသည်...</p>`;
-
     // 1. Consistent Character System Instruction (ဇာတ်ကောင် ရုပ်သွင်ပြင် မလွဲစေရန် စနစ်ညွှန်ကြားချက်)
     let systemInstruction = `You are an expert Movie Director and AI Video Prompt Engineer. 
 CRITICAL RULE FOR CHARACTER CONSISTENCY: 
-Whenever characters are introduced in the story, you MUST lock their core physical appearance (face shape, hair style, clothing, accessories like Thanaka) and ensure that description remains EXACTLY IDENTICAL across all generated scenes in the prompt. Do not change their facial descriptions or clothing styles randomly between scenes.`;
-
+Whenever characters (whether humans, animated fruit characters like apples, or objects) are introduced, you MUST lock their core physical appearance, exact colors, facial expressions, and style. Ensure that description remains EXACTLY IDENTICAL across all generated scenes in the prompt. Do not change their features randomly between scenes.`;
+ 
     // 2. Build Chat History Payload (Memory ထည့်သွင်းခြင်း)
     // ပထမဆုံးအကြိမ်ဖြစ်စေ၊ ဆက်တိုက်တောင်းတာဖြစ်စေ ဇာတ်လမ်း အတိတ်မှတ်ဉာဏ်ကို ထည့်ပေးမည်
     movieChatHistory.push({
