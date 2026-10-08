@@ -173,147 +173,789 @@ Required JSON format:
 }
 
 // --- 2. MOVIE DIRECTOR (MULTI-SHOT) API HANDLER ---
-// --- Global Memory Array (ဇာတ်လမ်း အတိတ်မှတ်ဉာဏ် သိမ်းဆည်းရန်) ---
-let movieChatHistory = [];
 
-// --- 2. MOVIE DIRECTOR (MULTI-SHOT) API HANDLER ---
 async function generateMultiShotMovie() {
-    const movieIdea = document.getElementById('movieIdeaInput').value.trim();
-    if(!movieIdea) {
-        return showNeonAlert("ဇာတ်လမ်း အစပျိုး Idea လေး အရင် ရိုက်ထည့်ပေးပါ သားရီး!");
+
+    const movieIdea =
+        document.getElementById('movieIdeaInput').value.trim();
+
+    if (!movieIdea) {
+        return showNeonAlert(
+            "ဇာတ်လမ်း အစပျိုး Idea လေး အရင် ရိုက်ထည့်ပေးပါ သားရီး!"
+        );
     }
 
-    const apiKey = localStorage.getItem('gemini_api_key') || 
-                   localStorage.getItem('geminiApiKey') || 
-                   localStorage.getItem('sh_gemini_api_key');
+    const openRouterKey =
+        localStorage.getItem('openrouter_api_key') || "";
 
-    if (!apiKey) {
-        return showNeonAlert("API Key Settings ထဲမှာ Key သတ်မှတ်ပေးပါဗျာ!");
+    const geminiKey =
+        localStorage.getItem('gemini_api_key') ||
+        localStorage.getItem('geminiApiKey') ||
+        localStorage.getItem('sh_gemini_api_key') ||
+        "";
+
+    if (!openRouterKey && !geminiKey) {
+        return showNeonAlert(
+            "API Key Settings ထဲမှာ OpenRouter သို့မဟုတ် Gemini Key သတ်မှတ်ပေးပါဗျာ!"
+        );
     }
 
-    const multiResultBox = document.getElementById('multiResultBox');
-    const multiResultContent = document.getElementById('multiResultContent');
-    
+    const multiResultBox =
+        document.getElementById('multiResultBox');
+
+    const multiResultContent =
+        document.getElementById('multiResultContent');
+
     multiResultBox.style.display = 'block';
-    multiResultContent.innerHTML = `<p style="color: #00f3ff; text-align:center;"><i class="fa-solid fa-spinner fa-spin"></i> Movie Director က အခန်းဆက် ဇာတ်ညွှန်းနှင့် စကားပြောခန်းများ ဖန်တီးနေသည်...</p>`;
-    // 1. Consistent Character System Instruction (ဇာတ်ကောင် ရုပ်သွင်ပြင် မလွဲစေရန် စနစ်ညွှန်ကြားချက်)
-    let systemInstruction = `You are an expert Movie Director and AI Video Prompt Engineer. 
-CRITICAL RULE FOR CHARACTER CONSISTENCY: 
-Whenever characters (whether humans, animated fruit characters like apples, or objects) are introduced, you MUST lock their core physical appearance, exact colors, facial expressions, and style. Ensure that description remains EXACTLY IDENTICAL across all generated scenes in the prompt. Do not change their features randomly between scenes.`;
- 
-    // 2. Build Chat History Payload (Memory ထည့်သွင်းခြင်း)
-    // ပထမဆုံးအကြိမ်ဖြစ်စေ၊ ဆက်တိုက်တောင်းတာဖြစ်စေ ဇာတ်လမ်း အတိတ်မှတ်ဉာဏ်ကို ထည့်ပေးမည်
-    movieChatHistory.push({
-        role: "user",
-        parts: [{ text: `Story Idea / Continuation Request: "${movieIdea}"` }]
-    });
 
-    let promptText = `Based on the conversation history and the latest input above, create the next sequence of 4 to 6 video scenes (multi-shot sequence). 
-For EACH scene, you MUST provide:
-1. Time range (e.g., "0-8s", "8-16s")
-2. Burmese character dialogue or voiceover script (ဇာတ်ကောင်များ၏ မြန်မာစကားပြောခန်း သို့မဟုတ် ဇာတ်ကြောင်းပြောချက်)
-3. Cinematic English prompt for Flow AI video generator, maintaining strict character appearance consistency from previous scenes (with camera angles, lighting, matching aspect ratio --ar ${currentMultiRatio})
+    multiResultContent.innerHTML = `
+        <div style="
+            padding:16px;
+            color:#00f3ff;
+            text-align:center;
+        ">
+            <i class="fa-solid fa-spinner fa-spin"></i>
+            Movie Director စတင်နေပါတယ်...
+        </div>
+    `;
 
-Return ONLY a valid raw JSON array of objects without markdown like \`\`\`json.
-Required JSON format:
+    // ---------------------------------------------------------
+    // SYSTEM INSTRUCTION
+    // ---------------------------------------------------------
+
+    const systemInstruction = `
+You are an expert Movie Director and AI Video Prompt Engineer.
+
+CRITICAL RULE FOR CHARACTER CONSISTENCY:
+
+Whenever characters (whether humans, animated fruit characters,
+animals, creatures, robots, or objects) are introduced, you MUST
+lock their core physical appearance, exact colors, facial features,
+clothing, hairstyle, body shape, age, and visual style.
+
+Once a character has been established, keep these details EXACTLY
+CONSISTENT across every following scene.
+
+Do not randomly change character appearance.
+
+Maintain story continuity from the conversation history.
+
+The Burmese dialogue or voiceover must be natural and suitable
+for Burmese movie recap / storytelling.
+
+The English Flow AI prompt must clearly describe the scene,
+characters, environment, camera movement, lighting, cinematic style,
+and character consistency.
+`;
+
+    // ---------------------------------------------------------
+    // PROMPT
+    // ---------------------------------------------------------
+
+    const promptText = `
+Based on the conversation history and the latest input,
+create the NEXT sequence of 4 to 6 video scenes.
+
+IMPORTANT:
+Continue directly from the previous story.
+Do NOT restart the story.
+Do NOT change established characters.
+Do NOT contradict previous scenes.
+
+For EACH scene provide:
+
+1. Time range
+   Example: "0-8s", "8-16s"
+
+2. Burmese character dialogue or voiceover script.
+
+3. Cinematic English prompt for Flow AI video generation.
+
+The Flow AI prompt must maintain strict character appearance
+consistency from previous scenes.
+
+Include:
+- camera angle
+- camera movement
+- environment
+- lighting
+- character actions
+- facial expressions
+- cinematic atmosphere
+- visual continuity
+- matching aspect ratio --ar ${currentMultiRatio}
+
+Return ONLY a valid raw JSON array.
+
+Do NOT use markdown.
+Do NOT use \`\`\`json.
+Do NOT add explanations before or after the JSON.
+
+Required format:
+
 [
   {
     "scene_number": 1,
     "time_range": "0-8s",
-    "burmese_dialogue": "ဇာတ်ကောင်ပြောမည့် မြန်မာစကားပြောခန်း (သို့) Voiceover",
-    "flow_prompt": "Cinematic English prompt with consistent character details --ar ${currentMultiRatio}"
+    "burmese_dialogue": "မြန်မာစကားပြောခန်း သို့မဟုတ် Voiceover",
+    "flow_prompt": "Cinematic English prompt --ar ${currentMultiRatio}"
   }
-]`;
+]
+`;
 
-    // လက်ရှိ တောင်းဆိုမှုကို History ထဲ ယာယီထည့်မည်
-    let currentContents = [...movieChatHistory];
-    currentContents[currentContents.length - 1].parts[0].text += "\n\n" + promptText;
+    // ---------------------------------------------------------
+    // ADD USER MESSAGE TO MEMORY
+    // ---------------------------------------------------------
 
-    try {
-        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=${apiKey}`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                system_instruction: { parts: [{ text: systemInstruction }] },
-                contents: currentContents
-            })
-        });
+    movieChatHistory.push({
+        role: "user",
+        parts: [
+            {
+                text:
+                    `Story Idea / Continuation Request: "${movieIdea}"\n\n${promptText}`
+            }
+        ]
+    });
 
-        const data = await response.json();
-        if (data.error) throw new Error(data.error.message || "API Error");
+    const currentContents = [...movieChatHistory];
 
-        const rawText = data.candidates[0].content.parts[0].text;
-        
-        // AI ရဲ့ အဖြေကို Memory ထဲ ပြန်သိမ်းမည် (နောက်တစ်ခါ Scene 6 ကနေ 10 ထပ်တောင်းရင် မှတ်မိနေစေရန်)
-        movieChatHistory.push({
-            role: "model",
-            parts: [{ text: rawText }]
-        });
+    // ---------------------------------------------------------
+    // JSON EXTRACTION
+    // ---------------------------------------------------------
 
-        const jsonMatch = rawText.match(/\[[\s\S]*\]/);
-        if (!jsonMatch) throw new Error("JSON Array ထွက်မလာပါ");
-        const scenes = JSON.parse(jsonMatch[0]);
+    function extractMovieScenes(rawText) {
+
+        if (!rawText) {
+            throw new Error("AI Response မရရှိပါ");
+        }
+
+        let cleaned = rawText.trim();
+
+        // Remove markdown code fences if model accidentally adds them
+        cleaned = cleaned
+            .replace(/^```json\s*/i, "")
+            .replace(/^```\s*/i, "")
+            .replace(/\s*```$/i, "")
+            .trim();
+
+        const start = cleaned.indexOf("[");
+        const end = cleaned.lastIndexOf("]");
+
+        if (start === -1 || end === -1 || end <= start) {
+            throw new Error("JSON Array ထွက်မလာပါ");
+        }
+
+        const jsonText =
+            cleaned.substring(start, end + 1);
+
+        try {
+            return JSON.parse(jsonText);
+        } catch (error) {
+            console.error("JSON Parse Error:", error);
+            console.log("Raw AI Text:", rawText);
+
+            throw new Error(
+                "AI ရဲ့ JSON ကို ဖတ်မရပါ။ နောက်တစ်ကြိမ် ပြန်စမ်းကြည့်ပါ။"
+            );
+        }
+    }
+
+    // ---------------------------------------------------------
+    // ESCAPE HTML
+    // ---------------------------------------------------------
+
+    function escapeHtml(value) {
+
+        return String(value ?? "")
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+    }
+
+    // ---------------------------------------------------------
+    // RENDER FINAL SCENES
+    // ---------------------------------------------------------
+
+    function renderMovieScenes(scenes) {
+
+        if (!Array.isArray(scenes) || scenes.length === 0) {
+            throw new Error("Scene များ မတွေ့ပါ");
+        }
+
         let htmlOutput = "";
-        scenes.forEach((s) => {
+
+        scenes.forEach((s, index) => {
+
+            const sceneNumber =
+                s.scene_number ?? (index + 1);
+
+            const timeRange =
+                escapeHtml(s.time_range || "");
+
+            const dialogue =
+                escapeHtml(s.burmese_dialogue || "");
+
+            const flowPrompt =
+                escapeHtml(s.flow_prompt || "");
+
+            const safeFlowPrompt =
+                String(s.flow_prompt || "")
+                    .replace(/\\/g, "\\\\")
+                    .replace(/`/g, "\\`")
+                    .replace(/\$/g, "\\$");
+
             htmlOutput += `
-                <div style="background: rgba(0,0,20,0.6); border: 1px solid rgba(0,243,255,0.2); padding: 12px; border-radius: 10px; margin-bottom: 12px;">
-                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
-                        <span style="color: #00f3ff; font-weight: bold;">🎬 Scene ${s.scene_number} (${s.time_range})</span>
-                        <button class="copy-all-btn" onclick="navigator.clipboard.writeText(\`${s.flow_prompt}\`); showNeonAlert('Scene ${s.scene_number} Flow Prompt ကို ကူးပြီးပါပြီ!')"><i class="fa-solid fa-copy"></i> Prompt ကူးမည်</button>
+                <div style="
+                    background:rgba(0,0,20,0.6);
+                    border:1px solid rgba(0,243,255,0.2);
+                    padding:12px;
+                    border-radius:10px;
+                    margin-bottom:12px;
+                ">
+
+                    <div style="
+                        display:flex;
+                        justify-content:space-between;
+                        align-items:center;
+                        gap:8px;
+                        margin-bottom:6px;
+                    ">
+
+                        <span style="
+                            color:#00f3ff;
+                            font-weight:bold;
+                        ">
+                            🎬 Scene ${sceneNumber}
+                            (${timeRange})
+                        </span>
+
+                        <button
+                            class="copy-all-btn"
+                            onclick="
+                                navigator.clipboard.writeText(\`${safeFlowPrompt}\`);
+                                showNeonAlert('Scene ${sceneNumber} Flow Prompt ကို ကူးပြီးပါပြီ!');
+                            "
+                        >
+                            <i class="fa-solid fa-copy"></i>
+                            Prompt ကူးမည်
+                        </button>
+
                     </div>
-                    <p style="margin-bottom: 6px; font-size: 13px;">🇲🇲 <b>မြန်မာစကားပြောခန်း / Voiceover:</b><br><span style="color: #f8fafc;">${s.burmese_dialogue}</span></p>
-                    <p style="font-size: 13px;">🇬🇧 <b>Flow AI Prompt:</b><br><span style="color: #94a3b8; font-family: monospace;">${s.flow_prompt}</span></p>
+
+                    <p style="
+                        margin-bottom:6px;
+                        font-size:13px;
+                    ">
+                        🇲🇲
+                        <b>မြန်မာစကားပြောခန်း / Voiceover:</b>
+                        <br>
+
+                        <span style="
+                            color:#f8fafc;
+                        ">
+                            ${dialogue}
+                        </span>
+                    </p>
+
+                    <p style="
+                        font-size:13px;
+                    ">
+                        🇬🇧
+                        <b>Flow AI Prompt:</b>
+                        <br>
+
+                        <span style="
+                            color:#94a3b8;
+                            font-family:monospace;
+                            white-space:pre-wrap;
+                        ">
+                            ${flowPrompt}
+                        </span>
+                    </p>
+
                 </div>
             `;
         });
 
         multiResultContent.innerHTML = htmlOutput;
+    }
+
+    // ---------------------------------------------------------
+    // SAVE MODEL MEMORY
+    // ---------------------------------------------------------
+
+    function saveMovieModelMemory(rawText) {
+
+        movieChatHistory.push({
+            role: "model",
+            parts: [
+                {
+                    text: rawText
+                }
+            ]
+        });
+    }
+
+    // =========================================================
+    // OPENROUTER STREAMING
+    // =========================================================
+
+    async function runOpenRouter() {
+
+        if (!openRouterKey) {
+            throw new Error("OpenRouter API Key မရှိပါ");
+        }
+
+        const response = await fetch(
+            "https://openrouter.ai/api/v1/chat/completions",
+            {
+                method: "POST",
+
+                headers: {
+                    "Authorization":
+                        `Bearer ${openRouterKey}`,
+
+                    "Content-Type":
+                        "application/json"
+                },
+
+                body: JSON.stringify({
+
+                    model: "openrouter/free",
+
+                    stream: true,
+
+                    messages: [
+                        {
+                            role: "system",
+                            content: systemInstruction
+                        },
+
+                        ...currentContents.map(item => ({
+                            role:
+                                item.role === "model"
+                                    ? "assistant"
+                                    : "user",
+
+                            content:
+                                item.parts
+                                    ?.map(p => p.text || "")
+                                    .join("") || ""
+                        }))
+                    ]
+                })
+            }
+        );
+
+        if (!response.ok) {
+
+            const errorText =
+                await response.text();
+
+            throw new Error(
+                `OpenRouter HTTP ${response.status}: ${errorText}`
+            );
+        }
+
+        if (!response.body) {
+            throw new Error(
+                "Streaming response မရရှိပါ"
+            );
+        }
+
+        const reader =
+            response.body.getReader();
+
+        const decoder =
+            new TextDecoder("utf-8");
+
+        let rawText = "";
+        let buffer = "";
+
+        multiResultContent.innerHTML = `
+            <div style="
+                background:rgba(0,0,20,0.6);
+                border:1px solid rgba(0,243,255,0.2);
+                padding:14px;
+                border-radius:10px;
+            ">
+
+                <div style="
+                    color:#00f3ff;
+                    font-weight:bold;
+                    margin-bottom:10px;
+                ">
+                    <i class="fa-solid fa-bolt"></i>
+                    OpenRouter Streaming...
+                </div>
+
+                <pre id="movieStreamingText" style="
+                    white-space:pre-wrap;
+                    word-break:break-word;
+                    color:#e2e8f0;
+                    font-family:inherit;
+                    font-size:13px;
+                    line-height:1.6;
+                    margin:0;
+                "></pre>
+
+            </div>
+        `;
+
+        const streamingText =
+            document.getElementById(
+                "movieStreamingText"
+            );
+
+        while (true) {
+
+            const { value, done } =
+                await reader.read();
+
+            if (done) break;
+
+            buffer +=
+                decoder.decode(value, {
+                    stream: true
+                });
+
+            const lines =
+                buffer.split("\n");
+
+            buffer =
+                lines.pop() || "";
+
+            for (const line of lines) {
+
+                const trimmed =
+                    line.trim();
+
+                if (!trimmed) continue;
+
+                if (!trimmed.startsWith("data:")) {
+                    continue;
+                }
+
+                const dataText =
+                    trimmed.substring(5).trim();
+
+                if (dataText === "[DONE]") {
+                    continue;
+                }
+
+                try {
+
+                    const data =
+                        JSON.parse(dataText);
+
+                    const delta =
+                        data?.choices?.[0]?.delta?.content;
+
+                    if (delta) {
+
+                        rawText += delta;
+
+                        if (streamingText) {
+                            streamingText.textContent =
+                                rawText;
+
+                            streamingText.scrollTop =
+                                streamingText.scrollHeight;
+                        }
+                    }
+
+                } catch (parseError) {
+
+                    // SSE chunk မပြည့်သေးရင် ignore
+                }
+            }
+        }
+
+        if (!rawText.trim()) {
+            throw new Error(
+                "OpenRouter က စာပြန်မပေးပါ"
+            );
+        }
+
+        return rawText;
+    }
+
+    // =========================================================
+    // GEMINI FALLBACK
+    // =========================================================
+
+    async function runGeminiFallback() {
+
+        if (!geminiKey) {
+            throw new Error(
+                "Gemini API Key မရှိပါ"
+            );
+        }
+
+        multiResultContent.innerHTML = `
+            <p style="
+                color:#ffaa00;
+                text-align:center;
+                padding:16px;
+            ">
+                ⚠️ OpenRouter မအောင်မြင်ပါ။
+                <br>
+                🔄 Gemini ကို အလိုအလျောက် ပြောင်းပြီး
+                ဆက်လုပ်နေပါတယ်...
+            </p>
+        `;
+
+        const response = await fetch(
+            `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=${geminiKey}`,
+            {
+                method: "POST",
+
+                headers: {
+                    "Content-Type":
+                        "application/json"
+                },
+
+                body: JSON.stringify({
+
+                    system_instruction: {
+                        parts: [
+                            {
+                                text:
+                                    systemInstruction
+                            }
+                        ]
+                    },
+
+                    contents:
+                        currentContents
+                })
+            }
+        );
+
+        const data =
+            await response.json();
+
+        if (!response.ok || data.error) {
+
+            throw new Error(
+                data?.error?.message ||
+                `Gemini HTTP ${response.status}`
+            );
+        }
+
+        const rawText =
+            data?.candidates?.[0]?.content?.parts
+                ?.map(part => part.text || "")
+                .join("") || "";
+
+        if (!rawText) {
+            throw new Error(
+                "Gemini က စာပြန်မပေးပါ"
+            );
+        }
+
+        return rawText;
+    }
+
+    // =========================================================
+    // MAIN AI FLOW
+    // =========================================================
+
+    let finalRawText = "";
+    let usedProvider = "";
+
+    try {
+
+        // -----------------------------------------------------
+        // 1. OPENROUTER FIRST
+        // -----------------------------------------------------
+
+        if (openRouterKey) {
+
+            try {
+
+                finalRawText =
+                    await runOpenRouter();
+
+                usedProvider =
+                    "OpenRouter";
+
+            } catch (openRouterError) {
+
+                console.error(
+                    "OpenRouter Error:",
+                    openRouterError
+                );
+
+                // -------------------------------------------------
+                // 2. GEMINI FALLBACK
+                // -------------------------------------------------
+
+                if (geminiKey) {
+
+                    finalRawText =
+                        await runGeminiFallback();
+
+                    usedProvider =
+                        "Gemini Fallback";
+
+                } else {
+
+                    throw openRouterError;
+                }
+            }
+
+        } else {
+
+            // No OpenRouter Key → Gemini directly
+
+            finalRawText =
+                await runGeminiFallback();
+
+            usedProvider =
+                "Gemini";
+        }
+
+        // -------------------------------------------------------
+        // SAVE AI RESPONSE TO MEMORY ONLY ONCE
+        // -------------------------------------------------------
+
+        saveMovieModelMemory(finalRawText);
+
+        // -------------------------------------------------------
+        // PARSE JSON
+        // -------------------------------------------------------
+
+        const scenes =
+            extractMovieScenes(finalRawText);
+
+        // -------------------------------------------------------
+        // RENDER SCENES
+        // -------------------------------------------------------
+
+        renderMovieScenes(scenes);
+
+        console.log(
+            `Movie Director Provider: ${usedProvider}`
+        );
 
     } catch (err) {
-        console.error("Multi-Shot Error:", err);
-        multiResultContent.innerHTML = `<p style="color: #ff4d4d;">Error: ${err.message}</p>`;
+
+        console.error(
+            "Multi-Shot Error:",
+            err
+        );
+
+        // -------------------------------------------------------
+        // REMOVE USER MESSAGE IF BOTH PROVIDERS FAIL
+        // -------------------------------------------------------
+
+        if (
+            movieChatHistory.length > 0 &&
+            movieChatHistory[movieChatHistory.length - 1]
+                .role === "user"
+        ) {
+            movieChatHistory.pop();
+        }
+
+        multiResultContent.innerHTML = `
+            <div style="
+                color:#ff4d4d;
+                background:rgba(255,0,0,0.05);
+                border:1px solid rgba(255,77,77,0.25);
+                padding:14px;
+                border-radius:10px;
+            ">
+                ❌ Movie Director Error
+                <br><br>
+                ${escapeHtml(err.message)}
+            </div>
+        `;
     }
 }
 
-// ဇာတ်လမ်းအသစ်ပြန်စလိုပါက Memory ရှင်းထုတ်ပေးရန် ခလုတ် သို့မဟုတ် လုပ်ဆောင်ချက်
+
+// =============================================================
+// RESET MOVIE MEMORY
+// =============================================================
+
 function resetMovieMemory() {
+
     movieChatHistory = [];
-    showNeonAlert("ဇာတ်လမ်း မှတ်ဉာဏ် (Memory) အသစ်ပြန်စလိုက်ပါပြီ!");
+
+    showNeonAlert(
+        "ဇာတ်လမ်း မှတ်ဉာဏ် (Memory) အသစ်ပြန်စလိုက်ပါပြီ!"
+    );
 }
 
 
-// AI Script ထဲက Single Shot နဲ့ Movie Director Tab များ ပြောင်းရန်
+// =============================================================
+// AI SCRIPT SUB TAB SWITCH
+// =============================================================
+
 function switchAiSubTab(tab) {
-    const subSingle = document.getElementById('subSectionSingle');
-    const subMulti = document.getElementById('subSectionMulti');
-    const btnSingle = document.getElementById('tabSingleBtn');
-    const btnMulti = document.getElementById('tabMultiBtn');
+
+    const subSingle =
+        document.getElementById('subSectionSingle');
+
+    const subMulti =
+        document.getElementById('subSectionMulti');
+
+    const btnSingle =
+        document.getElementById('tabSingleBtn');
+
+    const btnMulti =
+        document.getElementById('tabMultiBtn');
+
 
     if (tab === 'single') {
+
         subSingle.style.display = 'block';
         subMulti.style.display = 'none';
-        
-        btnSingle.style.background = "linear-gradient(135deg, #06b6d4, #0284c7)";
-        btnSingle.style.color = "#fff";
-        btnSingle.style.boxShadow = "0 0 10px rgba(34, 211, 238, 0.4)";
 
-        btnMulti.style.background = "transparent";
-        btnMulti.style.color = "#94a3b8";
-        btnMulti.style.boxShadow = "none";
+        btnSingle.style.background =
+            "linear-gradient(135deg, #06b6d4, #0284c7)";
+
+        btnSingle.style.color = "#fff";
+
+        btnSingle.style.boxShadow =
+            "0 0 10px rgba(34, 211, 238, 0.4)";
+
+        btnMulti.style.background =
+            "transparent";
+
+        btnMulti.style.color =
+            "#94a3b8";
+
+        btnMulti.style.boxShadow =
+            "none";
+
     } else {
+
         subSingle.style.display = 'none';
         subMulti.style.display = 'block';
 
-        btnMulti.style.background = "linear-gradient(135deg, #06b6d4, #0284c7)";
-        btnMulti.style.color = "#fff";
-        btnMulti.style.boxShadow = "0 0 10px rgba(34, 211, 238, 0.4)";
+        btnMulti.style.background =
+            "linear-gradient(135deg, #06b6d4, #0284c7)";
 
-        btnSingle.style.background = "transparent";
-        btnSingle.style.color = "#94a3b8";
-        btnSingle.style.boxShadow = "none";
+        btnMulti.style.color =
+            "#fff";
+
+        btnMulti.style.boxShadow =
+            "0 0 10px rgba(34, 211, 238, 0.4)";
+
+        btnSingle.style.background =
+            "transparent";
+
+        btnSingle.style.color =
+            "#94a3b8";
+
+        btnSingle.style.boxShadow =
+            "none";
     }
 }
-
 
 let activePickerTarget = null; // 'single' or block ID number
 let singleVoiceValue = "Charon";
