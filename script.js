@@ -4204,3 +4204,23 @@ window.addEventListener('DOMContentLoaded', () => {
     shRenderVoiceLibrary();
     switchView('mainDashboard');
 });
+// Custom Neon Glass Alert Function
+function showNeonAlert(message) {
+    const oldAlert = document.getElementById('shNeonAlertModal');
+    if (oldAlert) oldAlert.remove();
+
+    const alertHtml = `
+        <div id="shNeonAlertModal" class="sh-neon-alert-overlay">
+            <div class="sh-neon-alert-box">
+                <p>${message}</p>
+                <button class="sh-neon-alert-btn" onclick="document.getElementById('shNeonAlertModal').remove()">OK</button>
+            </div>
+        </div>
+    `;
+    document.body.insertAdjacentHTML('beforeend', alertHtml);
+}
+
+// App တစ်ခုလုံးရှိ alert() အားလုံးကို Neon Glass Alert သို့ အလိုအလျောက် ပြောင်းပေးရန်
+window.alert = function(message) {
+    showNeonAlert(message);
+};
