@@ -35,7 +35,34 @@ function removeFlowImg() {
     if (resultBox) resultBox.style.display = "none";
 }
 
-// Gemini Vision API ဖြင့် Script & Flow AI Prompt ထုတ်ပေးခြင်း
+let currentRatio = "16:9"; // Default Ratio
+
+// Ratio ခလုတ်နှိပ်သည့်အခါ ပြောင်းလဲခြင်း
+function setRatio(ratio) {
+    currentRatio = ratio;
+    const btn169 = document.getElementById('btn169');
+    const btn916 = document.getElementById('btn916');
+
+    if (ratio === '16:9') {
+        btn169.style.background = "rgba(34, 211, 238, 0.2)";
+        btn169.style.border = "1px solid #22d3ee";
+        btn169.style.color = "#fff";
+
+        btn916.style.background = "rgba(15, 23, 42, 0.8)";
+        btn916.style.border = "1px solid rgba(255, 255, 255, 0.2)";
+        btn916.style.color = "#aaa";
+    } else {
+        btn916.style.background = "rgba(34, 211, 238, 0.2)";
+        btn916.style.border = "1px solid #22d3ee";
+        btn916.style.color = "#fff";
+
+        btn169.style.background = "rgba(15, 23, 42, 0.8)";
+        btn169.style.border = "1px solid rgba(255, 255, 255, 0.2)";
+        btn169.style.color = "#aaa";
+    }
+}
+
+// Gemini Vision API + AI Image Generator
 async function generateScriptAndFlowPrompt() {
     if (!selectedFlowBase64) return showNeonAlert("ကျေးဇူးပြု၍ ပုံတစ်ပုံ ရွေးပေးပါ!");
 
@@ -47,21 +74,28 @@ async function generateScriptAndFlowPrompt() {
         return showNeonAlert("API Key Settings ထဲမှာ Key သတ်မှတ်ပေးပါဗျာ!");
     }
 
+    const customUserPrompt = document.getElementById('flowCustomPrompt')?.value.trim() || "";
+
     const btn = document.getElementById('genFlowBtn');
-    btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> ⚡ AI စဉ်းစားနေသည်...`;
+    btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> ⚡ AI စဉ်းစားပြီး Thumbnail ဖန်တီးနေသည်...`;
     btn.disabled = true;
 
-    const promptText = `Analyze this image for a short movie recap.
-Return ONLY a valid raw JSON object without any preamble or markdown formatting like \`\`\`json.
+    let promptText = `Analyze this image for a movie recap and cover thumbnail design.`;
+    if (customUserPrompt) {
+        promptText += ` User Instruction: "${customUserPrompt}". Follow this direction closely.`;
+    }
+
+    promptText += `\nReturn ONLY a valid raw JSON object without any markdown.
 Required JSON format:
 {
   "burmese_script": "2 sentences of engaging Burmese voiceover script",
-  "flow_prompt": "Cinematic English prompt for video generation with character details, camera movement, lighting, and atmosphere"
+  "flow_prompt": "Cinematic English prompt for video generation",
+  "thumbnail_prompt": "An eye-catching, highly detailed cinematic English image prompt suitable for a movie cover thumbnail, YouTube style, high quality"
 }`;
 
     try {
-        // v1 Endpoint သို့ ပြောင်းလဲထားပါသည်
-        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=${apiKey}`, {
+        // Gemini API ကို ခေါ်ယူခြင်း
+        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8:generateContent?key=${apiKey}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -76,36 +110,45 @@ Required JSON format:
 
         const data = await response.json();
 
-        if (data.error) {
-            throw new Error(data.error.message || "API Request မအောင်မြင်ပါ");
-        }
-
-        if (!data.candidates || !data.candidates[0]?.content?.parts?.[0]?.text) {
-            throw new Error("Gemini ထံမှ တုံ့ပြန်မှု မရရှိပါ");
-        }
+        if (data.error) throw new Error(data.error.message || "API Error");
 
         const rawText = data.candidates[0].content.parts[0].text;
         const jsonMatch = rawText.match(/\{[\s\S]*\}/);
-        
-        if (!jsonMatch) {
-            throw new Error("JSON Format ဖြင့် စာပြန်မလာပါ");
-        }
+        if (!jsonMatch) throw new Error("JSON Format ထွက်မလာပါ");
 
         const parsed = JSON.parse(jsonMatch[0]);
 
-        document.getElementById('outBurmeseScript').innerText = parsed.burmese_script || "Script ထုတ်မရပါ။";
-        document.getElementById('outFlowPrompt').innerText = parsed.flow_prompt || "Prompt ထုတ်မရပါ။";
+        // ၁။ Burmese Script နှင့် Video Prompt ထည့်သွင်းခြင်း
+        document.getElementById('outBurmeseScript').innerText = parsed.burmese_script || "Script မရပါ။";
+        document.getElementById('outFlowPrompt').innerText = parsed.flow_prompt || "Prompt မရပါ။";
+
+        // ၂။ Selected Aspect Ratio အတိုင်း Thumbnail ပုံအသစ် ထုတ်ပေးခြင်း
+        const thumbPrompt = encodeURIComponent(parsed.thumbnail_prompt || "Cinematic movie poster thumbnail");
+        let imgWidth = 1280;
+        let imgHeight = 720;
+
+        if (currentRatio === "9:16") {
+            imgWidth = 720;
+            imgHeight = 1280;
+        }
+
+        // Pollinations Free Image API ခေါ်ယူခြင်း
+        const randomSeed = Math.floor(Math.random() * 999999);
+        const imageUrl = `https://image.pollinations.ai/prompt/${thumbPrompt}?width=${imgWidth}&height=${imgHeight}&seed=${randomSeed}&nologo=true`;
+
+        const thumbImgElem = document.getElementById('outThumbnailImg');
+        thumbImgElem.src = imageUrl;
+        document.getElementById('thumbnailResultWrapper').style.display = "block";
         document.getElementById('flowResultBox').style.display = "block";
 
     } catch (err) {
-        console.error("Gemini Error Detail:", err);
+        console.error("Error Detail:", err);
         showNeonAlert("Error: " + err.message);
     } finally {
         btn.innerHTML = `<i class="fa-solid fa-bolt"></i> Script & Prompt ဖန်တီးမည်`;
         btn.disabled = false;
     }
 }
-
 // Copy လုပ်ဆောင်ချက်များ
 function copyBurmeseScript() {
     const text = document.getElementById('outBurmeseScript').innerText;
