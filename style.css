@@ -4522,3 +4522,29 @@ html, body {
     font-size: 14px !important;
     margin-top: 10px !important;
 }
+/* =========================================================
+   LOCK SCREEN CENTER & POSITION FIX (အပေါ်သို့ တိုးရန်)
+   ========================================================= */
+
+/* Lock Screen မျက်နှာပြင်တစ်ခုလုံးကို စခရင်အလယ်တည့်တည့် ကွက်တိညှိရန် */
+#shLockScreen, .sh-lock-screen, [id*="LockScreen"] {
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important; /* စခရင်အလယ်တွင် ကွက်တိထားမည် */
+    align-items: center !important;
+    min-height: 100vh !important;
+    padding-top: 15px !important;  /* အပေါ်အကွာအဝေးကို လျှော့မည် */
+    padding-bottom: 15px !important; /* အောက်အကွာအဝေးကို လျှော့မည် */
+    box-sizing: border-box !important;
+}
+
+/* အပေါ်ဆုံး Logo နှင့် ခေါင်းစဉ်ကြား အကွာအဝေးကို ကျုံ့ပေးရန် */
+.sh-lock-header, [class*="lock-header"] {
+    margin-bottom: 8px !important;
+}
+
+/* Lock Box Card ကို အပေါ်သို့ အနည်းငယ် တိုးပေးရန် */
+[id*="Lock"], [class*="lock-card"], .sh-lock-card {
+    margin-top: 0 !important;
+    margin-bottom: 10px !important;
+}
