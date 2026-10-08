@@ -337,6 +337,66 @@ cursor:pointer;
         <div id="keyMessage" class="message" style="margin-top: 12px; font-size: 12px; text-align: center;"></div>
     </div>
 </div>
+<!-- AI Script & Flow AI Prompt View -->
+<div id="aiScriptView" class="view-section" style="display: none; padding: 16px;">
+    
+    <!-- Neon Glass Header Card -->
+    <div style="background: rgba(13, 27, 42, 0.75); backdrop-filter: blur(12px); border: 1px solid rgba(34, 211, 238, 0.35); border-radius: 16px; padding: 20px; box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37), 0 0 15px rgba(34, 211, 238, 0.15);">
+        
+        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;">
+            <i class="fa-solid fa-wand-magic-sparkles" style="color: #22d3ee; font-size: 20px; filter: drop-shadow(0 0 8px #22d3ee);"></i>
+            <h2 style="color: #ffffff; font-size: 16px; font-weight: 600; margin: 0;">AI Script & Flow Prompt</h2>
+        </div>
+        
+        <p style="color: #94a3b8; font-size: 12px; margin-bottom: 16px; line-height: 1.4;">
+            ပုံတစ်ပုံ တင်လိုက်ရုံနဲ့ မြန်မာ Voiceover Script နဲ့ Flow AI Video Prompt ကို ဖျတ်ခနဲ တစ်ပြိုင်နက် ထုတ်ပေးသွားမှာပါဗျာ။
+        </p>
+
+        <!-- Image Upload Box (Neon Border) -->
+        <div id="dropZone" onclick="document.getElementById('flowImgInput').click()" style="border: 2px dashed rgba(34, 211, 238, 0.4); border-radius: 12px; padding: 22px; text-align: center; background: rgba(8, 21, 34, 0.5); cursor: pointer; transition: 0.3s;">
+            <i class="fa-solid fa-cloud-arrow-up" style="font-size: 30px; color: #22d3ee; margin-bottom: 8px; filter: drop-shadow(0 0 6px #22d3ee);"></i>
+            <div style="color: #e2e8f0; font-size: 13px; font-weight: 500;">ပုံရွေးရန် ဤနေရာကို နှိပ်ပါ</div>
+            <div style="color: #64748b; font-size: 10px; margin-top: 4px;">PNG, JPG, WEBP ထောက်ပံ့ပါသည်</div>
+        </div>
+        <input type="file" id="flowImgInput" accept="image/*" onchange="previewFlowImg(event)" style="display:none;">
+
+        <!-- Image Preview Area -->
+        <div id="imgPreviewWrapper" style="display: none; margin-top: 15px; text-align: center;">
+            <img id="flowImgPreview" style="max-width: 100%; max-height: 200px; border-radius: 10px; border: 1.5px solid #22d3ee; box-shadow: 0 0 15px rgba(34, 211, 238, 0.3);">
+        </div>
+
+        <!-- Generate Button -->
+        <button id="genFlowBtn" onclick="generateScriptAndFlowPrompt()" style="display: none; width: 100%; margin-top: 16px; background: linear-gradient(135deg, #06b6d4, #0284c7); color: #fff; border: none; padding: 12px; border-radius: 10px; font-weight: bold; font-size: 13px; cursor: pointer; box-shadow: 0 0 15px rgba(34, 211, 238, 0.4); transition: 0.3s;">
+            <i class="fa-solid fa-bolt"></i> Script & Prompt ဖန်တီးမည်
+        </button>
+    </div>
+
+    <!-- Output Box (Neon Glass Container) -->
+    <div id="flowResultBox" style="display: none; margin-top: 16px; background: rgba(13, 27, 42, 0.75); backdrop-filter: blur(12px); border: 1px solid rgba(34, 211, 238, 0.35); border-radius: 16px; padding: 18px; box-shadow: 0 0 20px rgba(34, 211, 238, 0.15);">
+        
+        <!-- Burmese Script Output -->
+        <div style="margin-bottom: 16px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                <span style="color: #67e8f9; font-size: 12px; font-weight: 600;"><i class="fa-solid fa-scroll"></i> မြန်မာ Voiceover Script</span>
+                <button onclick="copyBurmeseScript()" style="background: rgba(34, 211, 238, 0.15); border: 1px solid #22d3ee; color: #22d3ee; padding: 4px 10px; border-radius: 6px; font-size: 10px; cursor: pointer; font-weight: bold;">
+                    <i class="fa-solid fa-copy"></i> Copy
+                </button>
+            </div>
+            <div id="outBurmeseScript" style="background: rgba(8, 21, 34, 0.85); border: 1px solid rgba(255, 255, 255, 0.08); padding: 12px; border-radius: 8px; color: #f8fafc; font-size: 13px; line-height: 1.5; white-space: pre-wrap;"></div>
+        </div>
+
+        <!-- Flow AI Prompt Output -->
+        <div>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                <span style="color: #67e8f9; font-size: 12px; font-weight: 600;"><i class="fa-solid fa-film"></i> Flow AI Video Prompt (English)</span>
+                <button onclick="copyFlowPrompt()" style="background: rgba(34, 211, 238, 0.15); border: 1px solid #22d3ee; color: #22d3ee; padding: 4px 10px; border-radius: 6px; font-size: 10px; cursor: pointer; font-weight: bold;">
+                    <i class="fa-solid fa-copy"></i> Copy Prompt
+                </button>
+            </div>
+            <div id="outFlowPrompt" style="background: rgba(8, 21, 34, 0.85); border: 1px solid rgba(255, 255, 255, 0.08); padding: 12px; border-radius: 8px; color: #a5f3fc; font-size: 11px; font-family: monospace; line-height: 1.4; white-space: pre-wrap;"></div>
+        </div>
+    </div>
+</div>
 
 <div id="voiceStudio" class="view-container" style="display: none;">
         <!-- 1. အပြင်ဘက်မှာ အမြဲပေါ်နေမယ့် Header နဲ့ Tab ခလုတ်များ -->
