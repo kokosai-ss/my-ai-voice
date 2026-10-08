@@ -337,149 +337,130 @@ cursor:pointer;
         <div id="keyMessage" class="message" style="margin-top: 12px; font-size: 12px; text-align: center;"></div>
     </div>
 </div>
-<!-- AI Script & Flow AI Prompt View -->
+<!-- AI Script & Movie Director အစုံလိုက် View -->
 <div id="aiScriptView" class="view-container" style="display: none; padding: 16px;">
     
-    <!-- Neon Glass Header Card -->
-    <div style="background: rgba(13, 27, 42, 0.75); backdrop-filter: blur(12px); border: 1px solid rgba(34, 211, 238, 0.35); border-radius: 16px; padding: 20px; box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37), 0 0 15px rgba(34, 211, 238, 0.15);">
-        
-        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;">
-            <i class="fa-solid fa-wand-magic-sparkles" style="color: #22d3ee; font-size: 20px; filter: drop-shadow(0 0 8px #22d3ee);"></i>
-            <h2 style="color: #ffffff; font-size: 16px; font-weight: 600; margin: 0;">AI Script & Flow Prompt</h2>
-        </div>
-        
-        <p style="color: #94a3b8; font-size: 12px; margin-bottom: 16px; line-height: 1.4;">
-            ပုံတစ်ပုံ တင်လိုက်ရုံနဲ့ မြန်မာ Voiceover Script နဲ့ Flow AI Video Prompt ကို ဖျတ်ခနဲ တစ်ပြိုင်နက် ထုတ်ပေးသွားမှာပါဗျာ။
-        </p>
-
-        <!-- Image Upload Box (Neon Border) -->
-        <div id="dropZone" onclick="document.getElementById('flowImgInput').click()" style="border: 2px dashed rgba(34, 211, 238, 0.4); border-radius: 12px; padding: 22px; text-align: center; background: rgba(8, 21, 34, 0.5); cursor: pointer; transition: 0.3s;">
-            <i class="fa-solid fa-cloud-arrow-up" style="font-size: 30px; color: #22d3ee; margin-bottom: 8px; filter: drop-shadow(0 0 6px #22d3ee);"></i>
-            <div style="color: #e2e8f0; font-size: 13px; font-weight: 500;">ပုံရွေးရန် ဤနေရာကို နှိပ်ပါ</div>
-            <div style="color: #64748b; font-size: 10px; margin-top: 4px;">PNG, JPG, WEBP ထောက်ပံ့ပါသည်</div>
-        </div>
-        <input type="file" id="flowImgInput" accept="image/*" onchange="previewFlowImg(event)" style="display:none;">
-
-        <!-- Image Preview Area -->
-        <!-- ပုံ Preview ပြသသည့်နေရာ (အမှားခြစ် X ခလုတ်ပါဝင်သည်) -->
-<div id="imgPreviewWrapper" style="display: none; position: relative; margin-top: 15px; text-align: center;">
-    
-    <!-- ပုံဖျက်/ပုံပြောင်းရန် အမှားခြစ် (X) ခလုတ် -->
-    <button type="button" onclick="removeFlowImg()" style="position: absolute; top: -10px; right: 5px; background: rgba(239, 68, 68, 0.9); border: 1px solid #ff4d4d; color: white; width: 28px; height: 28px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 10px rgba(239, 68, 68, 0.6); z-index: 10; transition: 0.2s;">
-        <i class="fa-solid fa-xmark" style="font-size: 14px;"></i>
-    </button>
-    
-    <!-- ရွေးချယ်ထားသော ပုံ -->
-    <img id="flowImgPreview" src="" style="max-width: 100%; max-height: 250px; border-radius: 12px; border: 1px solid rgba(34, 211, 238, 0.4); box-shadow: 0 0 15px rgba(34, 211, 238, 0.2);">
-</div>
-
-<!-- Aspect Ratio ရွေးချယ်ရန် အကွက် -->
-<div style="margin-top: 15px; text-align: left;">
-    <label style="color: #22d3ee; font-size: 13px; font-weight: bold; display: block; margin-bottom: 6px;">
-        <i class="fa-solid fa-crop"></i> Thumbnail အချိုးအစား (Aspect Ratio) ရွေးပါ:
-    </label>
-    <div style="display: flex; gap: 10px;">
-        <button type="button" id="btn169" onclick="setRatio('16:9')" style="flex: 1; padding: 10px; background: rgba(34, 211, 238, 0.2); border: 1px solid #22d3ee; color: #fff; border-radius: 8px; cursor: pointer; font-size: 12px; font-weight: bold; transition: 0.3s;">
-            <i class="fa-brands fa-youtube" style="color: #ff0000; font-size: 14px;"></i> YouTube (16:9)
-        </button>
-        <button type="button" id="btn916" onclick="setRatio('9:16')" style="flex: 1; padding: 10px; background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(255, 255, 255, 0.2); color: #aaa; border-radius: 8px; cursor: pointer; font-size: 12px; font-weight: bold; transition: 0.3s;">
-            <i class="fa-brands fa-tiktok" style="color: #00f2fe; font-size: 14px;"></i> TikTok/Reels (9:16)
-        </button>
+    <!-- Header Title -->
+    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;">
+        <i class="fa-solid fa-wand-magic-sparkles" style="color: #22d3ee; font-size: 20px; filter: drop-shadow(0 0 8px #22d3ee);"></i>
+        <h2 style="color: #ffffff; font-size: 16px; font-weight: 600; margin: 0;">AI Script & Movie Director</h2>
     </div>
-</div>
 
-<!-- Output Result Box ထဲတွင် Thumbnail ပုံပြသပေးမည့်နေရာ -->
-<div id="thumbnailResultWrapper" style="margin-top: 15px; display: none; text-align: center;">
-    <label style="color: #22d3ee; font-size: 13px; font-weight: bold; display: block; text-align: left; margin-bottom: 8px;">
-        <i class="fa-solid fa-image"></i> AI ဖန်တီးပေးသော Thumbnail ပုံ:
-    </label>
-    <img id="outThumbnailImg" src="" style="max-width: 100%; border-radius: 10px; border: 1px solid rgba(34, 211, 238, 0.5); box-shadow: 0 0 15px rgba(34, 211, 238, 0.3);">
-</div>
-
-        <!-- Generate Button -->
-        <button id="genFlowBtn" onclick="generateScriptAndFlowPrompt()" style="display: none; width: 100%; margin-top: 16px; background: linear-gradient(135deg, #06b6d4, #0284c7); color: #fff; border: none; padding: 12px; border-radius: 10px; font-weight: bold; font-size: 13px; cursor: pointer; box-shadow: 0 0 15px rgba(34, 211, 238, 0.4); transition: 0.3s;">
-            <i class="fa-solid fa-bolt"></i> Script & Prompt ဖန်တီးမည်
+    <!-- FREE / PRO ပုံစံ Tab ခလုတ်များ (Single Shot vs Movie Director) -->
+    <div style="display: flex; background: rgba(8, 21, 34, 0.9); border: 1px solid rgba(34, 211, 238, 0.3); border-radius: 12px; padding: 5px; margin-bottom: 16px; gap: 5px;">
+        <button type="button" id="tabSingleBtn" onclick="switchAiSubTab('single')" style="flex: 1; padding: 10px; background: linear-gradient(135deg, #06b6d4, #0284c7); border: none; color: #fff; font-weight: bold; font-size: 12px; border-radius: 8px; cursor: pointer; transition: 0.3s; box-shadow: 0 0 10px rgba(34, 211, 238, 0.4);">
+            <i class="fa-solid fa-camera"></i> Single Shot
+        </button>
+        <button type="button" id="tabMultiBtn" onclick="switchAiSubTab('multi')" style="flex: 1; padding: 10px; background: transparent; border: none; color: #94a3b8; font-weight: bold; font-size: 12px; border-radius: 8px; cursor: pointer; transition: 0.3s;">
+            <i class="fa-solid fa-clapperboard"></i> Movie Director
         </button>
     </div>
 
-    <!-- Output Box (Neon Glass Container) -->
-    <div id="flowResultBox" style="display: none; margin-top: 16px; background: rgba(13, 27, 42, 0.75); backdrop-filter: blur(12px); border: 1px solid rgba(34, 211, 238, 0.35); border-radius: 16px; padding: 18px; box-shadow: 0 0 20px rgba(34, 211, 238, 0.15);">
-        
-        <!-- Burmese Script Output -->
-        <div style="margin-bottom: 16px;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                <span style="color: #67e8f9; font-size: 12px; font-weight: 600;"><i class="fa-solid fa-scroll"></i> မြန်မာ Voiceover Script</span>
-                <button onclick="copyBurmeseScript()" style="background: rgba(34, 211, 238, 0.15); border: 1px solid #22d3ee; color: #22d3ee; padding: 4px 10px; border-radius: 6px; font-size: 10px; cursor: pointer; font-weight: bold;">
-                    <i class="fa-solid fa-copy"></i> Copy
+    <!-- 1. SINGLE SHOT SUB-SECTION -->
+    <div id="subSectionSingle" style="display: block;">
+        <div style="background: rgba(13, 27, 42, 0.75); backdrop-filter: blur(12px); border: 1px solid rgba(34, 211, 238, 0.35); border-radius: 16px; padding: 20px; box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);">
+            
+            <p style="color: #94a3b8; font-size: 12px; margin-bottom: 16px; line-height: 1.4;">
+                ပုံတစ်ပုံ တင်လိုက်ရုံနဲ့ မြန်မာ Voiceover Script နဲ့ Flow AI Video Prompt ကို ဖျတ်ခနဲ တစ်ပြိုင်နက် ထုတ်ပေးသွားမှာပါဗျာ။
+            </p>
+
+            <!-- Image Upload Box -->
+            <div id="dropZone" onclick="document.getElementById('flowImgInput').click()" style="border: 2px dashed rgba(34, 211, 238, 0.4); border-radius: 12px; padding: 22px; text-align: center; background: rgba(8, 21, 34, 0.5); cursor: pointer; transition: 0.3s;">
+                <i class="fa-solid fa-cloud-arrow-up" style="font-size: 30px; color: #22d3ee; margin-bottom: 8px; filter: drop-shadow(0 0 6px #22d3ee);"></i>
+                <div style="color: #e2e8f0; font-size: 13px; font-weight: 500;">ပုံရွေးရန် ဤနေရာကို နှိပ်ပါ</div>
+                <div style="color: #64748b; font-size: 10px; margin-top: 4px;">PNG, JPG, WEBP ထောက်ပံ့ပါသည်</div>
+            </div>
+            <input type="file" id="flowImgInput" accept="image/*" onchange="previewFlowImg(event)" style="display:none;">
+
+            <!-- Image Preview Area -->
+            <div id="imgPreviewWrapper" style="display: none; position: relative; margin-top: 15px; text-align: center;">
+                <button type="button" onclick="removeFlowImg()" style="position: absolute; top: -10px; right: 5px; background: rgba(239, 68, 68, 0.9); border: 1px solid #ff4d4d; color: white; width: 28px; height: 28px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 10;">
+                    <i class="fa-solid fa-xmark" style="font-size: 14px;"></i>
                 </button>
+                <img id="flowImgPreview" src="" style="max-width: 100%; max-height: 250px; border-radius: 12px; border: 1px solid rgba(34, 211, 238, 0.4);">
             </div>
-            <div id="outBurmeseScript" style="background: rgba(8, 21, 34, 0.85); border: 1px solid rgba(255, 255, 255, 0.08); padding: 12px; border-radius: 8px; color: #f8fafc; font-size: 13px; line-height: 1.5; white-space: pre-wrap;"></div>
-        </div>
 
-        <!-- Flow AI Prompt Output -->
-        <div>
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                <span style="color: #67e8f9; font-size: 12px; font-weight: 600;"><i class="fa-solid fa-film"></i> Flow AI Video Prompt (English)</span>
-                <button onclick="copyFlowPrompt()" style="background: rgba(34, 211, 238, 0.15); border: 1px solid #22d3ee; color: #22d3ee; padding: 4px 10px; border-radius: 6px; font-size: 10px; cursor: pointer; font-weight: bold;">
-                    <i class="fa-solid fa-copy"></i> Copy Prompt
-                </button>
+            <!-- Aspect Ratio Selection -->
+            <div style="margin-top: 15px; text-align: left;">
+                <label style="color: #22d3ee; font-size: 13px; font-weight: bold; display: block; margin-bottom: 6px;">
+                    <i class="fa-solid fa-crop"></i> Thumbnail အချိုးအစား (Aspect Ratio) ရွေးပါ:
+                </label>
+                <div style="display: flex; gap: 10px;">
+                    <button type="button" id="btn169" onclick="setRatio('16:9')" style="flex: 1; padding: 10px; background: rgba(34, 211, 238, 0.2); border: 1px solid #22d3ee; color: #fff; border-radius: 8px; cursor: pointer; font-size: 12px; font-weight: bold;">YouTube (16:9)</button>
+                    <button type="button" id="btn916" onclick="setRatio('9:16')" style="flex: 1; padding: 10px; background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(255, 255, 255, 0.2); color: #aaa; border-radius: 8px; cursor: pointer; font-size: 12px; font-weight: bold;">TikTok (9:16)</button>
+                </div>
             </div>
-            <div id="outFlowPrompt" style="background: rgba(8, 21, 34, 0.85); border: 1px solid rgba(255, 255, 255, 0.08); padding: 12px; border-radius: 8px; color: #a5f3fc; font-size: 11px; font-family: monospace; line-height: 1.4; white-space: pre-wrap;"></div>
-        </div>
-    </div>
-</div>
-  
-<!-- Movie Director / Multi-Shot View -->
-<div id="movieDirectorView" class="view-container" style="display: none; padding: 16px;">
-    <div style="background: rgba(13, 27, 42, 0.75); backdrop-filter: blur(12px); border: 1px solid rgba(34, 211, 238, 0.35); border-radius: 16px; padding: 20px; box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37), 0 0 15px rgba(34, 211, 238, 0.15);">
-        
-        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;">
-            <i class="fa-solid fa-film" style="color: #22d3ee; font-size: 20px; filter: drop-shadow(0 0 8px #22d3ee);"></i>
-            <h2 style="color: #ffffff; font-size: 16px; font-weight: 600; margin: 0;">Movie Director (Multi-Shot)</h2>
-        </div>
-        
-        <p style="color: #94a3b8; font-size: 12px; margin-bottom: 16px; line-height: 1.4;">
-            ဇာတ်လမ်း Idea တစ်ခုပေးလိုက်ရုံနဲ့ ဇာတ်ကားတစ်ပုဒ်စာ အခန်းဆက် Scene များ၊ မြန်မာစကားပြောခန်းများနဲ့ Flow AI Prompts များကို အစအဆုံး ထုတ်ပေးပါမည်။
-        </p>
 
-        <!-- Movie Idea Input -->
-        <div style="margin-bottom: 15px;">
-            <label style="color: #22d3ee; font-size: 13px; font-weight: bold; display: block; margin-bottom: 6px;">
-                <i class="fa-solid fa-book-open"></i> ဇာတ်လမ်း အစပျိုး Idea / ဇာတ်ညွှန်း:
-            </label>
-            <textarea id="movieIdeaInput" rows="4" placeholder="ဥပမာ - ကောင်လေး ဂျွန်နဲ့ ကောင်မလေး ပရီတီတို့ မိုးထဲမှာ စကားများကြတဲ့ အခန်း... ဇာတ်သိမ်းအထိ အခန်းဆက် ရေးပေးပါ" style="width: 100%; background: rgba(8, 21, 34, 0.85); border: 1px solid rgba(34, 211, 238, 0.4); border-radius: 10px; padding: 12px; color: #fff; font-size: 13px; outline: none; resize: vertical;"></textarea>
-        </div>
-
-        <!-- Aspect Ratio for Multi-Shot -->
-        <div style="margin-bottom: 15px;">
-            <label style="color: #22d3ee; font-size: 13px; font-weight: bold; display: block; margin-bottom: 6px;">
-                <i class="fa-solid fa-crop"></i> ဗီဒီယို အချိုးအစား (Aspect Ratio):
-            </label>
-            <div style="display: flex; gap: 10px;">
-                <button type="button" id="multiBtn169" onclick="setMultiRatio('16:9')" style="flex: 1; padding: 10px; background: rgba(34, 211, 238, 0.2); border: 1px solid #22d3ee; color: #fff; border-radius: 8px; cursor: pointer; font-size: 12px; font-weight: bold;">YouTube (16:9)</button>
-                <button type="button" id="multiBtn916" onclick="setMultiRatio('9:16')" style="flex: 1; padding: 10px; background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(255, 255, 255, 0.2); color: #aaa; border-radius: 8px; cursor: pointer; font-size: 12px; font-weight: bold;">TikTok (9:16)</button>
-            </div>
-        </div>
-
-        <!-- Generate Button -->
-        <button onclick="generateMultiShotMovie()" style="width: 100%; background: linear-gradient(135deg, #06b6d4, #0284c7); color: #fff; border: none; padding: 12px; border-radius: 10px; font-weight: bold; font-size: 13px; cursor: pointer; box-shadow: 0 0 15px rgba(34, 211, 238, 0.4);">
-            <i class="fa-solid fa-clapperboard"></i> ဇာတ်ကားတစ်ပုဒ်စာ အခန်းဆက် Prompt များ ထုတ်မည်
-        </button>
-    </div>
-
-    <!-- Multi-Shot Result Box -->
-    <div id="multiResultBox" style="display: none; margin-top: 16px; background: rgba(13, 27, 42, 0.75); backdrop-filter: blur(12px); border: 1px solid rgba(34, 211, 238, 0.35); border-radius: 16px; padding: 18px; box-shadow: 0 0 20px rgba(34, 211, 238, 0.15);">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-            <span style="color: #67e8f9; font-size: 13px; font-weight: bold;"><i class="fa-solid fa-film"></i> အခန်းဆက် ဇာတ်ညွှန်း & Prompts မျာား</span>
-            <button onclick="copyAllMultiScenes()" style="background: rgba(34, 211, 238, 0.15); border: 1px solid #22d3ee; color: #22d3ee; padding: 4px 10px; border-radius: 6px; font-size: 10px; cursor: pointer; font-weight: bold;">
-                <i class="fa-solid fa-copy"></i> အကုန်ကူးမည်
+            <!-- Generate Button -->
+            <button id="genFlowBtn" onclick="generateScriptAndFlowPrompt()" style="display: none; width: 100%; margin-top: 16px; background: linear-gradient(135deg, #06b6d4, #0284c7); color: #fff; border: none; padding: 12px; border-radius: 10px; font-weight: bold; font-size: 13px; cursor: pointer; box-shadow: 0 0 15px rgba(34, 211, 238, 0.4);">
+                <i class="fa-solid fa-bolt"></i> Script & Prompt ဖန်တီးမည်
             </button>
         </div>
-        <div id="multiResultContent" style="max-height: 400px; overflow-y: auto;">
-            <!-- Dynamic Scenes will appear here -->
+
+        <!-- Single Shot Result Box -->
+        <div id="flowResultBox" style="display: none; margin-top: 16px; background: rgba(13, 27, 42, 0.75); backdrop-filter: blur(12px); border: 1px solid rgba(34, 211, 238, 0.35); border-radius: 16px; padding: 18px;">
+            <div style="margin-bottom: 16px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                    <span style="color: #67e8f9; font-size: 12px; font-weight: 600;"><i class="fa-solid fa-scroll"></i> မြန်မာ Voiceover Script</span>
+                    <button onclick="copyBurmeseScript()" style="background: rgba(34, 211, 238, 0.15); border: 1px solid #22d3ee; color: #22d3ee; padding: 4px 10px; border-radius: 6px; font-size: 10px; cursor: pointer; font-weight: bold;">Copy</button>
+                </div>
+                <div id="outBurmeseScript" style="background: rgba(8, 21, 34, 0.85); padding: 12px; border-radius: 8px; color: #f8fafc; font-size: 13px;"></div>
+            </div>
+            <div>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                    <span style="color: #67e8f9; font-size: 12px; font-weight: 600;"><i class="fa-solid fa-film"></i> Flow AI Video Prompt (English)</span>
+                    <button onclick="copyFlowPrompt()" style="background: rgba(34, 211, 238, 0.15); border: 1px solid #22d3ee; color: #22d3ee; padding: 4px 10px; border-radius: 6px; font-size: 10px; cursor: pointer; font-weight: bold;">Copy</button>
+                </div>
+                <div id="outFlowPrompt" style="background: rgba(8, 21, 34, 0.85); padding: 12px; border-radius: 8px; color: #a5f3fc; font-size: 11px; font-family: monospace;"></div>
+            </div>
         </div>
     </div>
+
+    <!-- 2. MOVIE DIRECTOR SUB-SECTION -->
+    <div id="subSectionMulti" style="display: none;">
+        <div style="background: rgba(13, 27, 42, 0.75); backdrop-filter: blur(12px); border: 1px solid rgba(34, 211, 238, 0.35); border-radius: 16px; padding: 20px; box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);">
+            
+            <p style="color: #94a3b8; font-size: 12px; margin-bottom: 16px; line-height: 1.4;">
+                ဇာတ်လမ်း Idea တစ်ခုပေးလိုက်ရုံနဲ့ ဇာတ်ကားတစ်ပုဒ်စာ အခန်းဆက် Scene များ၊ မြန်မာစကားပြောခန်းများနဲ့ Flow AI Prompts များကို အစအဆုံး ထုတ်ပေးပါမည်။
+            </p>
+
+            <!-- Movie Idea Input -->
+            <div style="margin-bottom: 15px;">
+                <label style="color: #22d3ee; font-size: 13px; font-weight: bold; display: block; margin-bottom: 6px;">
+                    <i class="fa-solid fa-book-open"></i> ဇာတ်လမ်း အစပျိုး Idea / ဇာတ်ညွှန်း:
+                </label>
+                <textarea id="movieIdeaInput" rows="4" placeholder="ဥပမာ - ကောင်လေး ဂျွန်နဲ့ ကောင်မလေး ပရီတီတို့ မိုးထဲမှာ စကားများကြတဲ့ အခန်း..." style="width: 100%; background: rgba(8, 21, 34, 0.85); border: 1px solid rgba(34, 211, 238, 0.4); border-radius: 10px; padding: 12px; color: #fff; font-size: 13px; outline: none; resize: vertical;"></textarea>
+            </div>
+
+            <!-- Aspect Ratio for Multi-Shot -->
+            <div style="margin-bottom: 15px;">
+                <label style="color: #22d3ee; font-size: 13px; font-weight: bold; display: block; margin-bottom: 6px;">
+                    <i class="fa-solid fa-crop"></i> ဗီဒီယို အချိုးအစား (Aspect Ratio):
+                </label>
+                <div style="display: flex; gap: 10px;">
+                    <button type="button" id="multiBtn169" onclick="setMultiRatio('16:9')" style="flex: 1; padding: 10px; background: rgba(34, 211, 238, 0.2); border: 1px solid #22d3ee; color: #fff; border-radius: 8px; cursor: pointer; font-size: 12px; font-weight: bold;">YouTube (16:9)</button>
+                    <button type="button" id="multiBtn916" onclick="setMultiRatio('9:16')" style="flex: 1; padding: 10px; background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(255, 255, 255, 0.2); color: #aaa; border-radius: 8px; cursor: pointer; font-size: 12px; font-weight: bold;">TikTok (9:16)</button>
+                </div>
+            </div>
+
+            <!-- Generate Button -->
+            <button onclick="generateMultiShotMovie()" style="width: 100%; background: linear-gradient(135deg, #06b6d4, #0284c7); color: #fff; border: none; padding: 12px; border-radius: 10px; font-weight: bold; font-size: 13px; cursor: pointer; box-shadow: 0 0 15px rgba(34, 211, 238, 0.4);">
+                <i class="fa-solid fa-clapperboard"></i> ဇာတ်ကားတစ်ပုဒ်စာ အခန်းဆက် Prompt များ ထုတ်မည်
+            </button>
+        </div>
+
+        <!-- Multi-Shot Result Box -->
+        <div id="multiResultBox" style="display: none; margin-top: 16px; background: rgba(13, 27, 42, 0.75); backdrop-filter: blur(12px); border: 1px solid rgba(34, 211, 238, 0.35); border-radius: 16px; padding: 18px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                <span style="color: #67e8f9; font-size: 13px; font-weight: bold;"><i class="fa-solid fa-film"></i> အခန်းဆက် ဇာတ်ညွှန်း & Prompts များ</span>
+                <button onclick="copyAllMultiScenes()" style="background: rgba(34, 211, 238, 0.15); border: 1px solid #22d3ee; color: #22d3ee; padding: 4px 10px; border-radius: 6px; font-size: 10px; cursor: pointer; font-weight: bold;">အကုန်ကူးမည်</button>
+            </div>
+            <div id="multiResultContent" style="max-height: 400px; overflow-y: auto;"></div>
+        </div>
+    </div>
+
 </div>
+
 
 <div id="voiceStudio" class="view-container" style="display: none;">
         <!-- 1. အပြင်ဘက်မှာ အမြဲပေါ်နေမယ့် Header နဲ့ Tab ခလုတ်များ -->
