@@ -27,33 +27,56 @@ function switchMode(mode) {
         btns[1].classList.add('active');
     }
 }
-
-// Aspect Ratio Setter for Single Shot
+// Single Shot အတွက် Aspect Ratio ရွေးရန်
+let currentRatio = '16:9'; // မူလ
 function setRatio(ratio) {
     currentRatio = ratio;
     const btn169 = document.getElementById('btn169');
     const btn916 = document.getElementById('btn916');
 
     if (ratio === '16:9') {
-        if(btn169) { btn169.classList.add('active'); }
-        if(btn916) { btn916.classList.remove('active'); }
+        btn169.style.background = "rgba(34, 211, 238, 0.2)";
+        btn169.style.borderColor = "#22d3ee";
+        btn169.style.color = "#fff";
+
+        btn916.style.background = "rgba(15, 23, 42, 0.8)";
+        btn916.style.borderColor = "rgba(255, 255, 255, 0.2)";
+        btn916.style.color = "#aaa";
     } else {
-        if(btn916) { btn916.classList.add('active'); }
-        if(btn169) { btn169.classList.remove('active'); }
+        btn916.style.background = "rgba(34, 211, 238, 0.2)";
+        btn916.style.borderColor = "#22d3ee";
+        btn916.style.color = "#fff";
+
+        btn169.style.background = "rgba(15, 23, 42, 0.8)";
+        btn169.style.borderColor = "rgba(255, 255, 255, 0.2)";
+        btn169.style.color = "#aaa";
     }
 }
 
-// Aspect Ratio Setter for Multi-Shot
+// Movie Director အတွက် Aspect Ratio ရွေးရန်
+let currentMultiRatio = '16:9'; // မူလ
 function setMultiRatio(ratio) {
     currentMultiRatio = ratio;
-    const multiRatioBtns = document.querySelectorAll('.multi-ratio');
-    multiRatioBtns.forEach(btn => {
-        if(btn.innerText.includes(ratio)) {
-            btn.classList.add('active');
-        } else {
-            btn.classList.remove('active');
-        }
-    });
+    const btn169 = document.getElementById('multiBtn169');
+    const btn916 = document.getElementById('multiBtn916');
+
+    if (ratio === '16:9') {
+        btn169.style.background = "rgba(34, 211, 238, 0.2)";
+        btn169.style.borderColor = "#22d3ee";
+        btn169.style.color = "#fff";
+
+        btn916.style.background = "rgba(15, 23, 42, 0.8)";
+        btn916.style.borderColor = "rgba(255, 255, 255, 0.2)";
+        btn916.style.color = "#aaa";
+    } else {
+        btn916.style.background = "rgba(34, 211, 238, 0.2)";
+        btn169.style.borderColor = "#22d3ee";
+        btn169.style.color = "#fff";
+
+        btn169.style.background = "rgba(15, 23, 42, 0.8)";
+        btn169.style.borderColor = "rgba(255, 255, 255, 0.2)";
+        btn169.style.color = "#aaa";
+    }
 }
 
 // Image Preview for Single Shot
@@ -303,31 +326,6 @@ function switchAiSubTab(tab) {
         btnSingle.style.background = "transparent";
         btnSingle.style.color = "#94a3b8";
         btnSingle.style.boxShadow = "none";
-    }
-}
-// Single Shot အတွက် Aspect Ratio ရွေးရန်
-let currentRatio = '16:9'; // မူလ
-function setRatio(ratio) {
-    currentRatio = ratio;
-    const btn169 = document.getElementById('btn169');
-    const btn916 = document.getElementById('btn916');
-
-    if (ratio === '16:9') {
-        btn169.style.background = "rgba(34, 211, 238, 0.2)";
-        btn169.style.borderColor = "#22d3ee";
-        btn169.style.color = "#fff";
-
-        btn916.style.background = "rgba(15, 23, 42, 0.8)";
-        btn916.style.borderColor = "rgba(255, 255, 255, 0.2)";
-        btn916.style.color = "#aaa";
-    } else {
-        btn916.style.background = "rgba(34, 211, 238, 0.2)";
-        btn916.style.borderColor = "#22d3ee";
-        btn916.style.color = "#fff";
-
-        btn169.style.background = "rgba(15, 23, 42, 0.8)";
-        btn169.style.borderColor = "rgba(255, 255, 255, 0.2)";
-        btn169.style.color = "#aaa";
     }
 }
 
