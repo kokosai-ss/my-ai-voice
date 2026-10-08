@@ -361,9 +361,18 @@ cursor:pointer;
         <input type="file" id="flowImgInput" accept="image/*" onchange="previewFlowImg(event)" style="display:none;">
 
         <!-- Image Preview Area -->
-        <div id="imgPreviewWrapper" style="display: none; margin-top: 15px; text-align: center;">
-            <img id="flowImgPreview" style="max-width: 100%; max-height: 200px; border-radius: 10px; border: 1.5px solid #22d3ee; box-shadow: 0 0 15px rgba(34, 211, 238, 0.3);">
-        </div>
+        <!-- ပုံ Preview ပြသသည့်နေရာ (အမှားခြစ် X ခလုတ်ပါဝင်သည်) -->
+<div id="imgPreviewWrapper" style="display: none; position: relative; margin-top: 15px; text-align: center;">
+    
+    <!-- ပုံဖျက်/ပုံပြောင်းရန် အမှားခြစ် (X) ခလုတ် -->
+    <button type="button" onclick="removeFlowImg()" style="position: absolute; top: -10px; right: 5px; background: rgba(239, 68, 68, 0.9); border: 1px solid #ff4d4d; color: white; width: 28px; height: 28px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 10px rgba(239, 68, 68, 0.6); z-index: 10; transition: 0.2s;">
+        <i class="fa-solid fa-xmark" style="font-size: 14px;"></i>
+    </button>
+    
+    <!-- ရွေးချယ်ထားသော ပုံ -->
+    <img id="flowImgPreview" src="" style="max-width: 100%; max-height: 250px; border-radius: 12px; border: 1px solid rgba(34, 211, 238, 0.4); box-shadow: 0 0 15px rgba(34, 211, 238, 0.2);">
+</div>
+
 
         <!-- Generate Button -->
         <button id="genFlowBtn" onclick="generateScriptAndFlowPrompt()" style="display: none; width: 100%; margin-top: 16px; background: linear-gradient(135deg, #06b6d4, #0284c7); color: #fff; border: none; padding: 12px; border-radius: 10px; font-weight: bold; font-size: 13px; cursor: pointer; box-shadow: 0 0 15px rgba(34, 211, 238, 0.4); transition: 0.3s;">
