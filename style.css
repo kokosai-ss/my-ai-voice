@@ -1,4 +1,3 @@
-
 /* =========================================================
    SH AI CHAT — PREMIUM NEON GLASS UI
    COMPLETE CSS
@@ -22,7 +21,6 @@
 #aiChatbot.sh-ai-chat *::after {
     box-sizing:border-box;
 }
-
 
 /* =========================================================
    MAIN SHELL
@@ -3094,6 +3092,11 @@
 }
 .sh-pro-asset-name,
 .sh-pro-preview-title {
+    display: none !important;
+}
+/* Card ပေါ်က Download ခလုတ်နှင့် စာသားများကို ဖျောက်ရန် */
+.sh-pro-asset-card .sh-pro-download,
+.sh-pro-asset-card button {
     display: none !important;
 }
 
