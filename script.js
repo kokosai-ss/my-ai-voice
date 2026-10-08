@@ -2374,105 +2374,55 @@ function getSHProAssetById(id) {
 
 
 /* ---------------------------------------------------------
-   14. PREVIEW
-   --------------------------------------------------------- */
+14. PREVIEW (FIXED FOR CRASH)
+--------------------------------------------------------- */
 
-function openSHProImagePreview(
-    id
-) {
+function openSHProImagePreview(id) {
+  const asset = getSHProAssetById(id);
+  if (!asset) {
+    shShowProMessage('ပုံကို ရှာမတွေ့ပါ။');
+    return;
+  }
 
-    const asset =
-        getSHProAssetById(id);
+  // ၁။ ယခင် ပွင့်နေသော Preview အဟောင်းရှိပါက RAM ရှင်းရန် အရင်ဖျက်ပါ
+  const oldPreview = document.getElementById('shProImagePreview');
+  if (oldPreview) {
+    oldPreview.remove();
+  }
 
-
-    if (!asset) {
-
-        shShowProMessage(
-            'ပုံကို ရှာမတွေ့ပါ။'
-        );
-
-        return;
-    }
-
-
-    const oldPreview =
-        document.getElementById(
-            'shProImagePreview'
-        );
-
-
-    if (oldPreview) {
-        oldPreview.remove();
-    }
-
-
-    const preview =
-        document.createElement('div');
-
-    preview.id =
-        'shProImagePreview';
-
-
-    preview.innerHTML = `
-
-        <div
-            class="sh-pro-preview-backdrop"
-            onclick="closeSHProImagePreview(event)"
-        >
-
-            <div
-                class="sh-pro-preview-box"
-                onclick="event.stopPropagation()"
-            >
-
-                <button
-                    class="sh-pro-preview-close"
-                    onclick="closeSHProImagePreview()"
-                >
-                    <i class="fa-solid fa-xmark"></i>
-                </button>
-
-
-                <img
-                    class="sh-pro-preview-image"
-                    src="${shSafeText(asset.image_url)}"
-                    alt="${shSafeText(asset.title || 'SH Asset')}"
-                >
-
-
-                <div class="sh-pro-preview-info">
-
-                    <div class="sh-pro-preview-category">
-                        ${shSafeText(asset.category || '')}
-                    </div>
-
-                    <div class="sh-pro-preview-title">
-                        ${shSafeText(asset.title || 'SH Asset')}
-                    </div>
-
-                </div>
-
-
-                <button
-                    class="sh-pro-preview-download"
-                    onclick="downloadSHProAsset(${Number(asset.id)})"
-                >
-                    <i class="fa-solid fa-download"></i>
-                    Download
-                </button>
-
-            </div>
-
+  // ၂။ Preview Box သစ် ဖန်တီးပါ
+  const preview = document.createElement('div');
+  preview.id = 'shProImagePreview';
+  
+  // 3. RAM/GPU Crash မဖြစ်စေရန် Image Container တွင် Max-Height နှင့် Decoding Async သတ်မှတ်ထားသည်
+  preview.innerHTML = `
+    <div class="sh-pro-preview-backdrop" onclick="closeSHProImagePreview(event)">
+      <div class="sh-pro-preview-box" onclick="event.stopPropagation()">
+        <button class="sh-pro-preview-close" onclick="closeSHProImagePreview()">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+        <div style="width: 100%; max-height: 55vh; display: flex; align-items: center; justify-content: center; overflow: hidden; background: #000; border-radius: 8px;">
+          <img class="sh-pro-preview-image" 
+               src="${shSafeText(asset.image_url)}" 
+               alt="${shSafeText(asset.title || 'SH Asset')}"
+               decoding="async"
+               style="max-width: 100%; max-height: 55vh; object-fit: contain; display: block;"
+          >
         </div>
-    `;
+        <div class="sh-pro-preview-info">
+          <div class="sh-pro-preview-category">${shSafeText(asset.category || '')}</div>
+          <div class="sh-pro-preview-title">${shSafeText(asset.title || 'SH Asset')}</div>
+        </div>
+        <button class="sh-pro-preview-download" onclick="downloadSHProAsset(${Number(asset.id)})">
+          <i class="fa-solid fa-download"></i> Download
+        </button>
+      </div>
+    </div>
+  `;
 
-
-    document.body.appendChild(
-        preview
-    );
+  document.body.appendChild(preview);
 }
-
-
+                    
 /* ---------------------------------------------------------
    15. CLOSE PREVIEW
    --------------------------------------------------------- */
