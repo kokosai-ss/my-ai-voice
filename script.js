@@ -1,11 +1,11 @@
-let selectedFlowBase64 = "";
-let selectedFlowMimeType = "image/jpeg"; // Dynamic Mime Type (JPG, PNG, WEBP အကုန်ရမည်)
+ let selectedFlowBase64 = "";
+let selectedFlowMimeType = "image/jpeg";
 
 // ပုံ Preview ပြသခြင်း
 function previewFlowImg(event) {
     const file = event.target.files[0];
     if (file) {
-        selectedFlowMimeType = file.type || "image/jpeg"; // ပုံရဲ့ Mime Type အမှန်ကို ယူမည်
+        selectedFlowMimeType = file.type || "image/jpeg";
         const reader = new FileReader();
         reader.onload = function(e) {
             document.getElementById('flowImgPreview').src = e.target.result;
@@ -17,11 +17,28 @@ function previewFlowImg(event) {
     }
 }
 
+// ပုံကို ပယ်ဖျက်ပြီး နောက်တစ်ပုံ အသစ်ပြန်ရွေးရန် (အမှားခြစ် ခလုတ်နှိပ်သည့်အခါ အလုပ်လုပ်မည်)
+function removeFlowImg() {
+    selectedFlowBase64 = "";
+    selectedFlowMimeType = "image/jpeg";
+    
+    // File Input ကို ခါထုတ်မည်
+    const fileInput = document.getElementById('flowFileInput');
+    if (fileInput) fileInput.value = "";
+    
+    document.getElementById('flowImgPreview').src = "";
+    document.getElementById('imgPreviewWrapper').style.display = "none";
+    document.getElementById('genFlowBtn').style.display = "none";
+    
+    // Result Box ရှိရင်ပါ ခေတ္တ ဖျောက်ထားမည်
+    const resultBox = document.getElementById('flowResultBox');
+    if (resultBox) resultBox.style.display = "none";
+}
+
 // Gemini Vision API ဖြင့် Script & Flow AI Prompt ထုတ်ပေးခြင်း
 async function generateScriptAndFlowPrompt() {
     if (!selectedFlowBase64) return showNeonAlert("ကျေးဇူးပြု၍ ပုံတစ်ပုံ ရွေးပေးပါ!");
 
-    // Settings ထဲတွင် သိမ်းထားပြီးသား API Key ကို အလိုအလျောက် ယူမည်
     const apiKey = localStorage.getItem('gemini_api_key') || 
                    localStorage.getItem('geminiApiKey') || 
                    localStorage.getItem('sh_gemini_api_key');
@@ -43,7 +60,8 @@ Required JSON format:
 }`;
 
     try {
-        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
+        // v1 Endpoint သို့ ပြောင်းလဲထားပါသည်
+        const response = await fetch(`https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -58,7 +76,6 @@ Required JSON format:
 
         const data = await response.json();
 
-        // API တုံ့ပြန်မှု အမှား စစ်ဆေးခြင်း
         if (data.error) {
             throw new Error(data.error.message || "API Request မအောင်မြင်ပါ");
         }
@@ -68,9 +85,8 @@ Required JSON format:
         }
 
         const rawText = data.candidates[0].content.parts[0].text;
-        
-        // JSON သီးသန့် ရှာဖွေထုတ်ယူခြင်း
         const jsonMatch = rawText.match(/\{[\s\S]*\}/);
+        
         if (!jsonMatch) {
             throw new Error("JSON Format ဖြင့် စာပြန်မလာပါ");
         }
@@ -83,7 +99,7 @@ Required JSON format:
 
     } catch (err) {
         console.error("Gemini Error Detail:", err);
-        showNeonAlert("Error ဖြစ်သွားပါသည်: " + err.message);
+        showNeonAlert("Error: " + err.message);
     } finally {
         btn.innerHTML = `<i class="fa-solid fa-bolt"></i> Script & Prompt ဖန်တီးမည်`;
         btn.disabled = false;
@@ -104,6 +120,7 @@ function copyFlowPrompt() {
     navigator.clipboard.writeText(text);
     showNeonAlert("Flow AI Prompt ကို Copy ကူးပြီးပါပြီ!");
 }
+
 let activePickerTarget = null; // 'single' or block ID number
 let singleVoiceValue = "Charon";
 let currentAudioBlob = null;
