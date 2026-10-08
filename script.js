@@ -1,4 +1,3 @@
-
 // --- Global Variables ---
 let selectedFlowBase64 = "";
 let selectedFlowMimeType = "image/jpeg";
@@ -331,33 +330,6 @@ function setRatio(ratio) {
         btn169.style.color = "#aaa";
     }
 }
-
-// Movie Director အတွက် Aspect Ratio ရွေးရန်
-let currentMultiRatio = '16:9'; // မူလ
-function setMultiRatio(ratio) {
-    currentMultiRatio = ratio;
-    const btn169 = document.getElementById('multiBtn169');
-    const btn916 = document.getElementById('multiBtn916');
-
-    if (ratio === '16:9') {
-        btn169.style.background = "rgba(34, 211, 238, 0.2)";
-        btn169.style.borderColor = "#22d3ee";
-        btn169.style.color = "#fff";
-
-        btn916.style.background = "rgba(15, 23, 42, 0.8)";
-        btn916.style.borderColor = "rgba(255, 255, 255, 0.2)";
-        btn916.style.color = "#aaa";
-    } else {
-        btn916.style.background = "rgba(34, 211, 238, 0.2)";
-        btn169.style.borderColor = "#22d3ee";
-        btn169.style.color = "#fff";
-
-        btn169.style.background = "rgba(15, 23, 42, 0.8)";
-        btn169.style.borderColor = "rgba(255, 255, 255, 0.2)";
-        btn169.style.color = "#aaa";
-    }
-}
-
 
 let activePickerTarget = null; // 'single' or block ID number
 let singleVoiceValue = "Charon";
