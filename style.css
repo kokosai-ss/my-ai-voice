@@ -4480,3 +4480,45 @@ html, body {
     user-select: none;
     overflow-x: hidden;
 }
+/* =========================================================
+   LOCK SCREEN COMPACT & SLIM UI FIX
+   ========================================================= */
+
+/* Lock Screen Card ပတ်လည် အကျယ်နှင့် spacing ထိန်းရန် */
+[id*="Lock"], [class*="lock-card"], .sh-lock-card {
+    max-width: 340px !important; /* Card ကို ဘေးမကားအောင် အကျယ် 340px ပဲ ပေးမည် */
+    width: 88% !important;
+    padding: 20px 16px !important; /* အတွင်းအကွာအဝေးကို ကျုံ့ပေးမည် */
+    margin: 0 auto !important;
+}
+
+/* အပေါ်ဆုံး Logo အရွယ်အစားကို မျှတအောင် လျှော့ရန် */
+[id*="Lock"] img, .sh-lock-logo {
+    max-width: 65px !important;
+    height: auto !important;
+}
+
+/* ခေါင်းစဉ်နှင့် စာသား အရွယ်အစားများ အလွန်ကြီးမနေစေရန် */
+[id*="Lock"] h1, [id*="Lock"] h2, .sh-lock-title {
+    font-size: 18px !important;
+    letter-spacing: 0.5px !important;
+    margin: 8px 0 4px 0 !important;
+}
+
+[id*="Lock"] p, .sh-lock-sub {
+    font-size: 11px !important;
+    opacity: 0.8;
+}
+
+/* Password ရိုက်သည့် Box နှင့် Unlock ခလုတ်ကို သဲသဲလေး ပြင်ရန် */
+[id*="Lock"] input {
+    height: 42px !important;
+    font-size: 13px !important;
+    padding: 0 14px !important;
+}
+
+[id*="Lock"] button {
+    height: 42px !important;
+    font-size: 14px !important;
+    margin-top: 10px !important;
+}
