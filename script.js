@@ -3385,54 +3385,59 @@ showOpenRouterMessage(
     "info"
 );
 
-try{
+try {
+
+    const controller = new AbortController();
+
+    const timeoutId = setTimeout(() => {
+        controller.abort();
+    }, 30000);
 
     const response = await fetch(
         "https://openrouter.ai/api/v1/chat/completions",
         {
-            method:"POST",
+            method: "POST",
 
-            headers:{
-                "Authorization":
-                    `Bearer ${apiKey}`,
+            signal: controller.signal,
 
-                "Content-Type":
-                    "application/json"
+            headers: {
+                "Authorization": `Bearer ${apiKey}`,
+                "Content-Type": "application/json"
             },
 
-            body:JSON.stringify({
+            body: JSON.stringify({
+                model: "openrouter/free",
 
-                model:"openrouter/free",
-
-                messages:[
+                messages: [
                     {
-                        role:"user",
-                        content:"Reply with only: OPENROUTER_OK"
+                        role: "user",
+                        content: "Reply with only: OPENROUTER_OK"
                     }
                 ],
 
-                stream:false
+                stream: false
             })
         }
     );
+
+    clearTimeout(timeoutId);
 
     const data = await response
         .json()
         .catch(() => ({}));
 
-    if(!response.ok){
-
+    if (!response.ok) {
         throw new Error(
             data?.error?.message ||
             `HTTP ${response.status}`
         );
     }
 
-    if(
+    if (
         document.getElementById(
             "saveOpenRouterKey"
         )?.checked
-    ){
+    ) {
 
         localStorage.setItem(
             "openrouter_api_key",
