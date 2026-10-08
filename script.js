@@ -1,3 +1,95 @@
+let selectedFlowBase64 = "";
+
+// ပုံ Preview ပြသခြင်း
+function previewFlowImg(event) {
+    const file = event.target.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            document.getElementById('flowImgPreview').src = e.target.result;
+            document.getElementById('imgPreviewWrapper').style.display = "block";
+            document.getElementById('genFlowBtn').style.display = "block";
+            selectedFlowBase64 = e.target.result.split(',')[1];
+        };
+        reader.readAsDataURL(file);
+    }
+}
+
+// Gemini Vision API ဖြင့် Script & Flow AI Prompt ထုတ်ပေးခြင်း
+async function generateScriptAndFlowPrompt() {
+    if (!selectedFlowBase64) return showNeonAlert("ကျေးဇူးပြု၍ ပုံတစ်ပုံ ရွေးပေးပါ!");
+
+    const btn = document.getElementById('genFlowBtn');
+    btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> ⚡ AI စဉ်းစားနေသည်...`;
+    btn.disabled = true;
+
+ // LocalStorage ထဲမှ Key ကို ယူမည်
+let apiKey = localStorage.getItem('sh_gemini_api_key');
+
+// Key မရှိသေးပါက တောင်းမည်
+if (!apiKey) {
+    apiKey = prompt("ကျေးဇူးပြု၍ သင့် Gemini API Key ကို ထည့်သွင်းပေးပါ:");
+    if (apiKey && apiKey.trim() !== "") {
+        localStorage.setItem('sh_gemini_api_key', apiKey.trim());
+        showNeonAlert("API Key ကို မှတ်သားလိုက်ပါပြီ!");
+    } else {
+        return showNeonAlert("API Key မရှိပါက AI Script ထုတ်၍ မရပါဗျာ!");
+    }
+}
+
+    const promptText = `Analyze this image for a short movie recap:
+1. Write an engaging 2-sentence Burmese voiceover script for the scene.
+2. Write a cinematic English prompt for Google Flow AI/Veo (include character details, camera movement, lighting, atmosphere).
+Output MUST be raw JSON format strictly like this: {"burmese_script": "...", "flow_prompt": "..."}`;
+
+    try {
+        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                contents: [{
+                    parts: [
+                        { text: promptText },
+                        { inline_data: { mime_type: "image/jpeg", data: selectedFlowBase64 } }
+                    ]
+                }]
+            })
+        });
+
+        const data = await response.json();
+        const rawText = data.candidates[0].content.parts[0].text;
+        
+        // Clean JSON formatting from API output
+        const cleanJson = rawText.replace(/```json|```/g, '').trim();
+        const parsed = JSON.parse(cleanJson);
+
+        document.getElementById('outBurmeseScript').innerText = parsed.burmese_script;
+        document.getElementById('outFlowPrompt').innerText = parsed.flow_prompt;
+        document.getElementById('flowResultBox').style.display = "block";
+
+    } catch (err) {
+        showNeonAlert("Error ဖြစ်သွားပါသည်။ အင်တာနက် သို့မဟုတ် API Key ကို စစ်ဆေးပေးပါဗျာ။");
+    } finally {
+        btn.innerHTML = `<i class="fa-solid fa-bolt"></i> Script & Prompt ဖန်တီးမည်`;
+        btn.disabled = false;
+    }
+}
+
+// Copy လုပ်ဆောင်ချက်များ
+function copyBurmeseScript() {
+    const text = document.getElementById('outBurmeseScript').innerText;
+    if (!text) return;
+    navigator.clipboard.writeText(text);
+    showNeonAlert("မြန်မာ Script ကို Copy ကူးပြီးပါပြီ!");
+}
+
+function copyFlowPrompt() {
+    const text = document.getElementById('outFlowPrompt').innerText;
+    if (!text) return;
+    navigator.clipboard.writeText(text);
+    showNeonAlert("Flow AI Prompt ကို Copy ကူးပြီးပါပြီ!");
+}
+
 let activePickerTarget = null; // 'single' or block ID number
 let singleVoiceValue = "Charon";
 let currentAudioBlob = null;
