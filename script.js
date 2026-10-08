@@ -23,20 +23,14 @@ async function generateScriptAndFlowPrompt() {
     btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> ⚡ AI စဉ်းစားနေသည်...`;
     btn.disabled = true;
 
- // LocalStorage ထဲမှ Key ကို ယူမည်
-let apiKey = localStorage.getItem('sh_gemini_api_key');
+// Settings ထဲတွင် သိမ်းထားပြီးသား API Key ကို အလိုအလျောက် ယူမည်
+const apiKey = localStorage.getItem('gemini_api_key') || 
+               localStorage.getItem('geminiApiKey') || 
+               localStorage.getItem('sh_gemini_api_key');
 
-// Key မရှိသေးပါက တောင်းမည်
 if (!apiKey) {
-    apiKey = prompt("ကျေးဇူးပြု၍ သင့် Gemini API Key ကို ထည့်သွင်းပေးပါ:");
-    if (apiKey && apiKey.trim() !== "") {
-        localStorage.setItem('sh_gemini_api_key', apiKey.trim());
-        showNeonAlert("API Key ကို မှတ်သားလိုက်ပါပြီ!");
-    } else {
-        return showNeonAlert("API Key မရှိပါက AI Script ထုတ်၍ မရပါဗျာ!");
-    }
+    return showNeonAlert("API Key Settings ထဲမှာ Key သတ်မှတ်ပေးပါဗျာ!");
 }
-
     const promptText = `Analyze this image for a short movie recap:
 1. Write an engaging 2-sentence Burmese voiceover script for the scene.
 2. Write a cinematic English prompt for Google Flow AI/Veo (include character details, camera movement, lighting, atmosphere).
