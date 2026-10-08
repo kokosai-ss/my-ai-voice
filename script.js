@@ -1,7 +1,63 @@
- let selectedFlowBase64 = "";
-let selectedFlowMimeType = "image/jpeg";
 
-// ပုံ Preview ပြသခြင်း
+// --- Global Variables ---
+let selectedFlowBase64 = "";
+let selectedFlowMimeType = "image/jpeg";
+let currentRatio = "16:9";
+let currentMultiRatio = "16:9";
+
+// Custom Alert Function (Neon Style)
+function showNeonAlert(message) {
+    alert(message); // လိုအပ်ပါက Custom UI Modal ဖြင့် အစားထိုးနိုင်ပါသည်
+}
+
+// Mode Switching (Single vs Multi-Shot)
+function switchMode(mode) {
+    const singleSec = document.getElementById('singleShotSection');
+    const multiSec = document.getElementById('multiShotSection');
+    const btns = document.querySelectorAll('.mode-tabs .tab-btn');
+
+    btns.forEach(b => b.classList.remove('active'));
+
+    if (mode === 'single') {
+        singleSec.style.display = 'block';
+        multiSec.style.display = 'none';
+        btns[0].classList.add('active');
+    } else {
+        singleSec.style.display = 'none';
+        multiSec.style.display = 'block';
+        btns[1].classList.add('active');
+    }
+}
+
+// Aspect Ratio Setter for Single Shot
+function setRatio(ratio) {
+    currentRatio = ratio;
+    const btn169 = document.getElementById('btn169');
+    const btn916 = document.getElementById('btn916');
+
+    if (ratio === '16:9') {
+        if(btn169) { btn169.classList.add('active'); }
+        if(btn916) { btn916.classList.remove('active'); }
+    } else {
+        if(btn916) { btn916.classList.add('active'); }
+        if(btn169) { btn169.classList.remove('active'); }
+    }
+}
+
+// Aspect Ratio Setter for Multi-Shot
+function setMultiRatio(ratio) {
+    currentMultiRatio = ratio;
+    const multiRatioBtns = document.querySelectorAll('.multi-ratio');
+    multiRatioBtns.forEach(btn => {
+        if(btn.innerText.includes(ratio)) {
+            btn.classList.add('active');
+        } else {
+            btn.classList.remove('active');
+        }
+    });
+}
+
+// Image Preview for Single Shot
 function previewFlowImg(event) {
     const file = event.target.files[0];
     if (file) {
@@ -17,12 +73,9 @@ function previewFlowImg(event) {
     }
 }
 
-// ပုံကို ပယ်ဖျက်ပြီး နောက်တစ်ပုံ အသစ်ပြန်ရွေးရန် (အမှားခြစ် ခလုတ်နှိပ်သည့်အခါ အလုပ်လုပ်မည်)
 function removeFlowImg() {
     selectedFlowBase64 = "";
     selectedFlowMimeType = "image/jpeg";
-    
-    // File Input ကို ခါထုတ်မည်
     const fileInput = document.getElementById('flowFileInput');
     if (fileInput) fileInput.value = "";
     
@@ -30,42 +83,11 @@ function removeFlowImg() {
     document.getElementById('imgPreviewWrapper').style.display = "none";
     document.getElementById('genFlowBtn').style.display = "none";
     
-    // Result Box ရှိရင်ပါ ခေတ္တ ဖျောက်ထားမည်
     const resultBox = document.getElementById('flowResultBox');
     if (resultBox) resultBox.style.display = "none";
 }
-let currentRatio = "16:9";
 
-function setRatio(ratio) {
-    currentRatio = ratio;
-    const btn169 = document.getElementById('btn169');
-    const btn916 = document.getElementById('btn916');
-
-    if (ratio === '16:9') {
-        if(btn169) {
-            btn169.style.background = "rgba(34, 211, 238, 0.2)";
-            btn169.style.border = "1px solid #22d3ee";
-            btn169.style.color = "#fff";
-        }
-        if(btn916) {
-            btn916.style.background = "rgba(15, 23, 42, 0.8)";
-            btn916.style.border = "1px solid rgba(255, 255, 255, 0.2)";
-            btn916.style.color = "#aaa";
-        }
-    } else {
-        if(btn916) {
-            btn916.style.background = "rgba(34, 211, 238, 0.2)";
-            btn916.style.border = "1px solid #22d3ee";
-            btn916.style.color = "#fff";
-        }
-        if(btn169) {
-            btn169.style.background = "rgba(15, 23, 42, 0.8)";
-            btn169.style.border = "1px solid rgba(255, 255, 255, 0.2)";
-            btn169.style.color = "#aaa";
-        }
-    }
-}
-
+// --- 1. SINGLE SHOT GEMINI 3.8 FLASH API HANDLER ---
 async function generateScriptAndFlowPrompt() {
     if (!selectedFlowBase64) return showNeonAlert("ကျေးဇူးပြု၍ ပုံတစ်ပုံ ရွေးပေးပါ!");
 
@@ -77,26 +99,22 @@ async function generateScriptAndFlowPrompt() {
         return showNeonAlert("API Key Settings ထဲမှာ Key သတ်မှတ်ပေးပါဗျာ!");
     }
 
-    // မင်း စာရိုက်ထည့်လိုက်သော အမိန့်/Custom Instruction ကို ရယူခြင်း
     const customUserPrompt = document.getElementById('flowCustomPrompt')?.value.trim() || "";
-
     const btn = document.getElementById('genFlowBtn');
-    btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> ⚡ AI စဉ်းစားပြီး Thumbnail ပါ ဖန်တီးနေသည်...`;
+    btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> ⚡ AI စဉ်းစားနေသည်...`;
     btn.disabled = true;
 
-    // Prompt ထဲသို့ မင်းခိုင်းလိုက်သော စာသားအမိန့်ကို ထည့်သွင်းခြင်း
     let promptText = `Analyze this image for a short movie recap and thumbnail cover design.`;
-    
     if (customUserPrompt) {
-        promptText += `\nCRITICAL USER INSTRUCTION: "${customUserPrompt}". You MUST strictly follow this specific instruction, tone, character addition, or setting changes requested by the user in all outputs.`;
+        promptText += `\nCRITICAL USER INSTRUCTION: "${customUserPrompt}". You MUST strictly follow this specific instruction.`;
     }
 
     promptText += `\n\nReturn ONLY a valid raw JSON object without any preamble or markdown formatting like \`\`\`json.
 Required JSON format:
 {
-  "burmese_script": "2 sentences of engaging Burmese voiceover script matching the requested user instruction",
+  "burmese_script": "2 sentences of engaging Burmese dialogue or voiceover script matching the instruction",
   "flow_prompt": "Cinematic English prompt for video generation matching the user instruction",
-  "thumbnail_prompt": "An eye-catching, highly detailed cinematic English image prompt suitable for a movie cover thumbnail, high quality, matching the user instruction"
+  "thumbnail_prompt": "An eye-catching cinematic English image prompt for movie thumbnail"
 }`;
 
     try {
@@ -114,7 +132,6 @@ Required JSON format:
         });
 
         const data = await response.json();
-
         if (data.error) throw new Error(data.error.message || "API Error");
 
         if (!data.candidates || !data.candidates[0]?.content?.parts?.[0]?.text) {
@@ -127,20 +144,13 @@ Required JSON format:
 
         const parsed = JSON.parse(jsonMatch[0]);
 
-        // Output စာသားများ ထည့်သွင်းခြင်း
         document.getElementById('outBurmeseScript').innerText = parsed.burmese_script || "Script မရပါ။";
         document.getElementById('outFlowPrompt').innerText = parsed.flow_prompt || "Prompt မရပါ။";
 
-        // Thumbnail ပုံ ဖန်တီးပေးခြင်း
         if (parsed.thumbnail_prompt) {
             const thumbPrompt = encodeURIComponent(parsed.thumbnail_prompt);
-            let imgWidth = 1280;
-            let imgHeight = 720;
-
-            if (currentRatio === "9:16") {
-                imgWidth = 720;
-                imgHeight = 1280;
-            }
+            let imgWidth = 1280, imgHeight = 720;
+            if (currentRatio === "9:16") { imgWidth = 720; imgHeight = 1280; }
 
             const randomSeed = Math.floor(Math.random() * 999999);
             const imageUrl = `https://image.pollinations.ai/prompt/${thumbPrompt}?width=${imgWidth}&height=${imgHeight}&seed=${randomSeed}&nologo=true`;
@@ -163,7 +173,88 @@ Required JSON format:
     }
 }
 
-// Copy လုပ်ဆောင်ချက်များ
+// --- 2. MOVIE DIRECTOR (MULTI-SHOT) API HANDLER ---
+async function generateMultiShotMovie() {
+    const movieIdea = document.getElementById('movieIdeaInput').value.trim();
+    if(!movieIdea) {
+        return showNeonAlert("ဇာတ်လမ်း အစပျိုး Idea လေး အရင် ရိုက်ထည့်ပေးပါ သားရီး!");
+    }
+
+    const apiKey = localStorage.getItem('gemini_api_key') || 
+                   localStorage.getItem('geminiApiKey') || 
+                   localStorage.getItem('sh_gemini_api_key');
+
+    if (!apiKey) {
+        return showNeonAlert("API Key Settings ထဲမှာ Key သတ်မှတ်ပေးပါဗျာ!");
+    }
+
+    const multiResultBox = document.getElementById('multiResultBox');
+    const multiResultContent = document.getElementById('multiResultContent');
+    
+    multiResultBox.style.display = 'block';
+    multiResultContent.innerHTML = `<p style="color: #00f3ff; text-align:center;"><i class="fa-solid fa-spinner fa-spin"></i> Movie Director က အခန်းဆက် ဇာတ်ညွှန်းနှင့် စကားပြောခန်းများ ဖန်တီးနေသည်...</p>`;
+
+    let promptText = `You are an expert Movie Director and AI Video Prompt Engineer. 
+Based on the following story idea, create a sequence of 4 to 6 video scenes (multi-shot sequence). 
+For EACH scene, you MUST provide:
+1. Time range (e.g., "0-8s", "8-16s")
+2. Burmese character dialogue or voiceover script (ဇာတ်ကောင်များ၏ မြန်မာစကားပြောခန်း သို့မဟုတ် ဇာတ်ကြောင်းပြောချက်)
+3. Cinematic English prompt for Flow AI video generator (with camera angles, lighting, matching aspect ratio --ar ${currentMultiRatio})
+
+Return ONLY a valid raw JSON array of objects without markdown like \`\`\`json.
+Required JSON format:
+[
+  {
+    "scene_number": 1,
+    "time_range": "0-8s",
+    "burmese_dialogue": "ဇာတ်ကောင်ပြောမည့် မြန်မာစကားပြောခန်း (သို့) Voiceover",
+    "flow_prompt": "Cinematic English prompt --ar ${currentMultiRatio}"
+  }
+]
+
+Story Idea: "${movieIdea}"`;
+
+    try {
+        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=${apiKey}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                contents: [{ parts: [{ text: promptText }] }]
+            })
+        });
+
+        const data = await response.json();
+        if (data.error) throw new Error(data.error.message || "API Error");
+
+        const rawText = data.candidates[0].content.parts[0].text;
+        const jsonMatch = rawText.match(/\[[\s\S]*\]/);
+        if (!jsonMatch) throw new Error("JSON Array ထွက်မလာပါ");
+
+        const scenes = JSON.parse(jsonMatch[0]);
+
+        let htmlOutput = "";
+        scenes.forEach((s) => {
+            htmlOutput += `
+                <div style="background: rgba(0,0,20,0.6); border: 1px solid rgba(0,243,255,0.2); padding: 12px; border-radius: 10px; margin-bottom: 12px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+                        <span style="color: #00f3ff; font-weight: bold;">🎬 Scene ${s.scene_number} (${s.time_range})</span>
+                        <button class="copy-all-btn" onclick="navigator.clipboard.writeText(\`${s.flow_prompt}\`); showNeonAlert('Scene ${s.scene_number} Flow Prompt ကို ကူးပြီးပါပြီ!')"><i class="fa-solid fa-copy"></i> Prompt ကူးမည်</button>
+                    </div>
+                    <p style="margin-bottom: 6px; font-size: 13px;">🇲🇲 <b>မြန်မာစကားပြောခန်း / Voiceover:</b><br><span style="color: #f8fafc;">${s.burmese_dialogue}</span></p>
+                    <p style="font-size: 13px;">🇬🇧 <b>Flow AI Prompt:</b><br><span style="color: #94a3b8; font-family: monospace;">${s.flow_prompt}</span></p>
+                </div>
+            `;
+        });
+
+        multiResultContent.innerHTML = htmlOutput;
+
+    } catch (err) {
+        console.error("Multi-Shot Error:", err);
+        multiResultContent.innerHTML = `<p style="color: #ff4d4d;">Error: ${err.message}</p>`;
+    }
+}
+
+// Copy Handlers
 function copyBurmeseScript() {
     const text = document.getElementById('outBurmeseScript').innerText;
     if (!text) return;
@@ -176,6 +267,13 @@ function copyFlowPrompt() {
     if (!text) return;
     navigator.clipboard.writeText(text);
     showNeonAlert("Flow AI Prompt ကို Copy ကူးပြီးပါပြီ!");
+}
+
+function copyAllMultiScenes() {
+    const content = document.getElementById('multiResultContent').innerText;
+    if (!content) return;
+    navigator.clipboard.writeText(content);
+    showNeonAlert("ဇာတ်လမ်း အခန်းဆက် အားလုံးကို Copy ကူးပြီးပါပြီ!");
 }
 
 let activePickerTarget = null; // 'single' or block ID number
