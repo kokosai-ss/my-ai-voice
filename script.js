@@ -183,8 +183,6 @@ Required JSON format:
    GLOBAL MOVIE MEMORY
    ========================================================= */
 
-let movieChatHistory = [];
-
 
 /* =========================================================
    CURRENT MULTI-SHOT RATIO
