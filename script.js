@@ -174,6 +174,10 @@ Required JSON format:
 }
 
 // --- 2. MOVIE DIRECTOR (MULTI-SHOT) API HANDLER ---
+// --- Global Memory Array (ဇာတ်လမ်း အတိတ်မှတ်ဉာဏ် သိမ်းဆည်းရန်) ---
+let movieChatHistory = [];
+
+// --- 2. MOVIE DIRECTOR (MULTI-SHOT) API HANDLER ---
 async function generateMultiShotMovie() {
     const movieIdea = document.getElementById('movieIdeaInput').value.trim();
     if(!movieIdea) {
@@ -194,12 +198,23 @@ async function generateMultiShotMovie() {
     multiResultBox.style.display = 'block';
     multiResultContent.innerHTML = `<p style="color: #00f3ff; text-align:center;"><i class="fa-solid fa-spinner fa-spin"></i> Movie Director က အခန်းဆက် ဇာတ်ညွှန်းနှင့် စကားပြောခန်းများ ဖန်တီးနေသည်...</p>`;
 
-    let promptText = `You are an expert Movie Director and AI Video Prompt Engineer. 
-Based on the following story idea, create a sequence of 4 to 6 video scenes (multi-shot sequence). 
+    // 1. Consistent Character System Instruction (ဇာတ်ကောင် ရုပ်သွင်ပြင် မလွဲစေရန် စနစ်ညွှန်ကြားချက်)
+    let systemInstruction = `You are an expert Movie Director and AI Video Prompt Engineer. 
+CRITICAL RULE FOR CHARACTER CONSISTENCY: 
+Whenever characters are introduced in the story, you MUST lock their core physical appearance (face shape, hair style, clothing, accessories like Thanaka) and ensure that description remains EXACTLY IDENTICAL across all generated scenes in the prompt. Do not change their facial descriptions or clothing styles randomly between scenes.`;
+
+    // 2. Build Chat History Payload (Memory ထည့်သွင်းခြင်း)
+    // ပထမဆုံးအကြိမ်ဖြစ်စေ၊ ဆက်တိုက်တောင်းတာဖြစ်စေ ဇာတ်လမ်း အတိတ်မှတ်ဉာဏ်ကို ထည့်ပေးမည်
+    movieChatHistory.push({
+        role: "user",
+        parts: [{ text: `Story Idea / Continuation Request: "${movieIdea}"` }]
+    });
+
+    let promptText = `Based on the conversation history and the latest input above, create the next sequence of 4 to 6 video scenes (multi-shot sequence). 
 For EACH scene, you MUST provide:
 1. Time range (e.g., "0-8s", "8-16s")
 2. Burmese character dialogue or voiceover script (ဇာတ်ကောင်များ၏ မြန်မာစကားပြောခန်း သို့မဟုတ် ဇာတ်ကြောင်းပြောချက်)
-3. Cinematic English prompt for Flow AI video generator (with camera angles, lighting, matching aspect ratio --ar ${currentMultiRatio})
+3. Cinematic English prompt for Flow AI video generator, maintaining strict character appearance consistency from previous scenes (with camera angles, lighting, matching aspect ratio --ar ${currentMultiRatio})
 
 Return ONLY a valid raw JSON array of objects without markdown like \`\`\`json.
 Required JSON format:
@@ -208,18 +223,21 @@ Required JSON format:
     "scene_number": 1,
     "time_range": "0-8s",
     "burmese_dialogue": "ဇာတ်ကောင်ပြောမည့် မြန်မာစကားပြောခန်း (သို့) Voiceover",
-    "flow_prompt": "Cinematic English prompt --ar ${currentMultiRatio}"
+    "flow_prompt": "Cinematic English prompt with consistent character details --ar ${currentMultiRatio}"
   }
-]
+]`;
 
-Story Idea: "${movieIdea}"`;
+    // လက်ရှိ တောင်းဆိုမှုကို History ထဲ ယာယီထည့်မည်
+    let currentContents = [...movieChatHistory];
+    currentContents[currentContents.length - 1].parts[0].text += "\n\n" + promptText;
 
     try {
-        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=${apiKey}`, {
+        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                contents: [{ parts: [{ text: promptText }] }]
+                system_instruction: { parts: [{ text: systemInstruction }] },
+                contents: currentContents
             })
         });
 
@@ -227,11 +245,16 @@ Story Idea: "${movieIdea}"`;
         if (data.error) throw new Error(data.error.message || "API Error");
 
         const rawText = data.candidates[0].content.parts[0].text;
+        
+        // AI ရဲ့ အဖြေကို Memory ထဲ ပြန်သိမ်းမည် (နောက်တစ်ခါ Scene 6 ကနေ 10 ထပ်တောင်းရင် မှတ်မိနေစေရန်)
+        movieChatHistory.push({
+            role: "model",
+            parts: [{ text: rawText }]
+        });
+
         const jsonMatch = rawText.match(/\[[\s\S]*\]/);
         if (!jsonMatch) throw new Error("JSON Array ထွက်မလာပါ");
-
         const scenes = JSON.parse(jsonMatch[0]);
-
         let htmlOutput = "";
         scenes.forEach((s) => {
             htmlOutput += `
@@ -254,27 +277,13 @@ Story Idea: "${movieIdea}"`;
     }
 }
 
-// Copy Handlers
-function copyBurmeseScript() {
-    const text = document.getElementById('outBurmeseScript').innerText;
-    if (!text) return;
-    navigator.clipboard.writeText(text);
-    showNeonAlert("မြန်မာ Script ကို Copy ကူးပြီးပါပြီ!");
+// ဇာတ်လမ်းအသစ်ပြန်စလိုပါက Memory ရှင်းထုတ်ပေးရန် ခလုတ် သို့မဟုတ် လုပ်ဆောင်ချက်
+function resetMovieMemory() {
+    movieChatHistory = [];
+    showNeonAlert("ဇာတ်လမ်း မှတ်ဉာဏ် (Memory) အသစ်ပြန်စလိုက်ပါပြီ!");
 }
 
-function copyFlowPrompt() {
-    const text = document.getElementById('outFlowPrompt').innerText;
-    if (!text) return;
-    navigator.clipboard.writeText(text);
-    showNeonAlert("Flow AI Prompt ကို Copy ကူးပြီးပါပြီ!");
-}
 
-function copyAllMultiScenes() {
-    const content = document.getElementById('multiResultContent').innerText;
-    if (!content) return;
-    navigator.clipboard.writeText(content);
-    showNeonAlert("ဇာတ်လမ်း အခန်းဆက် အားလုံးကို Copy ကူးပြီးပါပြီ!");
-}
 // AI Script ထဲက Single Shot နဲ့ Movie Director Tab များ ပြောင်းရန်
 function switchAiSubTab(tab) {
     const subSingle = document.getElementById('subSectionSingle');
