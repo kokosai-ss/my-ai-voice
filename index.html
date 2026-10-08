@@ -428,6 +428,58 @@ cursor:pointer;
         </div>
     </div>
 </div>
+  
+<!-- Movie Director / Multi-Shot View -->
+<div id="movieDirectorView" class="view-container" style="display: none; padding: 16px;">
+    <div style="background: rgba(13, 27, 42, 0.75); backdrop-filter: blur(12px); border: 1px solid rgba(34, 211, 238, 0.35); border-radius: 16px; padding: 20px; box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37), 0 0 15px rgba(34, 211, 238, 0.15);">
+        
+        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;">
+            <i class="fa-solid fa-film" style="color: #22d3ee; font-size: 20px; filter: drop-shadow(0 0 8px #22d3ee);"></i>
+            <h2 style="color: #ffffff; font-size: 16px; font-weight: 600; margin: 0;">Movie Director (Multi-Shot)</h2>
+        </div>
+        
+        <p style="color: #94a3b8; font-size: 12px; margin-bottom: 16px; line-height: 1.4;">
+            ဇာတ်လမ်း Idea တစ်ခုပေးလိုက်ရုံနဲ့ ဇာတ်ကားတစ်ပုဒ်စာ အခန်းဆက် Scene များ၊ မြန်မာစကားပြောခန်းများနဲ့ Flow AI Prompts များကို အစအဆုံး ထုတ်ပေးပါမည်။
+        </p>
+
+        <!-- Movie Idea Input -->
+        <div style="margin-bottom: 15px;">
+            <label style="color: #22d3ee; font-size: 13px; font-weight: bold; display: block; margin-bottom: 6px;">
+                <i class="fa-solid fa-book-open"></i> ဇာတ်လမ်း အစပျိုး Idea / ဇာတ်ညွှန်း:
+            </label>
+            <textarea id="movieIdeaInput" rows="4" placeholder="ဥပမာ - ကောင်လေး ဂျွန်နဲ့ ကောင်မလေး ပရီတီတို့ မိုးထဲမှာ စကားများကြတဲ့ အခန်း... ဇာတ်သိမ်းအထိ အခန်းဆက် ရေးပေးပါ" style="width: 100%; background: rgba(8, 21, 34, 0.85); border: 1px solid rgba(34, 211, 238, 0.4); border-radius: 10px; padding: 12px; color: #fff; font-size: 13px; outline: none; resize: vertical;"></textarea>
+        </div>
+
+        <!-- Aspect Ratio for Multi-Shot -->
+        <div style="margin-bottom: 15px;">
+            <label style="color: #22d3ee; font-size: 13px; font-weight: bold; display: block; margin-bottom: 6px;">
+                <i class="fa-solid fa-crop"></i> ဗီဒီယို အချိုးအစား (Aspect Ratio):
+            </label>
+            <div style="display: flex; gap: 10px;">
+                <button type="button" id="multiBtn169" onclick="setMultiRatio('16:9')" style="flex: 1; padding: 10px; background: rgba(34, 211, 238, 0.2); border: 1px solid #22d3ee; color: #fff; border-radius: 8px; cursor: pointer; font-size: 12px; font-weight: bold;">YouTube (16:9)</button>
+                <button type="button" id="multiBtn916" onclick="setMultiRatio('9:16')" style="flex: 1; padding: 10px; background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(255, 255, 255, 0.2); color: #aaa; border-radius: 8px; cursor: pointer; font-size: 12px; font-weight: bold;">TikTok (9:16)</button>
+            </div>
+        </div>
+
+        <!-- Generate Button -->
+        <button onclick="generateMultiShotMovie()" style="width: 100%; background: linear-gradient(135deg, #06b6d4, #0284c7); color: #fff; border: none; padding: 12px; border-radius: 10px; font-weight: bold; font-size: 13px; cursor: pointer; box-shadow: 0 0 15px rgba(34, 211, 238, 0.4);">
+            <i class="fa-solid fa-clapperboard"></i> ဇာတ်ကားတစ်ပုဒ်စာ အခန်းဆက် Prompt များ ထုတ်မည်
+        </button>
+    </div>
+
+    <!-- Multi-Shot Result Box -->
+    <div id="multiResultBox" style="display: none; margin-top: 16px; background: rgba(13, 27, 42, 0.75); backdrop-filter: blur(12px); border: 1px solid rgba(34, 211, 238, 0.35); border-radius: 16px; padding: 18px; box-shadow: 0 0 20px rgba(34, 211, 238, 0.15);">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+            <span style="color: #67e8f9; font-size: 13px; font-weight: bold;"><i class="fa-solid fa-film"></i> အခန်းဆက် ဇာတ်ညွှန်း & Prompts မျာား</span>
+            <button onclick="copyAllMultiScenes()" style="background: rgba(34, 211, 238, 0.15); border: 1px solid #22d3ee; color: #22d3ee; padding: 4px 10px; border-radius: 6px; font-size: 10px; cursor: pointer; font-weight: bold;">
+                <i class="fa-solid fa-copy"></i> အကုန်ကူးမည်
+            </button>
+        </div>
+        <div id="multiResultContent" style="max-height: 400px; overflow-y: auto;">
+            <!-- Dynamic Scenes will appear here -->
+        </div>
+    </div>
+</div>
 
 <div id="voiceStudio" class="view-container" style="display: none;">
         <!-- 1. အပြင်ဘက်မှာ အမြဲပေါ်နေမယ့် Header နဲ့ Tab ခလုတ်များ -->
