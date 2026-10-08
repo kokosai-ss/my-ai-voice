@@ -2992,6 +2992,107 @@
 .sh-pro-empty-btn:active {
     transform: scale(0.94);
 }
+/* =========================================================
+   PRO IMAGE PREVIEW POPUP (FIX CRASH & OVERFLOW)
+   ========================================================= */
+
+#shProImagePreview {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    z-index: 99999 !important;
+    background: rgba(2, 8, 15, 0.88) !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    backdrop-filter: blur(10px);
+}
+
+.sh-pro-preview-backdrop {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    box-sizing: border-box;
+}
+
+.sh-pro-preview-box {
+    position: relative;
+    background: #081522;
+    border: 1px solid rgba(34, 211, 238, 0.25);
+    border-radius: 18px;
+    padding: 16px;
+    width: 90%;
+    max-width: 420px;
+    max-height: 85vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    overflow: hidden !important;
+    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.6);
+}
+
+.sh-pro-preview-image {
+    max-width: 100% !important;
+    max-height: 50vh !important;
+    width: auto !important;
+    height: auto !important;
+    object-fit: contain !important;
+    border-radius: 10px;
+    display: block;
+    margin: 0 auto;
+}
+
+.sh-pro-preview-close {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    color: #fff;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    cursor: pointer;
+    z-index: 10;
+}
+
+.sh-pro-preview-info {
+    width: 100%;
+    margin-top: 12px;
+    text-align: left;
+}
+
+.sh-pro-preview-category {
+    color: #22d3ee;
+    font-size: 10px;
+    font-weight: 700;
+}
+
+.sh-pro-preview-title {
+    color: #ffffff;
+    font-size: 13px;
+    font-weight: 600;
+    margin-top: 2px;
+}
+
+.sh-pro-preview-download {
+    width: 100%;
+    margin-top: 14px;
+    padding: 10px;
+    background: #22d3ee;
+    color: #02080f;
+    border: none;
+    border-radius: 10px;
+    font-weight: 700;
+    font-size: 12px;
+    cursor: pointer;
+}
+
 #cyberpunk-lockscreen {
   position: fixed;
   top: 0; left: 0;
