@@ -9,7 +9,6 @@ let currentMultiRatio = "16:9";
 function showNeonAlert(message) {
     alert(message); // လိုအပ်ပါက Custom UI Modal ဖြင့် အစားထိုးနိုင်ပါသည်
 }
-
 // Mode Switching (Single vs Multi-Shot)
 function switchMode(mode) {
     const singleSec = document.getElementById('singleShotSection');
@@ -19,13 +18,13 @@ function switchMode(mode) {
     btns.forEach(b => b.classList.remove('active'));
 
     if (mode === 'single') {
-        singleSec.style.display = 'block';
-        multiSec.style.display = 'none';
-        btns[0].classList.add('active');
+        if(singleSec) singleSec.style.display = 'block';
+        if(multiSec) multiSec.style.display = 'none';
+        if(btns[0]) btns[0].classList.add('active');
     } else {
-        singleSec.style.display = 'none';
-        multiSec.style.display = 'block';
-        btns[1].classList.add('active');
+        if(singleSec) singleSec.style.display = 'none';
+        if(multiSec) multiSec.style.display = 'block';
+        if(btns[1]) btns[1].classList.add('active');
     }
 }
 
@@ -47,15 +46,18 @@ function setRatio(ratio) {
 // Aspect Ratio Setter for Multi-Shot
 function setMultiRatio(ratio) {
     currentMultiRatio = ratio;
-    const multiRatioBtns = document.querySelectorAll('.multi-ratio');
-    multiRatioBtns.forEach(btn => {
-        if(btn.innerText.includes(ratio)) {
-            btn.classList.add('active');
-        } else {
-            btn.classList.remove('active');
-        }
-    });
+    const btn169 = document.getElementById('multiBtn169');
+    const btn916 = document.getElementById('multiBtn916');
+
+    if (ratio === '16:9') {
+        if(btn169) { btn169.classList.add('active'); }
+        if(btn916) { btn916.classList.remove('active'); }
+    } else {
+        if(btn916) { btn916.classList.add('active'); }
+        if(btn169) { btn169.classList.remove('active'); }
+    }
 }
+
 
 // Image Preview for Single Shot
 function previewFlowImg(event) {
@@ -399,40 +401,6 @@ function switchAiSubTab(tab) {
         btnSingle.style.boxShadow = "none";
     }
 }
-
-// --- ASPECT RATIO RATIO SWITCHER FUNCTION ---
-let currentMultiRatio = '16:9'; // Default Value
-
-function setMultiRatio(ratio) {
-    currentMultiRatio = ratio;
-    const btn169 = document.getElementById('multiBtn169');
-    const btn916 = document.getElementById('multiBtn916');
-    
-    if (!btn169 || !btn916) return;
-
-    if (ratio === '16:9') {
-        // YouTube (16:9) ခလုတ်ကို Active အလင်းပြပေးမည်
-        btn169.style.background = 'rgba(34, 211, 238, 0.2)';
-        btn169.style.border = '1px solid #22d3ee';
-        btn169.style.color = '#fff';
-        
-        // TikTok (9:16) ခလုတ်ကို မှိန်ပေးမည်
-        btn916.style.background = 'rgba(15, 23, 42, 0.8)';
-        btn916.style.border = '1px solid rgba(255, 255, 255, 0.2)';
-        btn916.style.color = '#aaa';
-    } else {
-        // TikTok (9:16) ခလုတ်ကို Active အလင်းပြပေးမည်
-        btn916.style.background = 'rgba(34, 211, 238, 0.2)';
-        btn916.style.border = '1px solid #22d3ee';
-        btn916.style.color = '#fff';
-        
-        // YouTube (16:9) ခလုတ်ကို မှိန်ပေးမည်
-        btn169.style.background = 'rgba(15, 23, 42, 0.8)';
-        btn169.style.border = '1px solid rgba(255, 255, 255, 0.2)';
-        btn169.style.color = '#aaa';
-    }
-}
-
 let activePickerTarget = null; // 'single' or block ID number
 let singleVoiceValue = "Charon";
 let currentAudioBlob = null;
