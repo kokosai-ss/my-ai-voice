@@ -1,3 +1,4 @@
+
 // --- Global Variables ---
 let selectedFlowBase64 = "";
 let selectedFlowMimeType = "image/jpeg";
@@ -305,31 +306,7 @@ function switchAiSubTab(tab) {
         btnSingle.style.boxShadow = "none";
     }
 }
-// Single Shot အတွက် Aspect Ratio ရွေးရန်
-let currentRatio = '16:9'; // မူလ
-function setRatio(ratio) {
-    currentRatio = ratio;
-    const btn169 = document.getElementById('btn169');
-    const btn916 = document.getElementById('btn916');
 
-    if (ratio === '16:9') {
-        btn169.style.background = "rgba(34, 211, 238, 0.2)";
-        btn169.style.borderColor = "#22d3ee";
-        btn169.style.color = "#fff";
-
-        btn916.style.background = "rgba(15, 23, 42, 0.8)";
-        btn916.style.borderColor = "rgba(255, 255, 255, 0.2)";
-        btn916.style.color = "#aaa";
-    } else {
-        btn916.style.background = "rgba(34, 211, 238, 0.2)";
-        btn916.style.borderColor = "#22d3ee";
-        btn916.style.color = "#fff";
-
-        btn169.style.background = "rgba(15, 23, 42, 0.8)";
-        btn169.style.borderColor = "rgba(255, 255, 255, 0.2)";
-        btn169.style.color = "#aaa";
-    }
-}
 
 let activePickerTarget = null; // 'single' or block ID number
 let singleVoiceValue = "Charon";
@@ -2383,119 +2360,500 @@ function updateSingleSpeed(val){
     }
 }
 
+/* =========================================================
+GEMINI API KEY
+========================================================= */
+
 function getStoredKey(){
-    return localStorage.getItem("gemini_api_key") || "";
+return localStorage.getItem("gemini_api_key") || "";
 }
 
 function updateKeyStatus(){
-    const key = document.getElementById("apiKey").value.trim();
-    const status = document.getElementById("keyStatus");
 
-    if(key){
-        status.textContent = "Ready";
-        status.classList.add("ok");
-    }else{
-        status.textContent = "Missing";
-        status.classList.remove("ok");
-    }
+const input = document.getElementById("apiKey");
+const status = document.getElementById("keyStatus");
+
+if(!input || !status) return;
+
+const key = input.value.trim();
+
+if(key){
+    status.textContent = "Ready";
+    status.style.color = "#00ff9d";
+    status.style.background = "rgba(0,255,157,0.12)";
+    status.style.borderColor = "rgba(0,255,157,0.3)";
+}else{
+    status.textContent = "Missing";
+    status.style.color = "#ff4d4d";
+    status.style.background = "rgba(255,77,77,0.15)";
+    status.style.borderColor = "rgba(255,77,77,0.3)";
+}
+
 }
 
 function saveKey(){
-    const key = document.getElementById("apiKey").value.trim();
-    if(!key){
-        showKeyMessage("API Key မထည့်ရသေးပါ။", "error");
-        return;
-    }
 
-    if(document.getElementById("saveKey").checked){
-        localStorage.setItem("gemini_api_key", key);
-    }
+const input = document.getElementById("apiKey");
+const saveBox = document.getElementById("saveKey");
 
-    updateKeyStatus();
-    showKeyMessage("✅ API Key ကို သိမ်းပြီးပါပြီ။", "success");
+if(!input) return;
+
+const key = input.value.trim();
+
+if(!key){
+    showKeyMessage("API Key မထည့်ရသေးပါ။", "error");
+    return;
+}
+
+if(saveBox && saveBox.checked){
+    localStorage.setItem("gemini_api_key", key);
+}
+
+updateKeyStatus();
+
+showKeyMessage(
+    "✅ Gemini API Key ကို သိမ်းပြီးပါပြီ။",
+    "success"
+);
+
 }
 
 function changeKey(){
-    const input = document.getElementById("apiKey");
-    input.focus();
-    input.select();
+
+const input = document.getElementById("apiKey");
+
+if(!input) return;
+
+input.focus();
+input.select();
+
 }
 
 function removeKey(){
-    localStorage.removeItem("gemini_api_key");
-    document.getElementById("apiKey").value = "";
-    updateKeyStatus();
-    showKeyMessage("API Key ကို ဖျက်ပြီးပါပြီ။", "success");
+
+localStorage.removeItem("gemini_api_key");
+
+const input = document.getElementById("apiKey");
+
+if(input){
+    input.value = "";
+}
+
+updateKeyStatus();
+
+showKeyMessage(
+    "Gemini API Key ကို ဖျက်ပြီးပါပြီ။",
+    "success"
+);
+
 }
 
 function toggleKey(){
-    const input = document.getElementById("apiKey");
-    input.type = input.type === "password" ? "text" : "password";
+
+const input = document.getElementById("apiKey");
+
+if(!input) return;
+
+input.type =
+    input.type === "password"
+        ? "text"
+        : "password";
+
 }
 
-function showKeyMessage(text,type){
-    const box = document.getElementById("keyMessage");
-    box.textContent = text;
-    box.className = "message " + type;
+function showKeyMessage(text, type){
+
+const box = document.getElementById("keyMessage");
+
+if(!box) return;
+
+box.textContent = text;
+
+if(type === "error"){
+    box.style.color = "#ff4d4d";
+}else if(type === "success"){
+    box.style.color = "#00ff9d";
+}else{
+    box.style.color = "#00baff";
+}
+
 }
 
 async function testKey(){
-    const rawKeys = document.getElementById("apiKey").value.trim();
-    if(!rawKeys){
-        showKeyMessage("အရင်ဆုံး API Key ထည့်ပါ။", "error");
-        return;
-    }
 
-    const keysList = rawKeys.split(",").map(k => k.trim()).filter(k => k.length > 0);
-    showKeyMessage("🔄 API Key ကို စစ်ဆေးနေပါတယ်...", "info");
+const input = document.getElementById("apiKey");
 
-    try{
-        const response = await fetch("https://generativelanguage.googleapis.com/v1beta/models", {
+if(!input) return;
+
+const rawKeys = input.value.trim();
+
+if(!rawKeys){
+    showKeyMessage(
+        "အရင်ဆုံး Gemini API Key ထည့်ပါ။",
+        "error"
+    );
+    return;
+}
+
+const keysList = rawKeys
+    .split(",")
+    .map(k => k.trim())
+    .filter(k => k.length > 0);
+
+showKeyMessage(
+    "🔄 Gemini API Key ကို စစ်ဆေးနေပါတယ်...",
+    "info"
+);
+
+try{
+
+    const response = await fetch(
+        "https://generativelanguage.googleapis.com/v1beta/models",
+        {
             method:"GET",
-            headers: { "x-goog-api-key": keysList[0] }
-        });
-
-        const data = await response.json().catch(()=>({}));
-        if(!response.ok){
-            throw new Error(data?.error?.message || `HTTP ${response.status}`);
+            headers:{
+                "x-goog-api-key":keysList[0]
+            }
         }
+    );
 
-        if(document.getElementById("saveKey").checked){
-            localStorage.setItem("gemini_api_key", rawKeys);
-        }
+    const data = await response
+        .json()
+        .catch(() => ({}));
 
-        updateKeyStatus();
-        showKeyMessage("✅ API Key အလုပ်လုပ်ပါတယ်။", "success");
+    if(!response.ok){
 
-    }catch(error){
-        showKeyMessage("❌ API Key Error: " + error.message, "error");
+        throw new Error(
+            data?.error?.message ||
+            `HTTP ${response.status}`
+        );
+
     }
+
+    if(
+        document.getElementById("saveKey")?.checked
+    ){
+        localStorage.setItem(
+            "gemini_api_key",
+            rawKeys
+        );
+    }
+
+    updateKeyStatus();
+
+    showKeyMessage(
+        "✅ Gemini API Key အလုပ်လုပ်ပါတယ်။",
+        "success"
+    );
+
+}catch(error){
+
+    showKeyMessage(
+        "❌ Gemini API Error: " +
+        error.message,
+        "error"
+    );
 }
-async function testApiKey() {
-    const apiKey = document.getElementById('apiKey').value.trim();
-    if (!apiKey) {
-        alert('ကျေးဇူးပြု၍ API Key အရင်ထည့်ပါ။');
-        return;
-    }
-    
-    alert('စစ်ဆေးနေပါပြီ... ခဏစောင့်ပါ။');
-    
-    try {
-        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ contents: [{ parts: [{ text: "hi" }] }] })
-        });
-        
-        if (response.ok) {
-            alert('✅ API Key အလုပ်လုပ်ပါသည် (Valid Key)');
-        } else {
-            alert('❌ API Key မမှန်ပါ သို့မဟုတ် သက်တမ်းကုန်နေပါပြီ။');
-        }
-    } catch (error) {
-        alert('⚠️ ချိတ်ဆက်မှု အမှားအယွင်းရှိပါသည်: ' + error.message);
-    }
+
 }
+
+/* =========================================================
+OPENROUTER API KEY
+========================================================= */
+
+function getStoredOpenRouterKey(){
+
+return localStorage.getItem(
+    "openrouter_api_key"
+) || "";
+
+}
+
+function updateOpenRouterStatus(){
+
+const input =
+    document.getElementById("openRouterApiKey");
+
+const status =
+    document.getElementById("openRouterStatus");
+
+if(!input || !status) return;
+
+const key = input.value.trim();
+
+if(key){
+
+    status.textContent = "Ready";
+    status.style.color = "#00ff9d";
+    status.style.background =
+        "rgba(0,255,157,0.12)";
+    status.style.borderColor =
+        "rgba(0,255,157,0.3)";
+
+}else{
+
+    status.textContent = "Missing";
+    status.style.color = "#ff4d4d";
+    status.style.background =
+        "rgba(255,77,77,0.15)";
+    status.style.borderColor =
+        "rgba(255,77,77,0.3)";
+}
+
+}
+
+function saveOpenRouterKey(){
+
+const input =
+    document.getElementById("openRouterApiKey");
+
+const saveBox =
+    document.getElementById("saveOpenRouterKey");
+
+if(!input) return;
+
+const key = input.value.trim();
+
+if(!key){
+
+    showOpenRouterMessage(
+        "OpenRouter API Key မထည့်ရသေးပါ။",
+        "error"
+    );
+
+    return;
+}
+
+if(saveBox && saveBox.checked){
+
+    localStorage.setItem(
+        "openrouter_api_key",
+        key
+    );
+}
+
+updateOpenRouterStatus();
+
+showOpenRouterMessage(
+    "✅ OpenRouter API Key ကို သိမ်းပြီးပါပြီ။",
+    "success"
+);
+
+}
+
+function changeOpenRouterKey(){
+
+const input =
+    document.getElementById("openRouterApiKey");
+
+if(!input) return;
+
+input.focus();
+input.select();
+
+}
+
+function removeOpenRouterKey(){
+
+localStorage.removeItem(
+    "openrouter_api_key"
+);
+
+const input =
+    document.getElementById("openRouterApiKey");
+
+if(input){
+    input.value = "";
+}
+
+updateOpenRouterStatus();
+
+showOpenRouterMessage(
+    "OpenRouter API Key ကို ဖျက်ပြီးပါပြီ။",
+    "success"
+);
+
+}
+
+function toggleOpenRouterKey(){
+
+const input =
+    document.getElementById("openRouterApiKey");
+
+if(!input) return;
+
+input.type =
+    input.type === "password"
+        ? "text"
+        : "password";
+
+}
+
+function showOpenRouterMessage(text, type){
+
+const box =
+    document.getElementById("openRouterMessage");
+
+if(!box) return;
+
+box.textContent = text;
+
+if(type === "error"){
+    box.style.color = "#ff4d4d";
+}else if(type === "success"){
+    box.style.color = "#00ff9d";
+}else{
+    box.style.color = "#c084fc";
+}
+
+}
+
+/* =========================================================
+TEST OPENROUTER KEY
+========================================================= */
+
+async function testOpenRouterKey(){
+
+const input =
+    document.getElementById("openRouterApiKey");
+
+if(!input) return;
+
+const apiKey = input.value.trim();
+
+if(!apiKey){
+
+    showOpenRouterMessage(
+        "အရင်ဆုံး OpenRouter API Key ထည့်ပါ။",
+        "error"
+    );
+
+    return;
+}
+
+showOpenRouterMessage(
+    "🔄 OpenRouter API Key ကို စစ်ဆေးနေပါတယ်...",
+    "info"
+);
+
+try{
+
+    const response = await fetch(
+        "https://openrouter.ai/api/v1/chat/completions",
+        {
+            method:"POST",
+
+            headers:{
+                "Authorization":
+                    `Bearer ${apiKey}`,
+
+                "Content-Type":
+                    "application/json"
+            },
+
+            body:JSON.stringify({
+
+                model:"openrouter/free",
+
+                messages:[
+                    {
+                        role:"user",
+                        content:"Reply with only: OPENROUTER_OK"
+                    }
+                ],
+
+                stream:false
+            })
+        }
+    );
+
+    const data = await response
+        .json()
+        .catch(() => ({}));
+
+    if(!response.ok){
+
+        throw new Error(
+            data?.error?.message ||
+            `HTTP ${response.status}`
+        );
+    }
+
+    if(
+        document.getElementById(
+            "saveOpenRouterKey"
+        )?.checked
+    ){
+
+        localStorage.setItem(
+            "openrouter_api_key",
+            apiKey
+        );
+    }
+
+    updateOpenRouterStatus();
+
+    showOpenRouterMessage(
+        "✅ OpenRouter API Key အလုပ်လုပ်ပါတယ်။",
+        "success"
+    );
+
+}catch(error){
+
+    showOpenRouterMessage(
+        "❌ OpenRouter Error: " +
+        error.message,
+        "error"
+    );
+}
+
+}
+
+/* =========================================================
+LOAD SAVED API KEYS
+========================================================= */
+
+function loadApiKeys(){
+
+const geminiKey =
+    localStorage.getItem(
+        "gemini_api_key"
+    ) || "";
+
+const openRouterKey =
+    localStorage.getItem(
+        "openrouter_api_key"
+    ) || "";
+
+
+const geminiInput =
+    document.getElementById("apiKey");
+
+const openRouterInput =
+    document.getElementById(
+        "openRouterApiKey"
+    );
+
+
+if(geminiInput){
+    geminiInput.value = geminiKey;
+}
+
+if(openRouterInput){
+    openRouterInput.value =
+        openRouterKey;
+}
+
+
+updateKeyStatus();
+updateOpenRouterStatus();
+
+}
+
+document.addEventListener(
+"DOMContentLoaded",
+loadApiKeys
+);
 
 function cleanScriptText(rawText) {
     if (!rawText) return "";
