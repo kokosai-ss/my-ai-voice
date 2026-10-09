@@ -558,9 +558,11 @@ cursor:pointer;
                 <label style="color: #22d3ee; font-size: 13px; font-weight: bold;">
                     <i class="fa-solid fa-book-open"></i> ဇာတ်လမ်း အစပျိုး Idea / ဇာတ်ညွှန်း:
                 </label>
-                <button onclick="resetStoryMemory()" style="background: transparent; border: none; color: #ef4444; font-size: 11px; cursor: pointer;">
-                    <i class="fa-solid fa-rotate-right"></i> စာသစ်စမည် (Reset)
-                </button>
+                <!-- ဒီလိုမျိုး ပြောင်းပေးလိုက်ပါ -->
+              <button onclick="resetStory()" style="background: transparent; border: none; color: #22d3ee; cursor: pointer;">
+              <i class="fa-solid fa-rotate-right"></i> စာသစ်စတင်မည် (Reset)
+              </button>
+
             </div>
             <textarea id="movieIdeaInput" rows="4" placeholder="ဥပမာ - အသီးလူသားများ နေထိုင်သည့် ကမ္ဘာတွင် ပန်းသီးမင်းသားနှင့် သရက်သီး မင်းသမီးတို့ စစ်ခင်းကြပုံ..." style="width: 100%; background: rgba(8, 21, 34, 0.85); border: 1px solid rgba(34, 211, 238, 0.4); border-radius: 10px; padding: 12px; color: #fff; font-size: 13px; outline: none; resize: vertical;" oninput="checkIdeaChange()"></textarea>
         </div>
