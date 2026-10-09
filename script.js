@@ -523,11 +523,9 @@ Required format:
                 },
 
                 body: JSON.stringify({
-
-                    model: "openrouter/free",
-
-                    stream: true,
-
+    model: "google/gemini-3.8-flash-exp:free",
+    stream: true,
+    
                     messages: [
                         {
                             role: "system",
