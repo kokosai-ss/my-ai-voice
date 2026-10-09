@@ -524,7 +524,7 @@ Required format:
 
                 body: JSON.stringify({
     model: "google/gemini-3.8-flash-exp:free",
-    stream: true,
+    stream: false,
     
                     messages: [
                         {
