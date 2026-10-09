@@ -1,4 +1,5 @@
-l// --- Global Variables ---
+
+// --- Global Variables ---
 let selectedFlowBase64 = "";
 let selectedFlowMimeType = "image/jpeg";
 let currentRatio = "16:9";
@@ -173,683 +174,139 @@ Required JSON format:
 }
 
 // --- 2. MOVIE DIRECTOR (MULTI-SHOT) API HANDLER ---
-
 async function generateMultiShotMovie() {
-
-    const movieIdeaInput =
-        document.getElementById("movieIdeaInput");
-
-    const multiResultBox =
-        document.getElementById("multiResultBox");
-
-    const multiResultContent =
-        document.getElementById("multiResultContent");
-
-    if (!movieIdeaInput || !multiResultBox || !multiResultContent) {
-        console.error("Movie Director HTML elements မတွေ့ပါ");
-        if (typeof showNeonAlert === "function") {
-            showNeonAlert("Movie Director HTML Element တွေကို စစ်ဆေးပါ");
-        }
-        return;
+    const movieIdea = document.getElementById('movieIdeaInput').value.trim();
+    if(!movieIdea) {
+        return showNeonAlert("ဇာတ်လမ်း အစပျိုး Idea လေး အရင် ရိုက်ထည့်ပေးပါ သားရီး!");
     }
 
-    const movieIdea = movieIdeaInput.value.trim();
+    const apiKey = localStorage.getItem('gemini_api_key') || 
+                   localStorage.getItem('geminiApiKey') || 
+                   localStorage.getItem('sh_gemini_api_key');
 
-    if (!movieIdea) {
-        return showNeonAlert(
-            "ဇာတ်လမ်း အစပျိုး Idea လေး အရင် ရိုက်ထည့်ပေးပါ သားရီး!"
-        );
+    if (!apiKey) {
+        return showNeonAlert("API Key Settings ထဲမှာ Key သတ်မှတ်ပေးပါဗျာ!");
     }
 
-    const openRouterKey =
-        (localStorage.getItem("openrouter_api_key") || "").trim();
+    const multiResultBox = document.getElementById('multiResultBox');
+    const multiResultContent = document.getElementById('multiResultContent');
+    
+    multiResultBox.style.display = 'block';
+    multiResultContent.innerHTML = `<p style="color: #00f3ff; text-align:center;"><i class="fa-solid fa-spinner fa-spin"></i> Movie Director က အခန်းဆက် ဇာတ်ညွှန်းနှင့် စကားပြောခန်းများ ဖန်တီးနေသည်...</p>`;
 
-    const geminiKey = (
-        localStorage.getItem("gemini_api_key") ||
-        localStorage.getItem("geminiApiKey") ||
-        localStorage.getItem("sh_gemini_api_key") ||
-        ""
-    ).trim();
+    let promptText = `You are an expert Movie Director and AI Video Prompt Engineer. 
+Based on the following story idea, create a sequence of 4 to 6 video scenes (multi-shot sequence). 
+For EACH scene, you MUST provide:
+1. Time range (e.g., "0-8s", "8-16s")
+2. Burmese character dialogue or voiceover script (ဇာတ်ကောင်များ၏ မြန်မာစကားပြောခန်း သို့မဟုတ် ဇာတ်ကြောင်းပြောချက်)
+3. Cinematic English prompt for Flow AI video generator (with camera angles, lighting, matching aspect ratio --ar ${currentMultiRatio})
 
-    if (!openRouterKey && !geminiKey) {
-        return showNeonAlert(
-            "API Key Settings ထဲမှာ OpenRouter သို့မဟုတ် Gemini Key ထည့်ပေးပါ"
-        );
-    }
-
-    // Keep the existing conversation memory.
-    if (!Array.isArray(movieChatHistory)) {
-        movieChatHistory = [];
-    }
-
-    const ratio =
-        typeof currentMultiRatio !== "undefined"
-            ? currentMultiRatio
-            : "16:9";
-
-    multiResultBox.style.display = "block";
-
-    const showStatus = (message) => {
-        multiResultContent.innerHTML = `
-            <div style="
-                padding:16px;
-                color:#00f3ff;
-                text-align:center;
-                border:1px solid rgba(0,243,255,.2);
-                border-radius:12px;
-                background:rgba(0,0,20,.65);
-            ">
-                <i class="fa-solid fa-spinner fa-spin"></i>
-                <div style="margin-top:10px">
-                    ${escapeHtml(message)}
-                </div>
-            </div>
-        `;
-    };
-
-    // Reuse the same escaping logic for all rendered content.
-    function escapeHtml(value) {
-        return String(value ?? "")
-            .replace(/&/g, "&amp;")
-            .replace(/</g, "&lt;")
-            .replace(/>/g, "&gt;")
-            .replace(/"/g, "&quot;")
-            .replace(/'/g, "&#039;");
-    }
-
-    const systemInstruction = `
-You are an expert Movie Director and AI Video Prompt Engineer.
-
-CHARACTER CONSISTENCY:
-Lock each character's physical appearance, colors, facial features,
-clothing, hairstyle, body shape, age, and visual style when introduced.
-Maintain exactly consistent character details across all scenes.
-Never randomly change established characters.
-
-Maintain continuity with previous scenes and the user's story.
-Write natural Burmese dialogue or voiceover suitable for Burmese storytelling.
-Write detailed English Flow AI video prompts.
-
-Every Flow AI prompt should describe camera angle, camera movement,
-environment, lighting, character actions, facial expressions,
-cinematic atmosphere, visual continuity, and character appearance.
-`;
-
-    const promptText = `
-Based on the conversation history and latest input,
-create the NEXT sequence of 4 to 6 video scenes.
-
-Continue directly from the previous story.
-Do not restart the story or contradict established scenes.
-
-For EACH scene provide:
-1. scene_number
-2. time_range, for example "0-8s"
-3. burmese_dialogue: natural Burmese dialogue or voiceover
-4. flow_prompt: detailed cinematic English prompt for Flow AI
-
-Maintain strict character consistency.
-Include camera angle, camera movement, environment, lighting,
-character actions, facial expressions, cinematic atmosphere,
-visual continuity, and aspect ratio --ar ${ratio}.
-
-Return ONLY a valid JSON array.
-Do not use Markdown or code fences.
-Do not add explanations outside the JSON.
-
-Required structure:
+Return ONLY a valid raw JSON array of objects without markdown like \`\`\`json.
+Required JSON format:
 [
   {
     "scene_number": 1,
     "time_range": "0-8s",
-    "burmese_dialogue": "မြန်မာစကားပြောခန်း သို့မဟုတ် Voiceover",
-    "flow_prompt": "Detailed cinematic English prompt --ar ${ratio}"
+    "burmese_dialogue": "ဇာတ်ကောင်ပြောမည့် မြန်မာစကားပြောခန်း (သို့) Voiceover",
+    "flow_prompt": "Cinematic English prompt --ar ${currentMultiRatio}"
   }
 ]
-`;
 
-    const userMessage = {
-        role: "user",
-        parts: [{
-            text:
-                `Story Idea / Continuation Request: "${movieIdea}"\n\n` +
-                promptText
-        }]
-    };
+Story Idea: "${movieIdea}"`;
 
-    // Add the user message only once.
-    movieChatHistory.push(userMessage);
+    try {
+        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=${apiKey}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                contents: [{ parts: [{ text: promptText }] }]
+            })
+        });
 
-    const currentContents = [...movieChatHistory];
+        const data = await response.json();
+        if (data.error) throw new Error(data.error.message || "API Error");
 
-    // Abort requests that take too long.
-    async function fetchWithTimeout(url, options, timeoutMs = 90000) {
-        const controller = new AbortController();
+        const rawText = data.candidates[0].content.parts[0].text;
+        const jsonMatch = rawText.match(/\[[\s\S]*\]/);
+        if (!jsonMatch) throw new Error("JSON Array ထွက်မလာပါ");
 
-        const timer = setTimeout(
-            () => controller.abort(),
-            timeoutMs
-        );
+        const scenes = JSON.parse(jsonMatch[0]);
 
-        try {
-            return await fetch(url, {
-                ...options,
-                signal: controller.signal
-            });
-        } catch (error) {
-            if (error.name === "AbortError") {
-                throw new Error(
-                    "Request ၉၀ စက္ကန့်အတွင်း မပြီးပါ။ API သို့မဟုတ် Network ကို စစ်ပါ။"
-                );
-            }
-            throw error;
-        } finally {
-            clearTimeout(timer);
-        }
-    }
-
-    function extractMovieScenes(rawText) {
-        if (!rawText || !rawText.trim()) {
-            throw new Error("AI Response အလွတ်ဖြစ်နေပါတယ်");
-        }
-
-        let cleaned = rawText
-            .trim()
-            .replace(/^```(?:json)?\s*/i, "")
-            .replace(/\s*```$/i, "")
-            .trim();
-
-        const start = cleaned.indexOf("[");
-        const end = cleaned.lastIndexOf("]");
-
-        if (start < 0 || end <= start) {
-            throw new Error(
-                "AI က JSON Array မပြန်ပေးပါ။ အခြား Model နဲ့ ပြန်စမ်းပါ။"
-            );
-        }
-
-        let scenes;
-
-        try {
-            scenes = JSON.parse(
-                cleaned.substring(start, end + 1)
-            );
-        } catch (error) {
-            console.error("Movie JSON Parse Error:", error);
-            console.error("Raw AI Response:", rawText);
-
-            throw new Error(
-                "AI Response JSON မမှန်ပါ။ ပြန်စမ်းကြည့်ပါ။"
-            );
-        }
-
-        if (!Array.isArray(scenes) || scenes.length === 0) {
-            throw new Error("Scene Array အလွတ်ဖြစ်နေပါတယ်");
-        }
-
-        for (const scene of scenes) {
-            if (
-                !scene ||
-                typeof scene !== "object" ||
-                !scene.flow_prompt ||
-                !scene.burmese_dialogue
-            ) {
-                throw new Error(
-                    "Scene တစ်ခုမှာ dialogue သို့မဟုတ် flow_prompt မပြည့်စုံပါ"
-                );
-            }
-        }
-
-        return scenes;
-    }
-
-    function renderMovieScenes(scenes) {
-        let html = "";
-
-        scenes.forEach((scene, index) => {
-            const sceneNumber =
-                scene.scene_number ?? index + 1;
-
-            html += `
-                <div data-scene="${index}" style="
-                    background:rgba(0,0,20,.7);
-                    border:1px solid rgba(0,243,255,.25);
-                    padding:14px;
-                    border-radius:12px;
-                    margin-bottom:14px;
-                ">
-                    <div style="
-                        color:#00f3ff;
-                        font-weight:bold;
-                        margin-bottom:10px;
-                    ">
-                        🎬 Scene ${escapeHtml(sceneNumber)}
-                        (${escapeHtml(scene.time_range || "")})
+        let htmlOutput = "";
+        scenes.forEach((s) => {
+            htmlOutput += `
+                <div style="background: rgba(0,0,20,0.6); border: 1px solid rgba(0,243,255,0.2); padding: 12px; border-radius: 10px; margin-bottom: 12px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+                        <span style="color: #00f3ff; font-weight: bold;">🎬 Scene ${s.scene_number} (${s.time_range})</span>
+                        <button class="copy-all-btn" onclick="navigator.clipboard.writeText(\`${s.flow_prompt}\`); showNeonAlert('Scene ${s.scene_number} Flow Prompt ကို ကူးပြီးပါပြီ!')"><i class="fa-solid fa-copy"></i> Prompt ကူးမည်</button>
                     </div>
-
-                    <div style="margin-bottom:12px;font-size:13px">
-                        🇲🇲 <b>မြန်မာစကားပြောခန်း / Voiceover</b>
-                        <div style="
-                            color:#f8fafc;
-                            white-space:pre-wrap;
-                            margin-top:6px;
-                        ">${escapeHtml(scene.burmese_dialogue)}</div>
-                    </div>
-
-                    <div style="font-size:13px">
-                        🇬🇧 <b>Flow AI Prompt</b>
-                        <div class="flow-prompt" style="
-                            color:#cbd5e1;
-                            font-family:monospace;
-                            white-space:pre-wrap;
-                            overflow-wrap:anywhere;
-                            margin-top:6px;
-                        ">${escapeHtml(scene.flow_prompt)}</div>
-                    </div>
-
-                    <button type="button"
-                        class="copy-all-btn"
-                        style="margin-top:12px"
-                        onclick="
-                            const p = this.parentElement.querySelector('.flow-prompt');
-                            navigator.clipboard.writeText(p.textContent)
-                                .then(() => showNeonAlert('Flow Prompt ကူးပြီးပါပြီ'))
-                                .catch(() => showNeonAlert('Copy မရပါ။ Prompt ကို ကိုယ်တိုင်ရွေးကူးပါ'));
-                        ">
-                        <i class="fa-solid fa-copy"></i>
-                        Prompt ကူးမည်
-                    </button>
+                    <p style="margin-bottom: 6px; font-size: 13px;">🇲🇲 <b>မြန်မာစကားပြောခန်း / Voiceover:</b><br><span style="color: #f8fafc;">${s.burmese_dialogue}</span></p>
+                    <p style="font-size: 13px;">🇬🇧 <b>Flow AI Prompt:</b><br><span style="color: #94a3b8; font-family: monospace;">${s.flow_prompt}</span></p>
                 </div>
             `;
         });
 
-        multiResultContent.innerHTML = html;
-    }
+        multiResultContent.innerHTML = htmlOutput;
 
-    // OPENROUTER: Stream response and detect streaming errors.
-    async function runOpenRouter() {
-        showStatus("OpenRouter ကို ချိတ်ဆက်နေပါတယ်...");
-
-        const messages = [
-            {
-                role: "system",
-                content: systemInstruction
-            },
-            ...currentContents.map(item => ({
-                role: item.role === "model"
-                    ? "assistant"
-                    : "user",
-                content: (item.parts || [])
-                    .map(part => part.text || "")
-                    .join("")
-            }))
-        ];
-
-        const response = await fetchWithTimeout(
-            "https://openrouter.ai/api/v1/chat/completions",
-            {
-                method: "POST",
-                headers: {
-                    "Authorization": `Bearer ${openRouterKey}`,
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({
-                    model: "openrouter/free",
-                    stream: true,
-                    messages
-                })
-            },
-            90000
-        );
-
-        if (!response.ok) {
-            const errorText = await response.text();
-
-            throw new Error(
-                `OpenRouter HTTP ${response.status}: ${errorText.slice(0, 700)}`
-            );
-        }
-
-        if (!response.body) {
-            throw new Error("OpenRouter Streaming Body မရပါ");
-        }
-
-        const reader = response.body.getReader();
-        const decoder = new TextDecoder("utf-8");
-
-        let rawText = "";
-        let buffer = "";
-
-        showStatus("OpenRouter က Scene များ ရေးပေးနေပါတယ်...");
-
-        async function processLine(line) {
-            const trimmed = line.trim();
-
-            // SSE comment / keep-alive line.
-            if (!trimmed || trimmed.startsWith(":")) return;
-
-            if (!trimmed.startsWith("data:")) return;
-
-            const dataText = trimmed.slice(5).trim();
-
-            if (!dataText) return;
-
-            if (dataText === "[DONE]") return;
-
-            let data;
-
-            try {
-                data = JSON.parse(dataText);
-            } catch {
-                return;
-            }
-
-            if (data.error) {
-                throw new Error(
-                    "OpenRouter Stream Error: " +
-                    (data.error.message || JSON.stringify(data.error))
-                );
-            }
-
-            const choice = data.choices?.[0];
-
-            if (choice?.finish_reason === "error") {
-                throw new Error(
-                    "OpenRouter Model က Stream ကို အမှားနဲ့ ရပ်လိုက်ပါတယ်"
-                );
-            }
-
-            const delta = choice?.delta?.content;
-
-            if (typeof delta === "string" && delta) {
-                rawText += delta;
-
-                multiResultContent.innerHTML = `
-                    <div style="
-                        padding:14px;
-                        border:1px solid rgba(0,243,255,.2);
-                        border-radius:12px;
-                        color:#e2e8f0;
-                    ">
-                        <div style="color:#00f3ff;margin-bottom:8px">
-                            OpenRouter Streaming...
-                        </div>
-                        <pre style="
-                            white-space:pre-wrap;
-                            overflow-wrap:anywhere;
-                            font-size:12px;
-                        ">${escapeHtml(rawText)}</pre>
-                    </div>
-                `;
-            }
-        }
-
-        try {
-            while (true) {
-                const { value, done } = await reader.read();
-
-                if (done) break;
-
-                buffer += decoder.decode(value, {
-                    stream: true
-                });
-
-                const lines = buffer.split("\n");
-                buffer = lines.pop() || "";
-
-                for (const line of lines) {
-                    await processLine(line);
-                }
-            }
-
-            buffer += decoder.decode();
-
-            if (buffer.trim()) {
-                await processLine(buffer);
-            }
-
-        } finally {
-            reader.releaseLock();
-        }
-
-        if (!rawText.trim()) {
-            throw new Error(
-                "OpenRouter က စာမထုတ်ပေးပါ။ Free Model သို့မဟုတ် Provider ကို စစ်ပါ။"
-            );
-        }
-
-        return rawText;
-    }
-
-    // GEMINI FALLBACK: Keep the existing model ID.
-    async function runGeminiFallback() {
-        if (!geminiKey) {
-            throw new Error(
-                "Gemini API Key မရှိပါ။ Fallback မလုပ်နိုင်ပါ။"
-            );
-        }
-
-        showStatus("OpenRouter မအောင်မြင်ပါ။ Gemini သို့ ပြောင်းနေပါတယ်...");
-
-        const response = await fetchWithTimeout(
-            "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent",
-            {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "x-goog-api-key": geminiKey
-                },
-                body: JSON.stringify({
-                    system_instruction: {
-                        parts: [{
-                            text: systemInstruction
-                        }]
-                    },
-                    contents: currentContents
-                })
-            },
-            90000
-        );
-
-        const data = await response.json();
-
-        if (!response.ok || data.error) {
-            throw new Error(
-                "Gemini HTTP " + response.status + ": " +
-                (data.error?.message || "Request မအောင်မြင်ပါ")
-            );
-        }
-
-        const rawText = (
-            data.candidates?.[0]?.content?.parts || []
-        )
-            .map(part => part.text || "")
-            .join("");
-
-        if (!rawText.trim()) {
-            const reason =
-                data.candidates?.[0]?.finishReason || "Unknown";
-
-            throw new Error(
-                "Gemini Response အလွတ်ဖြစ်နေပါတယ်။ Finish reason: " +
-                reason
-            );
-        }
-
-        return rawText;
-    }
-
-    let finalRawText = "";
-    let scenes = [];
-    let usedProvider = "";
-
-    try {
-        // OpenRouter first. If request or JSON parsing fails,
-        // try Gemini before showing the final error.
-        if (openRouterKey) {
-            try {
-                const openRouterText = await runOpenRouter();
-
-                scenes = extractMovieScenes(openRouterText);
-                finalRawText = openRouterText;
-                usedProvider = "OpenRouter";
-
-            } catch (openRouterError) {
-                console.error(
-                    "OpenRouter failed; trying Gemini:",
-                    openRouterError
-                );
-
-                if (!geminiKey) {
-                    throw openRouterError;
-                }
-
-                const geminiText = await runGeminiFallback();
-
-                scenes = extractMovieScenes(geminiText);
-                finalRawText = geminiText;
-                usedProvider = "Gemini Fallback";
-            }
-
-        } else {
-            const geminiText = await runGeminiFallback();
-
-            scenes = extractMovieScenes(geminiText);
-            finalRawText = geminiText;
-            usedProvider = "Gemini";
-        }
-
-        // Save successful response only.
-        movieChatHistory.push({
-            role: "model",
-            parts: [{
-                text: finalRawText
-            }]
-        });
-
-        renderMovieScenes(scenes);
-
-        console.log(
-            "Movie Director Provider:",
-            usedProvider
-        );
-
-    } catch (error) {
-        console.error("Movie Director Error:", error);
-
-        // Remove the pending user message on total failure.
-        if (
-            movieChatHistory.length > 0 &&
-            movieChatHistory[movieChatHistory.length - 1] === userMessage
-        ) {
-            movieChatHistory.pop();
-        }
-
-        multiResultContent.innerHTML = `
-            <div style="
-                color:#ff7777;
-                background:rgba(255,0,0,.06);
-                border:1px solid rgba(255,77,77,.3);
-                padding:14px;
-                border-radius:12px;
-                overflow-wrap:anywhere;
-            ">
-                <b>❌ Movie Director Error</b>
-                <div style="margin-top:10px">
-                    ${escapeHtml(error.message || String(error))}
-                </div>
-                <div style="
-                    margin-top:12px;
-                    color:#cbd5e1;
-                    font-size:12px;
-                ">
-                    API Key, Internet Connection, Model availability
-                    နှင့် API quota ကို စစ်ဆေးပါ။
-                </div>
-            </div>
-        `;
+    } catch (err) {
+        console.error("Multi-Shot Error:", err);
+        multiResultContent.innerHTML = `<p style="color: #ff4d4d;">Error: ${err.message}</p>`;
     }
 }
 
-// =============================================================
-// RESET MOVIE MEMORY
-// =============================================================
-
-function resetMovieMemory() {
-
-    movieChatHistory = [];
-
-    showNeonAlert(
-        "ဇာတ်လမ်း မှတ်ဉာဏ် (Memory) အသစ်ပြန်စလိုက်ပါပြီ!"
-    );
+// Copy Handlers
+function copyBurmeseScript() {
+    const text = document.getElementById('outBurmeseScript').innerText;
+    if (!text) return;
+    navigator.clipboard.writeText(text);
+    showNeonAlert("မြန်မာ Script ကို Copy ကူးပြီးပါပြီ!");
 }
 
+function copyFlowPrompt() {
+    const text = document.getElementById('outFlowPrompt').innerText;
+    if (!text) return;
+    navigator.clipboard.writeText(text);
+    showNeonAlert("Flow AI Prompt ကို Copy ကူးပြီးပါပြီ!");
+}
 
-// =============================================================
-// AI SCRIPT SUB TAB SWITCH
-// =============================================================
-
+function copyAllMultiScenes() {
+    const content = document.getElementById('multiResultContent').innerText;
+    if (!content) return;
+    navigator.clipboard.writeText(content);
+    showNeonAlert("ဇာတ်လမ်း အခန်းဆက် အားလုံးကို Copy ကူးပြီးပါပြီ!");
+}
+// AI Script ထဲက Single Shot နဲ့ Movie Director Tab များ ပြောင်းရန်
 function switchAiSubTab(tab) {
-
-    const subSingle =
-        document.getElementById('subSectionSingle');
-
-    const subMulti =
-        document.getElementById('subSectionMulti');
-
-    const btnSingle =
-        document.getElementById('tabSingleBtn');
-
-    const btnMulti =
-        document.getElementById('tabMultiBtn');
-
+    const subSingle = document.getElementById('subSectionSingle');
+    const subMulti = document.getElementById('subSectionMulti');
+    const btnSingle = document.getElementById('tabSingleBtn');
+    const btnMulti = document.getElementById('tabMultiBtn');
 
     if (tab === 'single') {
-
         subSingle.style.display = 'block';
         subMulti.style.display = 'none';
-
-        btnSingle.style.background =
-            "linear-gradient(135deg, #06b6d4, #0284c7)";
-
+        
+        btnSingle.style.background = "linear-gradient(135deg, #06b6d4, #0284c7)";
         btnSingle.style.color = "#fff";
+        btnSingle.style.boxShadow = "0 0 10px rgba(34, 211, 238, 0.4)";
 
-        btnSingle.style.boxShadow =
-            "0 0 10px rgba(34, 211, 238, 0.4)";
-
-        btnMulti.style.background =
-            "transparent";
-
-        btnMulti.style.color =
-            "#94a3b8";
-
-        btnMulti.style.boxShadow =
-            "none";
-
+        btnMulti.style.background = "transparent";
+        btnMulti.style.color = "#94a3b8";
+        btnMulti.style.boxShadow = "none";
     } else {
-
         subSingle.style.display = 'none';
         subMulti.style.display = 'block';
 
-        btnMulti.style.background =
-            "linear-gradient(135deg, #06b6d4, #0284c7)";
+        btnMulti.style.background = "linear-gradient(135deg, #06b6d4, #0284c7)";
+        btnMulti.style.color = "#fff";
+        btnMulti.style.boxShadow = "0 0 10px rgba(34, 211, 238, 0.4)";
 
-        btnMulti.style.color =
-            "#fff";
-
-        btnMulti.style.boxShadow =
-            "0 0 10px rgba(34, 211, 238, 0.4)";
-
-        btnSingle.style.background =
-            "transparent";
-
-        btnSingle.style.color =
-            "#94a3b8";
-
-        btnSingle.style.boxShadow =
-            "none";
+        btnSingle.style.background = "transparent";
+        btnSingle.style.color = "#94a3b8";
+        btnSingle.style.boxShadow = "none";
     }
 }
+
 
 let activePickerTarget = null; // 'single' or block ID number
 let singleVoiceValue = "Charon";
@@ -2903,507 +2360,119 @@ function updateSingleSpeed(val){
     }
 }
 
-/* =========================================================
-GEMINI API KEY
-========================================================= */
-
 function getStoredKey(){
-return localStorage.getItem("gemini_api_key") || "";
+    return localStorage.getItem("gemini_api_key") || "";
 }
 
 function updateKeyStatus(){
+    const key = document.getElementById("apiKey").value.trim();
+    const status = document.getElementById("keyStatus");
 
-const input = document.getElementById("apiKey");
-const status = document.getElementById("keyStatus");
-
-if(!input || !status) return;
-
-const key = input.value.trim();
-
-if(key){
-    status.textContent = "Ready";
-    status.style.color = "#00ff9d";
-    status.style.background = "rgba(0,255,157,0.12)";
-    status.style.borderColor = "rgba(0,255,157,0.3)";
-}else{
-    status.textContent = "Missing";
-    status.style.color = "#ff4d4d";
-    status.style.background = "rgba(255,77,77,0.15)";
-    status.style.borderColor = "rgba(255,77,77,0.3)";
-}
-
+    if(key){
+        status.textContent = "Ready";
+        status.classList.add("ok");
+    }else{
+        status.textContent = "Missing";
+        status.classList.remove("ok");
+    }
 }
 
 function saveKey(){
-
-const input = document.getElementById("apiKey");
-const saveBox = document.getElementById("saveKey");
-
-if(!input) return;
-
-const key = input.value.trim();
-
-if(!key){
-    showKeyMessage("API Key မထည့်ရသေးပါ။", "error");
-    return;
-}
-
-if(saveBox && saveBox.checked){
-    localStorage.setItem("gemini_api_key", key);
-}
-
-updateKeyStatus();
-
-showKeyMessage(
-    "✅ Gemini API Key ကို သိမ်းပြီးပါပြီ။",
-    "success"
-);
-
-}
-
-function changeKey(){
-
-const input = document.getElementById("apiKey");
-
-if(!input) return;
-
-input.focus();
-input.select();
-
-}
-
-function removeKey(){
-
-localStorage.removeItem("gemini_api_key");
-
-const input = document.getElementById("apiKey");
-
-if(input){
-    input.value = "";
-}
-
-updateKeyStatus();
-
-showKeyMessage(
-    "Gemini API Key ကို ဖျက်ပြီးပါပြီ။",
-    "success"
-);
-
-}
-
-function toggleKey(){
-
-const input = document.getElementById("apiKey");
-
-if(!input) return;
-
-input.type =
-    input.type === "password"
-        ? "text"
-        : "password";
-
-}
-
-function showKeyMessage(text, type){
-
-const box = document.getElementById("keyMessage");
-
-if(!box) return;
-
-box.textContent = text;
-
-if(type === "error"){
-    box.style.color = "#ff4d4d";
-}else if(type === "success"){
-    box.style.color = "#00ff9d";
-}else{
-    box.style.color = "#00baff";
-}
-
-}
-
-async function testKey(){
-
-const input = document.getElementById("apiKey");
-
-if(!input) return;
-
-const rawKeys = input.value.trim();
-
-if(!rawKeys){
-    showKeyMessage(
-        "အရင်ဆုံး Gemini API Key ထည့်ပါ။",
-        "error"
-    );
-    return;
-}
-
-const keysList = rawKeys
-    .split(",")
-    .map(k => k.trim())
-    .filter(k => k.length > 0);
-
-showKeyMessage(
-    "🔄 Gemini API Key ကို စစ်ဆေးနေပါတယ်...",
-    "info"
-);
-
-try{
-
-    const response = await fetch(
-        "https://generativelanguage.googleapis.com/v1beta/models",
-        {
-            method:"GET",
-            headers:{
-                "x-goog-api-key":keysList[0]
-            }
-        }
-    );
-
-    const data = await response
-        .json()
-        .catch(() => ({}));
-
-    if(!response.ok){
-
-        throw new Error(
-            data?.error?.message ||
-            `HTTP ${response.status}`
-        );
-
+    const key = document.getElementById("apiKey").value.trim();
+    if(!key){
+        showKeyMessage("API Key မထည့်ရသေးပါ။", "error");
+        return;
     }
 
-    if(
-        document.getElementById("saveKey")?.checked
-    ){
-        localStorage.setItem(
-            "gemini_api_key",
-            rawKeys
-        );
+    if(document.getElementById("saveKey").checked){
+        localStorage.setItem("gemini_api_key", key);
     }
 
     updateKeyStatus();
-
-    showKeyMessage(
-        "✅ Gemini API Key အလုပ်လုပ်ပါတယ်။",
-        "success"
-    );
-
-}catch(error){
-
-    showKeyMessage(
-        "❌ Gemini API Error: " +
-        error.message,
-        "error"
-    );
+    showKeyMessage("✅ API Key ကို သိမ်းပြီးပါပြီ။", "success");
 }
 
+function changeKey(){
+    const input = document.getElementById("apiKey");
+    input.focus();
+    input.select();
 }
 
-/* =========================================================
-OPENROUTER API KEY
-========================================================= */
-
-function getStoredOpenRouterKey(){
-
-return localStorage.getItem(
-    "openrouter_api_key"
-) || "";
-
+function removeKey(){
+    localStorage.removeItem("gemini_api_key");
+    document.getElementById("apiKey").value = "";
+    updateKeyStatus();
+    showKeyMessage("API Key ကို ဖျက်ပြီးပါပြီ။", "success");
 }
 
-function updateOpenRouterStatus(){
-
-const input =
-    document.getElementById("openRouterApiKey");
-
-const status =
-    document.getElementById("openRouterStatus");
-
-if(!input || !status) return;
-
-const key = input.value.trim();
-
-if(key){
-
-    status.textContent = "Ready";
-    status.style.color = "#00ff9d";
-    status.style.background =
-        "rgba(0,255,157,0.12)";
-    status.style.borderColor =
-        "rgba(0,255,157,0.3)";
-
-}else{
-
-    status.textContent = "Missing";
-    status.style.color = "#ff4d4d";
-    status.style.background =
-        "rgba(255,77,77,0.15)";
-    status.style.borderColor =
-        "rgba(255,77,77,0.3)";
+function toggleKey(){
+    const input = document.getElementById("apiKey");
+    input.type = input.type === "password" ? "text" : "password";
 }
 
+function showKeyMessage(text,type){
+    const box = document.getElementById("keyMessage");
+    box.textContent = text;
+    box.className = "message " + type;
 }
 
-function saveOpenRouterKey(){
+async function testKey(){
+    const rawKeys = document.getElementById("apiKey").value.trim();
+    if(!rawKeys){
+        showKeyMessage("အရင်ဆုံး API Key ထည့်ပါ။", "error");
+        return;
+    }
 
-const input =
-    document.getElementById("openRouterApiKey");
+    const keysList = rawKeys.split(",").map(k => k.trim()).filter(k => k.length > 0);
+    showKeyMessage("🔄 API Key ကို စစ်ဆေးနေပါတယ်...", "info");
 
-const saveBox =
-    document.getElementById("saveOpenRouterKey");
+    try{
+        const response = await fetch("https://generativelanguage.googleapis.com/v1beta/models", {
+            method:"GET",
+            headers: { "x-goog-api-key": keysList[0] }
+        });
 
-if(!input) return;
-
-const key = input.value.trim();
-
-if(!key){
-
-    showOpenRouterMessage(
-        "OpenRouter API Key မထည့်ရသေးပါ။",
-        "error"
-    );
-
-    return;
-}
-
-if(saveBox && saveBox.checked){
-
-    localStorage.setItem(
-        "openrouter_api_key",
-        key
-    );
-}
-
-updateOpenRouterStatus();
-
-showOpenRouterMessage(
-    "✅ OpenRouter API Key ကို သိမ်းပြီးပါပြီ။",
-    "success"
-);
-
-}
-
-function changeOpenRouterKey(){
-
-const input =
-    document.getElementById("openRouterApiKey");
-
-if(!input) return;
-
-input.focus();
-input.select();
-
-}
-
-function removeOpenRouterKey(){
-
-localStorage.removeItem(
-    "openrouter_api_key"
-);
-
-const input =
-    document.getElementById("openRouterApiKey");
-
-if(input){
-    input.value = "";
-}
-
-updateOpenRouterStatus();
-
-showOpenRouterMessage(
-    "OpenRouter API Key ကို ဖျက်ပြီးပါပြီ။",
-    "success"
-);
-
-}
-
-function toggleOpenRouterKey(){
-
-const input =
-    document.getElementById("openRouterApiKey");
-
-if(!input) return;
-
-input.type =
-    input.type === "password"
-        ? "text"
-        : "password";
-
-}
-
-function showOpenRouterMessage(text, type){
-
-const box =
-    document.getElementById("openRouterMessage");
-
-if(!box) return;
-
-box.textContent = text;
-
-if(type === "error"){
-    box.style.color = "#ff4d4d";
-}else if(type === "success"){
-    box.style.color = "#00ff9d";
-}else{
-    box.style.color = "#c084fc";
-}
-
-}
-
-/* =========================================================
-TEST OPENROUTER KEY
-========================================================= */
-
-async function testOpenRouterKey(){
-
-const input =
-    document.getElementById("openRouterApiKey");
-
-if(!input) return;
-
-const apiKey = input.value.trim();
-
-if(!apiKey){
-
-    showOpenRouterMessage(
-        "အရင်ဆုံး OpenRouter API Key ထည့်ပါ။",
-        "error"
-    );
-
-    return;
-}
-
-showOpenRouterMessage(
-    "🔄 OpenRouter API Key ကို စစ်ဆေးနေပါတယ်...",
-    "info"
-);
-
-try {
-
-    const controller = new AbortController();
-
-    const timeoutId = setTimeout(() => {
-        controller.abort();
-    }, 30000);
-
-    const response = await fetch(
-        "https://openrouter.ai/api/v1/chat/completions",
-        {
-            method: "POST",
-
-            signal: controller.signal,
-
-            headers: {
-                "Authorization": `Bearer ${apiKey}`,
-                "Content-Type": "application/json"
-            },
-
-            body: JSON.stringify({
-                model: "openrouter/free",
-
-                messages: [
-                    {
-                        role: "user",
-                        content: "Reply with only: OPENROUTER_OK"
-                    }
-                ],
-
-                stream: false
-            })
+        const data = await response.json().catch(()=>({}));
+        if(!response.ok){
+            throw new Error(data?.error?.message || `HTTP ${response.status}`);
         }
-    );
 
-    clearTimeout(timeoutId);
+        if(document.getElementById("saveKey").checked){
+            localStorage.setItem("gemini_api_key", rawKeys);
+        }
 
-    const data = await response
-        .json()
-        .catch(() => ({}));
+        updateKeyStatus();
+        showKeyMessage("✅ API Key အလုပ်လုပ်ပါတယ်။", "success");
 
-    if (!response.ok) {
-        throw new Error(
-            data?.error?.message ||
-            `HTTP ${response.status}`
-        );
+    }catch(error){
+        showKeyMessage("❌ API Key Error: " + error.message, "error");
     }
-
-    if (
-        document.getElementById(
-            "saveOpenRouterKey"
-        )?.checked
-    ) {
-
-        localStorage.setItem(
-            "openrouter_api_key",
-            apiKey
-        );
+}
+async function testApiKey() {
+    const apiKey = document.getElementById('apiKey').value.trim();
+    if (!apiKey) {
+        alert('ကျေးဇူးပြု၍ API Key အရင်ထည့်ပါ။');
+        return;
     }
-
-    updateOpenRouterStatus();
-
-    showOpenRouterMessage(
-        "✅ OpenRouter API Key အလုပ်လုပ်ပါတယ်။",
-        "success"
-    );
-
-}catch(error){
-
-    showOpenRouterMessage(
-        "❌ OpenRouter Error: " +
-        error.message,
-        "error"
-    );
-}
-
-}
-
-/* =========================================================
-LOAD SAVED API KEYS
-========================================================= */
-
-function loadApiKeys(){
-
-const geminiKey =
-    localStorage.getItem(
-        "gemini_api_key"
-    ) || "";
-
-const openRouterKey =
-    localStorage.getItem(
-        "openrouter_api_key"
-    ) || "";
-
-
-const geminiInput =
-    document.getElementById("apiKey");
-
-const openRouterInput =
-    document.getElementById(
-        "openRouterApiKey"
-    );
-
-
-if(geminiInput){
-    geminiInput.value = geminiKey;
-}
-
-if(openRouterInput){
-    openRouterInput.value =
-        openRouterKey;
-}
-
-
-updateKeyStatus();
-updateOpenRouterStatus();
-
-}
-
-document.addEventListener(
-"DOMContentLoaded",
-loadApiKeys
-);
     
+    alert('စစ်ဆေးနေပါပြီ... ခဏစောင့်ပါ။');
     
+    try {
+        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ contents: [{ parts: [{ text: "hi" }] }] })
+        });
+        
+        if (response.ok) {
+            alert('✅ API Key အလုပ်လုပ်ပါသည် (Valid Key)');
+        } else {
+            alert('❌ API Key မမှန်ပါ သို့မဟုတ် သက်တမ်းကုန်နေပါပြီ။');
+        }
+    } catch (error) {
+        alert('⚠️ ချိတ်ဆက်မှု အမှားအယွင်းရှိပါသည်: ' + error.message);
+    }
+}
 
 function cleanScriptText(rawText) {
     if (!rawText) return "";
