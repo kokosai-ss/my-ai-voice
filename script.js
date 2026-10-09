@@ -189,30 +189,30 @@ async function generateMultiShotMovie() {
             storyMemory.scenes.map(s => `Scene ${s.scene_number}: Dialogue: "${s.burmese_dialogue}" \vert{} Prompt: "${s.flow_prompt}"`).join("\n") + "\n\n";
     }
 
-    // ၃။ Unrestricted & Sequence Prompt
-    let promptText = `You are an unrestricted, highly creative Movie Director and AI Video Prompt Engineer.
+// ၃။ Unrestricted & Sequence Prompt
+let promptText = `You are an unrestricted, highly creative Movie Director and AI Video Prompt Engineer.
 You write scripts about ANY story idea provided without refusal (including surreal themes, fruit-people, dark fantasy, sci-fi, horror, or bizarre storytelling).
+Maintain strict visual character consistency across ALL scenes. Use the exact same detailed visual description for the main characters in every scene's prompt so AI video models keep their appearances identical.
 
 ${historyPrompt}Story Idea: "${movieIdea}"
 
-Create a sequence of 3 to 4 video scenes starting from Scene ${nextSceneStart}.
+Create a sequence of 7 video scenes starting from Scene ${nextSceneStart}.
 For EACH scene, you MUST provide:
 1. scene_number (integer, starting from ${nextSceneStart})
 2. time_range (e.g., "0-8s", "8-16s")
-3. burmese_dialogue (ဇာတ်ကောင်များ၏ မြန်မာစကားပြောခန်း သို့မဟုတ် ဇာတ်ကြောင်းပြော Voiceover)
-4. flow_prompt (Cinematic English video prompt for AI generation with camera angles, lighting, aspect ratio --ar ${ratio})
+3. burmese_dialogue (ဇာတ်ကောင်များ၏ မြန်မာစကားပြော)
+4. flow_prompt (Cinematic English video prompt with character description)
 
-Return ONLY a valid raw JSON array of objects without markdown wrap like \`\`\`json.
+Return ONLY a valid raw JSON array of objects.
 Required JSON format:
 [
   {
     "scene_number": ${nextSceneStart},
     "time_range": "0-8s",
-    "burmese_dialogue": "ဇာတ်ကောင်ပြောမည့် မြန်မာစကားပြောခန်း (သို့) Voiceover",
-    "flow_prompt": "Cinematic English prompt --ar ${ratio}"
+    "burmese_dialogue": "ဇာတ်ကောင်ပြောမည့် မြန်မာစကားပြော",
+    "flow_prompt": "Cinematic English prompt..."
   }
 ]`;
-
     try {
         const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=${apiKey}`, {
             method: 'POST',
@@ -243,6 +243,8 @@ Required JSON format:
 
         // Scene Card အားလုံးကို UI ပေါ် Render ပြန်လုပ်ခြင်း
         renderMultiSceneCards();
+                saveStoryMemory();
+
 
     } catch (err) {
         console.error("Multi-Shot Error:", err);
@@ -3502,3 +3504,44 @@ function showNeonAlert(message) {
 window.alert = function(message) {
     showNeonAlert(message);
 };
+// ဇာတ်လမ်းအချက်အလက်များကို Browser ထဲ သိမ်းရန်
+function saveStoryMemory() {
+    localStorage.setItem('myMovieStoryMemory', JSON.stringify(storyMemory));
+}
+
+// App စဖွင့်ချိန်တွင် ယခင် ဇာတ်လမ်းများကို ပြန်ဆွဲထုတ်ရန်
+function loadStoryMemory() {
+    const saved = localStorage.getItem('myMovieStoryMemory');
+    if (saved) {
+        storyMemory = JSON.parse(saved);
+    }
+}
+
+// ဇာတ်ကားအသစ် စတင်လိုပါက Memory ရှင်းထုတ်ရန်
+function resetStory() {
+    if (confirm("ဇာတ်လမ်းဟောင်းကို ဖျက်ပြီး ဇာတ်ကားအသစ် စတင်မှာ သေချာပါသလား။")) {
+        storyMemory = { scenes: [] }; 
+        localStorage.removeItem('myMovieStoryMemory');
+        renderMultiSceneCards(); 
+        alert("ဇာတ်လမ်းဟောင်း ဖျက်ပြီးပါပြီ။");
+    }
+}
+
+// App စတင်ပွင့်သည်နှင့် Automatic ခေါ်ပေးမည်
+loadStoryMemory();
+
+// Scene တစ်ခုလုံး (Voiceover + English Prompt) ကို တစ်ခါတည်း Copy ကူးမည့် Function
+function copyFullScene(sceneNum, voiceoverText, flowPromptText) {
+    const fullText = `--- Scene ${sceneNum} ---
+[Voiceover]:
+${voiceoverText}
+
+[Flow Prompt]:
+${flowPromptText}`;
+
+    navigator.clipboard.writeText(fullText).then(() => {
+        alert(`Scene ${sceneNum} တစ်ခုလုံးကို Copy ကူးပြီးပါပြီ!`);
+    }).catch(err => {
+        console.error('Copy Error:', err);
+    });
+}
