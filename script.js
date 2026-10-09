@@ -10,54 +10,35 @@ function showNeonAlert(message) {
     alert(message); // လိုအပ်ပါက Custom UI Modal ဖြင့် အစားထိုးနိုင်ပါသည်
 }
 // Mode Switching (Single vs Multi-Shot)
-function switchMode(mode) {
-    const singleSec = document.getElementById('singleShotSection');
-    const multiSec = document.getElementById('multiShotSection');
-    const btns = document.querySelectorAll('.mode-tabs .tab-btn');
-
-    btns.forEach(b => b.classList.remove('active'));
-
-    if (mode === 'single') {
-        if(singleSec) singleSec.style.display = 'block';
-        if(multiSec) multiSec.style.display = 'none';
-        if(btns[0]) btns[0].classList.add('active');
-    } else {
-        if(singleSec) singleSec.style.display = 'none';
-        if(multiSec) multiSec.style.display = 'block';
-        if(btns[1]) btns[1].classList.add('active');
-    }
-}
-
-// Aspect Ratio Setter for Single Shot
-function setRatio(ratio) {
-    currentRatio = ratio;
-    const btn169 = document.getElementById('btn169');
-    const btn916 = document.getElementById('btn916');
-
-    if (ratio === '16:9') {
-        if(btn169) { btn169.classList.add('active'); }
-        if(btn916) { btn916.classList.remove('active'); }
-    } else {
-        if(btn916) { btn916.classList.add('active'); }
-        if(btn169) { btn169.classList.remove('active'); }
-    }
-}
-
-// Aspect Ratio Setter for Multi-Shot
 function setMultiRatio(ratio) {
     currentMultiRatio = ratio;
     const btn169 = document.getElementById('multiBtn169');
     const btn916 = document.getElementById('multiBtn916');
 
+    if (!btn169 || !btn916) return;
+
     if (ratio === '16:9') {
-        if(btn169) { btn169.classList.add('active'); }
-        if(btn916) { btn916.classList.remove('active'); }
+        btn169.classList.add('active');
+        btn169.style.background = 'rgba(34, 211, 238, 0.2)';
+        btn169.style.borderColor = '#22d3ee';
+        btn169.style.color = '#fff';
+
+        btn916.classList.remove('active');
+        btn916.style.background = 'rgba(15, 23, 42, 0.8)';
+        btn916.style.borderColor = 'rgba(255, 255, 255, 0.2)';
+        btn916.style.color = '#aaa';
     } else {
-        if(btn916) { btn916.classList.add('active'); }
-        if(btn169) { btn169.classList.remove('active'); }
+        btn916.classList.add('active');
+        btn916.style.background = 'rgba(34, 211, 238, 0.2)';
+        btn916.style.borderColor = '#22d3ee';
+        btn916.style.color = '#fff';
+
+        btn169.classList.remove('active');
+        btn169.style.background = 'rgba(15, 23, 42, 0.8)';
+        btn169.style.borderColor = 'rgba(255, 255, 255, 0.2)';
+        btn169.style.color = '#aaa';
     }
 }
-
 
 // Image Preview for Single Shot
 function previewFlowImg(event) {
