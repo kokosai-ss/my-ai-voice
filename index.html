@@ -720,8 +720,27 @@ cursor:pointer;
 </div>
   
 <!-- Movie Director / Multi-Shot View -->
-<div id="movieDirectorView" class="view-container" style="display: none; padding: 16px;">
-    <div style="background: rgba(13, 27, 42, 0.75); backdrop-filter: blur(12px); border: 1px solid rgba(34, 211, 238, 0.35); border-radius: 16px; padding: 20px; box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37), 0 0 15px rgba(34, 211, 238, 0.15);">
+<div class="view-container" style="padding: 16px;">
+    
+    <!-- Top Tabs (Single Shot & Movie Director) -->
+    <div style="display: flex; gap: 10px; background: rgba(13, 27, 42, 0.75); padding: 6px; border-radius: 12px; border: 1px solid rgba(34, 211, 238, 0.35); margin-bottom: 16px;">
+        <button type="button" id="tabSingleShot" onclick="switchView('single')" style="flex: 1; padding: 10px; background: rgba(34, 211, 238, 0.2); border: 1px solid #22d3ee; color: #fff; border-radius: 8px; cursor: pointer; font-size: 13px; font-weight: bold; display: flex; align-items: center; justify-content: center; gap: 6px;">
+            <i class="fa-solid fa-camera"></i> Single Shot
+        </button>
+        <button type="button" id="tabMovieDirector" onclick="switchView('director')" style="flex: 1; padding: 10px; background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(255, 255, 255, 0.2); color: #aaa; border-radius: 8px; cursor: pointer; font-size: 13px; font-weight: bold; display: flex; align-items: center; justify-content: center; gap: 6px;">
+            <i class="fa-solid fa-film"></i> Movie Director
+        </button>
+    </div>
+
+    <!-- 1. Single Shot View (ပုံစံပြရန်အတွက် ထည့်သွင်းပေးထားသည်) -->
+    <div id="singleShotView" style="display: block; background: rgba(13, 27, 42, 0.75); backdrop-filter: blur(12px); border: 1px solid rgba(34, 211, 238, 0.35); border-radius: 16px; padding: 20px; box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37), 0 0 15px rgba(34, 211, 238, 0.15);">
+        <h2 style="color: #ffffff; font-size: 16px; font-weight: 600; margin-bottom: 12px;">Single Shot Generator</h2>
+        <p style="color: #94a3b8; font-size: 12px; margin-bottom: 16px;">ပုံတစ်ပုံတင်လိုက်ရုံနဲ့ မြန်မာ Voiceover Script နဲ့ Flow AI Video Prompt ကို ထုတ်ပေးပါမည်။</p>
+        <!-- Single Shot content တွေ ဒီမှာ ဆက်ထည့်ပါ -->
+    </div>
+
+    <!-- 2. Movie Director View (Multi-Shot) -->
+    <div id="movieDirectorView" style="display: none; background: rgba(13, 27, 42, 0.75); backdrop-filter: blur(12px); border: 1px solid rgba(34, 211, 238, 0.35); border-radius: 16px; padding: 20px; box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37), 0 0 15px rgba(34, 211, 238, 0.15);">
         
         <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;">
             <i class="fa-solid fa-film" style="color: #22d3ee; font-size: 20px; filter: drop-shadow(0 0 8px #22d3ee);"></i>
@@ -755,23 +774,22 @@ cursor:pointer;
         <button onclick="generateMultiShotMovie()" style="width: 100%; background: linear-gradient(135deg, #06b6d4, #0284c7); color: #fff; border: none; padding: 12px; border-radius: 10px; font-weight: bold; font-size: 13px; cursor: pointer; box-shadow: 0 0 15px rgba(34, 211, 238, 0.4);">
             <i class="fa-solid fa-clapperboard"></i> ဇာတ်ကားတစ်ပုဒ်စာ အခန်းဆက် Prompt များ ထုတ်မည်
         </button>
-    </div>
 
-    <!-- Multi-Shot Result Box -->
-    <div id="multiResultBox" style="display: none; margin-top: 16px; background: rgba(13, 27, 42, 0.75); backdrop-filter: blur(12px); border: 1px solid rgba(34, 211, 238, 0.35); border-radius: 16px; padding: 18px; box-shadow: 0 0 20px rgba(34, 211, 238, 0.15);">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-            <span style="color: #67e8f9; font-size: 13px; font-weight: bold;"><i class="fa-solid fa-film"></i> အခန်းဆက် ဇာတ်ညွှန်း & Prompts မျာား</span>
-            <button onclick="copyAllMultiScenes()" style="background: rgba(34, 211, 238, 0.15); border: 1px solid #22d3ee; color: #22d3ee; padding: 4px 10px; border-radius: 6px; font-size: 10px; cursor: pointer; font-weight: bold;">
-                <i class="fa-solid fa-copy"></i> အကုန်ကူးမည်
-            </button>
+        <!-- Multi-Shot Result Box -->
+        <div id="multiResultBox" style="display: none; margin-top: 16px; background: rgba(13, 27, 42, 0.75); backdrop-filter: blur(12px); border: 1px solid rgba(34, 211, 238, 0.35); border-radius: 16px; padding: 18px; box-shadow: 0 0 20px rgba(34, 211, 238, 0.15);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                <span style="color: #67e8f9; font-size: 13px; font-weight: bold;"><i class="fa-solid fa-film"></i> အခန်းဆက် ဇာတ်ညွှန်း & Prompts များ</span>
+                <button onclick="copyAllMultiScenes()" style="background: rgba(34, 211, 238, 0.15); border: 1px solid #22d3ee; color: #22d3ee; padding: 4px 10px; border-radius: 6px; font-size: 10px; cursor: pointer; font-weight: bold;">
+                    <i class="fa-solid fa-copy"></i> အကုန်ကူးမည်
+                </button>
+            </div>
+            <div id="multiResultContent" style="max-height: 400px; overflow-y: auto;">
+                <!-- Dynamic Scenes will appear here -->
+            </div>
         </div>
-        <div id="multiResultContent" style="max-height: 400px; overflow-y: auto;">
-            <!-- Dynamic Scenes will appear here -->
-        </div>
-    </div>
-</div> <!-- <-- ဒီမှာ ပထမ div ကို ပိတ်ပါ -->
-</div> <!-- <-- ဒီမှာ ဒုတိယ div ကို ပိတ်ပါ -->
 
+    </div>
+</div>
 
 <div id="voiceStudio" class="view-container" style="display: none;">
         <!-- 1. အပြင်ဘက်မှာ အမြဲပေါ်နေမယ့် Header နဲ့ Tab ခလုတ်များ -->
