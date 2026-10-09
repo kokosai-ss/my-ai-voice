@@ -18,25 +18,11 @@ function setMultiRatio(ratio) {
     if (!btn169 || !btn916) return;
 
     if (ratio === '16:9') {
-        btn169.classList.add('active');
-        btn169.style.background = 'rgba(34, 211, 238, 0.2)';
-        btn169.style.borderColor = '#22d3ee';
-        btn169.style.color = '#fff';
-
-        btn916.classList.remove('active');
-        btn916.style.background = 'rgba(15, 23, 42, 0.8)';
-        btn916.style.borderColor = 'rgba(255, 255, 255, 0.2)';
-        btn916.style.color = '#aaa';
+        btn169.style.cssText = "flex: 1; padding: 10px; border-radius: 8px; cursor: pointer; font-size: 12px; font-weight: bold; background: rgba(34, 211, 238, 0.2) !important; border: 1px solid #22d3ee !important; color: #fff !important;";
+        btn916.style.cssText = "flex: 1; padding: 10px; border-radius: 8px; cursor: pointer; font-size: 12px; font-weight: bold; background: rgba(15, 23, 42, 0.8) !important; border: 1px solid rgba(255, 255, 255, 0.2) !important; color: #aaa !important;";
     } else {
-        btn916.classList.add('active');
-        btn916.style.background = 'rgba(34, 211, 238, 0.2)';
-        btn916.style.borderColor = '#22d3ee';
-        btn916.style.color = '#fff';
-
-        btn169.classList.remove('active');
-        btn169.style.background = 'rgba(15, 23, 42, 0.8)';
-        btn169.style.borderColor = 'rgba(255, 255, 255, 0.2)';
-        btn169.style.color = '#aaa';
+        btn916.style.cssText = "flex: 1; padding: 10px; border-radius: 8px; cursor: pointer; font-size: 12px; font-weight: bold; background: rgba(34, 211, 238, 0.2) !important; border: 1px solid #22d3ee !important; color: #fff !important;";
+        btn169.style.cssText = "flex: 1; padding: 10px; border-radius: 8px; cursor: pointer; font-size: 12px; font-weight: bold; background: rgba(15, 23, 42, 0.8) !important; border: 1px solid rgba(255, 255, 255, 0.2) !important; color: #aaa !important;";
     }
 }
 
