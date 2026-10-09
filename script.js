@@ -173,6 +173,12 @@ Required JSON format:
     }
 }
 
+// --- Global Memory State (Scene History မှတ်ရန်) ---
+let storyMemory = {
+    activeIdea: "",
+    scenes: []
+};
+
 // --- 2. MOVIE DIRECTOR (MULTI-SHOT) API HANDLER ---
 async function generateMultiShotMovie() {
     const movieIdea = document.getElementById('movieIdeaInput').value.trim();
@@ -192,27 +198,51 @@ async function generateMultiShotMovie() {
     const multiResultContent = document.getElementById('multiResultContent');
     
     multiResultBox.style.display = 'block';
-    multiResultContent.innerHTML = `<p style="color: #00f3ff; text-align:center;"><i class="fa-solid fa-spinner fa-spin"></i> Movie Director က အခန်းဆက် ဇာတ်ညွှန်းနှင့် စကားပြောခန်းများ ဖန်တီးနေသည်...</p>`;
 
-    let promptText = `You are an expert Movie Director and AI Video Prompt Engineer. 
-Based on the following story idea, create a sequence of 4 to 6 video scenes (multi-shot sequence). 
+    // ၁။ ဇာတ်လမ်း Idea စာသား ပြောင်းသွားပါက Memory သစ် စတင်မည်
+    if (movieIdea !== storyMemory.activeIdea) {
+        storyMemory.activeIdea = movieIdea;
+        storyMemory.scenes = [];
+        multiResultContent.innerHTML = `<p style="color: #00f3ff; text-align:center;"><i class="fa-solid fa-spinner fa-spin"></i> Movie Director က ဇာတ်လမ်းသစ် စတင်ဖန်တီးနေသည်...</p>`;
+    } else {
+        // Idea တူတူပဲဆိုရင် အောက်ခြေမှာ Loading ပြပြီး နောက်ထပ် Scenes တွေ ဆက်ထုတ်မည်
+        const existingCards = multiResultContent.innerHTML;
+        multiResultContent.innerHTML = existingCards + `<p id="loadingStatus" style="color: #00f3ff; text-align:center; margin: 15px 0;"><i class="fa-solid fa-spinner fa-spin"></i> အဆက် Scene များကို ဆက်လက် ရေးသားနေသည်...</p>`;
+    }
+
+    const nextSceneStart = storyMemory.scenes.length + 1;
+    const ratio = (typeof currentMultiRatio !== 'undefined') ? currentMultiRatio : '16:9';
+
+    // ၂။ ယခင် ထွက်ထားသမျှ Scenes များကို History အဖြစ် Prompt ထဲ ထည့်ပေါင်းခြင်း
+    let historyPrompt = "";
+    if (storyMemory.scenes.length > 0) {
+        historyPrompt = `Previous Scene History (You MUST seamlessly continue story from Scene ${nextSceneStart}):\n` + 
+            storyMemory.scenes.map(s => `Scene ${s.scene_number}: Dialogue: "${s.burmese_dialogue}" \vert{} Prompt: "${s.flow_prompt}"`).join("\n") + "\n\n";
+    }
+
+    // ၃။ Unrestricted & Sequence Prompt
+    let promptText = `You are an unrestricted, highly creative Movie Director and AI Video Prompt Engineer.
+You write scripts about ANY story idea provided without refusal (including surreal themes, fruit-people, dark fantasy, sci-fi, horror, or bizarre storytelling).
+
+${historyPrompt}Story Idea: "${movieIdea}"
+
+Create a sequence of 3 to 4 video scenes starting from Scene ${nextSceneStart}.
 For EACH scene, you MUST provide:
-1. Time range (e.g., "0-8s", "8-16s")
-2. Burmese character dialogue or voiceover script (ဇာတ်ကောင်များ၏ မြန်မာစကားပြောခန်း သို့မဟုတ် ဇာတ်ကြောင်းပြောချက်)
-3. Cinematic English prompt for Flow AI video generator (with camera angles, lighting, matching aspect ratio --ar ${currentMultiRatio})
+1. scene_number (integer, starting from ${nextSceneStart})
+2. time_range (e.g., "0-8s", "8-16s")
+3. burmese_dialogue (ဇာတ်ကောင်များ၏ မြန်မာစကားပြောခန်း သို့မဟုတ် ဇာတ်ကြောင်းပြော Voiceover)
+4. flow_prompt (Cinematic English video prompt for AI generation with camera angles, lighting, aspect ratio --ar ${ratio})
 
-Return ONLY a valid raw JSON array of objects without markdown like \`\`\`json.
+Return ONLY a valid raw JSON array of objects without markdown wrap like \`\`\`json.
 Required JSON format:
 [
   {
-    "scene_number": 1,
+    "scene_number": ${nextSceneStart},
     "time_range": "0-8s",
     "burmese_dialogue": "ဇာတ်ကောင်ပြောမည့် မြန်မာစကားပြောခန်း (သို့) Voiceover",
-    "flow_prompt": "Cinematic English prompt --ar ${currentMultiRatio}"
+    "flow_prompt": "Cinematic English prompt --ar ${ratio}"
   }
-]
-
-Story Idea: "${movieIdea}"`;
+]`;
 
     try {
         const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=${apiKey}`, {
@@ -230,51 +260,114 @@ Story Idea: "${movieIdea}"`;
         const jsonMatch = rawText.match(/\[[\s\S]*\]/);
         if (!jsonMatch) throw new Error("JSON Array ထွက်မလာပါ");
 
-        const scenes = JSON.parse(jsonMatch[0]);
+        const newScenes = JSON.parse(jsonMatch[0]);
 
-        let htmlOutput = "";
-        scenes.forEach((s) => {
-            htmlOutput += `
-                <div style="background: rgba(0,0,20,0.6); border: 1px solid rgba(0,243,255,0.2); padding: 12px; border-radius: 10px; margin-bottom: 12px;">
-                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
-                        <span style="color: #00f3ff; font-weight: bold;">🎬 Scene ${s.scene_number} (${s.time_range})</span>
-                        <button class="copy-all-btn" onclick="navigator.clipboard.writeText(\`${s.flow_prompt}\`); showNeonAlert('Scene ${s.scene_number} Flow Prompt ကို ကူးပြီးပါပြီ!')"><i class="fa-solid fa-copy"></i> Prompt ကူးမည်</button>
-                    </div>
-                    <p style="margin-bottom: 6px; font-size: 13px;">🇲🇲 <b>မြန်မာစကားပြောခန်း / Voiceover:</b><br><span style="color: #f8fafc;">${s.burmese_dialogue}</span></p>
-                    <p style="font-size: 13px;">🇬🇧 <b>Flow AI Prompt:</b><br><span style="color: #94a3b8; font-family: monospace;">${s.flow_prompt}</span></p>
-                </div>
-            `;
+        // Memory ထဲသို့ Scene အသစ်များ ပေါင်းထည့်ခြင်း
+        newScenes.forEach(s => {
+            storyMemory.scenes.push({
+                scene_number: s.scene_number,
+                time_range: s.time_range || `${(s.scene_number - 1)*8}-${s.scene_number*8}s`,
+                burmese_dialogue: s.burmese_dialogue,
+                flow_prompt: s.flow_prompt
+            });
         });
 
-        multiResultContent.innerHTML = htmlOutput;
+        // Scene Card အားလုံးကို UI ပေါ် Render ပြန်လုပ်ခြင်း
+        renderMultiSceneCards();
 
     } catch (err) {
         console.error("Multi-Shot Error:", err);
-        multiResultContent.innerHTML = `<p style="color: #ff4d4d;">Error: ${err.message}</p>`;
+        const loadingStatus = document.getElementById('loadingStatus');
+        if (loadingStatus) loadingStatus.remove();
+        showNeonAlert("Error: " + err.message);
     }
 }
 
-// Copy Handlers
+// --- Card ပြသပေးသည့် Function ( Voiceover & Prompt Copy Buttons ပါဝင်သည်) ---
+function renderMultiSceneCards() {
+    const multiResultContent = document.getElementById('multiResultContent');
+    let htmlOutput = "";
+
+    storyMemory.scenes.forEach((s, index) => {
+        htmlOutput += `
+            <div style="background: rgba(0,0,20,0.6); border: 1px solid rgba(0,243,255,0.2); padding: 12px; border-radius: 10px; margin-bottom: 12px;">
+                <!-- Header -->
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; border-bottom: 1px solid rgba(0,243,255,0.15); padding-bottom: 6px;">
+                    <span style="color: #00f3ff; font-weight: bold; font-size: 13px;">🎬 Scene ${s.scene_number} (${s.time_range})</span>
+                </div>
+
+                <!-- မြန်မာ Voiceover Section -->
+                <div style="background: rgba(15, 23, 42, 0.6); padding: 8px 10px; border-radius: 8px; margin-bottom: 8px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+                        <span style="color: #fbbf24; font-size: 11px; font-weight: bold;">🇲🇲 မြန်မာစကားပြောခန်း / Voiceover:</span>
+                        <button class="copy-all-btn" style="background: #fbbf24; color: #000; font-weight: bold; padding: 3px 8px; font-size: 10px;" onclick="copySceneItem(${index}, 'dialogue')">
+                            <i class="fa-solid fa-microphone"></i> Voiceover ကူးမည်
+                        </button>
+                    </div>
+                    <p style="margin: 0; font-size: 13px; color: #f8fafc; line-height: 1.4;">${escapeHtml(s.burmese_dialogue)}</p>
+                </div>
+
+                <!-- Flow AI Prompt Section -->
+                <div style="background: rgba(15, 23, 42, 0.6); padding: 8px 10px; border-radius: 8px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+                        <span style="color: #00f3ff; font-size: 11px; font-weight: bold;">🇬🇧 Flow AI Prompt:</span>
+                        <button class="copy-all-btn" style="padding: 3px 8px; font-size: 10px;" onclick="copySceneItem(${index}, 'prompt')">
+                            <i class="fa-solid fa-wand-magic-sparkles"></i> Prompt ကူးမည်
+                        </button>
+                    </div>
+                    <p style="margin: 0; font-size: 12px; color: #94a3b8; font-family: monospace; line-height: 1.4;">${escapeHtml(s.flow_prompt)}</p>
+                </div>
+            </div>
+        `;
+    });
+
+    multiResultContent.innerHTML = htmlOutput;
+}
+
+// --- Single Copy Handler (Single Quote / Double Quote အမှားမတတ်အောင် ထိန်းပေးထားသည်) ---
+function copySceneItem(sceneIndex, type) {
+    if (!storyMemory.scenes[sceneIndex]) return;
+    const targetScene = storyMemory.scenes[sceneIndex];
+    const textToCopy = (type === 'dialogue') ? targetScene.burmese_dialogue : targetScene.flow_prompt;
+    
+    navigator.clipboard.writeText(textToCopy);
+    const label = (type === 'dialogue') ? 'Voiceover' : 'Flow AI Prompt';
+    showNeonAlert(`Scene ${targetScene.scene_number} ${label} ကို ကူးပြီးပါပြီ!`);
+}
+
+// --- Text Escape Helper ---
+function escapeHtml(text) {
+    if (!text) return "";
+    return text
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+
+// --- Copy Handlers ---
 function copyBurmeseScript() {
-    const text = document.getElementById('outBurmeseScript').innerText;
+    const text = document.getElementById('outBurmeseScript')?.innerText;
     if (!text) return;
     navigator.clipboard.writeText(text);
     showNeonAlert("မြန်မာ Script ကို Copy ကူးပြီးပါပြီ!");
 }
 
 function copyFlowPrompt() {
-    const text = document.getElementById('outFlowPrompt').innerText;
+    const text = document.getElementById('outFlowPrompt')?.innerText;
     if (!text) return;
     navigator.clipboard.writeText(text);
     showNeonAlert("Flow AI Prompt ကို Copy ကူးပြီးပါပြီ!");
 }
 
 function copyAllMultiScenes() {
-    const content = document.getElementById('multiResultContent').innerText;
-    if (!content) return;
-    navigator.clipboard.writeText(content);
+    if (storyMemory.scenes.length === 0) return;
+    let allText = storyMemory.scenes.map(s => `--- Scene ${s.scene_number} (${s.time_range}) ---\n[Voiceover]:\n${s.burmese_dialogue}\n\n[Flow Prompt]:\n${s.flow_prompt}`).join('\n\n====================\n\n');
+    navigator.clipboard.writeText(allText);
     showNeonAlert("ဇာတ်လမ်း အခန်းဆက် အားလုံးကို Copy ကူးပြီးပါပြီ!");
 }
+
 // AI Script ထဲက Single Shot နဲ့ Movie Director Tab များ ပြောင်းရန်
 function switchAiSubTab(tab) {
     const subSingle = document.getElementById('subSectionSingle');
@@ -307,6 +400,38 @@ function switchAiSubTab(tab) {
     }
 }
 
+// --- ASPECT RATIO RATIO SWITCHER FUNCTION ---
+let currentMultiRatio = '16:9'; // Default Value
+
+function setMultiRatio(ratio) {
+    currentMultiRatio = ratio;
+    const btn169 = document.getElementById('multiBtn169');
+    const btn916 = document.getElementById('multiBtn916');
+    
+    if (!btn169 || !btn916) return;
+
+    if (ratio === '16:9') {
+        // YouTube (16:9) ခလုတ်ကို Active အလင်းပြပေးမည်
+        btn169.style.background = 'rgba(34, 211, 238, 0.2)';
+        btn169.style.border = '1px solid #22d3ee';
+        btn169.style.color = '#fff';
+        
+        // TikTok (9:16) ခလုတ်ကို မှိန်ပေးမည်
+        btn916.style.background = 'rgba(15, 23, 42, 0.8)';
+        btn916.style.border = '1px solid rgba(255, 255, 255, 0.2)';
+        btn916.style.color = '#aaa';
+    } else {
+        // TikTok (9:16) ခလုတ်ကို Active အလင်းပြပေးမည်
+        btn916.style.background = 'rgba(34, 211, 238, 0.2)';
+        btn916.style.border = '1px solid #22d3ee';
+        btn916.style.color = '#fff';
+        
+        // YouTube (16:9) ခလုတ်ကို မှိန်ပေးမည်
+        btn169.style.background = 'rgba(15, 23, 42, 0.8)';
+        btn169.style.border = '1px solid rgba(255, 255, 255, 0.2)';
+        btn169.style.color = '#aaa';
+    }
+}
 
 let activePickerTarget = null; // 'single' or block ID number
 let singleVoiceValue = "Charon";
@@ -2557,303 +2682,6 @@ try{
 
 }
 
-/* =========================================================
-OPENROUTER API KEY
-========================================================= */
-
-function getStoredOpenRouterKey(){
-
-return localStorage.getItem(
-    "openrouter_api_key"
-) || "";
-
-}
-
-function updateOpenRouterStatus(){
-
-const input =
-    document.getElementById("openRouterApiKey");
-
-const status =
-    document.getElementById("openRouterStatus");
-
-if(!input || !status) return;
-
-const key = input.value.trim();
-
-if(key){
-
-    status.textContent = "Ready";
-    status.style.color = "#00ff9d";
-    status.style.background =
-        "rgba(0,255,157,0.12)";
-    status.style.borderColor =
-        "rgba(0,255,157,0.3)";
-
-}else{
-
-    status.textContent = "Missing";
-    status.style.color = "#ff4d4d";
-    status.style.background =
-        "rgba(255,77,77,0.15)";
-    status.style.borderColor =
-        "rgba(255,77,77,0.3)";
-}
-
-}
-
-function saveOpenRouterKey(){
-
-const input =
-    document.getElementById("openRouterApiKey");
-
-const saveBox =
-    document.getElementById("saveOpenRouterKey");
-
-if(!input) return;
-
-const key = input.value.trim();
-
-if(!key){
-
-    showOpenRouterMessage(
-        "OpenRouter API Key မထည့်ရသေးပါ။",
-        "error"
-    );
-
-    return;
-}
-
-if(saveBox && saveBox.checked){
-
-    localStorage.setItem(
-        "openrouter_api_key",
-        key
-    );
-}
-
-updateOpenRouterStatus();
-
-showOpenRouterMessage(
-    "✅ OpenRouter API Key ကို သိမ်းပြီးပါပြီ။",
-    "success"
-);
-
-}
-
-function changeOpenRouterKey(){
-
-const input =
-    document.getElementById("openRouterApiKey");
-
-if(!input) return;
-
-input.focus();
-input.select();
-
-}
-
-function removeOpenRouterKey(){
-
-localStorage.removeItem(
-    "openrouter_api_key"
-);
-
-const input =
-    document.getElementById("openRouterApiKey");
-
-if(input){
-    input.value = "";
-}
-
-updateOpenRouterStatus();
-
-showOpenRouterMessage(
-    "OpenRouter API Key ကို ဖျက်ပြီးပါပြီ။",
-    "success"
-);
-
-}
-
-function toggleOpenRouterKey(){
-
-const input =
-    document.getElementById("openRouterApiKey");
-
-if(!input) return;
-
-input.type =
-    input.type === "password"
-        ? "text"
-        : "password";
-
-}
-
-function showOpenRouterMessage(text, type){
-
-const box =
-    document.getElementById("openRouterMessage");
-
-if(!box) return;
-
-box.textContent = text;
-
-if(type === "error"){
-    box.style.color = "#ff4d4d";
-}else if(type === "success"){
-    box.style.color = "#00ff9d";
-}else{
-    box.style.color = "#c084fc";
-}
-
-}
-
-/* =========================================================
-TEST OPENROUTER KEY
-========================================================= */
-
-async function testOpenRouterKey(){
-
-const input =
-    document.getElementById("openRouterApiKey");
-
-if(!input) return;
-
-const apiKey = input.value.trim();
-
-if(!apiKey){
-
-    showOpenRouterMessage(
-        "အရင်ဆုံး OpenRouter API Key ထည့်ပါ။",
-        "error"
-    );
-
-    return;
-}
-
-showOpenRouterMessage(
-    "🔄 OpenRouter API Key ကို စစ်ဆေးနေပါတယ်...",
-    "info"
-);
-
-try{
-
-    const response = await fetch(
-        "https://openrouter.ai/api/v1/chat/completions",
-        {
-            method:"POST",
-
-            headers:{
-                "Authorization":
-                    `Bearer ${apiKey}`,
-
-                "Content-Type":
-                    "application/json"
-            },
-
-            body:JSON.stringify({
-
-                model:"openrouter/free",
-
-                messages:[
-                    {
-                        role:"user",
-                        content:"Reply with only: OPENROUTER_OK"
-                    }
-                ],
-
-                stream:false
-            })
-        }
-    );
-
-    const data = await response
-        .json()
-        .catch(() => ({}));
-
-    if(!response.ok){
-
-        throw new Error(
-            data?.error?.message ||
-            `HTTP ${response.status}`
-        );
-    }
-
-    if(
-        document.getElementById(
-            "saveOpenRouterKey"
-        )?.checked
-    ){
-
-        localStorage.setItem(
-            "openrouter_api_key",
-            apiKey
-        );
-    }
-
-    updateOpenRouterStatus();
-
-    showOpenRouterMessage(
-        "✅ OpenRouter API Key အလုပ်လုပ်ပါတယ်။",
-        "success"
-    );
-
-}catch(error){
-
-    showOpenRouterMessage(
-        "❌ OpenRouter Error: " +
-        error.message,
-        "error"
-    );
-}
-
-}
-
-/* =========================================================
-LOAD SAVED API KEYS
-========================================================= */
-
-function loadApiKeys(){
-
-const geminiKey =
-    localStorage.getItem(
-        "gemini_api_key"
-    ) || "";
-
-const openRouterKey =
-    localStorage.getItem(
-        "openrouter_api_key"
-    ) || "";
-
-
-const geminiInput =
-    document.getElementById("apiKey");
-
-const openRouterInput =
-    document.getElementById(
-        "openRouterApiKey"
-    );
-
-
-if(geminiInput){
-    geminiInput.value = geminiKey;
-}
-
-if(openRouterInput){
-    openRouterInput.value =
-        openRouterKey;
-}
-
-
-updateKeyStatus();
-updateOpenRouterStatus();
-
-}
-
-document.addEventListener(
-"DOMContentLoaded",
-loadApiKeys
-);
 
 function cleanScriptText(rawText) {
     if (!rawText) return "";
