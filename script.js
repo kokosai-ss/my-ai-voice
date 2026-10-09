@@ -3406,7 +3406,7 @@ function shPreviewVoice(voice, button){
         shVoiceAudio = new Audio('./' + src);
         shPlayingButton = button;
 
-        button.textContent = '⏸ Stop';
+        button.textContent = '🇲🇲 Stop';
 
         shVoiceAudio.onended = () => {
             button.textContent = '▶ Play';
@@ -3531,6 +3531,21 @@ function resetStory() {
 loadStoryMemory();
 
 // Scene တစ်ခုလုံး (Voiceover + English Prompt) ကို တစ်ခါတည်း Copy ကူးမည့် Function
+function copyFullScene(sceneNum, voiceoverText, flowPromptText) {
+    const fullText = `--- Scene ${sceneNum} ---
+[Voiceover]:
+${voiceoverText}
+
+[Flow Prompt]:
+${flowPromptText}`;
+
+    navigator.clipboard.writeText(fullText).then(() => {
+        alert(`Scene ${sceneNum} တစ်ခုလုံးကို Copy ကူးပြီးပါပြီ!`);
+    }).catch(err => {
+        console.error('Copy Error:', err);
+    });
+}
+// Scene တစ်ခုလုံး (Voiceover + Flow Prompt) ကို တစ်ခါတည်း Copy ကူးမည့် Function
 function copyFullScene(sceneNum, voiceoverText, flowPromptText) {
     const fullText = `--- Scene ${sceneNum} ---
 [Voiceover]:
