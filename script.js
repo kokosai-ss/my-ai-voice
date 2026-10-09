@@ -508,6 +508,13 @@ Required format:
         if (!openRouterKey) {
             throw new Error("OpenRouter API Key မရှိပါ");
         }
+           // 👇 ဒီလိုင်းလေးတွေကို ထည့်ပါ
+        multiResultContent.innerHTML = `
+            <div style="color:#00f3ff; text-align:center; padding:10px;">
+                🔄 OpenRouter ဆီ Request ပို့နေပါပြီ...
+            </div>
+        `;
+        // 👆 ပြီးရင် ဒီအောက်မှာ fetch ဆက်လုပ်ပါ
 
         const response = await fetch(
             "https://openrouter.ai/api/v1/chat/completions",
