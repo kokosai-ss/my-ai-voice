@@ -370,6 +370,56 @@ function switchAiSubTab(tab) {
         btnSingle.style.boxShadow = "none";
     }
 }
+// Menu ဖွင့်ရန်
+function openSettingsMenu() {
+    document.getElementById('scriptMenuModal').style.display = 'flex';
+}
+
+// Menu ပိတ်ရန်
+function closeScriptMenu() {
+    document.getElementById('scriptMenuModal').style.display = 'none';
+}
+
+// ၁။ Save Copy လုပ်ခြင်း (LocalStorage ထဲမှာ သိမ်းမည်)
+function saveScriptCopy() {
+    const textInput = document.getElementById('scriptTextInput') || document.querySelector('textarea'); 
+    if (textInput) {
+        localStorage.setItem('saved_script_copy', textInput.value);
+        alert('✨ Copy သိမ်းဆည်းပြီးပါပြီ သားရီး!');
+    } else {
+        alert('သိမ်းဆည်းရန် စာသားနေရာ မတွေ့ပါ။');
+    }
+    closeScriptMenu();
+}
+
+// ၂။ Restore လုပ်ခြင်း (သိမ်းထားတာကို ပြန်ခေါ်မည်)
+function loadScriptCopy() {
+    const savedData = localStorage.getItem('saved_script_copy');
+    const textInput = document.getElementById('scriptTextInput') || document.querySelector('textarea');
+    
+    if (savedData && textInput) {
+        textInput.value = savedData;
+        alert('📂 သိမ်းဆည်းထားသော Copy ကို ပြန်လည်ဖော်ပြပြီးပါပြီ!');
+    } else {
+        alert('⚠️ သိမ်းဆည်းထားသော Data မရှိသေးပါ။');
+    }
+    closeScriptMenu();
+}
+
+// ၃။ သေချာမှ ဖျက်မည့် Delete ခလုတ် (Confirm Box ပါဝင်သည်)
+function confirmClearScript() {
+    const isConfirmed = confirm('❗ အချက်အလက်များကို အမှန်တကယ် ဖျက်ပစ်မှာ လោក?');
+    if (isConfirmed) {
+        const textInput = document.getElementById('scriptTextInput') || document.querySelector('textarea');
+        if (textInput) {
+            textInput.value = '';
+        }
+        localStorage.removeItem('saved_script_copy');
+        alert('🗑️ အချက်အလက်များအားလုံးကို ရှင်းလင်းပြီးပါပြီ။');
+    }
+    closeScriptMenu();
+}
+
 let activePickerTarget = null; // 'single' or block ID number
 let singleVoiceValue = "Charon";
 let currentAudioBlob = null;
