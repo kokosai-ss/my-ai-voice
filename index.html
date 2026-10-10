@@ -467,65 +467,62 @@ cursor:pointer;
 
 </div>
   </div>
+
 <!-- Settings / Silence Removal View Container -->
-<div class="view-container">
-    <!-- View: Silence & Audio Enhancer Tab -->
-    <div id="view-silence" class="tab-view active">
+<div id="silenceView" class="view-container" style="padding: 20px; color: #fff;">
+    <h2>Silence Removal</h2>
+    
+    <!-- 1. Silence Removal Card -->
+    <div class="card" style="margin-top: 20px; background: #111827; padding: 20px; border-radius: 12px; border: 1px solid #1f2937;">
+        <h3 style="color: #60a5fa; margin-bottom: 8px;">✂️ Auto Silence Removal</h3>
+        <p style="color: #9ca3af; font-size: 13px; margin-bottom: 15px;">အသံဖိုင်ထဲက အသံတိတ်နေတဲ့ နေရာတွေကို အလိုအလျောက် ဖြတ်ထုတ်ပေးသည်</p>
+
+        <input type="file" id="audioFileInput" accept="audio/*" style="width: 100%; color: #fff; margin-bottom: 15px;">
+
+        <!-- Auto-Enhance Toggle Checkbox -->
+        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 15px;">
+            <input type="checkbox" id="autoEnhanceToggle" checked style="width: 18px; height: 18px; accent-color: #2563eb; cursor: pointer;">
+            <label for="autoEnhanceToggle" style="color: #e5e7eb; font-size: 13px; cursor: pointer;">
+                ✨ Silence ပြီးလျှင် အသံအရည်အသွေး (Enhance) ဆက်လုပ်ရန်
+            </label>
+        </div>
+
+        <button onclick="processSilenceRemoval()" style="width: 100%; background: #2563eb; color: white; border: none; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer;">
+            Silence ဖြတ်မည် & လုပ်ဆောင်မည်
+        </button>
         
-        <!-- 1. Silence Removal Card -->
-        <div class="card" style="background: #111827; padding: 20px; border-radius: 12px; border: 1px solid #1f2937; margin-bottom: 20px;">
-            <h3 style="color: #60a5fa; margin-bottom: 8px;">✂️ Auto Silence Removal</h3>
-            <p style="color: #9ca3af; font-size: 13px; margin-bottom: 15px;">အသံဖိုင်ထဲက အသံတိတ်နေတဲ့ နေရာတွေကို အလိုအလျောက် ဖြတ်ထုတ်ပေးသည်</p>
+        <!-- Silence Result Player -->
+        <div id="silenceResult" style="display: none; margin-top: 15px;">
+            <audio id="silencePlayer" controls style="width: 100%; margin-bottom: 10px;"></audio>
+            <a id="downloadSilenceLink" style="background: #10b981; color: white; padding: 10px; border-radius: 8px; text-decoration: none; font-size: 13px; font-weight: bold; display: block; text-align: center;">
+                💾 Silence ဖြတ်ပြီးသားဖိုင် ဒေါင်းလုဒ်လုပ်ရန်
+            </a>
+        </div>
+    </div>
 
-            <input type="file" id="audioFileInput" accept="audio/*" style="width: 100%; color: #fff; margin-bottom: 15px;">
+    <!-- 2. Audio Enhancer Card (Pipeline Connected) -->
+    <div id="enhancerCard" class="card" style="margin-top: 20px; background: #111827; padding: 20px; border-radius: 12px; border: 1px solid #1f2937;">
+        <h3 style="color: #60a5fa; margin-bottom: 8px;">✨ Audio Enhancer (Studio Quality)</h3>
+        <p style="color: #9ca3af; font-size: 13px; margin-bottom: 15px;">အသံဖိုင်ကို ပိုမိုကြည်လင်ပြည့်ဝစေပြီး ဗြူသံများကို လျှော့ချပေးသည်</p>
 
-            <!-- Auto-Enhance Toggle Checkbox -->
-            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 15px;">
-                <input type="checkbox" id="autoEnhanceToggle" checked style="width: 18px; height: 18px; accent-color: #2563eb; cursor: pointer;">
-                <label for="autoEnhanceToggle" style="color: #e5e7eb; font-size: 13px; cursor: pointer;">
-                    ✨ Silence ပြီးလျှင် အသံအရည်အသွေး (Enhance) ဆက်လုပ်ရန်
-                </label>
-            </div>
-
-            <button onclick="processSilenceRemoval()" style="width: 100%; background: #2563eb; color: white; border: none; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer;">
-                Silence ဖြတ်မည် & လုပ်ဆောင်မည်
-            </button>
-            
-            <!-- Silence Result Player -->
-            <div id="silenceResult" style="display: none; margin-top: 15px;">
-                <audio id="silencePlayer" controls style="width: 100%; margin-bottom: 10px;"></audio>
-                <a id="downloadSilenceLink" style="background: #10b981; color: white; padding: 10px; border-radius: 8px; text-decoration: none; font-size: 13px; font-weight: bold; display: block; text-align: center;">
-                    💾 Silence ဖြတ်ပြီးသားဖိုင် ဒေါင်းလုဒ်လုပ်ရန်
-                </a>
-            </div>
+        <div style="margin-bottom: 15px;">
+            <label style="color: #d1d5db; font-size: 14px;">🔊 Voice Clarity & Boost: <span id="boostValue">1.5</span>x</label>
+            <input type="range" id="boostSlider" min="1" max="3" step="0.1" value="1.5" style="width: 100%; margin-top: 8px;">
         </div>
 
-        <!-- 2. Audio Enhancer Card (Pipeline Connected) -->
-        <div id="enhancerCard" class="card" style="background: #111827; padding: 20px; border-radius: 12px; border: 1px solid #1f2937;">
-            <h3 style="color: #60a5fa; margin-bottom: 8px;">✨ Audio Enhancer (Studio Quality)</h3>
-            <p style="color: #9ca3af; font-size: 13px; margin-bottom: 15px;">အသံဖိုင်ကို ပိုမိုကြည်လင်ပြည့်ဝစေပြီး ဗြူသံများကို လျှော့ချပေးသည်</p>
+        <button onclick="enhanceProcessedAudio()" style="width: 100%; background: #7c3aed; color: white; border: none; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer;">
+            ✨ အသံအရည်အသွေး မြှင့်တင်မည် (Enhance)
+        </button>
 
-            <div style="margin-bottom: 15px;">
-                <label style="color: #d1d5db; font-size: 14px;">🔊 Voice Clarity & Boost: <span id="boostValue">1.5</span>x</label>
-                <input type="range" id="boostSlider" min="1" max="3" step="0.1" value="1.5" style="width: 100%; margin-top: 8px;">
-            </div>
-
-            <button onclick="enhanceProcessedAudio()" style="width: 100%; background: #7c3aed; color: white; border: none; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer;">
-                ✨ အသံအရည်အသွေး မြှင့်တင်မည် (Enhance)
-            </button>
-
-            <!-- Enhanced Result Player -->
-            <div id="enhancedResult" style="display: none; margin-top: 15px;">
-                <audio id="enhancedPlayer" controls style="width: 100%; margin-bottom: 10px;"></audio>
-                <a id="downloadEnhancedLink" style="background: #10b981; color: white; padding: 10px; border-radius: 8px; text-decoration: none; font-size: 13px; font-weight: bold; display: block; text-align: center;">
-                    💾 စတူဒီယို အသံဖိုင်ကို ဒေါင်းလုဒ်လုပ်ရန်
-                </a>
-            </div>
+        <!-- Enhanced Result Player -->
+        <div id="enhancedResult" style="display: none; margin-top: 15px;">
+            <audio id="enhancedPlayer" controls style="width: 100%; margin-bottom: 10px;"></audio>
+            <a id="downloadEnhancedLink" style="background: #10b981; color: white; padding: 10px; border-radius: 8px; text-decoration: none; font-size: 13px; font-weight: bold; display: block; text-align: center;">
+                💾 စတူဒီယို အသံဖိုင်ကို ဒေါင်းလုဒ်လုပ်ရန်
+            </a>
         </div>
-
     </div>
 </div>
-
 
 <!-- AI Script & Movie Director အစုံလိုက် View -->
 <div id="aiScriptView" class="view-container" style="display: none; padding: 16px;">
