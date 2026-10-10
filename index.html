@@ -313,19 +313,25 @@ cursor:pointer;
     </h2>
 </div>
 
-<div class="setting-card">
-    <h3>Auto Silence Removal</h3>
-    <p>အသံဖိုင်ထဲက အသံတိတ်နေတဲ့ နေရာတွေကို အလိုအလျောက် ဖြတ်ထုတ်ပေးသည်</p>
+<!-- Settings View Container -->
+<div id="settings-view" class="view-container" style="display: none; padding: 20px; color: white;">
+    <h2>Settings</h2>
     
-    <!-- အသံဖိုင်တင်ရန် (သို့မဟုတ် ရှိပြီးသား audio variable နဲ့ ချိတ်ရန်) -->
-    <input type="file" id="audioFileInput" accept="audio/*">
-    
-    <!-- လုပ်ဆောင်ရန် ခလုတ် -->
-    <button id="processAudioBtn" class="btn-primary">Silence ဖြတ်မည် & ဒေါင်းလုဒ်ဆွဲမည်</button>
-    
-    <!-- ရလဒ် အသံဖိုင်နားထောင်ရန်နှင့် ဒေါင်းလုဒ်ဆွဲရန် -->
-    <audio id="outputAudio" controls style="display:none; margin-top:10px; width:100%;"></audio>
-    <a id="downloadAudioLink" style="display:none; margin-top:10px;" class="btn-download">💾 ရှင်းလင်းထားသော အသံဖိုင်ကို ဒေါင်းလုဒ်လုပ်ရန်</a>
+    <div class="setting-card" style="margin-top: 20px; background: rgba(255,255,255,0.05); padding: 15px; border-radius: 8px;">
+        <h3>Auto Silence Removal</h3>
+        <p style="font-size: 14px; opacity: 0.8;">အသံဖိုင်ထဲက အသံတိတ်နေတဲ့ နေရာတွေကို အလိုအလျောက် ဖြတ်ထုတ်ပေးသည်</p>
+        
+        <!-- အသံဖိုင်တင်ရန် -->
+        <input type="file" id="audioFileInput" accept="audio/*" style="margin: 10px 0;">
+        <br>
+        <!-- လုပ်ဆောင်ရန် ခလုတ် -->
+        <button id="processAudioBtn" class="btn-primary" style="padding: 10px 15px; background: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer;">Silence ဖြတ်မည် & ဒေါင်းလုဒ်ဆွဲမည်</button>
+        
+        <!-- ရလဒ် အသံဖိုင်နားထောင်ရန်နှင့် ဒေါင်းလုဒ်ဆွဲရန် -->
+        <audio id="outputAudio" controls style="display:none; margin-top:15px; width:100%;"></audio>
+        <br>
+        <a id="downloadAudioLink" style="display:none; margin-top:15px; color: #4CAF50; font-weight: bold; text-decoration: none;" download="cleaned_voiceover.wav">💾 ရှင်းလင်းထားသော အသံဖိုင်ကို ဒေါင်းလုဒ်လုပ်ရန်</a>
+    </div>
 </div>
 
 <!-- =====================================================
