@@ -313,6 +313,20 @@ cursor:pointer;
     </h2>
 </div>
 
+<div class="setting-card">
+    <h3>Auto Silence Removal</h3>
+    <p>အသံဖိုင်ထဲက အသံတိတ်နေတဲ့ နေရာတွေကို အလိုအလျောက် ဖြတ်ထုတ်ပေးသည်</p>
+    
+    <!-- အသံဖိုင်တင်ရန် (သို့မဟုတ် ရှိပြီးသား audio variable နဲ့ ချိတ်ရန်) -->
+    <input type="file" id="audioFileInput" accept="audio/*">
+    
+    <!-- လုပ်ဆောင်ရန် ခလုတ် -->
+    <button id="processAudioBtn" class="btn-primary">Silence ဖြတ်မည် & ဒေါင်းလုဒ်ဆွဲမည်</button>
+    
+    <!-- ရလဒ် အသံဖိုင်နားထောင်ရန်နှင့် ဒေါင်းလုဒ်ဆွဲရန် -->
+    <audio id="outputAudio" controls style="display:none; margin-top:10px; width:100%;"></audio>
+    <a id="downloadAudioLink" style="display:none; margin-top:10px;" class="btn-download">💾 ရှင်းလင်းထားသော အသံဖိုင်ကို ဒေါင်းလုဒ်လုပ်ရန်</a>
+</div>
 
 <!-- =====================================================
      GEMINI API
