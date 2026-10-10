@@ -715,88 +715,94 @@ cursor:pointer;
         </div> <!-- /voice-card-container -->
     </div> <!-- /section -->
 </div> <!-- /singleTab အဆုံး -->
-  
-<!-- PAGE 2: MULTI-VOICE (Neon UI) -->
+
+  <!-- PAGE 2: MULTI-VOICE (Neon UI) -->
 <div id="multiTab" class="page-content" style="display: none;">
+    <div class="section" style="padding: 12px;">
+        
+        <!-- Neon Card Container -->
+        <div class="voice-card-container" style="background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(0, 210, 255, 0.35); border-radius: 16px; padding: 16px; box-shadow: 0 0 25px rgba(0, 210, 255, 0.15); backdrop-filter: blur(14px); margin-bottom: 20px;">
 
-        <!-- Card Header -->
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 12px;">
-            <div style="display: flex; align-items: center; gap: 10px;">
-                <div style="width: 32px; height: 32px; background: rgba(0,210,255,0.15); border-radius: 10px; display: flex; align-items: center; justify-content: center; color: #00d2ff;">
-                    <i class="fa-solid fa-users-gear"></i>
+            <!-- Card Header -->
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 12px;">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <div style="width: 32px; height: 32px; background: rgba(0,210,255,0.15); border-radius: 10px; display: flex; align-items: center; justify-content: center; color: #00d2ff;">
+                        <i class="fa-solid fa-users-gear"></i>
+                    </div>
+                    <div>
+                        <h3 style="font-size: 15px; color: #fff; margin: 0;">Multi-Voice Studio</h3>
+                        <div style="font-size: 11px; color: #8b9bb4;">စကားပြော block တစ်ခုချင်းစီအတွက် Speaker သီးသန့်ရွေးပါ</div>
+                    </div>
                 </div>
-                <div>
-                    <h3 style="font-size: 15px; color: #fff; margin: 0;">Multi-Voice Studio</h3>
-                    <div style="font-size: 11px; color: #8b9bb4;">စကားပြော block တစ်ခုချင်းစီအတွက် Speaker သီးသန့်ရွေးပါ</div>
-                </div>
+                <span style="background: rgba(0,210,255,0.15); color: #00d2ff; padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: bold; border: 1px solid rgba(0,210,255,0.3);">Multi-Mode</span>
             </div>
-            <span style="background: rgba(0,210,255,0.15); color: #00d2ff; padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: bold; border: 1px solid rgba(0,210,255,0.3);">Multi-Mode</span>
-        </div>
 
-        <!-- Dynamic Speech Blocks Container -->
-        <div id="speechBlocksContainer">
-            <!-- Dynamic Speech Blocks will appear here -->
-        </div>
+            <!-- Dynamic Speech Blocks Container -->
+            <div id="speechBlocksContainer">
+                <!-- Dynamic Speech Blocks will appear here -->
+            </div>
 
-        <!-- Add Block Button -->
-        <button id="addBlockBtn" onclick="addSpeechBlock()" style="width: 100%; padding: 12px; background: rgba(0,210,255,0.1); border: 1px dashed rgba(0,210,255,0.4); border-radius: 12px; color: #00d2ff; font-weight: bold; cursor: pointer; margin-bottom: 15px; font-size: 13px; transition: 0.2s;">
-            + Add Speech Block (1)
-        </button>
+            <!-- Add Block Button -->
+            <button id="addBlockBtn" onclick="addSpeechBlock()" style="width: 100%; padding: 12px; background: rgba(0,210,255,0.1); border: 1px dashed rgba(0,210,255,0.4); border-radius: 12px; color: #00d2ff; font-weight: bold; cursor: pointer; margin-bottom: 15px; font-size: 13px; transition: 0.2s;">
+                + Add Speech Block (1)
+            </button>
 
-        <!-- Voice Speed Section -->
-        <div style="margin-bottom: 18px;">
-            <label style="display: flex; justify-content: space-between; margin-bottom: 6px; color: #b7d5ee; font-size: 13px;">
-                <span>⚡ Voice Speed</span>
-                <span id="speedVal" style="color: #00baff; font-weight: bold;">1.0x</span>
-            </label>
-            <input type="range" id="speedSlider" min="0.5" max="2.0" step="0.1" value="1.0" oninput="updateSpeed(this.value)" style="width: 100%; accent-color: #00d2ff; cursor: pointer;">
-        </div>
+            <!-- Voice Speed Section -->
+            <div style="margin-bottom: 18px;">
+                <label style="display: flex; justify-content: space-between; margin-bottom: 6px; color: #b7d5ee; font-size: 13px;">
+                    <span>⚡ Voice Speed</span>
+                    <span id="speedVal" style="color: #00baff; font-weight: bold;">1.0x</span>
+                </label>
+                <input type="range" id="speedSlider" min="0.5" max="2.0" step="0.1" value="1.0" oninput="updateSpeed(this.value)" style="width: 100%; accent-color: #00d2ff; cursor: pointer;">
+            </div>
 
-        <!-- Generate Button -->
-        <button id="generateBtn" onclick="generateVoice()" style="width: 100%; padding: 14px; background: linear-gradient(135deg, #00c6ff, #0072ff); border: none; border-radius: 14px; color: #fff; font-weight: bold; font-size: 14px; cursor: pointer; box-shadow: 0 4px 15px rgba(0,114,255,0.4);">
-            🔊 Generate Multi-Voice Audio
-        </button>
-        
-        <div id="generateMessage" class="message" style="margin-top: 10px; font-size: 12px; text-align: center;"></div>
+            <!-- Generate Button -->
+            <button id="generateBtn" onclick="generateVoice()" style="width: 100%; padding: 14px; background: linear-gradient(135deg, #00c6ff, #0072ff); border: none; border-radius: 14px; color: #fff; font-weight: bold; font-size: 14px; cursor: pointer; box-shadow: 0 4px 15px rgba(0,114,255,0.4);">
+                🔊 Generate Multi-Voice Audio
+            </button>
+            
+            <div id="generateMessage" class="message" style="margin-top: 10px; font-size: 12px; text-align: center;"></div>
 
-        <!-- Result Section -->
-        <div id="result" class="result" style="margin-top: 15px; background: rgba(5, 15, 30, 0.6); border: 1px solid rgba(0,210,255,0.2); border-radius: 14px; padding: 12px; display: none;">
-            <strong style="color: #00d2ff; font-size: 12px; display: block; margin-bottom: 8px;">🎧 Generated Voice</strong>
-            <audio id="audioPlayer" controls style="width: 100%; height: 36px; margin-bottom: 8px;"></audio>
-            <a id="downloadBtn" class="download" style="display: block; text-align: center; background: rgba(0,210,255,0.15); color: #00d2ff; padding: 8px; border-radius: 10px; text-decoration: none; font-size: 12px; font-weight: bold;" onclick="triggerDownload(event)">⬇️ Download Voice</a>
-        </div>
+            <!-- Result Section -->
+            <div id="result" class="result" style="margin-top: 15px; background: rgba(5, 15, 30, 0.6); border: 1px solid rgba(0,210,255,0.2); border-radius: 14px; padding: 12px; display: none;">
+                <strong style="color: #00d2ff; font-size: 12px; display: block; margin-bottom: 8px;">🎧 Generated Voice</strong>
+                <audio id="audioPlayer" controls style="width: 100%; height: 36px; margin-bottom: 8px;"></audio>
+                <a id="downloadBtn" class="download" style="display: block; text-align: center; background: rgba(0,210,255,0.15); color: #00d2ff; padding: 8px; border-radius: 10px; text-decoration: none; font-size: 12px; font-weight: bold;" onclick="triggerDownload(event)">⬇️ Download Voice</a>
+            </div>
 
-    <!-- Modal Popup Window (Global Style အတွက်) -->
-    <div id="styleModalOverlay" class="style-modal-overlay">
-      <div class="style-modal-content">
-        <div class="style-modal-header">
-          <h3>🎛️ Select Global Voice Style</h3>
-          <span class="style-close-btn" onclick="closeStyleModal()">&times;</span>
-        </div>
-        
-        <div class="style-modal-cards">
-          <div class="modal-style-card" onclick="selectStyleOption(this, 'Natural Dialogue - သဘာဝကျကျ', 'Speak naturally and clearly as a movie narrator.')">
-            <h4>Natural Dialogue</h4>
-            <p>သဘာဝကျကျ စကားပြောဟန်</p>
-          </div>
-          <div class="modal-style-card active" onclick="selectStyleOption(this, 'Warm - နွေးထွေးစွာ', 'Speak warmly and gently as a narrator.')">
-            <h4>Warm (နွေးထွေးစွာ)</h4>
-            <p>နွေးထွေးယုယသော စကားပြောအသံ</p>
-          </div>
-          <div class="modal-style-card" onclick="selectStyleOption(this, 'Movie Dialogue - ဇာတ်လမ်းပုံစံ', 'Speak like a dramatic movie narrator.')">
-            <h4>Movie Dialogue</h4>
-            <p>Movie Recap နှင့် ဇာတ်လမ်းပြောပြသည့် ပုံစံ</p>
-          </div>
-          <div class="modal-style-card" onclick="selectStyleOption(this, 'Excited -စိတ်လှုပ်ရှားစွာ', 'Speak with excitement and high energy.')">
-            <h4>Excited</h4>
-            <p>စိတ်လှုပ်ရှား တက်ကြွသော အသံ</p>
-          </div>
-        </div>
-      </div>
-    </div>
-</div>
-   </div>
-  </div>
+            <!-- Modal Popup Window (Global Style အတွက်) -->
+            <div id="styleModalOverlay" class="style-modal-overlay">
+              <div class="style-modal-content">
+                <div class="style-modal-header">
+                  <h3>🎛️ Select Global Voice Style</h3>
+                  <span class="style-close-btn" onclick="closeStyleModal()">&times;</span>
+                </div>
+                
+                <div class="style-modal-cards">
+                  <div class="modal-style-card" onclick="selectStyleOption(this, 'Natural Dialogue - သဘာဝကျကျ', 'Speak naturally and clearly as a movie narrator.')">
+                    <h4>Natural Dialogue</h4>
+                    <p>သဘာဝကျကျ စကားပြောဟန်</p>
+                  </div>
+                  <div class="modal-style-card active" onclick="selectStyleOption(this, 'Warm - နွေးထွေးစွာ', 'Speak warmly and gently as a narrator.')">
+                    <h4>Warm (နွေးထွေးစွာ)</h4>
+                    <p>နွေးထွေးယုယသော စကားပြောအသံ</p>
+                  </div>
+                  <div class="modal-style-card" onclick="selectStyleOption(this, 'Movie Dialogue - ဇာတ်လမ်းပုံစံ', 'Speak like a dramatic movie narrator.')">
+                    <h4>Movie Dialogue</h4>
+                    <p>Movie Recap နှင့် ဇာတ်လမ်းပြောပြသည့် ပုံစံ</p>
+                  </div>
+                  <div class="modal-style-card" onclick="selectStyleOption(this, 'Excited -စိတ်လှုပ်ရှားစွာ', 'Speak with excitement and high energy.')">
+                    <h4>Excited</h4>
+                    <p>စိတ်လှုပ်ရှား တက်ကြွသော အသံ</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+        </div> <!-- /voice-card-container -->
+    </div> <!-- /section -->
+</div> <!-- /multiTab အဆုံး -->
+
 <!-- =========================================================
      SH ASSET HUB
      FREE / PRO
