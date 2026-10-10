@@ -3665,6 +3665,7 @@ ${flowPromptText}`;
         console.error('Copy Error:', err);
     });
 }
+
 document.getElementById('processAudioBtn').addEventListener('click', async () => {
     const fileInput = document.getElementById('audioFileInput');
     if (fileInput.files.length === 0) {
@@ -3705,9 +3706,12 @@ document.getElementById('processAudioBtn').addEventListener('click', async () =>
         nonSilentChunks.push({ start: start, end: channelData.length });
     }
 
-    // အသံအပိုင်းအစများကို ပြန်လည်စုစည်းခြင်း
+    // အသံအပိုင်းအစများကို ပြန်လည်စုစည်းခြင်း (Fade-in / Fade-out ဖြင့် "ဖောက်" သံပျောက်အောင် ပြုလုပ်ခြင်း)
     let totalLength = nonSilentChunks.reduce((acc, chunk) => acc + (chunk.end - chunk.start), 0);
     const newAudioBuffer = audioCtx.createBuffer(audioBuffer.numberOfChannels, totalLength, sampleRate);
+
+    // ကလစ်သံမမြည်စေရန် အလွန်တိုသော ချိန်ညှိချက် (ဥပမာ: 5ms)
+    const fadeSamples = Math.floor(sampleRate * 0.005); 
 
     for (let channel = 0; channel < audioBuffer.numberOfChannels; channel++) {
         let newChannelData = newAudioBuffer.getChannelData(channel);
@@ -3716,7 +3720,27 @@ document.getElementById('processAudioBtn').addEventListener('click', async () =>
         
         nonSilentChunks.forEach(chunk => {
             let length = chunk.end - chunk.start;
-            newChannelData.set(sourceData.subarray(chunk.start, chunk.end), offset);
+            
+            // Chunk တစ်ခုချင်းစီကို ယာယီကူးယူမည်
+            let chunkData = sourceData.subarray(chunk.start, chunk.end);
+            
+            // အစမှာ Fade-in ထည့်မည်
+            for (let f = 0; f < fadeSamples && f < length; f++) {
+                let gain = f / fadeSamples;
+                newChannelData[offset + f] = chunkData[f] * gain;
+            }
+            
+            // အလယ်ပိုင်း ပုံမှန်ဒေတာများကို ထည့်မည်
+            for (let f = fadeSamples; f < length - fadeSamples; f++) {
+                newChannelData[offset + f] = chunkData[f];
+            }
+            
+            // အဆုံးမှာ Fade-out ထည့်မည်
+            for (let f = Math.max(0, length - fadeSamples); f < length; f++) {
+                let gain = (length - f) / fadeSamples;
+                newChannelData[offset + f] = chunkData[f] * gain;
+            }
+
             offset += length;
         });
     }
@@ -3735,7 +3759,7 @@ document.getElementById('processAudioBtn').addEventListener('click', async () =>
     downloadLink.download = 'cleaned_voiceover.wav';
     downloadLink.style.display = 'inline-block';
     
-    alert('အသံတိတ်ကွက်များ အောင်မြင်စွာ ဖယ်ရှားပြီးပါပြီ သားရီး!');
+    alert('အသံတိတ်ကွက်များ ဖယ်ရှားပြီး ကလစ်သံများ ကင်းစင်အောင် ပြုလုပ်ပြီးပါပြီ သားရီး!');
 });
 
 // AudioBuffer ကို WAV Blob သို့ ပြောင်းပေးသည့် Helper Function
