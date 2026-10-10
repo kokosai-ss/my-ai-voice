@@ -2339,8 +2339,7 @@ function addSpeechBlock(initialText = "", selectedSpeaker = "Charon") {
         <div class="block-card-header">
             <span class="block-card-title">💬 <span class="block-number-text">Speech Block (1)</span></span>
         </div>
-        <div class="block-card-body">
-            <div class="mic-avatar-circle">🎙️</div>
+        <div class="block-card-body">   
             <div style="flex:1; width:100%;">
                 <label style="display:block; font-size:12px; color:#8eb0cb; margin-bottom:6px;">Speaker Voice ရွေးရန်:</label>
                 <div class="speaker-select-trigger" onclick="openVoicePicker(${blockCounter})">
