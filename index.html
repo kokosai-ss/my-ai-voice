@@ -488,6 +488,31 @@ cursor:pointer;
 </a>
     </div>
 </div>
+  <!-- Audio Enhancer Card -->
+<div class="card" style="margin-top: 20px; background: #111827; padding: 20px; border-radius: 12px; border: 1px solid #1f2937;">
+    <h3 style="color: #60a5fa; margin-bottom: 8px;">✨ Audio Enhancer (Studio Quality)</h3>
+    <p style="color: #9ca3af; font-size: 13px; margin-bottom: 15px;">အသံဖိုင်ကို ပိုမိုကြည်လင်ပြည့်ဝစေပြီး ဗြူသံများကို လျှော့ချပေးပါသည်</p>
+
+    <!-- Boost Level Slider -->
+    <div style="margin-bottom: 15px;">
+        <label style="color: #d1d5db; font-size: 14px;">🔊 Voice Clarity & Boost: <span id="boostValue">1.5</span>x</label>
+        <input type="range" id="boostSlider" min="1" max="3" step="0.1" value="1.5" style="width: 100%; margin-top: 8px;">
+    </div>
+
+    <!-- Enhance Button -->
+    <button id="enhanceBtn" onclick="enhanceAudio()" style="width: 100%; background: #2563eb; color: white; border: none; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer;">
+        ✨ အသံအရည်အသွေး မြှင့်တင်မည်
+    </button>
+
+    <!-- Result Audio Player -->
+    <div id="enhancedResult" style="display: none; margin-top: 15px; text-align: center;">
+        <audio id="enhancedPlayer" controls style="width: 100%; margin-bottom: 10px;"></audio>
+        <a id="downloadEnhancedLink" style="background: #10b981; color: white; padding: 10px 16px; border-radius: 8px; text-decoration: none; font-size: 14px; font-weight: bold; display: inline-flex; align-items: center; justify-content: center; gap: 6px; width: 100%; text-align: center;">
+            💾 ကြည်လင်သော အသံဖိုင်ကို ဒေါင်းလုဒ်လုပ်ရန်
+        </a>
+    </div>
+</div>
+
 
 <!-- AI Script & Movie Director အစုံလိုက် View -->
 <div id="aiScriptView" class="view-container" style="display: none; padding: 16px;">
