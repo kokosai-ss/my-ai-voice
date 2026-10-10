@@ -1457,6 +1457,24 @@ body{
     color:#eaf6ff;
     min-height:100vh;
 }
+/* Multi-Voice Speech Block Card (Single Voice လို သပ်ရပ်စေရန်) */
+.speech-block-card, .voice-card-container {
+  background: rgba(13, 27, 42, 0.75);
+  border: 1px solid rgba(0, 210, 255, 0.3);
+  border-radius: 20px;
+  padding: 18px;
+  margin-bottom: 15px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(12px);
+}
+
+/* အတွင်းခံ Card ပုံစံ နှစ်ထပ်ကွမ်း ဒီဇိုင်း */
+.speech-block-inner-card {
+  background: rgba(10, 15, 30, 0.45);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 14px;
+  padding: 14px;
+}
 
 /* HEADER & SIDEBAR STYLES */
 .app-header {
