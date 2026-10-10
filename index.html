@@ -535,22 +535,27 @@ cursor:pointer;
             </div>
         </div>
     </div>
-
 <!-- 2. MOVIE DIRECTOR SUB-SECTION -->
 <div id="subSectionMulti" style="display: none;">
-    <div style="background: rgba(13, 27, 42, 0.75); backdrop-filter: blur(12px); border: 1px solid rgba(34, 211, 238, 0.35); border-radius: 16px; padding: 20px; box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);">
+    <div style="background: rgba(13, 27, 42, 0.6); border: 1px solid rgba(0, 210, 255, 0.2); border-radius: 16px; padding: 18px; margin-bottom: 20px;">
         
-        <!-- Header Status -->
+        <!-- Movie Director Card Header & Setting Button -->
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-            <span style="color: #67e8f9; font-size: 13px; font-weight: bold;"><i class="fa-solid fa-clapperboard"></i> AI Script & Movie Director</span>
-            <span id="memoryStatus" style="font-size: 10px; color: #10b981; background: rgba(16, 185, 129, 0.15); padding: 3px 8px; border-radius: 10px; border: 1px solid rgba(16, 185, 129, 0.3);">
-                <i class="fa-solid fa-database"></i> Memory: Ready
-            </span>
+            <!-- ဘယ်ဘက် Header Status -->
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <span style="color: #67e8f9; font-size: 14px; font-weight: bold;">🎬 Movie Director</span>
+            </div>
+            
+            <!-- Setting / Menu Icon Button -->
+            <button type="button" onclick="openSettingsMenu()" style="background: rgba(0,210,255,0.15); border: 1px solid rgba(0,210,255,0.3); color: #00d2ff; width: 34px; height: 34px; border-radius: 10px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s;">
+                <i class="fa-solid fa-gear" style="font-size: 14px;"></i>
+            </button>
         </div>
 
         <p style="color: #94a3b8; font-size: 12px; margin-bottom: 16px; line-height: 1.4;">
             ဇာတ်လမ်း Idea ပေးလိုက်ရုံနဲ့ အသီးလူသား၊ Fantasy နဲ့ ကြိုက်တဲ့ အကြောင်းအရာမဆို Scene အစဉ်လိုက်၊ မြန်မာစကားပြောနဲ့ Eng Video Prompt များကို ထုတ်ပေးပါမည်။
         </p>
+
 
         <!-- Movie Idea Input -->
         <div style="margin-bottom: 15px;">
@@ -636,6 +641,7 @@ cursor:pointer;
         </div>
     </div>
 </div>
+  
 
 <div id="voiceStudio" class="view-container" style="display: none;">
         <!-- 1. အပြင်ဘက်မှာ အမြဲပေါ်နေမယ့် Header နဲ့ Tab ခလုတ်များ -->
