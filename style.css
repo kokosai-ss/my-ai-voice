@@ -1450,6 +1450,7 @@ body {
     display: none;
 }
 
+/* Body Animation & Background */
 body {
     font-family: Arial, "Noto Sans Myanmar", "Pyidaungsu", sans-serif;
     background: radial-gradient(circle at top, #123b70 0%, #061426 42%, #020914 100%);
@@ -1457,6 +1458,16 @@ body {
     min-height: 100vh;
     margin: 0;
     padding: 0;
+}
+
+/* Neon Blue Glowing Placeholder */
+.speech-textarea::placeholder {
+    color: rgba(0, 243, 255, 0.5);
+    text-shadow: 0 0 8px rgba(0, 243, 255, 0.4);
+}
+
+.speech-textarea:focus {
+    box-shadow: 0 0 15px rgba(0, 243, 255, 0.3);
 }
 
 /* Multi-Voice Speech Block Card - တစ်ထပ်တည်းကျပြီး သပ်ရပ်သော နှစ်ထပ်ကွမ်းဘောင် ဒီဇိုင်း */
@@ -1556,7 +1567,6 @@ body {
 .hidden {
     display: none;
 }
-
 
 /* HEADER & SIDEBAR STYLES */
 .app-header {
