@@ -2320,7 +2320,6 @@ function addSpeechBlock(initialText = "", selectedSpeaker = "Charon") {
     
     const blockDiv = document.createElement("div");
     blockDiv.className = "speech-block-card voice-card-container";
-    blockDiv.style.cssText = "background: rgba(13, 27, 42, 0.75); border: 1px solid rgba(0, 210, 255, 0.3); border-radius: 20px; padding: 18px; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5); backdrop-filter: blur(12px); margin-bottom: 15px;";
     
     blockCounter++;
     blockDiv.id = `speechBlock_${blockCounter}`;
