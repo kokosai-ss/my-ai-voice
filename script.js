@@ -420,6 +420,22 @@ function confirmClearScript() {
     closeScriptMenu();
 }
 
+// 1. စာရိုက်နေစဉ် သို့မဟုတ် ပြောင်းလဲမှုရှိတိုင်း အလိုအလျောက် LocalStorage ထဲ သိမ်းပေးမည့် Auto-save function
+const scriptInputBox = document.getElementById('scriptTextInput') || document.querySelector('textarea');
+
+if (scriptInputBox) {
+    // Page ပွင့်လာရင် သိမ်းထားတာရှိရင် ပြန်ပေါ်လာစေရန်
+    const savedAutoCopy = localStorage.getItem('auto_saved_script');
+    if (savedAutoCopy && !scriptInputBox.value) {
+        scriptInputBox.value = savedAutoCopy;
+    }
+
+    // စာရိုက်တိုင်း အလိုအလျောက် မှတ်သွားရန်
+    scriptInputBox.addEventListener('input', function() {
+        localStorage.setItem('auto_saved_script', scriptInputBox.value);
+    });
+}
+
 let activePickerTarget = null; // 'single' or block ID number
 let singleVoiceValue = "Charon";
 let currentAudioBlob = null;
