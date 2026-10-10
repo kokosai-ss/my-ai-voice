@@ -3836,26 +3836,56 @@ function bufferToWave(abuffer, len) {
 
     return new Blob([buffer], { type: "audio/wav" });
 }
-// Slider Value ပြောင်းရင် စာသားပါလိုက်ပြောင်းရန်
+let processedAudioBlob = null; // Silence ပြီးသွားသော Blob ဖိုင်ကို သိမ်းရန်
+
+// Slider Value ပြောင်းရင် စာသားပြောင်းရန်
 document.getElementById('boostSlider').addEventListener('input', function(e) {
     document.getElementById('boostValue').innerText = e.target.value;
 });
 
-async function enhanceAudio() {
-    // Silence ဖြတ်ထားတဲ့ အသံဖိုင် သို့မဟုတ် တင်ထားတဲ့ အသံဖိုင်ကို ယူမည်
-    const fileInput = document.getElementById('audioFileInput'); // သားရီးရဲ့ File Input ID ထည့်ပါ
-    if (!fileInput || !fileInput.files[0]) {
+// 1. Silence Removal လုပ်ဆောင်သည့် Function (Placeholder/Existing logic)
+async function processSilenceRemoval() {
+    const fileInput = document.getElementById('audioFileInput');
+    if (!fileInput.files[0]) {
         alert('ကျေးဇူးပြု၍ အသံဖိုင်တစ်ခု ရွေးချယ်ပေးပါ သားရီး!');
         return;
     }
 
     const file = fileInput.files[0];
-    const arrayBuffer = await file.arrayBuffer();
     
+    // (ဤနေရာတွင် သားရီးရဲ့ မူလ Silence Removal ကုဒ်များကို ထည့်ပါ)
+    // ဥပမာအနေဖြင့် Original File ကို ခေတ္တသုံးထားပါသည်:
+    processedAudioBlob = file; 
+
+    // UI တွင် Player ပြရန်
+    const audioUrl = URL.createObjectURL(file);
+    const player = document.getElementById('silencePlayer');
+    player.src = audioUrl;
+    
+    const downloadLink = document.getElementById('downloadSilenceLink');
+    downloadLink.href = audioUrl;
+    downloadLink.download = "SilenceRemoved_" + file.name;
+    
+    document.getElementById('silenceResult').style.display = 'block';
+
+    // Auto-Enhance Toggle ဖွင့်ထားပါက အလိုအလျောက် Enhance ဆက်လုပ်မည်
+    const isAutoEnhance = document.getElementById('autoEnhanceToggle').checked;
+    if (isAutoEnhance) {
+        await enhanceProcessedAudio();
+    }
+}
+
+// 2. Audio Enhancer လုပ်ဆောင်သည့် Function
+async function enhanceProcessedAudio() {
+    if (!processedAudioBlob) {
+        alert('ကျေးဇူးပြု၍ ပထမဦးစွာ အသံဖိုင် တင်ပြီး Silence ဖြတ်ပါ။');
+        return;
+    }
+
+    const arrayBuffer = await processedAudioBlob.arrayBuffer();
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     const audioBuffer = await audioCtx.decodeAudioData(arrayBuffer);
 
-    // Offline Audio Context ဖြင့် Audio Processing လုပ်ခြင်း
     const offlineCtx = new OfflineAudioContext(
         audioBuffer.numberOfChannels,
         audioBuffer.length,
@@ -3865,32 +3895,29 @@ async function enhanceAudio() {
     const source = offlineCtx.createBufferSource();
     source.buffer = audioBuffer;
 
-    // 1. High-pass Filter (မလိုလားအပ်သော ဗြူသံနှိမ့်များကို ဖြတ်ထုတ်ရန်)
+    // High-pass Filter (ဗြူသံရှင်းရန်)
     const highpass = offlineCtx.createBiquadFilter();
     highpass.type = 'highpass';
-    highpass.frequency.value = 80; // 80Hz အောက် ဗြူသံများ ရှင်းမည်
+    highpass.frequency.value = 80;
 
-    // 2. Peaking Filter (လူသံ ထင်းရှားစေမည့် Frequency ကို မြှင့်ရန်)
+    // Peaking Filter (လူသံကြည်လင်ရန်)
     const presence = offlineCtx.createBiquadFilter();
     presence.type = 'peaking';
-    presence.frequency.value = 3000; // 3kHz လူသံ အကြည်လင်ဆုံးနေရာ
+    presence.frequency.value = 3000;
     presence.Q.value = 1;
-    presence.gain.value = 4; // Clarity မြှင့်မည်
+    presence.gain.value = 4;
 
-    // 3. Compressor (အသံတိုး/ကျယ် မျှပေးပြီး Studio အသံဖြစ်စေရန်)
+    // Compressor (အသံပမာဏ ညှိရန်)
     const compressor = offlineCtx.createDynamicsCompressor();
     compressor.threshold.value = -24;
     compressor.knee.value = 30;
     compressor.ratio.value = 12;
-    compressor.attack.value = 0.003;
-    compressor.release.value = 0.25;
 
-    // 4. Gain / Volume Booster (Slider တန်ဖိုးအတိုင်း အသံမြှင့်ရန်)
+    // Gain / Volume Booster
     const boostGain = offlineCtx.createGain();
-    const boostVal = parseFloat(document.getElementById('boostSlider').value);
-    boostGain.gain.value = boostVal;
+    boostGain.gain.value = parseFloat(document.getElementById('boostSlider').value);
 
-    // Audio Nodes များကို ဆက်သွယ်ပေးခြင်း
+    // Nodes ချိတ်ဆက်ခြင်း
     source.connect(highpass);
     highpass.connect(presence);
     presence.connect(compressor);
@@ -3899,28 +3926,22 @@ async function enhanceAudio() {
 
     source.start(0);
 
-    // Process ပြီးသွားပါက WAV ဖိုင်ပြောင်းပြီး Output ထုတ်ပေးခြင်း
     const renderedBuffer = await offlineCtx.startRendering();
     const wavBlob = bufferToWav(renderedBuffer);
-    
-    // Base64 Data URI ပြောင်းပြီး Player နဲ့ Download Link ပေးမည်
-    const reader = new FileReader();
-    reader.readAsDataURL(wavBlob);
-    reader.onloadend = function() {
-        const base64Data = reader.result;
-        
-        const player = document.getElementById('enhancedPlayer');
-        player.src = base64Data;
-        
-        const downloadLink = document.getElementById('downloadEnhancedLink');
-        downloadLink.href = base64Data;
-        downloadLink.download = "Enhanced_" + file.name;
-        
-        document.getElementById('enhancedResult').style.display = 'block';
-    };
+
+    // Enhanced Result ပြသရန်
+    const enhancedUrl = URL.createObjectURL(wavBlob);
+    const enhancedPlayer = document.getElementById('enhancedPlayer');
+    enhancedPlayer.src = enhancedUrl;
+
+    const downloadEnhanced = document.getElementById('downloadEnhancedLink');
+    downloadEnhanced.href = enhancedUrl;
+    downloadEnhanced.download = "Studio_Enhanced_Audio.wav";
+
+    document.getElementById('enhancedResult').style.display = 'block';
 }
 
-// AudioBuffer ကို WAV Blob အဖြစ် ပြောင်းပေးသည့် Helper Function
+// WAV Helper Function
 function bufferToWav(buffer) {
     let numOfChan = buffer.numberOfChannels,
         length = buffer.length * numOfChan * 2 + 44,
@@ -3959,4 +3980,3 @@ function bufferToWav(buffer) {
     }
     return new Blob([out], { type: 'audio/wav' });
 }
-
