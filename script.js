@@ -447,31 +447,24 @@ let singleAudioURL = null;
 let blockCounter = 0;
 
 /* LOCK SCREEN CONTROLS */
-function togglePasswordVisibility() {
-    const input = document.getElementById('passInput');
-    const eyeIcon = document.getElementById('eyeIcon');
-    if (input.type === 'password') {
-        input.type = 'text';
-        if (eyeIcon) {
-            eyeIcon.classList.remove('fa-eye');
-            eyeIcon.classList.add('fa-eye-slash');
-        }
-    } else {
-        input.type = 'password';
-        if (eyeIcon) {
-            eyeIcon.classList.remove('fa-eye-slash');
-            eyeIcon.classList.add('fa-eye');
-        }
-    }
-}
-
 function checkUnlockPassword() {
     const input = document.getElementById('passInput').value;
+    const errorMsg = document.getElementById('errorMsg');
+
+    // အရင် Error စာသားကို အရင်ရှင်းထုတ်မည်
+    if (errorMsg) {
+        errorMsg.style.display = 'none';
+        errorMsg.innerText = '';
+    }
 
     if (input === '') {
-        alert('ကျေးဇူးပြု၍ စကားဝှက် ရိုက်ထည့်ပါ!');
+        if (errorMsg) {
+            errorMsg.innerText = 'ကျေးဇူးပြု၍ စကားဝှက် ရိုက်ထည့်ပါ!';
+            errorMsg.style.display = 'block';
+        } else {
+            alert('ကျေးဇူးပြု၍ စကားဝှက် ရိုက်ထည့်ပါ!');
+        }
     } else if (input === '1911999') {
-
         const lockScreen = document.getElementById('cyberpunk-lockscreen');
         if (lockScreen) {
             lockScreen.style.transition = 'opacity 0.5s ease';
@@ -486,15 +479,24 @@ function checkUnlockPassword() {
             appContent.style.display = "block";
         }
 
-        const saved = getStoredKey();
-        if (saved) {
+        const saved = typeof getStoredKey === 'function' ? getStoredKey() : null;
+        if (saved && document.getElementById("apiKey")) {
             document.getElementById("apiKey").value = saved;
         }
-        updateKeyStatus();
+        if (typeof updateKeyStatus === 'function') {
+            updateKeyStatus();
+        }
     } else {
-        alert('စကားဝှက် မှားယွင်းနေပါသည်။');
+        // ❌ Password မှားနေလျှင် ဒီနေရာက အလုပ်လုပ်မည်
+        if (errorMsg) {
+            errorMsg.innerText = '❌ စကားဝှက် မှားယွင်းနေပါသည်။ ထပ်ကြိုးစားပါ။';
+            errorMsg.style.display = 'block';
+        } else {
+            alert('စကားဝှက် မှားယွင်းနေပါသည်။');
+        }
     }
 }
+
 /* =========================================
    SH IMAGE SEARCH — UNSPLASH FREE MODE
    ========================================= */
