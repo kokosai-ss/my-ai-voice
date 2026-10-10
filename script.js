@@ -3836,3 +3836,127 @@ function bufferToWave(abuffer, len) {
 
     return new Blob([buffer], { type: "audio/wav" });
 }
+// Slider Value ပြောင်းရင် စာသားပါလိုက်ပြောင်းရန်
+document.getElementById('boostSlider').addEventListener('input', function(e) {
+    document.getElementById('boostValue').innerText = e.target.value;
+});
+
+async function enhanceAudio() {
+    // Silence ဖြတ်ထားတဲ့ အသံဖိုင် သို့မဟုတ် တင်ထားတဲ့ အသံဖိုင်ကို ယူမည်
+    const fileInput = document.getElementById('audioFileInput'); // သားရီးရဲ့ File Input ID ထည့်ပါ
+    if (!fileInput || !fileInput.files[0]) {
+        alert('ကျေးဇူးပြု၍ အသံဖိုင်တစ်ခု ရွေးချယ်ပေးပါ သားရီး!');
+        return;
+    }
+
+    const file = fileInput.files[0];
+    const arrayBuffer = await file.arrayBuffer();
+    
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    const audioBuffer = await audioCtx.decodeAudioData(arrayBuffer);
+
+    // Offline Audio Context ဖြင့် Audio Processing လုပ်ခြင်း
+    const offlineCtx = new OfflineAudioContext(
+        audioBuffer.numberOfChannels,
+        audioBuffer.length,
+        audioBuffer.sampleRate
+    );
+
+    const source = offlineCtx.createBufferSource();
+    source.buffer = audioBuffer;
+
+    // 1. High-pass Filter (မလိုလားအပ်သော ဗြူသံနှိမ့်များကို ဖြတ်ထုတ်ရန်)
+    const highpass = offlineCtx.createBiquadFilter();
+    highpass.type = 'highpass';
+    highpass.frequency.value = 80; // 80Hz အောက် ဗြူသံများ ရှင်းမည်
+
+    // 2. Peaking Filter (လူသံ ထင်းရှားစေမည့် Frequency ကို မြှင့်ရန်)
+    const presence = offlineCtx.createBiquadFilter();
+    presence.type = 'peaking';
+    presence.frequency.value = 3000; // 3kHz လူသံ အကြည်လင်ဆုံးနေရာ
+    presence.Q.value = 1;
+    presence.gain.value = 4; // Clarity မြှင့်မည်
+
+    // 3. Compressor (အသံတိုး/ကျယ် မျှပေးပြီး Studio အသံဖြစ်စေရန်)
+    const compressor = offlineCtx.createDynamicsCompressor();
+    compressor.threshold.value = -24;
+    compressor.knee.value = 30;
+    compressor.ratio.value = 12;
+    compressor.attack.value = 0.003;
+    compressor.release.value = 0.25;
+
+    // 4. Gain / Volume Booster (Slider တန်ဖိုးအတိုင်း အသံမြှင့်ရန်)
+    const boostGain = offlineCtx.createGain();
+    const boostVal = parseFloat(document.getElementById('boostSlider').value);
+    boostGain.gain.value = boostVal;
+
+    // Audio Nodes များကို ဆက်သွယ်ပေးခြင်း
+    source.connect(highpass);
+    highpass.connect(presence);
+    presence.connect(compressor);
+    compressor.connect(boostGain);
+    boostGain.connect(offlineCtx.destination);
+
+    source.start(0);
+
+    // Process ပြီးသွားပါက WAV ဖိုင်ပြောင်းပြီး Output ထုတ်ပေးခြင်း
+    const renderedBuffer = await offlineCtx.startRendering();
+    const wavBlob = bufferToWav(renderedBuffer);
+    
+    // Base64 Data URI ပြောင်းပြီး Player နဲ့ Download Link ပေးမည်
+    const reader = new FileReader();
+    reader.readAsDataURL(wavBlob);
+    reader.onloadend = function() {
+        const base64Data = reader.result;
+        
+        const player = document.getElementById('enhancedPlayer');
+        player.src = base64Data;
+        
+        const downloadLink = document.getElementById('downloadEnhancedLink');
+        downloadLink.href = base64Data;
+        downloadLink.download = "Enhanced_" + file.name;
+        
+        document.getElementById('enhancedResult').style.display = 'block';
+    };
+}
+
+// AudioBuffer ကို WAV Blob အဖြစ် ပြောင်းပေးသည့် Helper Function
+function bufferToWav(buffer) {
+    let numOfChan = buffer.numberOfChannels,
+        length = buffer.length * numOfChan * 2 + 44,
+        out = new DataView(new ArrayBuffer(length)),
+        channels = [], i, sample,
+        offset = 0,
+        pos = 0;
+
+    function setUint16(data) { out.setUint16(pos, data, true); pos += 2; }
+    function setUint32(data) { out.setUint32(pos, data, true); pos += 4; }
+
+    setUint32(0x46464952); // "RIFF"
+    setUint32(length - 8);
+    setUint32(0x45564157); // "WAVE"
+    setUint32(0x20746d66); // "fmt "
+    setUint32(16);
+    setUint16(1);
+    setUint16(numOfChan);
+    setUint32(buffer.sampleRate);
+    setUint32(buffer.sampleRate * 2 * numOfChan);
+    setUint16(numOfChan * 2);
+    setUint16(16);
+    setUint32(0x61746164); // "data"
+    setUint32(length - pos - 4);
+
+    for(i = 0; i < buffer.numberOfChannels; i++) channels.push(buffer.getChannelData(i));
+
+    while(offset < buffer.length) {
+        for(i = 0; i < numOfChan; i++) {
+            sample = Math.max(-1, Math.min(1, channels[i][offset]));
+            sample = (0.5 + sample < 0 ? sample * 32768 : sample * 32767)|0;
+            out.setInt16(pos, sample, true);
+            pos += 2;
+        }
+        offset++;
+    }
+    return new Blob([out], { type: 'audio/wav' });
+}
+
