@@ -3097,24 +3097,38 @@ Clear, natural Burmese conversational tone with friendly, engaging, casual narra
     btn.innerHTML = "🔊 Generate Single-Voice Audio";
 }
 
-// Download Button Click Handler
+// Download Button Click Handler (Median.co App နဲ့ Browser နှစ်ခုစလုံးအတွက် တွဲဖက်သုံးရန်)
 function triggerDownload(e) {
     if (e) e.preventDefault();
     if (!currentAudioBlob) return;
 
     const format = document.getElementById("formatSelect").value || "wav";
+    const fileName = `sh_multi_audio_${Date.now()}.${format}`;
+
     const reader = new FileReader();
     reader.onloadend = function() {
         const base64Data = reader.result;
-        const a = document.createElement('a');
-        a.href = base64Data;
-        a.download = `sh_multi_audio_${Date.now()}.${format}`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
+
+        // Median.co App ထဲမှာ ဖြစ်နေလား စစ်ဆေးခြင်း
+        if (typeof nativeBridge !== 'undefined' && nativeBridge.files) {
+            // Median.co Native Download Plugin ရှိရင် သုံးမည်
+            nativeBridge.files.download({
+                url: base64Data,
+                filename: fileName
+            });
+        } else {
+            // ပုံမှန် Browser အတွက်
+            const a = document.createElement('a');
+            a.href = base64Data;
+            a.download = fileName;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
     };
     reader.readAsDataURL(currentAudioBlob);
 }
+
 
 /* HELPER FUNCTIONS */
 function base64ToUint8Array(base64){
