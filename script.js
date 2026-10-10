@@ -2334,10 +2334,15 @@ function addSpeechBlock(initialText = "", selectedSpeaker = "Charon") {
         "Callirrhoe": "Callirrhoe (အေးဆေးပေါ့ပါး သဘာဝသံ)",
         "Despina": "Despina (ချောမွေ့ငြိမ့်ညောင်း ဇာတ်လမ်းသံ)"
     };
-    blockDiv.innerHTML = `
-        <div class="block-card-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 8px;">
-            <span style="font-size: 13px; font-weight: bold; color: #00d2ff;">💬 Speech Block (${blockCounter})</span>
-            <button type="button" onclick="removeSpeechBlock(${blockCounter})" style="background: rgba(255,0,0,0.15); color: #ff4d4d; border: none; padding: 3px 8px; border-radius: 6px; font-size: 11px; cursor: pointer;">Delete</button>
+        blockDiv.innerHTML = `
+        <!-- Single Voice လို Header ပုံစံတူညီစေရန် -->
+        <div class="block-card-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 10px;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <div style="width: 28px; height: 28px; border-radius: 6px; background: rgba(0, 210, 255, 0.15); display: flex; align-items: center; justify-content: center; color: #00d2ff; font-size: 12px;">
+                    <i class="fa-solid fa-microphone"></i>
+                </div>
+                <h3 style="font-size: 14px; font-weight: bold; color: #ffffff; margin: 0;">Speech Block (${blockCounter})</h3>
+            </div>
         </div>
         
         <!-- Speaker Selection -->
@@ -2349,10 +2354,10 @@ function addSpeechBlock(initialText = "", selectedSpeaker = "Charon") {
             </div>
         </div>
 
-        <!-- Voice Style (Speaker ရဲ့အောက်သို့ တိုက်ရိုက်ရောက်စေရန်) -->
+        <!-- Voice Style Selection (onclick="openStyleModal()" ထည့်သွင်းပေးထားပါပြီ) -->
         <div style="margin-bottom: 12px;">
             <label style="display: block; font-size: 12px; color: #8eb0cb; margin-bottom: 4px;">Voice</label>
-            <div class="style-trigger-box" style="background: rgba(10, 15, 30, 0.65); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 10px 12px; display: flex; justify-content: space-between; align-items: center; cursor: pointer;">
+            <div class="style-trigger-box" onclick="openStyleModal()" style="background: rgba(10, 15, 30, 0.65); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 10px 12px; display: flex; justify-content: space-between; align-items: center; cursor: pointer;">
                 <span style="font-size: 13px; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Warm - နွေးထွေးယုယသော စကားပြောအသံ</span>
                 <span style="color: #8b9bb4; font-size: 11px;">▼</span>
             </div>
@@ -2361,15 +2366,19 @@ function addSpeechBlock(initialText = "", selectedSpeaker = "Charon") {
         <!-- Text Input -->
         <div style="margin-bottom: 12px;">
             <label style="display: block; font-size: 12px; color: #8eb0cb; margin-bottom: 4px;">Text</label>
-            <textarea class="block-textarea block-text-input" style="min-height: 100px; background: rgba(10, 15, 30, 0.65); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; color: #fff; padding: 12px; width: 100%; resize: vertical; font-size: 13px;" placeholder="ဒီ block အတွက် ပြောရမည့် စာသား ရိုက်ထည့်ပါ...">${initialText}</textarea>
+            <textarea class="block-textarea block-text-input" style="min-height: 120px; background: rgba(10, 15, 30, 0.65); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; color: #fff; padding: 12px; width: 100%; resize: vertical; font-size: 13px;" placeholder="ဒီ block အတွက် ပြောရမည့် စာသား ရိုက်ထည့်ပါ...">${initialText}</textarea>
         </div>
 
-        <!-- Controls (Move Up/Down) -->
-        <div style="display: flex; gap: 6px; margin-top: 8px;">
-            <button class="btn-card-ctrl" onclick="moveBlockUp(${blockCounter})" style="background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.1); color: #fff; padding: 4px 8px; border-radius: 6px; font-size: 11px; cursor: pointer;">↑ Move Up</button>
-            <button class="btn-card-ctrl" onclick="moveBlockDown(${blockCounter})" style="background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.1); color: #fff; padding: 4px 8px; border-radius: 6px; font-size: 11px; cursor: pointer;">↓ Move Down</button>
+        <!-- Controls & Delete -->
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 12px;">
+            <div style="display: flex; gap: 8px;">
+                <button class="btn-card-ctrl" onclick="moveBlockUp(${blockCounter})" style="background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.1); color: #fff; padding: 6px 12px; border-radius: 8px; font-size: 12px; cursor: pointer;">↑ Move Up</button>
+                <button class="btn-card-ctrl" onclick="moveBlockDown(${blockCounter})" style="background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.1); color: #fff; padding: 6px 12px; border-radius: 8px; font-size: 12px; cursor: pointer;">↓ Move Down</button>
+            </div>
+            <button type="button" class="btn-card-delete" onclick="removeSpeechBlock(${blockCounter})" style="background: rgba(255,0,0,0.15); color: #ff4d4d; border: 1px solid rgba(255,0,0,0.3); padding: 6px 12px; border-radius: 8px; font-size: 12px; cursor: pointer; font-weight: bold;">Delete</button>
         </div>
     `;
+
 
 
     container.appendChild(blockDiv);
