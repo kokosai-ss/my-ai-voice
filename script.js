@@ -3096,28 +3096,38 @@ Clear, natural Burmese conversational tone with friendly, engaging, casual narra
     btn.disabled = false;
     btn.innerHTML = "🔊 Generate Single-Voice Audio";
 }
-
-// Download Button Click Handler (Median.co App နဲ့ Browser နှစ်ခုစလုံးအတွက် တွဲဖက်သုံးရန်)
-function triggerDownload(e) {
+// App နဲ့ Browser နှစ်ခုစလုံးအတွက် အကောင်းဆုံး Download/Share Logic
+async function triggerDownload(e) {
     if (e) e.preventDefault();
     if (!currentAudioBlob) return;
 
     const format = document.getElementById("formatSelect").value || "wav";
     const fileName = `sh_multi_audio_${Date.now()}.${format}`;
+    const file = new File([currentAudioBlob], fileName, { type: currentAudioBlob.type });
 
+    // ၁။ ပထမဦးစွာ ဖုန်းရဲ့ Native Share (Share နိုင်ရင် Share မည်) ကို စမ်းမည်
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        try {
+            await navigator.share({
+                files: [file],
+                title: 'Cleaned Audio',
+                text: 'အသံတိတ်များ ဖယ်ရှားထားသော အသံဖိုင်'
+            });
+            return; // Share လို့ အောင်မြင်သွားရင် ဒီမှာ ပြီးပြီ
+        } catch (error) {
+            console.log('Share skipped or failed, trying browser open...', error);
+        }
+    }
+
+    // ၂။ Share လို့မရတဲ့ ဖုန်းတွေအတွက် Base64 ပြောင်းပြီး Browser နဲ့ ဖွင့်ပေးမည်
     const reader = new FileReader();
     reader.onloadend = function() {
         const base64Data = reader.result;
-
-        // Median.co App ထဲမှာ ဖြစ်နေလား စစ်ဆေးခြင်း
-        if (typeof nativeBridge !== 'undefined' && nativeBridge.files) {
-            // Median.co Native Download Plugin ရှိရင် သုံးမည်
-            nativeBridge.files.download({
-                url: base64Data,
-                filename: fileName
-            });
-        } else {
-            // ပုံမှန် Browser အတွက်
+        
+        // Median App ထဲမှာ Browser Tab အသစ်နဲ့ ဖွင့်ပြီး ဒေါင်းခိုင်းခြင်း
+        const openedWindow = window.open(base64Data, '_blank');
+        if (!openedWindow) {
+            // Pop-up ပိတ်ထားရင် ပုံမှန် Link ပုံစံနဲ့ ဆင်းခိုင်းမည်
             const a = document.createElement('a');
             a.href = base64Data;
             a.download = fileName;
@@ -3128,7 +3138,6 @@ function triggerDownload(e) {
     };
     reader.readAsDataURL(currentAudioBlob);
 }
-
 
 /* HELPER FUNCTIONS */
 function base64ToUint8Array(base64){
@@ -3769,11 +3778,11 @@ document.getElementById('processAudioBtn').addEventListener('click', async () =>
     audioElement.style.display = 'block';
 
     const downloadLink = document.getElementById('downloadAudioLink');
-    downloadLink.href = audioUrl;
-    downloadLink.download = 'cleaned_voiceover.wav';
-    downloadLink.style.display = 'inline-block';
-    
-    alert('အသံတိတ်ကွက်များ ဖယ်ရှားပြီး ကလစ်သံများ ကင်းစင်အောင် ပြုလုပ်ပြီးပါပြီ သားရီး!');
+downloadLink.href = base64Data;
+downloadLink.download = fileName;
+downloadLink.style.display = 'inline-flex'; // ခလုတ်ပုံစံ လှလှလေး ပေါ်လာစေရန်
+
+    alert('Silence တွေကို ​ဖျက်ပြီးပါပြီ သားရီး!');
 });
 
 // AudioBuffer ကို WAV Blob သို့ ပြောင်းပေးသည့် Helper Function
