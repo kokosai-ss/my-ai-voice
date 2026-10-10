@@ -2335,21 +2335,24 @@ function addSpeechBlock(initialText = "", selectedSpeaker = "Charon") {
         "Despina": "Despina (ချောမွေ့ငြိမ့်ညောင်း ဇာတ်လမ်းသံ)"
     };
 
-    blockDiv.innerHTML = `
-        <div class="block-card-header">
-            <span class="block-card-title">💬 <span class="block-number-text">Speech Block (1)</span></span>
+        blockDiv.innerHTML = `
+        <div class="block-card-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 8px;">
+            <span class="block-card-title" style="font-size: 13px; font-weight: bold; color: #00d2ff;">
+                💬 <span class="block-number-text">Speech Block (${blockCounter})</span>
+            </span>
+            <button type="button" onclick="removeSpeechBlock(${blockCounter})" style="background: rgba(255,0,0,0.15); color: #ff4d4d; border: none; padding: 3px 8px; border-radius: 6px; font-size: 11px; cursor: pointer;">🗑️ ဖျက်မည်</button>
         </div>
-        <div class="block-card-body">   
-            <div style="flex:1; width:100%;">
-                <label style="display:block; font-size:12px; color:#8eb0cb; margin-bottom:6px;">Speaker Voice ရွေးရန်:</label>
-                <div class="speaker-select-trigger" onclick="openVoicePicker(${blockCounter})">
+        <div class="block-card-body">
+            <div style="width:100%;">
+                <label style="display:block; font-size:12px; color:#8eb0cb; margin-bottom:4px;">Speaker Voice ရွေးရန်</label>
+                <div class="speaker-select-trigger" onclick="openVoicePicker(${blockCounter})" style="background: rgba(10, 15, 30, 0.65); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 10px 12px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; color: #fff; font-size: 13px;">
                     <span class="block-speaker-label">${speakerLabelMap[selectedSpeaker] || selectedSpeaker}</span>
-                    <span>▼</span>
+                    <span style="color: #8b9bb4; font-size: 11px;">▼</span>
                 </div>
             </div>
         </div>
-        <textarea class="block-textarea block-text-input" placeholder="ဒီ block အတွက် ပြောရမည့် စာသား ရိုက်ထည့်ပါ...">${initialText}</textarea>
-        
+    `;
+
         <div class="block-card-footer">
             <div class="card-controls-left">
                 <button class="btn-card-ctrl" onclick="moveBlockUp(${blockCounter})">↑ Move Up</button>
