@@ -3577,10 +3577,38 @@ function showNeonAlert(message) {
     document.body.insertAdjacentHTML('beforeend', alertHtml);
 }
 
-// App တစ်ခုလုံးရှိ alert() အားလုံးကို Neon Glass Alert သို့ အလိုအလျောက် ပြောင်းပေးရန်
+// 1. Neon Glass Notification UI ဖန်တီးပေးမည့် Function
+function showNeonAlert(msg) {
+    let noticeBox = document.getElementById('neonAlertNotice');
+    if (!noticeBox) {
+        noticeBox = document.createElement('div');
+        noticeBox.id = 'neonAlertNotice';
+        noticeBox.style.cssText = `
+            position: fixed; bottom: 35px; left: 50%; transform: translateX(-50%);
+            background: rgba(15, 23, 42, 0.95); border: 1px solid #00d2ff;
+            color: #fff; padding: 12px 24px; border-radius: 14px;
+            box-shadow: 0 0 25px rgba(0, 210, 255, 0.45); font-size: 13px; font-weight: bold;
+            z-index: 99999; backdrop-filter: blur(12px); display: flex; align-items: center; gap: 10px;
+            transition: all 0.3s ease; opacity: 0; pointer-events: none;
+        `;
+        document.body.appendChild(noticeBox);
+    }
+    
+    noticeBox.innerHTML = `<span>✨</span> <span>${msg}</span>`;
+    noticeBox.style.opacity = '1';
+    noticeBox.style.transform = 'translateX(-50%) translateY(-5px)';
+    
+    setTimeout(() => {
+        noticeBox.style.opacity = '0';
+        noticeBox.style.transform = 'translateX(-50%) translateY(0px)';
+    }, 2800);
+}
+
+// 2. Browser ရဲ့ ရိုးရိုး alert() အားလုံးကို Neon Alert သို့ အလိုအလျောက် ပြောင်းပစ်ခြင်း
 window.alert = function(message) {
     showNeonAlert(message);
 };
+
 // ဇာတ်လမ်းအချက်အလက်များကို Browser ထဲ သိမ်းရန်
 function saveStoryMemory() {
     localStorage.setItem('myMovieStoryMemory', JSON.stringify(storyMemory));
@@ -3636,5 +3664,4 @@ ${flowPromptText}`;
     }).catch(err => {
         console.error('Copy Error:', err);
     });
-}
 }
