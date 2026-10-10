@@ -3665,3 +3665,127 @@ ${flowPromptText}`;
         console.error('Copy Error:', err);
     });
 }
+document.getElementById('processAudioBtn').addEventListener('click', async () => {
+    const fileInput = document.getElementById('audioFileInput');
+    if (fileInput.files.length === 0) {
+        alert('ကျေးဇူးပြု၍ အသံဖိုင်တစ်ခု ရွေးချယ်ပါ သားရီး!');
+        return;
+    }
+
+    const file = fileInput.files[0];
+    const arrayBuffer = await file.arrayBuffer();
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    const audioBuffer = await audioCtx.decodeAudioData(arrayBuffer);
+
+    // Silence Removal Logic
+    const channelData = audioBuffer.getChannelData(0); // Mono channel ယူမည်
+    const sampleRate = audioBuffer.sampleRate;
+    
+    // ချိန်ညှိချက်များ (Threshold နဲ့ Min Duration)
+    const silenceThreshold = 0.02; // ဒီပမာဏထက် ငြိမ်ရင် အသံတိတ်ဟု သတ်မှတ်မည်
+    const minSilenceSamples = sampleRate * 0.3; // 0.3 စက္ကန့်ထက်ပို၍ တိတ်မှ ဖြတ်မည်
+
+    let nonSilentChunks = [];
+    let start = null;
+
+    for (let i = 0; i < channelData.length; i++) {
+        const absValue = Math.abs(channelData[i]);
+        if (absValue > silenceThreshold) {
+            if (start === null) start = i;
+        } else {
+            if (start !== null) {
+                if (i - start > minSilenceSamples) {
+                    nonSilentChunks.push({ start: start, end: i });
+                    start = null;
+                }
+            }
+        }
+    }
+    if (start !== null) {
+        nonSilentChunks.push({ start: start, end: channelData.length });
+    }
+
+    // အသံအပိုင်းအစများကို ပြန်လည်စုစည်းခြင်း
+    let totalLength = nonSilentChunks.reduce((acc, chunk) => acc + (chunk.end - chunk.start), 0);
+    const newAudioBuffer = audioCtx.createBuffer(audioBuffer.numberOfChannels, totalLength, sampleRate);
+
+    for (let channel = 0; channel < audioBuffer.numberOfChannels; channel++) {
+        let newChannelData = newAudioBuffer.getChannelData(channel);
+        let offset = 0;
+        const sourceData = audioBuffer.getChannelData(channel);
+        
+        nonSilentChunks.forEach(chunk => {
+            let length = chunk.end - chunk.start;
+            newChannelData.set(sourceData.subarray(chunk.start, chunk.end), offset);
+            offset += length;
+        });
+    }
+
+    // WAV ဖိုင်အဖြစ် ပြောင်းလဲခြင်း
+    const wavBlob = bufferToWave(newAudioBuffer, totalLength);
+    const audioUrl = URL.createObjectURL(wavBlob);
+
+    // Audio Player နဲ့ Download Link ချိတ်ပေးခြင်း
+    const audioElement = document.getElementById('outputAudio');
+    audioElement.src = audioUrl;
+    audioElement.style.display = 'block';
+
+    const downloadLink = document.getElementById('downloadAudioLink');
+    downloadLink.href = audioUrl;
+    downloadLink.download = 'cleaned_voiceover.wav';
+    downloadLink.style.display = 'inline-block';
+    
+    alert('အသံတိတ်ကွက်များ အောင်မြင်စွာ ဖယ်ရှားပြီးပါပြီ သားရီး!');
+});
+
+// AudioBuffer ကို WAV Blob သို့ ပြောင်းပေးသည့် Helper Function
+function bufferToWave(abuffer, len) {
+    let numOfChan = abuffer.numberOfChannels,
+        length = len * numOfChan * 2 + 44,
+        buffer = new ArrayBuffer(length),
+        view = new DataView(buffer),
+        channels = [], i, sample,
+        offset = 0,
+        pos = 0;
+
+    function setUint16(data) {
+        view.setUint16(pos, data, true);
+        pos += 2;
+    }
+
+    function setUint32(data) {
+        view.setUint32(pos, data, true);
+        pos += 4;
+    }
+
+    setUint32(0x46464952); // "RIFF"
+    setUint32(length - 8); // file length - 8
+    setUint32(0x45564157); // "WAVE"
+
+    setUint32(0x20746d66); // "fmt " chunk
+    setUint32(16); // length = 16
+    setUint16(1); // PCM (uncompressed)
+    setUint16(numOfChan);
+    setUint32(abuffer.sampleRate);
+    setUint32(abuffer.sampleRate * 2 * numOfChan); // avg. bytes/sec
+    setUint16(numOfChan * 2); // block-align
+    setUint16(16); // 16-bit
+
+    setUint32(0x61746164); // "data" - chunk
+    setUint32(length - pos - 4); // data length
+
+    for (i = 0; i < abuffer.numberOfChannels; i++)
+        channels.push(abuffer.getChannelData(i));
+
+    while (offset < len) {
+        for (i = 0; i < numOfChan; i++) {
+            sample = Math.max(-1, Math.min(1, channels[i][offset]));
+            sample = (0.5 + sample < 0 ? sample * 32768 : sample * 32767);
+            view.setInt16(pos, sample, true);
+            pos += 2;
+        }
+        offset++;
+    }
+
+    return new Blob([buffer], { type: "audio/wav" });
+}
