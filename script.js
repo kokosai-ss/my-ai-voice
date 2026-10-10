@@ -2314,15 +2314,16 @@ function toggleTempSlider() {
     document.getElementById("tempSliderWrap").style.display = isChecked ? "block" : "none";
 }
 
+// 1. Speech Block အသစ်ထည့်သွင်းခြင်း
 function addSpeechBlock(initialText = "", selectedSpeaker = "Charon") {
-    blockCounter++;
     const container = document.getElementById("speechBlocksContainer");
-
+    
     const blockDiv = document.createElement("div");
-    blockDiv.className = "speech-block-card";
+    blockDiv.className = "speech-block-card voice-card-container";
+    blockDiv.style.cssText = "background: rgba(13, 27, 42, 0.75); border: 1px solid rgba(0, 210, 255, 0.3); border-radius: 20px; padding: 18px; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5); backdrop-filter: blur(12px); margin-bottom: 15px;";
+    
+    blockCounter++;
     blockDiv.id = `speechBlock_${blockCounter}`;
-    blockDiv.setAttribute("data-speaker", selectedSpeaker);
-
     const speakerLabelMap = {
         "Puck": "Puck (တက်ကြွလှုပ်ရှား လူငယ်သံ)",
         "Charon": "Charon (သတင်း/ဗဟုသုတပေး တည်ငြိမ်သံ)",
@@ -2334,14 +2335,14 @@ function addSpeechBlock(initialText = "", selectedSpeaker = "Charon") {
         "Callirrhoe": "Callirrhoe (အေးဆေးပေါ့ပါး သဘာဝသံ)",
         "Despina": "Despina (ချောမွေ့ငြိမ့်ညောင်း ဇာတ်လမ်းသံ)"
     };
-        blockDiv.innerHTML = `
-        <!-- Single Voice လို Header ပုံစံတူညီစေရန် -->
+        
+blockDiv.innerHTML = `
         <div class="block-card-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 10px;">
             <div style="display: flex; align-items: center; gap: 8px;">
                 <div style="width: 28px; height: 28px; border-radius: 6px; background: rgba(0, 210, 255, 0.15); display: flex; align-items: center; justify-content: center; color: #00d2ff; font-size: 12px;">
                     <i class="fa-solid fa-microphone"></i>
                 </div>
-                <h3 style="font-size: 14px; font-weight: bold; color: #ffffff; margin: 0;">Speech Block (${blockCounter})</h3>
+                <h3 class="block-number-text" style="font-size: 14px; font-weight: bold; color: #ffffff; margin: 0;">Speech Block</h3>
             </div>
         </div>
         
@@ -2354,7 +2355,7 @@ function addSpeechBlock(initialText = "", selectedSpeaker = "Charon") {
             </div>
         </div>
 
-        <!-- Voice Style Selection (onclick="openStyleModal()" ထည့်သွင်းပေးထားပါပြီ) -->
+        <!-- Voice Style Selection -->
         <div style="margin-bottom: 12px;">
             <label style="display: block; font-size: 12px; color: #8eb0cb; margin-bottom: 4px;">Voice</label>
             <div class="style-trigger-box" onclick="openStyleModal()" style="background: rgba(10, 15, 30, 0.65); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 10px 12px; display: flex; justify-content: space-between; align-items: center; cursor: pointer;">
@@ -2379,12 +2380,11 @@ function addSpeechBlock(initialText = "", selectedSpeaker = "Charon") {
         </div>
     `;
 
-
-
     container.appendChild(blockDiv);
     reindexBlocks();
 }
 
+// 2. ဘလောက်ဖျက်ခြင်း
 function removeSpeechBlock(id) {
     const block = document.getElementById(`speechBlock_${id}`);
     if (block) {
@@ -2393,6 +2393,7 @@ function removeSpeechBlock(id) {
     }
 }
 
+// 3. အပေါ်ရွှေ့ခြင်း
 function moveBlockUp(id) {
     const block = document.getElementById(`speechBlock_${id}`);
     if (block && block.previousElementSibling) {
@@ -2401,6 +2402,7 @@ function moveBlockUp(id) {
     }
 }
 
+// 4. အောက်ရွှေ့ခြင်း
 function moveBlockDown(id) {
     const block = document.getElementById(`speechBlock_${id}`);
     if (block && block.nextElementSibling) {
@@ -2409,37 +2411,19 @@ function moveBlockDown(id) {
     }
 }
 
+// 5. နံပါတ်စဉ်များနှင့် Add Button စာသားကို ညီညာအောင် ပြန်စီခြင်း
 function reindexBlocks() {
     const blocks = document.querySelectorAll(".speech-block-card");
     blocks.forEach((el, index) => {
         const numText = el.querySelector(".block-number-text");
-        if(numText) numText.textContent = `Speech Block (${index + 1})`;
+        if (numText) {
+            numText.textContent = `Speech Block (${index + 1})`;
+        }
     });
 
     const addBtn = document.getElementById("addBlockBtn");
-    if(addBtn) {
+    if (addBtn) {
         addBtn.textContent = `+ Add Speech Block (${blocks.length + 1})`;
-    }
-}
-
-// Initialize default block
-window.addEventListener("DOMContentLoaded", () => {
-    addSpeechBlock();
-});
-
-function updateSpeed(val){
-    document.getElementById("speedVal").textContent = val + "x";
-    const player = document.getElementById("audioPlayer");
-    if(player){
-        player.playbackRate = parseFloat(val);
-    }
-}
-
-function updateSingleSpeed(val){
-    document.getElementById("singleSpeedVal").textContent = val + "x";
-    const player = document.getElementById("singleAudioPlayer");
-    if(player){
-        player.playbackRate = parseFloat(val);
     }
 }
 
