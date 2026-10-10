@@ -313,10 +313,9 @@ cursor:pointer;
     </h2>
 </div>
 
-<!-- Settings View Container -->
-<div id="settings" class="view-container" style="display: none; padding: 20px; color: white;">
-    <h2>Settings</h2>
-    
+<!-- Settings / Silence Removal View Container -->
+<div id="silenceView" class="view-container" style="display: none; padding: 20px; color: white;">
+    <h2>Silence Removal</h2>
     <div class="setting-card" style="margin-top: 20px; background: rgba(255,255,255,0.05); padding: 15px; border-radius: 8px;">
         <h3>Auto Silence Removal</h3>
         <p style="font-size: 14px; opacity: 0.8;">အသံဖိုင်ထဲက အသံတိတ်နေတဲ့ နေရာတွေကို အလိုအလျောက် ဖြတ်ထုတ်ပေးသည်</p>
@@ -1407,12 +1406,12 @@ cursor:pointer;
     <i class="fa-solid fa-wand-magic-sparkles" style="font-size: 16px; margin-bottom: 3px;"></i>
     <div style="font-size: 9px;">AI Script</div>
 </div>
-
-    <!-- Settings / Keys -->
-    <div class="nav-btn" onclick="switchView('settings', this)" style="text-align: center; cursor: pointer; color: #8eb0cb; transition: 0.3s;">
-        <i class="fa-solid fa-gear" style="font-size: 16px; margin-bottom: 3px;"></i>
-        <div style="font-size: 9px;">Settings</div>
-    </div>
+  
+  <!-- Silence Removal Tab -->
+<div class="nav-btn" onclick="switchView('silenceView', this)" style="text-align: center; cursor: pointer; color: #8eb0cb; transition: 0.3s;">
+    <i class="fa-solid fa-gear" style="font-size: 16px; margin-bottom: 3px;"></i>
+    <div style="font-size: 9px;">Silence</div>
+</div>    
 </div>
 </div>
   <script src="script.js"></script>
