@@ -3703,8 +3703,9 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 });
-// --- SH SMART SILENCE REMOVAL ---
-// Replace the existing processAudioBtn section only.
+
+ // --- SH SMART SILENCE REMOVAL V2 ---
+ // Replace the existing processAudioBtn section only.
 
 const processAudioBtn = document.getElementById('processAudioBtn');
 
@@ -3712,38 +3713,46 @@ if (processAudioBtn) {
     processAudioBtn.addEventListener('click', async () => {
         const fileInput = document.getElementById('audioFileInput');
 
-        if (!fileInput || !fileInput.files.length) {
+        if (!fileInput || !fileInput.files || !fileInput.files.length) {
             alert('ကျေးဇူးပြု၍ အသံဖိုင်တစ်ခု ရွေးချယ်ပါ သားရီး!');
             return;
         }
 
         processAudioBtn.disabled = true;
+        let audioCtx = null;
 
         try {
             const file = fileInput.files[0];
             const arrayBuffer = await file.arrayBuffer();
 
-            const audioCtx = new (
+            audioCtx = new (
                 window.AudioContext || window.webkitAudioContext
             )();
 
             const audioBuffer = await audioCtx.decodeAudioData(arrayBuffer);
             const sampleRate = audioBuffer.sampleRate;
             const channels = audioBuffer.numberOfChannels;
-            const frameSize = Math.max(1, Math.floor(sampleRate * 0.01));
+            const audioLength = audioBuffer.length;
 
-            // Analyze all channels together using short-time RMS.
-            const channelData = Array.from(
-                { length: channels },
-                (_, ch) => audioBuffer.getChannelData(ch)
+            // 5 ms frames: detect shorter pauses more accurately.
+            const frameSize = Math.max(
+                1,
+                Math.floor(sampleRate * 0.005)
             );
 
-            const frameCount = Math.ceil(audioBuffer.length / frameSize);
+            const frameCount = Math.ceil(audioLength / frameSize);
+            const channelData = [];
+
+            for (let ch = 0; ch < channels; ch++) {
+                channelData.push(audioBuffer.getChannelData(ch));
+            }
+
+            // RMS analysis across all channels.
             const rms = new Float32Array(frameCount);
 
             for (let frame = 0; frame < frameCount; frame++) {
                 const start = frame * frameSize;
-                const end = Math.min(start + frameSize, audioBuffer.length);
+                const end = Math.min(start + frameSize, audioLength);
                 let sum = 0;
                 let count = 0;
 
@@ -3759,120 +3768,165 @@ if (processAudioBtn) {
                 rms[frame] = Math.sqrt(sum / Math.max(1, count));
             }
 
-            // Tunable settings.
-            const threshold = 0.008;
-            const minSilenceSeconds = 0.35;
-            const keepBeforeSeconds = 0.08;
-            const keepAfterSeconds = 0.12;
+            /*
+             * Clean TTS settings:
+             * Lower threshold catches quieter pauses.
+             * Very short gaps are preserved to protect speech.
+             */
+            const threshold = 0.004;
+            const minSilenceSeconds = 0.12;
+            const keepSilenceSeconds = 0.055;
+            const edgeGuardSeconds = 0.025;
 
-            const minSilenceFrames = Math.ceil(
-                minSilenceSeconds * sampleRate / frameSize
+            const minSilenceFrames = Math.max(
+                1,
+                Math.ceil(
+                    minSilenceSeconds * sampleRate / frameSize
+                )
             );
 
-            const keepBefore = Math.floor(
-                keepBeforeSeconds * sampleRate
+            const keepSilenceSamples = Math.floor(
+                keepSilenceSeconds * sampleRate
             );
 
-            const keepAfter = Math.floor(
-                keepAfterSeconds * sampleRate
+            const edgeGuardSamples = Math.floor(
+                edgeGuardSeconds * sampleRate
             );
 
-            // Build speech regions by measuring silence duration,
-            // rather than speech-region length.
-            const regions = [];
-            let speechStart = null;
-            let silenceStart = null;
+            // Detect silence intervals.
+            const silenceRegions = [];
+            let silenceStartFrame = -1;
 
-            for (let frame = 0; frame < frameCount; frame++) {
-                const isSpeech = rms[frame] >= threshold;
-                const frameStart = frame * frameSize;
-                const frameEnd = Math.min(
-                    frameStart + frameSize,
-                    audioBuffer.length
-                );
+            for (let frame = 0; frame <= frameCount; frame++) {
+                const silent = frame < frameCount &&
+                    rms[frame] < threshold;
 
-                if (isSpeech) {
-                    if (speechStart === null) {
-                        speechStart = frameStart;
-                    }
-                    silenceStart = null;
-                } else if (speechStart !== null) {
-                    if (silenceStart === null) {
-                        silenceStart = frameStart;
-                    }
+                if (silent && silenceStartFrame === -1) {
+                    silenceStartFrame = frame;
+                }
 
-                    const silentFrames = frame -
-                        Math.floor(silenceStart / frameSize);
+                if (!silent && silenceStartFrame !== -1) {
+                    const silenceEndFrame = frame;
+                    const silentFrames =
+                        silenceEndFrame - silenceStartFrame;
 
                     if (silentFrames >= minSilenceFrames) {
-                        regions.push({
-                            start: Math.max(0, speechStart - keepBefore),
-                            end: Math.min(
-                                audioBuffer.length,
-                                silenceStart + keepAfter
-                            )
+                        const startSample =
+                            silenceStartFrame * frameSize;
+
+                        const endSample = Math.min(
+                            silenceEndFrame * frameSize,
+                            audioLength
+                        );
+
+                        silenceRegions.push({
+                            start: startSample,
+                            end: endSample
                         });
-
-                        speechStart = null;
-                        silenceStart = null;
                     }
+
+                    silenceStartFrame = -1;
                 }
             }
 
-            if (speechStart !== null) {
-                regions.push({
-                    start: Math.max(0, speechStart - keepBefore),
-                    end: audioBuffer.length
-                });
-            }
+            /*
+             * Compress detected silence instead of deleting all of it.
+             * This keeps a small natural gap between words.
+             */
+            const cuts = [];
 
-            // Merge overlapping regions to avoid tiny, abrupt cuts.
-            const merged = [];
+            for (const silence of silenceRegions) {
+                const silenceLength = silence.end - silence.start;
 
-            for (const region of regions) {
-                const previous = merged[merged.length - 1];
-
-                if (previous && region.start <= previous.end) {
-                    previous.end = Math.max(previous.end, region.end);
-                } else {
-                    merged.push({ ...region });
+                // Keep short gaps intact to avoid damaging word transitions.
+                if (silenceLength <= keepSilenceSamples) {
+                    continue;
                 }
-            }
 
-            if (!merged.length) {
-                alert(
-                    'အသံကို မတွေ့ရှိပါ။ Threshold ကို လျှော့ပြီး ထပ်စမ်းပါ သားရီး!'
+                // Preserve a little audio at each boundary.
+                const cutStart = Math.min(
+                    silence.end,
+                    silence.start + edgeGuardSamples
                 );
+
+                const cutEnd = Math.max(
+                    cutStart,
+                    silence.end - edgeGuardSamples
+                );
+
+                if (cutEnd > cutStart) {
+                    cuts.push({
+                        start: cutStart,
+                        end: cutEnd
+                    });
+                }
+            }
+
+            // Merge overlapping cuts.
+            const mergedCuts = [];
+
+            for (const cut of cuts) {
+                const previous = mergedCuts[mergedCuts.length - 1];
+
+                if (previous && cut.start <= previous.end) {
+                    previous.end = Math.max(previous.end, cut.end);
+                } else {
+                    mergedCuts.push({
+                        start: cut.start,
+                        end: cut.end
+                    });
+                }
+            }
+
+            const outputLength = audioLength -
+                mergedCuts.reduce(
+                    (total, cut) => total + cut.end - cut.start,
+                    0
+                );
+
+            if (outputLength <= 0) {
+                alert('အသံဖိုင်ကို မပြင်နိုင်ပါ။ မူရင်းဖိုင်ကို ထပ်စမ်းပါ သားရီး!');
                 return;
             }
 
-            const totalLength = merged.reduce(
-                (sum, region) => sum + region.end - region.start,
-                0
-            );
-
             const outputBuffer = audioCtx.createBuffer(
                 channels,
-                totalLength,
+                outputLength,
                 sampleRate
             );
 
-            // Copy original samples without fading every speech region.
-            // This preserves consonants and natural voice quality.
+            // Copy all samples except the detected silence cuts.
             for (let ch = 0; ch < channels; ch++) {
-                const source = audioBuffer.getChannelData(ch);
+                const source = channelData[ch];
                 const destination = outputBuffer.getChannelData(ch);
-                let offset = 0;
 
-                for (const region of merged) {
-                    const length = region.end - region.start;
+                let sourcePosition = 0;
+                let destinationPosition = 0;
 
+                for (const cut of mergedCuts) {
+                    const keepLength = cut.start - sourcePosition;
+
+                    if (keepLength > 0) {
+                        destination.set(
+                            source.subarray(
+                                sourcePosition,
+                                cut.start
+                            ),
+                            destinationPosition
+                        );
+
+                        destinationPosition += keepLength;
+                    }
+
+                    sourcePosition = cut.end;
+                }
+
+                // Copy the final section.
+                if (sourcePosition < audioLength) {
                     destination.set(
-                        source.subarray(region.start, region.end),
-                        offset
+                        source.subarray(sourcePosition),
+                        destinationPosition
                     );
-
-                    offset += length;
                 }
             }
 
@@ -3895,6 +3949,7 @@ if (processAudioBtn) {
                 outputAudio.src = audioUrl;
                 outputAudio.dataset.objectUrl = audioUrl;
                 outputAudio.style.display = 'block';
+                outputAudio.load();
             }
 
             if (downloadLink) {
@@ -3903,20 +3958,37 @@ if (processAudioBtn) {
                 downloadLink.style.display = 'inline-block';
             }
 
+            const removedSeconds =
+                (audioLength - outputLength) / sampleRate;
+
             alert(
-                'Silence Removal ပြီးပါပြီ သားရီး! အသံဖိုင်ကို နားထောင်ပြီး စစ်ကြည့်ပါ။'
+                'Silence Removal ပြီးပါပြီ သားရီး!\n' +
+                'ဖယ်ရှားထားသော အချိန်: ' +
+                removedSeconds.toFixed(2) + ' စက္ကန့်\n' +
+                'အသံဖိုင်အသစ်ကို နားထောင်ပြီး စစ်ကြည့်ပါ။'
             );
 
-            await audioCtx.close();
-
         } catch (error) {
-            console.error('Silence Removal Error:', error);
-            alert('အသံဖိုင်ပြင်ဆင်ရာတွင် အမှားဖြစ်နေပါတယ်။ ထပ်စမ်းကြည့်ပါ သားရီး!');
+            console.error('SH Silence Removal Error:', error);
+
+            alert(
+                'အသံဖိုင်ပြင်ဆင်ရာတွင် အမှားဖြစ်နေပါတယ်။ ' +
+                'မူရင်းဖိုင်ကို ထပ်စမ်းကြည့်ပါ သားရီး!'
+            );
+
         } finally {
+            if (audioCtx && audioCtx.state !== 'closed') {
+                try {
+                    await audioCtx.close();
+                } catch (closeError) {
+                    console.warn('AudioContext close warning:', closeError);
+                }
+            }
+
             processAudioBtn.disabled = false;
         }
     });
-}
+}           
 
 // AudioBuffer ကို WAV Blob သို့ ပြောင်းပေးသည့် Helper Function
 function bufferToWave(abuffer, len) {
