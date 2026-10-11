@@ -3680,7 +3680,7 @@ ${flowPromptText}`;
     });
 }
 
-document.getElementById('processAudioBtn').addEventListener('click', async () => {
+    Document.getElementById('processAudioBtn').addEventListener('click', async () => {
     const fileInput = document.getElementById('audioFileInput');
     if (fileInput.files.length === 0) {
         alert('ကျေးဇူးပြု၍ အသံဖိုင်တစ်ခု ရွေးချယ်ပါ သားရီး!');
@@ -3761,6 +3761,10 @@ document.getElementById('processAudioBtn').addEventListener('click', async () =>
 
     // WAV ဖိုင်အဖြစ် ပြောင်းလဲခြင်း
     const wavBlob = bufferToWave(newAudioBuffer, totalLength);
+    
+    // 🌟 အောက်က Enhancer ဆက်သုံးလို့ရအောင် သိမ်းပေးခြင်း
+    window.currentProcessedAudioBlob = wavBlob;
+
     const audioUrl = URL.createObjectURL(wavBlob);
 
     // Audio Player နဲ့ Download Link ချိတ်ပေးခြင်း
@@ -3842,19 +3846,17 @@ if (enhanceAudioBtn) {
     enhanceAudioBtn.addEventListener('click', async () => {
         const fileInput = document.getElementById('audioFileInput');
 
-// Silence ဖြတ်ထားတာ ရှိရင် အဲ့ဒါကိုယူမယ်၊ မရှိရင် Original ဖိုင်ကို ယူမယ်
-let targetFile = window.currentProcessedAudioBlob || (fileInput.files.length > 0 ? fileInput.files[0] : null);
+        // Silence ဖြတ်ထားတာ ရှိရင် အဲ့ဒါကိုယူမယ်၊ မရှိရင် Original ဖိုင်ကို ယူမယ်
+        let targetFile = window.currentProcessedAudioBlob || (fileInput.files.length > 0 ? fileInput.files[0] : null);
 
-if (!targetFile) {
-    alert('ကျေးဇူးပြု၍ အသံဖိုင်တစ်ခု ရွေးချယ်ပါ သားရီး!');
-    return;
-}
+        if (!targetFile) {
+            alert('ကျေးဇူးပြု၍ အသံဖိုင်တစ်ခု ရွေးချယ်ပါ သားရီး!');
+            return;
+        }
 
-const file = targetFile;
-
+        const file = targetFile; // 👈 ဒီတစ်ကြောင်းပဲ သုံးရပါမယ်
 
         const boostFactor = parseFloat(document.getElementById('boostSlider').value);
-        const file = fileInput.files[0];
         const arrayBuffer = await file.arrayBuffer();
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         const audioBuffer = await audioCtx.decodeAudioData(arrayBuffer);
@@ -3869,7 +3871,6 @@ const file = targetFile;
             const newChannelData = newAudioBuffer.getChannelData(channel);
             
             for (let i = 0; i < totalLength; i++) {
-                // အသံအရည်အသွေးနှင့် Boost မြှင့်တင်ခြင်း (Clipping မဖြစ်အောင် -1 နဲ့ 1 ကြား ကန့်သတ်ခြင်း)
                 let boosted = sourceData[i] * boostFactor;
                 newChannelData[i] = Math.max(-1, Math.min(1, boosted));
             }
@@ -3892,3 +3893,6 @@ const file = targetFile;
         alert('စတူဒီယို အရည်အသွေးသို့ အသံမြှင့်တင်ခြင်း ပြီးစီးပါပြီ သားရီး!');
     });
 }
+
+
+    
