@@ -3180,9 +3180,9 @@ function writeString(view, offset, string){
         view.setUint8(offset + i, string.charCodeAt(i));
     }
 }
-  function switchView(viewId, element) {
+  Function switchView(viewId, element) {
     // ၁။ View အားလုံးကို ဖျောက်မယ်
-    document.querySelectorAll('.view-container, .tab-view').forEach(el => {
+    document.querySelectorAll('.view-container').forEach(el => {
         el.style.display = 'none';
     });
     
@@ -3192,24 +3192,20 @@ function writeString(view, offset, string){
         targetView.style.display = 'block';
     }
 
-    // ၃။ Navigation ခလုတ်အရောင်များ ပြန်ပြောင်းမယ်
+    // ၃။ Navigation ခလုတ်တွေ အားလုံးကို မူလအရောင် (မီးခိုးပြာရောင်) ပြန်ပြောင်းမယ်
     document.querySelectorAll('.nav-btn').forEach(btn => {
         btn.style.color = '#8eb0cb';
     });
 
-    // ၄။ နှိပ်လိုက်သော ခလုတ်ကို Active လုပ်မယ်
+    // ၄။ အခု နှိပ်လိုက်တဲ့ ခလုတ်ကိုပဲ အပြာရောင် (Active) ဖြစ်စေမယ်
     if (element) {
-        element.style.color = '#00baff';
-    }
-
-    // ၅။ Voice Generator View ပွင့်လာလျှင် Voice Library ကို လုံခြုံစွာ ခေါ်မည်
-    if (viewId && (viewId.includes('voice') || viewId.includes('generator') || viewId.includes('studio'))) {
-        if (typeof shRenderVoiceLibrary === 'function') {
-            shRenderVoiceLibrary();
-        }
-    }
+    element.style.color = '#00baff';
 }
-      
+
+    if (viewId === 'voiceGenerator' || viewId === 'generator') {
+    shRenderVoiceLibrary();
+}
+  }
 function showGenerateMessage(text, type){
     const box = document.getElementById("generateMessage");
     box.textContent = text;
