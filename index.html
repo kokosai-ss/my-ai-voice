@@ -467,15 +467,21 @@ cursor:pointer;
 
 </div>
   </div>
+
 <!-- Settings / Silence Removal View Container -->
 <div id="silenceView" class="view-container" style="display: none; padding: 20px; color: white;">
-    <h2>Silence Removal</h2>
+    <h2>Silence Removal & Audio Enhancer</h2>
+    
+    <!-- Silence Removal Card -->
     <div class="setting-card" style="margin-top: 20px; background: rgba(255,255,255,0.05); padding: 15px; border-radius: 8px;">
         <h3>Auto Silence Removal</h3>
         <p style="font-size: 14px; opacity: 0.8;">အသံဖိုင်ထဲက အသံတိတ်နေတဲ့ နေရာတွေကို အလိုအလျောက် ဖြတ်ထုတ်ပေးသည်</p>
         
-        <!-- အသံဖိုင်တင်ရန် -->
-        <input type="file" id="audioFileInput" accept="audio/*" style="margin: 10px 0;">
+        <!-- အသံဖိုင်တင်ရန်နှင့် ဖျက်ရန်/အမှားခြစ်ခလုတ် -->
+        <div style="display: flex; align-items: center; gap: 10px; margin: 10px 0;">
+            <input type="file" id="audioFileInput" accept="audio/*" style="flex: 1;">
+            <button id="clearFileBtn" title="ဖိုင်ကို ဖျက်ရန်" style="display: none; padding: 8px 12px; background: #dc3545; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold;">❌</button>
+        </div>
         <br>
         <!-- လုပ်ဆောင်ရန် ခလုတ် -->
         <button id="processAudioBtn" class="btn-primary" style="padding: 10px 15px; background: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer;">Silence ဖြတ်မည် & ဒေါင်းလုဒ်ဆွဲမည်</button>
@@ -485,25 +491,25 @@ cursor:pointer;
         <br>
         <a id="downloadAudioLink" style="display:none; margin-top:15px; color: #4CAF50; font-weight: bold; text-decoration: none;" download="cleaned_voiceover.wav">💾 ရှင်းလင်းထားသော အသံဖိုင်ကို ဒေါင်းလုဒ်လုပ်ရန်</a>
     </div>
-</div>
-  <!-- Audio Enhancer Card -->
-<div id="enhancerCard" class="setting-card" style="margin-top: 20px; background: rgba(255,255,255,0.05); padding: 15px; border-radius: 8px;">
-    <h3>✨ Audio Enhancer (Studio Quality)</h3>
-    <p style="font-size: 14px; opacity: 0.8;">အသံဖိုင်ကို ပိုမိုကြည်လင်ပြည့်ဝစေပြီး ဗြူသံများကို လျှော့ချပေးသည်</p>
 
-    <div style="margin: 15px 0;">
-        <label style="font-size: 14px;">🔊 Voice Clarity & Boost: <span id="boostValue">1.5</span>x</label>
-        <input type="range" id="boostSlider" min="1" max="3" step="0.1" value="1.5" style="width: 100%; margin-top: 8px; cursor: pointer; pointer-events: auto !important;">
+    <!-- Audio Enhancer Card -->
+    <div id="enhancerCard" class="setting-card" style="margin-top: 20px; background: rgba(255,255,255,0.05); padding: 15px; border-radius: 8px;">
+        <h3>✨ Audio Enhancer (Studio Quality)</h3>
+        <p style="font-size: 14px; opacity: 0.8;">အသံဖိုင်ကို ပိုမိုကြည်လင်ပြည့်ဝစေပြီး ဗြူသံများကို လျှော့ချပေးသည်</p>
+
+        <div style="margin: 15px 0;">
+            <label style="font-size: 14px;">🔊 Voice Clarity & Boost: <span id="boostValue">1.5</span>x</label>
+            <input type="range" id="boostSlider" min="1" max="3" step="0.1" value="1.5" style="width: 100%; margin-top: 8px; cursor: pointer; pointer-events: auto !important;">
+        </div>
+
+        <button id="enhanceAudioBtn" class="btn-primary" style="padding: 10px 15px; background: #7c3aed; color: white; border: none; border-radius: 5px; cursor: pointer; width: 100%;">✨ အသံအရည်အသွေး မြှင့်တင်မည် (Enhance)</button>
+
+        <!-- Enhanced Result Player -->
+        <audio id="enhancedAudio" controls style="display:none; margin-top:15px; width:100%;"></audio>
+        <br>
+        <a id="downloadEnhancedLink" style="display:none; margin-top:15px; color: #4CAF50; font-weight: bold; text-decoration: none;" download="enhanced_voiceover.wav">💾 စတူဒီယို အသံဖိုင်ကို ဒေါင်းလုဒ်လုပ်ရန်</a>
     </div>
-
-    <button id="enhanceAudioBtn" class="btn-primary" style="padding: 10px 15px; background: #7c3aed; color: white; border: none; border-radius: 5px; cursor: pointer; width: 100%;">✨ အသံအရည်အသွေး မြှင့်တင်မည် (Enhance)</button>
-
-    <!-- Enhanced Result Player -->
-    <audio id="enhancedAudio" controls style="display:none; margin-top:15px; width:100%;"></audio>
-    <br>
-    <a id="downloadEnhancedLink" style="display:none; margin-top:15px; color: #4CAF50; font-weight: bold; text-decoration: none;" download="enhanced_voiceover.wav">💾 စတူဒီယို အသံဖိုင်ကို ဒေါင်းလုဒ်လုပ်ရန်</a>
 </div>
-
 
 <!-- AI Script & Movie Director အစုံလိုက် View -->
 <div id="aiScriptView" class="view-container" style="display: none; padding: 16px;">
