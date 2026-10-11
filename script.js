@@ -3664,121 +3664,139 @@ ${flowPromptText}`;
         console.error('Copy Error:', err);
     });
 }
-// Scene တစ်ခုလုံး (Voiceover + Flow Prompt) ကို တစ်ခါတည်း Copy ကူးမည့် Function
-function copyFullScene(sceneNum, voiceoverText, flowPromptText) {
-    const fullText = `--- Scene ${sceneNum} ---
-[Voiceover]:
-${voiceoverText}
+// Global variable สำหรับเก็บ Silence ဖြတ်ပြီးသား အသံဖိုင်ဒေတာ
+let currentProcessedAudioBlob = null;
 
-[Flow Prompt]:
-${flowPromptText}`;
+// ဖိုင်တင်သည့်အခါ ❌ (Clear) ခလုတ် ပေါ်လာစေရန်နှင့် Clear လုပ်သည့် Logic
+document.addEventListener('DOMContentLoaded', () => {
+    const audioFileInput = document.getElementById('audioFileInput');
+    const clearFileBtn = document.getElementById('clearFileBtn');
+    const outputAudio = document.getElementById('outputAudio');
+    const downloadAudioLink = document.getElementById('downloadAudioLink');
+    const enhancedAudio = document.getElementById('enhancedAudio');
+    const downloadEnhancedLink = document.getElementById('downloadEnhancedLink');
 
-    navigator.clipboard.writeText(fullText).then(() => {
-        alert(`Scene ${sceneNum} တစ်ခုလုံးကို Copy ကူးပြီးပါပြီ!`);
-    }).catch(err => {
-        console.error('Copy Error:', err);
-    });
-}
-
-    Document.getElementById('processAudioBtn').addEventListener('click', async () => {
-    const fileInput = document.getElementById('audioFileInput');
-    if (fileInput.files.length === 0) {
-        alert('ကျေးဇူးပြု၍ အသံဖိုင်တစ်ခု ရွေးချယ်ပါ သားရီး!');
-        return;
-    }
-
-    const file = fileInput.files[0];
-    const arrayBuffer = await file.arrayBuffer();
-    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    const audioBuffer = await audioCtx.decodeAudioData(arrayBuffer);
-
-    // Silence Removal Logic
-    const channelData = audioBuffer.getChannelData(0); // Mono channel ယူမည်
-    const sampleRate = audioBuffer.sampleRate;
-    
-    // ချိန်ညှိချက်များ (Threshold နဲ့ Min Duration)
-    const silenceThreshold = 0.02; // ဒီပမာဏထက် ငြိမ်ရင် အသံတိတ်ဟု သတ်မှတ်မည်
-    const minSilenceSamples = sampleRate * 0.3; // 0.3 စက္ကန့်ထက်ပို၍ တိတ်မှ ဖြတ်မည်
-
-    let nonSilentChunks = [];
-    let start = null;
-
-    for (let i = 0; i < channelData.length; i++) {
-        const absValue = Math.abs(channelData[i]);
-        if (absValue > silenceThreshold) {
-            if (start === null) start = i;
-        } else {
-            if (start !== null) {
-                if (i - start > minSilenceSamples) {
-                    nonSilentChunks.push({ start: start, end: i });
-                    start = null;
-                }
+    if (audioFileInput) {
+        audioFileInput.addEventListener('change', function(e) {
+            if (e.target.files.length > 0) {
+                if (clearFileBtn) clearFileBtn.style.display = 'inline-block';
+                currentProcessedAudioBlob = null; // ဖိုင်အသစ်တင်လိုက်ရင် အဟောင်းကို ရှင်းမည်
             }
-        }
-    }
-    if (start !== null) {
-        nonSilentChunks.push({ start: start, end: channelData.length });
-    }
-
-    // အသံအပိုင်းအစများကို ပြန်လည်စုစည်းခြင်း (Fade-in / Fade-out ဖြင့် "ဖောက်" သံပျောက်အောင် ပြုလုပ်ခြင်း)
-    let totalLength = nonSilentChunks.reduce((acc, chunk) => acc + (chunk.end - chunk.start), 0);
-    const newAudioBuffer = audioCtx.createBuffer(audioBuffer.numberOfChannels, totalLength, sampleRate);
-
-    // ကလစ်သံမမြည်စေရန် အလွန်တိုသော ချိန်ညှိချက် (ဥပမာ: 5ms)
-    const fadeSamples = Math.floor(sampleRate * 0.005); 
-
-    for (let channel = 0; channel < audioBuffer.numberOfChannels; channel++) {
-        let newChannelData = newAudioBuffer.getChannelData(channel);
-        let offset = 0;
-        const sourceData = audioBuffer.getChannelData(channel);
-        
-        nonSilentChunks.forEach(chunk => {
-            let length = chunk.end - chunk.start;
-            
-            // Chunk တစ်ခုချင်းစီကို ယာယီကူးယူမည်
-            let chunkData = sourceData.subarray(chunk.start, chunk.end);
-            
-            // အစမှာ Fade-in ထည့်မည်
-            for (let f = 0; f < fadeSamples && f < length; f++) {
-                let gain = f / fadeSamples;
-                newChannelData[offset + f] = chunkData[f] * gain;
-            }
-            
-            // အလယ်ပိုင်း ပုံမှန်ဒေတာများကို ထည့်မည်
-            for (let f = fadeSamples; f < length - fadeSamples; f++) {
-                newChannelData[offset + f] = chunkData[f];
-            }
-            
-            // အဆုံးမှာ Fade-out ထည့်မည်
-            for (let f = Math.max(0, length - fadeSamples); f < length; f++) {
-                let gain = (length - f) / fadeSamples;
-                newChannelData[offset + f] = chunkData[f] * gain;
-            }
-
-            offset += length;
         });
     }
 
-    // WAV ဖိုင်အဖြစ် ပြောင်းလဲခြင်း
-    const wavBlob = bufferToWave(newAudioBuffer, totalLength);
-    
-    // 🌟 အောက်က Enhancer ဆက်သုံးလို့ရအောင် သိမ်းပေးခြင်း
-    window.currentProcessedAudioBlob = wavBlob;
-
-    const audioUrl = URL.createObjectURL(wavBlob);
-
-    // Audio Player နဲ့ Download Link ချိတ်ပေးခြင်း
-    const audioElement = document.getElementById('outputAudio');
-    audioElement.src = audioUrl;
-    audioElement.style.display = 'block';
-
-    const downloadLink = document.getElementById('downloadAudioLink');
-    downloadLink.href = audioUrl;
-    downloadLink.download = 'cleaned_voiceover.wav';
-    downloadLink.style.display = 'inline-block';
-    
-    alert('အသံတိတ်ကွက်များ ဖယ်ရှားပြီး ကလစ်သံများ ကင်းစင်အောင် ပြုလုပ်ပြီးပါပြီ သားရီး!');
+    if (clearFileBtn) {
+        clearFileBtn.addEventListener('click', function() {
+            if (audioFileInput) audioFileInput.value = '';
+            clearFileBtn.style.display = 'none';
+            if (outputAudio) {
+                outputAudio.style.display = 'none';
+                outputAudio.src = '';
+            }
+            if (downloadAudioLink) downloadAudioLink.style.display = 'none';
+            if (enhancedAudio) {
+                enhancedAudio.style.display = 'none';
+                enhancedAudio.src = '';
+            }
+            if (downloadEnhancedLink) downloadEnhancedLink.style.display = 'none';
+            currentProcessedAudioBlob = null;
+        });
+    }
 });
+
+// Silence Removal လုပ်ဆောင်ရန်
+const processAudioBtn = document.getElementById('processAudioBtn');
+if (processAudioBtn) {
+    processAudioBtn.addEventListener('click', async () => {
+        const fileInput = document.getElementById('audioFileInput');
+        if (!fileInput || fileInput.files.length === 0) {
+            alert('ကျေးဇူးပြု၍ အသံဖိုင်တစ်ခု ရွေးချယ်ပါ သားရီး!');
+            return;
+        }
+
+        const file = fileInput.files[0];
+        const arrayBuffer = await file.arrayBuffer();
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const audioBuffer = await audioCtx.decodeAudioData(arrayBuffer);
+
+        const channelData = audioBuffer.getChannelData(0);
+        const sampleRate = audioBuffer.sampleRate;
+        
+        const silenceThreshold = 0.02;
+        const minSilenceSamples = sampleRate * 0.3;
+
+        let nonSilentChunks = [];
+        let start = null;
+
+        for (let i = 0; i < channelData.length; i++) {
+            const absValue = Math.abs(channelData[i]);
+            if (absValue > silenceThreshold) {
+                if (start === null) start = i;
+            } else {
+                if (start !== null) {
+                    if (i - start > minSilenceSamples) {
+                        nonSilentChunks.push({ start: start, end: i });
+                        start = null;
+                    }
+                }
+            }
+        }
+        if (start !== null) {
+            nonSilentChunks.push({ start: start, end: channelData.length });
+        }
+
+        let totalLength = nonSilentChunks.reduce((acc, chunk) => acc + (chunk.end - chunk.start), 0);
+        const newAudioBuffer = audioCtx.createBuffer(audioBuffer.numberOfChannels, totalLength, sampleRate);
+        const fadeSamples = Math.floor(sampleRate * 0.005); 
+
+        for (let channel = 0; channel < audioBuffer.numberOfChannels; channel++) {
+            let newChannelData = newAudioBuffer.getChannelData(channel);
+            let offset = 0;
+            const sourceData = audioBuffer.getChannelData(channel);
+            
+            nonSilentChunks.forEach(chunk => {
+                let length = chunk.end - chunk.start;
+                let chunkData = sourceData.subarray(chunk.start, chunk.end);
+                
+                for (let f = 0; f < fadeSamples && f < length; f++) {
+                    let gain = f / fadeSamples;
+                    newChannelData[offset + f] = chunkData[f] * gain;
+                }
+                
+                for (let f = fadeSamples; f < length - fadeSamples; f++) {
+                    newChannelData[offset + f] = chunkData[f];
+                }
+                
+                for (let f = Math.max(0, length - fadeSamples); f < length; f++) {
+                    let gain = (length - f) / fadeSamples;
+                    newChannelData[offset + f] = chunkData[f] * gain;
+                }
+
+                offset += length;
+            });
+        }
+
+        const wavBlob = bufferToWave(newAudioBuffer, totalLength);
+        currentProcessedAudioBlob = wavBlob; // သိမ်းဆည်းမည်
+
+        const audioUrl = URL.createObjectURL(wavBlob);
+
+        const audioElement = document.getElementById('outputAudio');
+        if (audioElement) {
+            audioElement.src = audioUrl;
+            audioElement.style.display = 'block';
+        }
+
+        const downloadLink = document.getElementById('downloadAudioLink');
+        if (downloadLink) {
+            downloadLink.href = audioUrl;
+            downloadLink.download = 'cleaned_voiceover.wav';
+            downloadLink.style.display = 'inline-block';
+        }
+        
+        alert('အသံတိတ်ကွက်များ ဖယ်ရှားပြီး ကလစ်သံများ ကင်းစင်အောင် ပြုလုပ်ပြီးပါပြီ သားရီး!');
+    });
+}
 
 // AudioBuffer ကို WAV Blob သို့ ပြောင်းပေးသည့် Helper Function
 function bufferToWave(abuffer, len) {
@@ -3801,20 +3819,20 @@ function bufferToWave(abuffer, len) {
     }
 
     setUint32(0x46464952); // "RIFF"
-    setUint32(length - 8); // file length - 8
+    setUint32(length - 8); 
     setUint32(0x45564157); // "WAVE"
 
     setUint32(0x20746d66); // "fmt " chunk
-    setUint32(16); // length = 16
-    setUint16(1); // PCM (uncompressed)
+    setUint32(16); 
+    setUint16(1); 
     setUint16(numOfChan);
     setUint32(abuffer.sampleRate);
-    setUint32(abuffer.sampleRate * 2 * numOfChan); // avg. bytes/sec
-    setUint16(numOfChan * 2); // block-align
-    setUint16(16); // 16-bit
+    setUint32(abuffer.sampleRate * 2 * numOfChan); 
+    setUint16(numOfChan * 2); 
+    setUint16(16); 
 
     setUint32(0x61746164); // "data" - chunk
-    setUint32(length - pos - 4); // data length
+    setUint32(length - pos - 4); 
 
     for (i = 0; i < abuffer.numberOfChannels; i++)
         channels.push(abuffer.getChannelData(i));
@@ -3836,7 +3854,8 @@ function bufferToWave(abuffer, len) {
 const boostSlider = document.getElementById('boostSlider');
 if (boostSlider) {
     boostSlider.addEventListener('input', function() {
-        document.getElementById('boostValue').textContent = this.value;
+        const boostValue = document.getElementById('boostValue');
+        if (boostValue) boostValue.textContent = this.value;
     });
 }
 
@@ -3845,23 +3864,20 @@ const enhanceAudioBtn = document.getElementById('enhanceAudioBtn');
 if (enhanceAudioBtn) {
     enhanceAudioBtn.addEventListener('click', async () => {
         const fileInput = document.getElementById('audioFileInput');
-
-        // Silence ဖြတ်ထားတာ ရှိရင် အဲ့ဒါကိုယူမယ်၊ မရှိရင် Original ဖိုင်ကို ယူမယ်
-        let targetFile = window.currentProcessedAudioBlob || (fileInput.files.length > 0 ? fileInput.files[0] : null);
+        
+        // Silence ဖြတ်ထားတာ ရှိရင် အဲ့ဒါကိုယူမယ်၊ မရှိရင် Original ဖိုင်ကို ယူမည်
+        let targetFile = currentProcessedAudioBlob || (fileInput && fileInput.files.length > 0 ? fileInput.files[0] : null);
 
         if (!targetFile) {
-            alert('ကျေးဇူးပြု၍ အသံဖိုင်တစ်ခု ရွေးချယ်ပါ သားရီး!');
+            alert('ကျေးဇူးပြု၍ အသံဖိုင်တစ်ခု ရွေးချယ်ပါ (သို့) Silence အရင်ဖြတ်ပါ သားရီး!');
             return;
         }
 
-        const file = targetFile; // 👈 ဒီတစ်ကြောင်းပဲ သုံးရပါမယ်
-
         const boostFactor = parseFloat(document.getElementById('boostSlider').value);
-        const arrayBuffer = await file.arrayBuffer();
+        const arrayBuffer = await targetFile.arrayBuffer();
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         const audioBuffer = await audioCtx.decodeAudioData(arrayBuffer);
 
-        // Enhance / Volume & Clarity Boost Logic
         const sampleRate = audioBuffer.sampleRate;
         const totalLength = audioBuffer.length;
         const newAudioBuffer = audioCtx.createBuffer(audioBuffer.numberOfChannels, totalLength, sampleRate);
@@ -3876,23 +3892,22 @@ if (enhanceAudioBtn) {
             }
         }
 
-        // WAV ဖိုင်အဖြစ် ပြောင်းလဲခြင်း
         const wavBlob = bufferToWave(newAudioBuffer, totalLength);
         const audioUrl = URL.createObjectURL(wavBlob);
 
-        // Enhanced Audio Player နဲ့ Download Link ချိတ်ပေးခြင်း
         const enhancedElement = document.getElementById('enhancedAudio');
-        enhancedElement.src = audioUrl;
-        enhancedElement.style.display = 'block';
+        if (enhancedElement) {
+            enhancedElement.src = audioUrl;
+            enhancedElement.style.display = 'block';
+        }
 
         const downloadEnhancedLink = document.getElementById('downloadEnhancedLink');
-        downloadEnhancedLink.href = audioUrl;
-        downloadEnhancedLink.download = 'enhanced_voiceover.wav';
-        downloadEnhancedLink.style.display = 'block';
+        if (downloadEnhancedLink) {
+            downloadEnhancedLink.href = audioUrl;
+            downloadEnhancedLink.download = 'enhanced_voiceover.wav';
+            downloadEnhancedLink.style.display = 'block';
+        }
         
         alert('စတူဒီယို အရည်အသွေးသို့ အသံမြှင့်တင်ခြင်း ပြီးစီးပါပြီ သားရီး!');
     });
 }
-
-
-    
