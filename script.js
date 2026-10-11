@@ -370,6 +370,72 @@ function switchAiSubTab(tab) {
         btnSingle.style.boxShadow = "none";
     }
 }
+// Menu ဖွင့်ရန်
+function openSettingsMenu() {
+    document.getElementById('scriptMenuModal').style.display = 'flex';
+}
+
+// Menu ပိတ်ရန်
+function closeScriptMenu() {
+    document.getElementById('scriptMenuModal').style.display = 'none';
+}
+
+// ၁။ Save Copy လုပ်ခြင်း (LocalStorage ထဲမှာ သိမ်းမည်)
+function saveScriptCopy() {
+    const textInput = document.getElementById('scriptTextInput') || document.querySelector('textarea'); 
+    if (textInput) {
+        localStorage.setItem('saved_script_copy', textInput.value);
+        alert('✨ Copy သိမ်းဆည်းပြီးပါပြီ သားရီး!');
+    } else {
+        alert('သိမ်းဆည်းရန် စာသားနေရာ မတွေ့ပါ။');
+    }
+    closeScriptMenu();
+}
+
+// ၂။ Restore လုပ်ခြင်း (သိမ်းထားတာကို ပြန်ခေါ်မည်)
+function loadScriptCopy() {
+    const savedData = localStorage.getItem('saved_script_copy');
+    const textInput = document.getElementById('scriptTextInput') || document.querySelector('textarea');
+    
+    if (savedData && textInput) {
+        textInput.value = savedData;
+        alert('📂 သိမ်းဆည်းထားသော Copy ကို ပြန်လည်ဖော်ပြပြီးပါပြီ!');
+    } else {
+        alert('⚠️ သိမ်းဆည်းထားသော Data မရှိသေးပါ။');
+    }
+    closeScriptMenu();
+}
+
+// ၃။ သေချာမှ ဖျက်မည့် Delete ခလုတ် (Confirm Box ပါဝင်သည်)
+function confirmClearScript() {
+    const isConfirmed = confirm('❗ အချက်အလက်များကို အမှန်တကယ် ဖျက်ပစ်မှာ လោក?');
+    if (isConfirmed) {
+        const textInput = document.getElementById('scriptTextInput') || document.querySelector('textarea');
+        if (textInput) {
+            textInput.value = '';
+        }
+        localStorage.removeItem('saved_script_copy');
+        alert('🗑️ အချက်အလက်များအားလုံးကို ရှင်းလင်းပြီးပါပြီ။');
+    }
+    closeScriptMenu();
+}
+
+// 1. စာရိုက်နေစဉ် သို့မဟုတ် ပြောင်းလဲမှုရှိတိုင်း အလိုအလျောက် LocalStorage ထဲ သိမ်းပေးမည့် Auto-save function
+const scriptInputBox = document.getElementById('scriptTextInput') || document.querySelector('textarea');
+
+if (scriptInputBox) {
+    // Page ပွင့်လာရင် သိမ်းထားတာရှိရင် ပြန်ပေါ်လာစေရန်
+    const savedAutoCopy = localStorage.getItem('auto_saved_script');
+    if (savedAutoCopy && !scriptInputBox.value) {
+        scriptInputBox.value = savedAutoCopy;
+    }
+
+    // စာရိုက်တိုင်း အလိုအလျောက် မှတ်သွားရန်
+    scriptInputBox.addEventListener('input', function() {
+        localStorage.setItem('auto_saved_script', scriptInputBox.value);
+    });
+}
+
 let activePickerTarget = null; // 'single' or block ID number
 let singleVoiceValue = "Charon";
 let currentAudioBlob = null;
@@ -3031,24 +3097,38 @@ Clear, natural Burmese conversational tone with friendly, engaging, casual narra
     btn.innerHTML = "🔊 Generate Single-Voice Audio";
 }
 
-// Download Button Click Handler
+// Download Button Click Handler (Median.co App နဲ့ Browser နှစ်ခုစလုံးအတွက် တွဲဖက်သုံးရန်)
 function triggerDownload(e) {
     if (e) e.preventDefault();
     if (!currentAudioBlob) return;
 
     const format = document.getElementById("formatSelect").value || "wav";
+    const fileName = `sh_multi_audio_${Date.now()}.${format}`;
+
     const reader = new FileReader();
     reader.onloadend = function() {
         const base64Data = reader.result;
-        const a = document.createElement('a');
-        a.href = base64Data;
-        a.download = `sh_multi_audio_${Date.now()}.${format}`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
+
+        // Median.co App ထဲမှာ ဖြစ်နေလား စစ်ဆေးခြင်း
+        if (typeof nativeBridge !== 'undefined' && nativeBridge.files) {
+            // Median.co Native Download Plugin ရှိရင် သုံးမည်
+            nativeBridge.files.download({
+                url: base64Data,
+                filename: fileName
+            });
+        } else {
+            // ပုံမှန် Browser အတွက်
+            const a = document.createElement('a');
+            a.href = base64Data;
+            a.download = fileName;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
     };
     reader.readAsDataURL(currentAudioBlob);
 }
+
 
 /* HELPER FUNCTIONS */
 function base64ToUint8Array(base64){
@@ -3511,10 +3591,38 @@ function showNeonAlert(message) {
     document.body.insertAdjacentHTML('beforeend', alertHtml);
 }
 
-// App တစ်ခုလုံးရှိ alert() အားလုံးကို Neon Glass Alert သို့ အလိုအလျောက် ပြောင်းပေးရန်
+// 1. Neon Glass Notification UI ဖန်တီးပေးမည့် Function
+function showNeonAlert(msg) {
+    let noticeBox = document.getElementById('neonAlertNotice');
+    if (!noticeBox) {
+        noticeBox = document.createElement('div');
+        noticeBox.id = 'neonAlertNotice';
+        noticeBox.style.cssText = `
+            position: fixed; bottom: 35px; left: 50%; transform: translateX(-50%);
+            background: rgba(15, 23, 42, 0.95); border: 1px solid #00d2ff;
+            color: #fff; padding: 12px 24px; border-radius: 14px;
+            box-shadow: 0 0 25px rgba(0, 210, 255, 0.45); font-size: 13px; font-weight: bold;
+            z-index: 99999; backdrop-filter: blur(12px); display: flex; align-items: center; gap: 10px;
+            transition: all 0.3s ease; opacity: 0; pointer-events: none;
+        `;
+        document.body.appendChild(noticeBox);
+    }
+    
+    noticeBox.innerHTML = `<span>✨</span> <span>${msg}</span>`;
+    noticeBox.style.opacity = '1';
+    noticeBox.style.transform = 'translateX(-50%) translateY(-5px)';
+    
+    setTimeout(() => {
+        noticeBox.style.opacity = '0';
+        noticeBox.style.transform = 'translateX(-50%) translateY(0px)';
+    }, 2800);
+}
+
+// 2. Browser ရဲ့ ရိုးရိုး alert() အားလုံးကို Neon Alert သို့ အလိုအလျောက် ပြောင်းပစ်ခြင်း
 window.alert = function(message) {
     showNeonAlert(message);
 };
+
 // ဇာတ်လမ်းအချက်အလက်များကို Browser ထဲ သိမ်းရန်
 function saveStoryMemory() {
     localStorage.setItem('myMovieStoryMemory', JSON.stringify(storyMemory));
@@ -3570,4 +3678,152 @@ ${flowPromptText}`;
     }).catch(err => {
         console.error('Copy Error:', err);
     });
+}
+
+document.getElementById('processAudioBtn').addEventListener('click', async () => {
+    const fileInput = document.getElementById('audioFileInput');
+    if (fileInput.files.length === 0) {
+        alert('ကျေးဇူးပြု၍ အသံဖိုင်တစ်ခု ရွေးချယ်ပါ သားရီး!');
+        return;
+    }
+
+    const file = fileInput.files[0];
+    const arrayBuffer = await file.arrayBuffer();
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    const audioBuffer = await audioCtx.decodeAudioData(arrayBuffer);
+
+    // Silence Removal Logic
+    const channelData = audioBuffer.getChannelData(0); // Mono channel ယူမည်
+    const sampleRate = audioBuffer.sampleRate;
+    
+    // ချိန်ညှိချက်များ (Threshold နဲ့ Min Duration)
+    const silenceThreshold = 0.02; // ဒီပမာဏထက် ငြိမ်ရင် အသံတိတ်ဟု သတ်မှတ်မည်
+    const minSilenceSamples = sampleRate * 0.3; // 0.3 စက္ကန့်ထက်ပို၍ တိတ်မှ ဖြတ်မည်
+
+    let nonSilentChunks = [];
+    let start = null;
+
+    for (let i = 0; i < channelData.length; i++) {
+        const absValue = Math.abs(channelData[i]);
+        if (absValue > silenceThreshold) {
+            if (start === null) start = i;
+        } else {
+            if (start !== null) {
+                if (i - start > minSilenceSamples) {
+                    nonSilentChunks.push({ start: start, end: i });
+                    start = null;
+                }
+            }
+        }
+    }
+    if (start !== null) {
+        nonSilentChunks.push({ start: start, end: channelData.length });
+    }
+
+    // အသံအပိုင်းအစများကို ပြန်လည်စုစည်းခြင်း (Fade-in / Fade-out ဖြင့် "ဖောက်" သံပျောက်အောင် ပြုလုပ်ခြင်း)
+    let totalLength = nonSilentChunks.reduce((acc, chunk) => acc + (chunk.end - chunk.start), 0);
+    const newAudioBuffer = audioCtx.createBuffer(audioBuffer.numberOfChannels, totalLength, sampleRate);
+
+    // ကလစ်သံမမြည်စေရန် အလွန်တိုသော ချိန်ညှိချက် (ဥပမာ: 5ms)
+    const fadeSamples = Math.floor(sampleRate * 0.005); 
+
+    for (let channel = 0; channel < audioBuffer.numberOfChannels; channel++) {
+        let newChannelData = newAudioBuffer.getChannelData(channel);
+        let offset = 0;
+        const sourceData = audioBuffer.getChannelData(channel);
+        
+        nonSilentChunks.forEach(chunk => {
+            let length = chunk.end - chunk.start;
+            
+            // Chunk တစ်ခုချင်းစီကို ယာယီကူးယူမည်
+            let chunkData = sourceData.subarray(chunk.start, chunk.end);
+            
+            // အစမှာ Fade-in ထည့်မည်
+            for (let f = 0; f < fadeSamples && f < length; f++) {
+                let gain = f / fadeSamples;
+                newChannelData[offset + f] = chunkData[f] * gain;
+            }
+            
+            // အလယ်ပိုင်း ပုံမှန်ဒေတာများကို ထည့်မည်
+            for (let f = fadeSamples; f < length - fadeSamples; f++) {
+                newChannelData[offset + f] = chunkData[f];
+            }
+            
+            // အဆုံးမှာ Fade-out ထည့်မည်
+            for (let f = Math.max(0, length - fadeSamples); f < length; f++) {
+                let gain = (length - f) / fadeSamples;
+                newChannelData[offset + f] = chunkData[f] * gain;
+            }
+
+            offset += length;
+        });
+    }
+
+    // WAV ဖိုင်အဖြစ် ပြောင်းလဲခြင်း
+    const wavBlob = bufferToWave(newAudioBuffer, totalLength);
+    const audioUrl = URL.createObjectURL(wavBlob);
+
+    // Audio Player နဲ့ Download Link ချိတ်ပေးခြင်း
+    const audioElement = document.getElementById('outputAudio');
+    audioElement.src = audioUrl;
+    audioElement.style.display = 'block';
+
+    const downloadLink = document.getElementById('downloadAudioLink');
+    downloadLink.href = audioUrl;
+    downloadLink.download = 'cleaned_voiceover.wav';
+    downloadLink.style.display = 'inline-block';
+    
+    alert('အသံတိတ်ကွက်များ ဖယ်ရှားပြီး ကလစ်သံများ ကင်းစင်အောင် ပြုလုပ်ပြီးပါပြီ သားရီး!');
+});
+
+// AudioBuffer ကို WAV Blob သို့ ပြောင်းပေးသည့် Helper Function
+function bufferToWave(abuffer, len) {
+    let numOfChan = abuffer.numberOfChannels,
+        length = len * numOfChan * 2 + 44,
+        buffer = new ArrayBuffer(length),
+        view = new DataView(buffer),
+        channels = [], i, sample,
+        offset = 0,
+        pos = 0;
+
+    function setUint16(data) {
+        view.setUint16(pos, data, true);
+        pos += 2;
+    }
+
+    function setUint32(data) {
+        view.setUint32(pos, data, true);
+        pos += 4;
+    }
+
+    setUint32(0x46464952); // "RIFF"
+    setUint32(length - 8); // file length - 8
+    setUint32(0x45564157); // "WAVE"
+
+    setUint32(0x20746d66); // "fmt " chunk
+    setUint32(16); // length = 16
+    setUint16(1); // PCM (uncompressed)
+    setUint16(numOfChan);
+    setUint32(abuffer.sampleRate);
+    setUint32(abuffer.sampleRate * 2 * numOfChan); // avg. bytes/sec
+    setUint16(numOfChan * 2); // block-align
+    setUint16(16); // 16-bit
+
+    setUint32(0x61746164); // "data" - chunk
+    setUint32(length - pos - 4); // data length
+
+    for (i = 0; i < abuffer.numberOfChannels; i++)
+        channels.push(abuffer.getChannelData(i));
+
+    while (offset < len) {
+        for (i = 0; i < numOfChan; i++) {
+            sample = Math.max(-1, Math.min(1, channels[i][offset]));
+            sample = (0.5 + sample < 0 ? sample * 32768 : sample * 32767);
+            view.setInt16(pos, sample, true);
+            pos += 2;
+        }
+        offset++;
+    }
+
+    return new Blob([buffer], { type: "audio/wav" });
 }
