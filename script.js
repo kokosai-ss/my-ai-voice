@@ -3722,8 +3722,8 @@ if (processAudioBtn) {
         const channelData = audioBuffer.getChannelData(0);
         const sampleRate = audioBuffer.sampleRate;
         
-        const silenceThreshold = 0.02;
-        const minSilenceSamples = sampleRate * 0.3;
+        const silenceThreshold = 0.01;
+        const minSilenceSamples = sampleRate * 0.5;
 
         let nonSilentChunks = [];
         let start = null;
@@ -3747,7 +3747,7 @@ if (processAudioBtn) {
 
         let totalLength = nonSilentChunks.reduce((acc, chunk) => acc + (chunk.end - chunk.start), 0);
         const newAudioBuffer = audioCtx.createBuffer(audioBuffer.numberOfChannels, totalLength, sampleRate);
-        const fadeSamples = Math.floor(sampleRate * 0.005); 
+        const fadeSamples = Math.floor(sampleRate * 0.025); 
 
         for (let channel = 0; channel < audioBuffer.numberOfChannels; channel++) {
             let newChannelData = newAudioBuffer.getChannelData(channel);
