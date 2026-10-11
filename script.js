@@ -3206,6 +3206,7 @@ function writeString(view, offset, string){
     shRenderVoiceLibrary();
 }
   }
+}
 function showGenerateMessage(text, type){
     const box = document.getElementById("generateMessage");
     box.textContent = text;
