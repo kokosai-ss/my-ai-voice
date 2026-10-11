@@ -254,7 +254,7 @@ Required JSON format:
     }
 }
 
-// --- Card ပြသပေးသည့် Function ( Voiceover & Prompt Copy Buttons ပါဝင်သည်) ---
+// --- Card ပြသပေးသည့် Function (မြန်မာ Voiceover နှင့် Flow AI Prompt ပေါင်းပြီး တစ်ခါတည်း ကူးရန် ခလုတ်ပါဝင်သည်) ---
 function renderMultiSceneCards() {
     const multiResultContent = document.getElementById('multiResultContent');
     let htmlOutput = "";
@@ -265,15 +265,16 @@ function renderMultiSceneCards() {
                 <!-- Header -->
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; border-bottom: 1px solid rgba(0,243,255,0.15); padding-bottom: 6px;">
                     <span style="color: #00f3ff; font-weight: bold; font-size: 13px;">🎬 Scene ${s.scene_number} (${s.time_range})</span>
+                    <!-- တစ်ခုချင်းစီကို မြန်မာ Voiceover နှင့် Prompt နှစ်ခုလုံး တွဲကူးမည့် ခလုတ် -->
+                    <button class="copy-all-btn" style="background: linear-gradient(135deg, #fbbf24, #f59e0b); color: #000; font-weight: bold; padding: 4px 10px; font-size: 11px; border-radius: 6px; border: none; cursor: pointer;" onclick="copyCombinedScene(${index})">
+                        <i class="fa-solid fa-copy"></i> အကုန် ကူးမည်
+                    </button>
                 </div>
 
                 <!-- မြန်မာ Voiceover Section -->
                 <div style="background: rgba(15, 23, 42, 0.6); padding: 8px 10px; border-radius: 8px; margin-bottom: 8px;">
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
                         <span style="color: #fbbf24; font-size: 11px; font-weight: bold;">🇲🇲 မြန်မာစကားပြောခန်း / Voiceover:</span>
-                        <button class="copy-all-btn" style="background: #fbbf24; color: #000; font-weight: bold; padding: 3px 8px; font-size: 10px;" onclick="copySceneItem(${index}, 'dialogue')">
-                            <i class="fa-solid fa-microphone"></i> Voiceover ကူးမည်
-                        </button>
                     </div>
                     <p style="margin: 0; font-size: 13px; color: #f8fafc; line-height: 1.4;">${escapeHtml(s.burmese_dialogue)}</p>
                 </div>
@@ -282,9 +283,6 @@ function renderMultiSceneCards() {
                 <div style="background: rgba(15, 23, 42, 0.6); padding: 8px 10px; border-radius: 8px;">
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
                         <span style="color: #00f3ff; font-size: 11px; font-weight: bold;">🇬🇧 Flow AI Prompt:</span>
-                        <button class="copy-all-btn" style="padding: 3px 8px; font-size: 10px;" onclick="copySceneItem(${index}, 'prompt')">
-                            <i class="fa-solid fa-wand-magic-sparkles"></i> Prompt ကူးမည်
-                        </button>
                     </div>
                     <p style="margin: 0; font-size: 12px; color: #94a3b8; font-family: monospace; line-height: 1.4;">${escapeHtml(s.flow_prompt)}</p>
                 </div>
@@ -295,15 +293,16 @@ function renderMultiSceneCards() {
     multiResultContent.innerHTML = htmlOutput;
 }
 
-// --- Single Copy Handler (Single Quote / Double Quote အမှားမတတ်အောင် ထိန်းပေးထားသည်) ---
-function copySceneItem(sceneIndex, type) {
+// --- Scene တစ်ခုချင်းစီအတွက် Voiceover နှင့် Flow AI Prompt ကို တွဲ၍ ပုံစံတကျ Copy ကူးပေးမည့် Function ---
+function copyCombinedScene(sceneIndex) {
     if (!storyMemory.scenes[sceneIndex]) return;
     const targetScene = storyMemory.scenes[sceneIndex];
-    const textToCopy = (type === 'dialogue') ? targetScene.burmese_dialogue : targetScene.flow_prompt;
     
-    navigator.clipboard.writeText(textToCopy);
-    const label = (type === 'dialogue') ? 'Voiceover' : 'Flow AI Prompt';
-    showNeonAlert(`Scene ${targetScene.scene_number} ${label} ကို ကူးပြီးပါပြီ!`);
+    // မင်းလိုချင်တဲ့ ပုံစံအတိုင်း စာသားများကို စနစ်တကျ ပေါင်းပေးခြင်း
+    const combinedText = `မြန်မာ Voice over: ${targetScene.burmese_dialogue}\n\nFlow AI Prompt:\n${targetScene.flow_prompt}`;
+    
+    navigator.clipboard.writeText(combinedText);
+    showNeonAlert(`Scene ${targetScene.scene_number} ၏ Voiceover နှင့် Prompt ကို ကူးပြီးပါပြီ!`);
 }
 
 // --- Text Escape Helper ---
@@ -334,9 +333,9 @@ function copyFlowPrompt() {
 
 function copyAllMultiScenes() {
     if (storyMemory.scenes.length === 0) return;
-    let allText = storyMemory.scenes.map(s => `--- Scene ${s.scene_number} (${s.time_range}) ---\n[Voiceover]:\n${s.burmese_dialogue}\n\n[Flow Prompt]:\n${s.flow_prompt}`).join('\n\n====================\n\n');
+    let allText = storyMemory.scenes.map(s => `မြန်မာ Voice over: ${s.burmese_dialogue}\n\nFlow AI Prompt:\n${s.flow_prompt}`).join('\n\n====================\n\n');
     navigator.clipboard.writeText(allText);
-    showNeonAlert("ဇာတ်လမ်း အခန်းဆက် အားလုံးကို Copy ကူးပြီးပါပြီ!");
+    showNeonAlert("ဇာတ်လမ်း အခန်းဆက် အားလုံးကို တွဲလျက် Copy ကူးပြီးပါပြီ!");
 }
 
 // AI Script ထဲက Single Shot နဲ့ Movie Director Tab များ ပြောင်းရန်
