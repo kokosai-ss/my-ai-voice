@@ -370,72 +370,6 @@ function switchAiSubTab(tab) {
         btnSingle.style.boxShadow = "none";
     }
 }
-// Menu ဖွင့်ရန်
-function openSettingsMenu() {
-    document.getElementById('scriptMenuModal').style.display = 'flex';
-}
-
-// Menu ပိတ်ရန်
-function closeScriptMenu() {
-    document.getElementById('scriptMenuModal').style.display = 'none';
-}
-
-// ၁။ Save Copy လုပ်ခြင်း (LocalStorage ထဲမှာ သိမ်းမည်)
-function saveScriptCopy() {
-    const textInput = document.getElementById('scriptTextInput') || document.querySelector('textarea'); 
-    if (textInput) {
-        localStorage.setItem('saved_script_copy', textInput.value);
-        alert('✨ Copy သိမ်းဆည်းပြီးပါပြီ သားရီး!');
-    } else {
-        alert('သိမ်းဆည်းရန် စာသားနေရာ မတွေ့ပါ။');
-    }
-    closeScriptMenu();
-}
-
-// ၂။ Restore လုပ်ခြင်း (သိမ်းထားတာကို ပြန်ခေါ်မည်)
-function loadScriptCopy() {
-    const savedData = localStorage.getItem('saved_script_copy');
-    const textInput = document.getElementById('scriptTextInput') || document.querySelector('textarea');
-    
-    if (savedData && textInput) {
-        textInput.value = savedData;
-        alert('📂 သိမ်းဆည်းထားသော Copy ကို ပြန်လည်ဖော်ပြပြီးပါပြီ!');
-    } else {
-        alert('⚠️ သိမ်းဆည်းထားသော Data မရှိသေးပါ။');
-    }
-    closeScriptMenu();
-}
-
-// ၃။ သေချာမှ ဖျက်မည့် Delete ခလုတ် (Confirm Box ပါဝင်သည်)
-function confirmClearScript() {
-    const isConfirmed = confirm('❗ အချက်အလက်များကို အမှန်တကယ် ဖျက်ပစ်မှာ လោក?');
-    if (isConfirmed) {
-        const textInput = document.getElementById('scriptTextInput') || document.querySelector('textarea');
-        if (textInput) {
-            textInput.value = '';
-        }
-        localStorage.removeItem('saved_script_copy');
-        alert('🗑️ အချက်အလက်များအားလုံးကို ရှင်းလင်းပြီးပါပြီ။');
-    }
-    closeScriptMenu();
-}
-
-// 1. စာရိုက်နေစဉ် သို့မဟုတ် ပြောင်းလဲမှုရှိတိုင်း အလိုအလျောက် LocalStorage ထဲ သိမ်းပေးမည့် Auto-save function
-const scriptInputBox = document.getElementById('scriptTextInput') || document.querySelector('textarea');
-
-if (scriptInputBox) {
-    // Page ပွင့်လာရင် သိမ်းထားတာရှိရင် ပြန်ပေါ်လာစေရန်
-    const savedAutoCopy = localStorage.getItem('auto_saved_script');
-    if (savedAutoCopy && !scriptInputBox.value) {
-        scriptInputBox.value = savedAutoCopy;
-    }
-
-    // စာရိုက်တိုင်း အလိုအလျောက် မှတ်သွားရန်
-    scriptInputBox.addEventListener('input', function() {
-        localStorage.setItem('auto_saved_script', scriptInputBox.value);
-    });
-}
-
 let activePickerTarget = null; // 'single' or block ID number
 let singleVoiceValue = "Charon";
 let currentAudioBlob = null;
@@ -447,24 +381,31 @@ let singleAudioURL = null;
 let blockCounter = 0;
 
 /* LOCK SCREEN CONTROLS */
+function togglePasswordVisibility() {
+    const input = document.getElementById('passInput');
+    const eyeIcon = document.getElementById('eyeIcon');
+    if (input.type === 'password') {
+        input.type = 'text';
+        if (eyeIcon) {
+            eyeIcon.classList.remove('fa-eye');
+            eyeIcon.classList.add('fa-eye-slash');
+        }
+    } else {
+        input.type = 'password';
+        if (eyeIcon) {
+            eyeIcon.classList.remove('fa-eye-slash');
+            eyeIcon.classList.add('fa-eye');
+        }
+    }
+}
+
 function checkUnlockPassword() {
     const input = document.getElementById('passInput').value;
-    const errorMsg = document.getElementById('errorMsg');
-
-    // အရင် Error စာသားကို အရင်ရှင်းထုတ်မည်
-    if (errorMsg) {
-        errorMsg.style.display = 'none';
-        errorMsg.innerText = '';
-    }
 
     if (input === '') {
-        if (errorMsg) {
-            errorMsg.innerText = 'ကျေးဇူးပြု၍ စကားဝှက် ရိုက်ထည့်ပါ!';
-            errorMsg.style.display = 'block';
-        } else {
-            alert('ကျေးဇူးပြု၍ စကားဝှက် ရိုက်ထည့်ပါ!');
-        }
+        alert('ကျေးဇူးပြု၍ စကားဝှက် ရိုက်ထည့်ပါ!');
     } else if (input === '1911999') {
+
         const lockScreen = document.getElementById('cyberpunk-lockscreen');
         if (lockScreen) {
             lockScreen.style.transition = 'opacity 0.5s ease';
@@ -479,24 +420,15 @@ function checkUnlockPassword() {
             appContent.style.display = "block";
         }
 
-        const saved = typeof getStoredKey === 'function' ? getStoredKey() : null;
-        if (saved && document.getElementById("apiKey")) {
+        const saved = getStoredKey();
+        if (saved) {
             document.getElementById("apiKey").value = saved;
         }
-        if (typeof updateKeyStatus === 'function') {
-            updateKeyStatus();
-        }
+        updateKeyStatus();
     } else {
-        // ❌ Password မှားနေလျှင် ဒီနေရာက အလုပ်လုပ်မည်
-        if (errorMsg) {
-            errorMsg.innerText = '❌ စကားဝှက် မှားယွင်းနေပါသည်။ ထပ်ကြိုးစားပါ။';
-            errorMsg.style.display = 'block';
-        } else {
-            alert('စကားဝှက် မှားယွင်းနေပါသည်။');
-        }
+        alert('စကားဝှက် မှားယွင်းနေပါသည်။');
     }
 }
-
 /* =========================================
    SH IMAGE SEARCH — UNSPLASH FREE MODE
    ========================================= */
@@ -3098,45 +3030,22 @@ Clear, natural Burmese conversational tone with friendly, engaging, casual narra
     btn.disabled = false;
     btn.innerHTML = "🔊 Generate Single-Voice Audio";
 }
-// App နဲ့ Browser နှစ်ခုစလုံးအတွက် အကောင်းဆုံး Download/Share Logic
-async function triggerDownload(e) {
+
+// Download Button Click Handler
+function triggerDownload(e) {
     if (e) e.preventDefault();
     if (!currentAudioBlob) return;
 
     const format = document.getElementById("formatSelect").value || "wav";
-    const fileName = `sh_multi_audio_${Date.now()}.${format}`;
-    const file = new File([currentAudioBlob], fileName, { type: currentAudioBlob.type });
-
-    // ၁။ ပထမဦးစွာ ဖုန်းရဲ့ Native Share (Share နိုင်ရင် Share မည်) ကို စမ်းမည်
-    if (navigator.canShare && navigator.canShare({ files: [file] })) {
-        try {
-            await navigator.share({
-                files: [file],
-                title: 'Cleaned Audio',
-                text: 'အသံတိတ်များ ဖယ်ရှားထားသော အသံဖိုင်'
-            });
-            return; // Share လို့ အောင်မြင်သွားရင် ဒီမှာ ပြီးပြီ
-        } catch (error) {
-            console.log('Share skipped or failed, trying browser open...', error);
-        }
-    }
-
-    // ၂။ Share လို့မရတဲ့ ဖုန်းတွေအတွက် Base64 ပြောင်းပြီး Browser နဲ့ ဖွင့်ပေးမည်
     const reader = new FileReader();
     reader.onloadend = function() {
         const base64Data = reader.result;
-        
-        // Median App ထဲမှာ Browser Tab အသစ်နဲ့ ဖွင့်ပြီး ဒေါင်းခိုင်းခြင်း
-        const openedWindow = window.open(base64Data, '_blank');
-        if (!openedWindow) {
-            // Pop-up ပိတ်ထားရင် ပုံမှန် Link ပုံစံနဲ့ ဆင်းခိုင်းမည်
-            const a = document.createElement('a');
-            a.href = base64Data;
-            a.download = fileName;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-        }
+        const a = document.createElement('a');
+        a.href = base64Data;
+        a.download = `sh_multi_audio_${Date.now()}.${format}`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
     };
     reader.readAsDataURL(currentAudioBlob);
 }
@@ -3180,7 +3089,7 @@ function writeString(view, offset, string){
         view.setUint8(offset + i, string.charCodeAt(i));
     }
 }
-  Function switchView(viewId, element) {
+  function switchView(viewId, element) {
     // ၁။ View အားလုံးကို ဖျောက်မယ်
     document.querySelectorAll('.view-container').forEach(el => {
         el.style.display = 'none';
@@ -3206,7 +3115,6 @@ function writeString(view, offset, string){
     shRenderVoiceLibrary();
 }
   }
-}
 function showGenerateMessage(text, type){
     const box = document.getElementById("generateMessage");
     box.textContent = text;
@@ -3603,38 +3511,10 @@ function showNeonAlert(message) {
     document.body.insertAdjacentHTML('beforeend', alertHtml);
 }
 
-// 1. Neon Glass Notification UI ဖန်တီးပေးမည့် Function
-function showNeonAlert(msg) {
-    let noticeBox = document.getElementById('neonAlertNotice');
-    if (!noticeBox) {
-        noticeBox = document.createElement('div');
-        noticeBox.id = 'neonAlertNotice';
-        noticeBox.style.cssText = `
-            position: fixed; bottom: 35px; left: 50%; transform: translateX(-50%);
-            background: rgba(15, 23, 42, 0.95); border: 1px solid #00d2ff;
-            color: #fff; padding: 12px 24px; border-radius: 14px;
-            box-shadow: 0 0 25px rgba(0, 210, 255, 0.45); font-size: 13px; font-weight: bold;
-            z-index: 99999; backdrop-filter: blur(12px); display: flex; align-items: center; gap: 10px;
-            transition: all 0.3s ease; opacity: 0; pointer-events: none;
-        `;
-        document.body.appendChild(noticeBox);
-    }
-    
-    noticeBox.innerHTML = `<span>✨</span> <span>${msg}</span>`;
-    noticeBox.style.opacity = '1';
-    noticeBox.style.transform = 'translateX(-50%) translateY(-5px)';
-    
-    setTimeout(() => {
-        noticeBox.style.opacity = '0';
-        noticeBox.style.transform = 'translateX(-50%) translateY(0px)';
-    }, 2800);
-}
-
-// 2. Browser ရဲ့ ရိုးရိုး alert() အားလုံးကို Neon Alert သို့ အလိုအလျောက် ပြောင်းပစ်ခြင်း
+// App တစ်ခုလုံးရှိ alert() အားလုံးကို Neon Glass Alert သို့ အလိုအလျောက် ပြောင်းပေးရန်
 window.alert = function(message) {
     showNeonAlert(message);
 };
-
 // ဇာတ်လမ်းအချက်အလက်များကို Browser ထဲ သိမ်းရန်
 function saveStoryMemory() {
     localStorage.setItem('myMovieStoryMemory', JSON.stringify(storyMemory));
@@ -3690,296 +3570,4 @@ ${flowPromptText}`;
     }).catch(err => {
         console.error('Copy Error:', err);
     });
-}
-
-document.getElementById('processAudioBtn').addEventListener('click', async () => {
-    const fileInput = document.getElementById('audioFileInput');
-    if (fileInput.files.length === 0) {
-        alert('ကျေးဇူးပြု၍ အသံဖိုင်တစ်ခု ရွေးချယ်ပါ သားရီး!');
-        return;
-    }
-
-    const file = fileInput.files[0];
-    const arrayBuffer = await file.arrayBuffer();
-    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    const audioBuffer = await audioCtx.decodeAudioData(arrayBuffer);
-
-    // Silence Removal Logic
-    const channelData = audioBuffer.getChannelData(0); // Mono channel ယူမည်
-    const sampleRate = audioBuffer.sampleRate;
-    
-    // ချိန်ညှိချက်များ (Threshold နဲ့ Min Duration)
-    const silenceThreshold = 0.02; // ဒီပမာဏထက် ငြိမ်ရင် အသံတိတ်ဟု သတ်မှတ်မည်
-    const minSilenceSamples = sampleRate * 0.3; // 0.3 စက္ကန့်ထက်ပို၍ တိတ်မှ ဖြတ်မည်
-
-    let nonSilentChunks = [];
-    let start = null;
-
-    for (let i = 0; i < channelData.length; i++) {
-        const absValue = Math.abs(channelData[i]);
-        if (absValue > silenceThreshold) {
-            if (start === null) start = i;
-        } else {
-            if (start !== null) {
-                if (i - start > minSilenceSamples) {
-                    nonSilentChunks.push({ start: start, end: i });
-                    start = null;
-                }
-            }
-        }
-    }
-    if (start !== null) {
-        nonSilentChunks.push({ start: start, end: channelData.length });
-    }
-
-    // အသံအပိုင်းအစများကို ပြန်လည်စုစည်းခြင်း (Fade-in / Fade-out ဖြင့် "ဖောက်" သံပျောက်အောင် ပြုလုပ်ခြင်း)
-    let totalLength = nonSilentChunks.reduce((acc, chunk) => acc + (chunk.end - chunk.start), 0);
-    const newAudioBuffer = audioCtx.createBuffer(audioBuffer.numberOfChannels, totalLength, sampleRate);
-
-    // ကလစ်သံမမြည်စေရန် အလွန်တိုသော ချိန်ညှိချက် (ဥပမာ: 5ms)
-    const fadeSamples = Math.floor(sampleRate * 0.005); 
-
-    for (let channel = 0; channel < audioBuffer.numberOfChannels; channel++) {
-        let newChannelData = newAudioBuffer.getChannelData(channel);
-        let offset = 0;
-        const sourceData = audioBuffer.getChannelData(channel);
-        
-        nonSilentChunks.forEach(chunk => {
-            let length = chunk.end - chunk.start;
-            
-            // Chunk တစ်ခုချင်းစီကို ယာယီကူးယူမည်
-            let chunkData = sourceData.subarray(chunk.start, chunk.end);
-            
-            // အစမှာ Fade-in ထည့်မည်
-            for (let f = 0; f < fadeSamples && f < length; f++) {
-                let gain = f / fadeSamples;
-                newChannelData[offset + f] = chunkData[f] * gain;
-            }
-            
-            // အလယ်ပိုင်း ပုံမှန်ဒေတာများကို ထည့်မည်
-            for (let f = fadeSamples; f < length - fadeSamples; f++) {
-                newChannelData[offset + f] = chunkData[f];
-            }
-            
-            // အဆုံးမှာ Fade-out ထည့်မည်
-            for (let f = Math.max(0, length - fadeSamples); f < length; f++) {
-                let gain = (length - f) / fadeSamples;
-                newChannelData[offset + f] = chunkData[f] * gain;
-            }
-
-            offset += length;
-        });
-    }
-
-    // WAV ဖိုင်အဖြစ် ပြောင်းလဲခြင်း
-    const wavBlob = bufferToWave(newAudioBuffer, totalLength);
-    const audioUrl = URL.createObjectURL(wavBlob);
-
-    // Audio Player နဲ့ Download Link ချိတ်ပေးခြင်း
-    const audioElement = document.getElementById('outputAudio');
-    audioElement.src = audioUrl;
-    audioElement.style.display = 'block';
-
-    const downloadLink = document.getElementById('downloadAudioLink');
-downloadLink.href = base64Data;
-downloadLink.download = fileName;
-downloadLink.style.display = 'inline-flex'; // ခလုတ်ပုံစံ လှလှလေး ပေါ်လာစေရန်
-
-    alert('Silence တွေကို ​ဖျက်ပြီးပါပြီ သားရီး!');
-});
-
-// AudioBuffer ကို WAV Blob သို့ ပြောင်းပေးသည့် Helper Function
-function bufferToWave(abuffer, len) {
-    let numOfChan = abuffer.numberOfChannels,
-        length = len * numOfChan * 2 + 44,
-        buffer = new ArrayBuffer(length),
-        view = new DataView(buffer),
-        channels = [], i, sample,
-        offset = 0,
-        pos = 0;
-
-    function setUint16(data) {
-        view.setUint16(pos, data, true);
-        pos += 2;
-    }
-
-    function setUint32(data) {
-        view.setUint32(pos, data, true);
-        pos += 4;
-    }
-
-    setUint32(0x46464952); // "RIFF"
-    setUint32(length - 8); // file length - 8
-    setUint32(0x45564157); // "WAVE"
-
-    setUint32(0x20746d66); // "fmt " chunk
-    setUint32(16); // length = 16
-    setUint16(1); // PCM (uncompressed)
-    setUint16(numOfChan);
-    setUint32(abuffer.sampleRate);
-    setUint32(abuffer.sampleRate * 2 * numOfChan); // avg. bytes/sec
-    setUint16(numOfChan * 2); // block-align
-    setUint16(16); // 16-bit
-
-    setUint32(0x61746164); // "data" - chunk
-    setUint32(length - pos - 4); // data length
-
-    for (i = 0; i < abuffer.numberOfChannels; i++)
-        channels.push(abuffer.getChannelData(i));
-
-    while (offset < len) {
-        for (i = 0; i < numOfChan; i++) {
-            sample = Math.max(-1, Math.min(1, channels[i][offset]));
-            sample = (0.5 + sample < 0 ? sample * 32768 : sample * 32767);
-            view.setInt16(pos, sample, true);
-            pos += 2;
-        }
-        offset++;
-    }
-
-    return new Blob([buffer], { type: "audio/wav" });
-}
-let processedAudioBlob = null; // Silence ပြီးသွားသော Blob ဖိုင်ကို သိမ်းရန်
-
-// Slider Value ပြောင်းရင် စာသားပြောင်းရန်
-document.getElementById('boostSlider').addEventListener('input', function(e) {
-    document.getElementById('boostValue').innerText = e.target.value;
-});
-
-// 1. Silence Removal လုပ်ဆောင်သည့် Function (Placeholder/Existing logic)
-async function processSilenceRemoval() {
-    const fileInput = document.getElementById('audioFileInput');
-    if (!fileInput.files[0]) {
-        alert('ကျေးဇူးပြု၍ အသံဖိုင်တစ်ခု ရွေးချယ်ပေးပါ သားရီး!');
-        return;
-    }
-
-    const file = fileInput.files[0];
-    
-    // (ဤနေရာတွင် သားရီးရဲ့ မူလ Silence Removal ကုဒ်များကို ထည့်ပါ)
-    // ဥပမာအနေဖြင့် Original File ကို ခေတ္တသုံးထားပါသည်:
-    processedAudioBlob = file; 
-
-    // UI တွင် Player ပြရန်
-    const audioUrl = URL.createObjectURL(file);
-    const player = document.getElementById('silencePlayer');
-    player.src = audioUrl;
-    
-    const downloadLink = document.getElementById('downloadSilenceLink');
-    downloadLink.href = audioUrl;
-    downloadLink.download = "SilenceRemoved_" + file.name;
-    
-    document.getElementById('silenceResult').style.display = 'block';
-
-    // Auto-Enhance Toggle ဖွင့်ထားပါက အလိုအလျောက် Enhance ဆက်လုပ်မည်
-    const isAutoEnhance = document.getElementById('autoEnhanceToggle').checked;
-    if (isAutoEnhance) {
-        await enhanceProcessedAudio();
-    }
-}
-
-// 2. Audio Enhancer လုပ်ဆောင်သည့် Function
-async function enhanceProcessedAudio() {
-    if (!processedAudioBlob) {
-        alert('ကျေးဇူးပြု၍ ပထမဦးစွာ အသံဖိုင် တင်ပြီး Silence ဖြတ်ပါ။');
-        return;
-    }
-
-    const arrayBuffer = await processedAudioBlob.arrayBuffer();
-    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    const audioBuffer = await audioCtx.decodeAudioData(arrayBuffer);
-
-    const offlineCtx = new OfflineAudioContext(
-        audioBuffer.numberOfChannels,
-        audioBuffer.length,
-        audioBuffer.sampleRate
-    );
-
-    const source = offlineCtx.createBufferSource();
-    source.buffer = audioBuffer;
-
-    // High-pass Filter (ဗြူသံရှင်းရန်)
-    const highpass = offlineCtx.createBiquadFilter();
-    highpass.type = 'highpass';
-    highpass.frequency.value = 80;
-
-    // Peaking Filter (လူသံကြည်လင်ရန်)
-    const presence = offlineCtx.createBiquadFilter();
-    presence.type = 'peaking';
-    presence.frequency.value = 3000;
-    presence.Q.value = 1;
-    presence.gain.value = 4;
-
-    // Compressor (အသံပမာဏ ညှိရန်)
-    const compressor = offlineCtx.createDynamicsCompressor();
-    compressor.threshold.value = -24;
-    compressor.knee.value = 30;
-    compressor.ratio.value = 12;
-
-    // Gain / Volume Booster
-    const boostGain = offlineCtx.createGain();
-    boostGain.gain.value = parseFloat(document.getElementById('boostSlider').value);
-
-    // Nodes ချိတ်ဆက်ခြင်း
-    source.connect(highpass);
-    highpass.connect(presence);
-    presence.connect(compressor);
-    compressor.connect(boostGain);
-    boostGain.connect(offlineCtx.destination);
-
-    source.start(0);
-
-    const renderedBuffer = await offlineCtx.startRendering();
-    const wavBlob = bufferToWav(renderedBuffer);
-
-    // Enhanced Result ပြသရန်
-    const enhancedUrl = URL.createObjectURL(wavBlob);
-    const enhancedPlayer = document.getElementById('enhancedPlayer');
-    enhancedPlayer.src = enhancedUrl;
-
-    const downloadEnhanced = document.getElementById('downloadEnhancedLink');
-    downloadEnhanced.href = enhancedUrl;
-    downloadEnhanced.download = "Studio_Enhanced_Audio.wav";
-
-    document.getElementById('enhancedResult').style.display = 'block';
-}
-
-// WAV Helper Function
-function bufferToWav(buffer) {
-    let numOfChan = buffer.numberOfChannels,
-        length = buffer.length * numOfChan * 2 + 44,
-        out = new DataView(new ArrayBuffer(length)),
-        channels = [], i, sample,
-        offset = 0,
-        pos = 0;
-
-    function setUint16(data) { out.setUint16(pos, data, true); pos += 2; }
-    function setUint32(data) { out.setUint32(pos, data, true); pos += 4; }
-
-    setUint32(0x46464952); // "RIFF"
-    setUint32(length - 8);
-    setUint32(0x45564157); // "WAVE"
-    setUint32(0x20746d66); // "fmt "
-    setUint32(16);
-    setUint16(1);
-    setUint16(numOfChan);
-    setUint32(buffer.sampleRate);
-    setUint32(buffer.sampleRate * 2 * numOfChan);
-    setUint16(numOfChan * 2);
-    setUint16(16);
-    setUint32(0x61746164); // "data"
-    setUint32(length - pos - 4);
-
-    for(i = 0; i < buffer.numberOfChannels; i++) channels.push(buffer.getChannelData(i));
-
-    while(offset < buffer.length) {
-        for(i = 0; i < numOfChan; i++) {
-            sample = Math.max(-1, Math.min(1, channels[i][offset]));
-            sample = (0.5 + sample < 0 ? sample * 32768 : sample * 32767)|0;
-            out.setInt16(pos, sample, true);
-            pos += 2;
-        }
-        offset++;
-    }
-    return new Blob([out], { type: 'audio/wav' });
 }
