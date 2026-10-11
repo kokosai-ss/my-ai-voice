@@ -3841,10 +3841,17 @@ const enhanceAudioBtn = document.getElementById('enhanceAudioBtn');
 if (enhanceAudioBtn) {
     enhanceAudioBtn.addEventListener('click', async () => {
         const fileInput = document.getElementById('audioFileInput');
-        if (fileInput.files.length === 0) {
-            alert('ကျေးဇူးပြု၍ အသံဖိုင်တစ်ခု ရွေးချယ်ပါ သားရီး!');
-            return;
-        }
+
+// Silence ဖြတ်ထားတာ ရှိရင် အဲ့ဒါကိုယူမယ်၊ မရှိရင် Original ဖိုင်ကို ယူမယ်
+let targetFile = window.currentProcessedAudioBlob || (fileInput.files.length > 0 ? fileInput.files[0] : null);
+
+if (!targetFile) {
+    alert('ကျေးဇူးပြု၍ အသံဖိုင်တစ်ခု ရွေးချယ်ပါ သားရီး!');
+    return;
+}
+
+const file = targetFile;
+
 
         const boostFactor = parseFloat(document.getElementById('boostSlider').value);
         const file = fileInput.files[0];
