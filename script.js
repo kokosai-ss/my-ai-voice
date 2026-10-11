@@ -3181,35 +3181,34 @@ function writeString(view, offset, string){
     }
 }
   function switchView(viewId, element) {
-    // ၁။ View အားလုံး (view-container နှင့် tab-view နှစ်မျိုးစလုံး) ကို ဖျောက်မယ်
+    // ၁။ View အားလုံးကို ဖျောက်မယ်
     document.querySelectorAll('.view-container, .tab-view').forEach(el => {
         el.style.display = 'none';
-        el.classList.remove('active');
     });
     
     // ၂။ ရွေးလိုက်တဲ့ View ကို ဖော်မယ်
     const targetView = document.getElementById(viewId);
     if (targetView) {
         targetView.style.display = 'block';
-        targetView.classList.add('active');
     }
 
-    // ၃။ Navigation ခလုတ်တွေ အားလုံးကို မူလအရောင် (မီးခိုးပြာရောင်) ပြန်ပြောင်းမယ်
+    // ၃။ Navigation ခလုတ်အရောင်များ ပြန်ပြောင်းမယ်
     document.querySelectorAll('.nav-btn').forEach(btn => {
         btn.style.color = '#8eb0cb';
     });
 
-    // ၄။ အခု နှိပ်လိုက်တဲ့ ခလုတ်ကိုပဲ အပြာရောင် (Active) ဖြစ်စေမယ်
+    // ၄။ နှိပ်လိုက်သော ခလုတ်ကို Active လုပ်မယ်
     if (element) {
         element.style.color = '#00baff';
     }
 
-    if (viewId === 'voiceGenerator' || viewId === 'generator') {
+    // ၅။ Voice Generator View ပွင့်လာလျှင် Voice Library ကို လုံခြုံစွာ ခေါ်မည်
+    if (viewId && (viewId.includes('voice') || viewId.includes('generator') || viewId.includes('studio'))) {
         if (typeof shRenderVoiceLibrary === 'function') {
             shRenderVoiceLibrary();
         }
     }
-  }
+}
       
 function showGenerateMessage(text, type){
     const box = document.getElementById("generateMessage");
