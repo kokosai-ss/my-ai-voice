@@ -465,36 +465,74 @@ function togglePasswordVisibility() {
     }
 }
 
-function checkUnlockPassword() {
-    const input = document.getElementById('passInput').value;
+function showSHNeonAlert(message) {
+const alertBox = document.getElementById('sh-neon-alert');
+const messageBox = document.getElementById('sh-alert-message');
 
-    if (input === '') {
-        alert('ကျေးဇူးပြု၍ စကားဝှက် ရိုက်ထည့်ပါ!');
-    } else if (input === '1911999') {
-
-        const lockScreen = document.getElementById('cyberpunk-lockscreen');
-        if (lockScreen) {
-            lockScreen.style.transition = 'opacity 0.5s ease';
-            lockScreen.style.opacity = '0';
-            setTimeout(() => {
-                lockScreen.style.display = 'none';
-            }, 500);
-        }
-
-        const appContent = document.getElementById("appContent");
-        if (appContent) {
-            appContent.style.display = "block";
-        }
-
-        const saved = getStoredKey();
-        if (saved) {
-            document.getElementById("apiKey").value = saved;
-        }
-        updateKeyStatus();
-    } else {
-        alert('စကားဝှက် မှားယွင်းနေပါသည်။');
-    }
+if (!alertBox || !messageBox) {
+    window.alert(message);
+    return;
 }
+
+messageBox.textContent = message;
+alertBox.style.display = 'flex';
+
+}
+
+function closeSHNeonAlert() {
+const alertBox = document.getElementById('sh-neon-alert');
+if (alertBox) {
+alertBox.style.display = 'none';
+}
+}
+
+function checkUnlockPassword() {
+const inputElement = document.getElementById('passInput');
+
+if (!inputElement) return;
+
+const input = inputElement.value;
+
+if (input === '') {
+    showSHNeonAlert('ကျေးဇူးပြု၍ စကားဝှက် ရိုက်ထည့်ပါ။');
+} else if (input === '1911999') {
+
+    const lockScreen = document.getElementById('cyberpunk-lockscreen');
+
+    if (lockScreen) {
+        lockScreen.style.transition = 'opacity 0.5s ease';
+        lockScreen.style.opacity = '0';
+
+        setTimeout(() => {
+            lockScreen.style.display = 'none';
+        }, 500);
+    }
+
+    const appContent = document.getElementById('appContent');
+
+    if (appContent) {
+        appContent.style.display = 'block';
+    }
+
+    const saved = getStoredKey();
+
+    if (saved) {
+        const apiKeyInput = document.getElementById('apiKey');
+        if (apiKeyInput) {
+            apiKeyInput.value = saved;
+        }
+    }
+
+    updateKeyStatus();
+
+} else {
+    showSHNeonAlert('စကားဝှက် မှားယွင်းနေပါသည်။');
+    inputElement.value = '';
+    inputElement.focus();
+}
+
+}
+
 /* =========================================
    SH IMAGE SEARCH — UNSPLASH FREE MODE
    ========================================= */
