@@ -3827,3 +3827,61 @@ function bufferToWave(abuffer, len) {
 
     return new Blob([buffer], { type: "audio/wav" });
 }
+
+// Slider value ပြောင်းလဲမှုကို ထိန်းချုပ်ရန်
+const boostSlider = document.getElementById('boostSlider');
+if (boostSlider) {
+    boostSlider.addEventListener('input', function() {
+        document.getElementById('boostValue').textContent = this.value;
+    });
+}
+
+// Audio Enhancer လုပ်ဆောင်ရန်
+const enhanceAudioBtn = document.getElementById('enhanceAudioBtn');
+if (enhanceAudioBtn) {
+    enhanceAudioBtn.addEventListener('click', async () => {
+        const fileInput = document.getElementById('audioFileInput');
+        if (fileInput.files.length === 0) {
+            alert('ကျေးဇူးပြု၍ အသံဖိုင်တစ်ခု ရွေးချယ်ပါ သားရီး!');
+            return;
+        }
+
+        const boostFactor = parseFloat(document.getElementById('boostSlider').value);
+        const file = fileInput.files[0];
+        const arrayBuffer = await file.arrayBuffer();
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const audioBuffer = await audioCtx.decodeAudioData(arrayBuffer);
+
+        // Enhance / Volume & Clarity Boost Logic
+        const sampleRate = audioBuffer.sampleRate;
+        const totalLength = audioBuffer.length;
+        const newAudioBuffer = audioCtx.createBuffer(audioBuffer.numberOfChannels, totalLength, sampleRate);
+
+        for (let channel = 0; channel < audioBuffer.numberOfChannels; channel++) {
+            const sourceData = audioBuffer.getChannelData(channel);
+            const newChannelData = newAudioBuffer.getChannelData(channel);
+            
+            for (let i = 0; i < totalLength; i++) {
+                // အသံအရည်အသွေးနှင့် Boost မြှင့်တင်ခြင်း (Clipping မဖြစ်အောင် -1 နဲ့ 1 ကြား ကန့်သတ်ခြင်း)
+                let boosted = sourceData[i] * boostFactor;
+                newChannelData[i] = Math.max(-1, Math.min(1, boosted));
+            }
+        }
+
+        // WAV ဖိုင်အဖြစ် ပြောင်းလဲခြင်း
+        const wavBlob = bufferToWave(newAudioBuffer, totalLength);
+        const audioUrl = URL.createObjectURL(wavBlob);
+
+        // Enhanced Audio Player နဲ့ Download Link ချိတ်ပေးခြင်း
+        const enhancedElement = document.getElementById('enhancedAudio');
+        enhancedElement.src = audioUrl;
+        enhancedElement.style.display = 'block';
+
+        const downloadEnhancedLink = document.getElementById('downloadEnhancedLink');
+        downloadEnhancedLink.href = audioUrl;
+        downloadEnhancedLink.download = 'enhanced_voiceover.wav';
+        downloadEnhancedLink.style.display = 'block';
+        
+        alert('စတူဒီယို အရည်အသွေးသို့ အသံမြှင့်တင်ခြင်း ပြီးစီးပါပြီ သားရီး!');
+    });
+}
